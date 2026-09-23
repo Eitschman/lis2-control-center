@@ -150,7 +150,7 @@ public partial class MainWindow : Window
         try
         {
             _connection.Send(command);
-            Log($"TX   {Convert.ToHexString(command, " ")}    {semantic}");
+            Log($"TX   {string.Join(" ", command.Select(b => b.ToString("X2", CultureInfo.InvariantCulture)))}    {semantic}");
         }
         catch (Exception ex)
         {
