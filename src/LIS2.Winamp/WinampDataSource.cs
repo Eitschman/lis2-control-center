@@ -22,7 +22,8 @@ public sealed class WinampDataSource : IDataSource
 
     public string Id => "Winamp";
 
-    public IReadOnlyDictionary<string, object?> Values => _values;
+    public IReadOnlyDictionary<string, object?> Values =>
+        Volatile.Read(ref _values);
 
     public event EventHandler? Changed;
 
@@ -39,7 +40,7 @@ public sealed class WinampDataSource : IDataSource
 
     private void Server_SnapshotReceived(object? sender, WinampSnapshot snapshot)
     {
-        _values = WinampValues.FromSnapshot(snapshot);
+        Volatile.Write(ref _values, WinampValues.FromSnapshot(snapshot));
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
