@@ -616,7 +616,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (sender is not Button { Tag: string tag })
+            if (sender is not System.Windows.Controls.Button { Tag: string tag })
                 return;
 
             var brightness = tag switch
@@ -714,7 +714,7 @@ public partial class MainWindow : Window
     private void ShowError(Exception ex)
     {
         Log($"ERR  {ex.Message}");
-        MessageBox.Show(this, ex.Message, "LIS2 Control Center", MessageBoxButton.OK, MessageBoxImage.Error);
+        System.Windows.MessageBox.Show(this, ex.Message, "LIS2 Control Center", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
     private void Log(string text)
