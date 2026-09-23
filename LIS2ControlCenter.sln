@@ -2,6 +2,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Core", "src\LIS2.Core\LIS2.Core.csproj", "{0C11E68F-39BD-4A40-A714-4CC9E0A4C101}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Display", "src\LIS2.Display\LIS2.Display.csproj", "{A4F4D911-59B3-4D75-A853-F45EC6DA2102}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.App", "src\LIS2.App\LIS2.App.csproj", "{3C41882A-72D5-43D6-A8C1-D358B5503103}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.ProtocolTester", "tools\LIS2.ProtocolTester\LIS2.ProtocolTester.csproj", "{5D7C0A1D-7A36-4D53-A5C7-0D9A84DAA101}"
 EndProject
 Global
@@ -10,6 +16,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0C11E68F-39BD-4A40-A714-4CC9E0A4C101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C11E68F-39BD-4A40-A714-4CC9E0A4C101}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C11E68F-39BD-4A40-A714-4CC9E0A4C101}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C11E68F-39BD-4A40-A714-4CC9E0A4C101}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4F4D911-59B3-4D75-A853-F45EC6DA2102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4F4D911-59B3-4D75-A853-F45EC6DA2102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4F4D911-59B3-4D75-A853-F45EC6DA2102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4F4D911-59B3-4D75-A853-F45EC6DA2102}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C41882A-72D5-43D6-A8C1-D358B5503103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C41882A-72D5-43D6-A8C1-D358B5503103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C41882A-72D5-43D6-A8C1-D358B5503103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C41882A-72D5-43D6-A8C1-D358B5503103}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5D7C0A1D-7A36-4D53-A5C7-0D9A84DAA101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5D7C0A1D-7A36-4D53-A5C7-0D9A84DAA101}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D7C0A1D-7A36-4D53-A5C7-0D9A84DAA101}.Release|Any CPU.ActiveCfg = Release|Any CPU
