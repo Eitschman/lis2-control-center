@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>LIS2.App</AssemblyName>
     <RootNamespace>LIS2.App</RootNamespace>
   </PropertyGroup>
