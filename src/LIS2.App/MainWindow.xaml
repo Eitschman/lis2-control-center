@@ -122,7 +122,14 @@
                             <TextBox x:Name="Fan3TextBox" Grid.Column="5" Text="100" Margin="0,0,8,0"/>
                             <TextBlock Grid.Column="6" Text="4" VerticalAlignment="Center" Margin="0,0,4,0"/>
                             <TextBox x:Name="Fan4TextBox" Grid.Column="7" Text="100" Margin="0,0,8,0"/>
-                            <Button Grid.Column="8" Content="Apply" Click="Fans_Click" Padding="12,5" HorizontalAlignment="Left"/>
+                            <StackPanel Grid.Column="8">
+                                <Button Content="Apply" Click="Fans_Click" Padding="12,5" HorizontalAlignment="Left"/>
+                                <CheckBox x:Name="AutomaticFanControlCheckBox"
+                                          Content="Automatic"
+                                          Margin="0,7,0,0"
+                                          Checked="AutomaticFanControlChanged"
+                                          Unchecked="AutomaticFanControlChanged"/>
+                            </StackPanel>
                         </Grid>
                     </GroupBox>
                 </Grid>
