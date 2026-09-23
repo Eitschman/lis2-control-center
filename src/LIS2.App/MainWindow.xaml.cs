@@ -151,6 +151,7 @@ public partial class MainWindow : Window
         PageLine1TextBox.Text = page.Line1Template;
         PageLine2TextBox.Text = page.Line2Template;
         PageDurationTextBox.Text = page.DurationSeconds.ToString(CultureInfo.InvariantCulture);
+        PageVisibilityTextBox.Text = page.VisibilityExpression ?? string.Empty;
     }
 
     private async void AddPage_Click(object sender, RoutedEventArgs e)
@@ -198,6 +199,9 @@ public partial class MainWindow : Window
             page.Line1Template = PageLine1TextBox.Text;
             page.Line2Template = PageLine2TextBox.Text;
             page.DurationSeconds = duration;
+            page.VisibilityExpression = string.IsNullOrWhiteSpace(PageVisibilityTextBox.Text)
+                ? null
+                : PageVisibilityTextBox.Text.Trim();
 
             await PersistPagesAsync();
             LoadPagesIntoRuntime();
