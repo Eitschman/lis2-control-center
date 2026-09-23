@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using LIS2.Core;
 using LIS2.Display;
+using LIS2.Fans;
 using LIS2.Sources;
 
 namespace LIS2.App;
@@ -17,6 +18,7 @@ public partial class MainWindow : Window
     private readonly EventQueue _eventQueue = new();
     private readonly DisplayRuntime _displayRuntime;
     private readonly DispatcherTimer _pageTimer;
+    private readonly FanController _fanController = new();
 
     private AppSettings _settings = new();
     private ILis2Transport? _transport;
@@ -442,12 +444,43 @@ public partial class MainWindow : Window
     {
         try
         {
-            var fan1 = ParsePercent(Fan1TextBox.Text, "Fan 1");
-            var fan2 = ParsePercent(Fan2TextBox.Text, "Fan 2");
-            var fan3 = ParsePercent(Fan3TextBox.Text, "Fan 3");
-            var fan4 = ParsePercent(Fan4TextBox.Text, "Fan 4");
+            var requested = new[]
+            {
+                ParsePercent(Fan1TextBox.Text, "Fan 1"),
+                ParsePercent(Fan2TextBox.Text, "Fan 2"),
+                ParsePercent(Fan3TextBox.Text, "Fan 3"),
+                ParsePercent(Fan4TextBox.Text, "Fan 4")
+            };
 
-            await RequireDevice().SetFansAsync(fan1, fan2, fan3, fan4);
+            var outputs = new int[4];
+
+            for (var index = 0; index < 4; index++)
+            {
+                var stored = _settings.Fans.Channels[index];
+                stored.FixedPercent = requested[index];
+
+                var configuration = new FanChannelConfiguration
+                {
+                    Mode = FanMode.Fixed,
+                    FixedPercent = stored.FixedPercent,
+                    MinimumPercent = stored.MinimumPercent,
+                    MaximumPercent = stored.MaximumPercent,
+                    FailSafePercent = stored.FailSafePercent,
+                    AllowStop = stored.AllowStop
+                };
+
+                outputs[index] = _fanController.CalculateOutput(configuration);
+            }
+
+            await _settingsStore.SaveAsync(_settings);
+            await RequireDevice().SetFansAsync(outputs[0], outputs[1], outputs[2], outputs[3]);
+
+            Fan1TextBox.Text = outputs[0].ToString(CultureInfo.InvariantCulture);
+            Fan2TextBox.Text = outputs[1].ToString(CultureInfo.InvariantCulture);
+            Fan3TextBox.Text = outputs[2].ToString(CultureInfo.InvariantCulture);
+            Fan4TextBox.Text = outputs[3].ToString(CultureInfo.InvariantCulture);
+
+            Log($"INFO fan outputs after safety limits: {string.Join("/", outputs)}%");
         }
         catch (Exception ex)
         {
