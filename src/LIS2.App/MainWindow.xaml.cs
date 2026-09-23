@@ -21,6 +21,8 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _pageTimer;
     private readonly DispatcherTimer _fanTimer;
     private readonly DispatcherTimer _hardwareTimer;
+    private readonly DispatcherTimer _winampTimer;
+    private readonly WinampDataSource _winampSource = new();
     private readonly FanController _fanController = new();
     private int[]? _lastAutomaticFanOutputs;
     private readonly TrayIconService _trayIcon = new();
@@ -61,8 +63,16 @@ public partial class MainWindow : Window
         };
         _hardwareTimer.Tick += HardwareTimer_Tick;
 
+        _winampTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        _winampTimer.Tick += WinampTimer_Tick;
+
+        _winampSource.Changed += WinampSource_Changed;
+
         _sources.Add(new ClockDataSource());
-        _sources.Add(new WinampDataSource());
+        _sources.Add(_winampSource);
         _sources.Add(new LibreHardwareMonitorDataSource());
 
         _trayIcon.ShowRequested += TrayIcon_ShowRequested;
@@ -139,6 +149,9 @@ public partial class MainWindow : Window
         SectionSubtitleText.Text = Sections[index].Subtitle;
         UpdateNavigationSelection(index);
 
+        if (index == 3)
+            RefreshWinampView();
+
         if (index == 4)
             RefreshHardwareSensors();
 
@@ -171,6 +184,7 @@ public partial class MainWindow : Window
             await ReconnectAsync();
             await _sources.StartAllAsync();
             LogSourceHealth();
+            RefreshWinampView();
             RefreshHardwareSensors();
             RefreshFanSensorChoices();
             await RenderRuntimePageAsync();
@@ -178,6 +192,7 @@ public partial class MainWindow : Window
             _pageTimer.Start();
             _fanTimer.Start();
             _hardwareTimer.Start();
+            _winampTimer.Start();
 
             RefreshDiagnostics();
 
@@ -225,6 +240,8 @@ public partial class MainWindow : Window
         _pageTimer.Stop();
         _fanTimer.Stop();
         _hardwareTimer.Stop();
+        _winampTimer.Stop();
+        _winampSource.Changed -= WinampSource_Changed;
 
         await _sources.StopAllAsync();
         await _sources.DisposeAsync();
@@ -412,6 +429,90 @@ public partial class MainWindow : Window
 
     private void RefreshFanSensors_Click(object sender, RoutedEventArgs e) =>
         RefreshFanSensorChoices();
+
+    private void WinampSource_Changed(object? sender, EventArgs e)
+    {
+        Dispatcher.BeginInvoke(RefreshWinampView);
+    }
+
+    private void WinampTimer_Tick(object? sender, EventArgs e)
+    {
+        if (MainTabs.SelectedIndex == 3)
+            RefreshWinampView();
+    }
+
+    private void RefreshWinampView()
+    {
+        var values = _winampSource.Values;
+
+        var state = GetWinampValue(values, "State") ?? "Unknown";
+        var artist = GetWinampValue(values, "Artist");
+        var title = GetWinampValue(values, "Title");
+        var album = GetWinampValue(values, "Album");
+        var elapsed = GetWinampValue(values, "Elapsed") ?? "--:--";
+        var duration = GetWinampValue(values, "Duration") ?? "--:--";
+        var playlistPosition = GetWinampValue(values, "PlaylistPosition") ?? "-";
+        var playlistCount = GetWinampValue(values, "PlaylistCount") ?? "-";
+        var bitrate = GetWinampValue(values, "BitrateKbps");
+        var sampleRate = GetWinampValue(values, "SampleRateHz");
+
+        var connected = _winampSource.IsRecentlyConnected;
+
+        WinampTitleText.Text =
+            !string.IsNullOrWhiteSpace(title)
+                ? title
+                : connected
+                    ? "No title"
+                    : "Nothing playing";
+
+        WinampArtistText.Text =
+            !string.IsNullOrWhiteSpace(artist)
+                ? artist
+                : connected
+                    ? "Winamp connected"
+                    : "Waiting for Winamp...";
+
+        WinampAlbumText.Text = album ?? string.Empty;
+        WinampPlaybackText.Text = connected ? state : "Disconnected";
+        WinampTimeText.Text = $"{elapsed} / {duration}";
+        WinampPlaylistText.Text = $"{playlistPosition} / {playlistCount}";
+        WinampAudioText.Text =
+            bitrate is null && sampleRate is null
+                ? "-"
+                : $"{bitrate ?? "-"} kbps / {FormatSampleRate(sampleRate)}";
+
+        WinampStatusText.Text = connected
+            ? $"Connected • {state}"
+            : "Waiting for Winamp";
+
+        WinampConnectionDetailText.Text = connected
+            ? @"Receiving snapshots on \\.\pipe\LIS2ControlCenter.Winamp" +
+              (_winampSource.LastSnapshotAt is not null
+                  ? $" • last update {_winampSource.LastSnapshotAt.Value.ToLocalTime():HH:mm:ss}"
+                  : string.Empty)
+            : @"Listening on \\.\pipe\LIS2ControlCenter.Winamp — no recent plugin/simulator data.";
+    }
+
+    private static string? GetWinampValue(
+        IReadOnlyDictionary<string, object?> values,
+        string key)
+    {
+        if (!values.TryGetValue(key, out var raw) || raw is null)
+            return null;
+
+        var text = Convert.ToString(raw, CultureInfo.CurrentCulture);
+        return string.IsNullOrWhiteSpace(text) ? null : text;
+    }
+
+    private static string FormatSampleRate(string? raw)
+    {
+        if (!int.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out var hz))
+            return raw ?? "-";
+
+        return hz >= 1000
+            ? $"{hz / 1000.0:0.#} kHz"
+            : $"{hz} Hz";
+    }
 
     private void HardwareTimer_Tick(object? sender, EventArgs e)
     {

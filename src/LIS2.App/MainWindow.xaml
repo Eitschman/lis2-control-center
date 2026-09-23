@@ -301,22 +301,115 @@
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock x:Name="WinampTitleText"
+                                                   Text="Nothing playing"
+                                                   FontSize="26"
+                                                   FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock x:Name="WinampArtistText"
+                                                   Text="Waiting for Winamp..."
+                                                   FontSize="17"
+                                                   Foreground="{DynamicResource MutedBrush}"
+                                                   Margin="0,5,0,0"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock x:Name="WinampAlbumText"
+                                                   Text=""
+                                                   Foreground="{DynamicResource MutedBrush}"
+                                                   Margin="0,4,0,0"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+
+                                    <Border Grid.Column="1"
+                                            Background="{DynamicResource StatusBadgeBrush}"
+                                            CornerRadius="12"
+                                            Padding="12,8"
+                                            VerticalAlignment="Top"
+                                            Margin="16,0,0,0">
+                                        <TextBlock x:Name="WinampStatusText"
+                                                   Text="Waiting for Winamp"
+                                                   Foreground="{DynamicResource StatusBadgeTextBrush}"
+                                                   FontWeight="SemiBold"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Playback" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8"/>
+                                        <TextBlock x:Name="WinampPlaybackText"
+                                                   Text="Unknown"
+                                                   FontSize="20"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock x:Name="WinampTimeText"
+                                                   Text="--:-- / --:--"
+                                                   FontFamily="Consolas"
+                                                   Foreground="{DynamicResource MutedBrush}"
+                                                   Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Playlist" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8"/>
+                                        <TextBlock x:Name="WinampPlaylistText"
+                                                   Text="- / -"
+                                                   FontSize="20"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="Current position / total tracks"
+                                                   Foreground="{DynamicResource MutedBrush}"
+                                                   Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="4" Style="{StaticResource CardBorderStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Audio" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8"/>
+                                        <TextBlock x:Name="WinampAudioText"
+                                                   Text="-"
+                                                   FontSize="20"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="Bitrate / sample rate"
+                                                   Foreground="{DynamicResource MutedBrush}"
+                                                   Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                                 <StackPanel>
-                                    <TextBlock Text="Winamp Integration" FontWeight="SemiBold" FontSize="18"/>
-                                    <TextBlock Text="The host listens on \\.\pipe\LIS2ControlCenter.Winamp."
-                                               Foreground="{DynamicResource MutedBrush}"
-                                               Margin="0,8,0,0"/>
-                                    <TextBlock Text="The native gen_lis2.dll sends artist, title, album, playback state, position and timing."
+                                    <TextBlock Text="Integration Status" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="WinampConnectionDetailText"
+                                               Text="Listening on \\.\pipe\LIS2ControlCenter.Winamp"
+                                               TextWrapping="Wrap"
+                                               Foreground="{DynamicResource MutedBrush}"/>
+                                    <TextBlock Text="Install gen_lis2.dll in Winamp's Plugins folder, or run LIS2.WinampSimulator while testing without Winamp."
                                                TextWrapping="Wrap"
                                                Foreground="{DynamicResource MutedBrush}"
-                                               Margin="0,5,0,0"/>
+                                               Margin="0,6,0,0"/>
                                 </StackPanel>
                             </Border>
+
                             <Border Style="{StaticResource CardBorderStyle}">
                                 <StackPanel>
                                     <TextBlock Text="Available page variables" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
                                     <TextBlock FontFamily="Consolas"
-                                               Text="{}{Winamp.State}   {Winamp.Artist}   {Winamp.Title}   {Winamp.Album}&#x0a;{Winamp.Elapsed}   {Winamp.Duration}   {Winamp.PlaylistPosition}   {Winamp.PlaylistCount}"
+                                               Text="{}{Winamp.State}   {Winamp.Artist}   {Winamp.Title}   {Winamp.Album}&#x0a;{Winamp.Elapsed}   {Winamp.Duration}   {Winamp.PlaylistPosition}   {Winamp.PlaylistCount}&#x0a;{Winamp.BitrateKbps}   {Winamp.SampleRateHz}"
                                                Foreground="{DynamicResource LogTextBrush}"/>
                                 </StackPanel>
                             </Border>
