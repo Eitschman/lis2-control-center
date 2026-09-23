@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using System.Reflection;
 using System.Windows;
 
 namespace LIS2.App;
@@ -36,19 +37,26 @@ public static class ThemeService
             _mode == AppThemeMode.Light ||
             (_mode == AppThemeMode.System && WindowsUsesLightTheme());
 
+        var themeName = useLight ? "Light.xaml" : "Dark.xaml";
+        var assemblyName =
+            typeof(ThemeService).Assembly.GetName().Name
+            ?? "LIS2ControlCenter";
+
         var source = new Uri(
-            useLight ? "Themes/Light.xaml" : "Themes/Dark.xaml",
+            $"/{assemblyName};component/Themes/{themeName}",
             UriKind.Relative);
 
-        var dictionaries = System.Windows.Application.Current.Resources.MergedDictionaries;
+        var resources = System.Windows.Application.Current?.Resources
+            ?? throw new InvalidOperationException(
+                "WPF application resources are not initialized.");
+
+        var dictionaries = resources.MergedDictionaries;
+        var palette = new ResourceDictionary { Source = source };
 
         if (dictionaries.Count == 0)
-        {
-            dictionaries.Add(new ResourceDictionary { Source = source });
-            return;
-        }
-
-        dictionaries[0] = new ResourceDictionary { Source = source };
+            dictionaries.Add(palette);
+        else
+            dictionaries[0] = palette;
     }
 
     private static bool WindowsUsesLightTheme()
