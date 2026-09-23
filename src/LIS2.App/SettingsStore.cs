@@ -21,6 +21,16 @@ public sealed class SettingsStore
         _path = Path.Combine(root, "settings.json");
     }
 
+    public AppSettings Load()
+    {
+        if (!File.Exists(_path))
+            return new AppSettings();
+
+        using var stream = File.OpenRead(_path);
+        return JsonSerializer.Deserialize<AppSettings>(stream, JsonOptions)
+            ?? new AppSettings();
+    }
+
     public async Task<AppSettings> LoadAsync()
     {
         if (!File.Exists(_path))
@@ -28,6 +38,7 @@ public sealed class SettingsStore
 
         await using var stream = File.OpenRead(_path);
         return await JsonSerializer.DeserializeAsync<AppSettings>(stream, JsonOptions)
+            .ConfigureAwait(false)
             ?? new AppSettings();
     }
 
