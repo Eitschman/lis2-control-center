@@ -171,6 +171,7 @@ public partial class MainWindow : Window
             await ReconnectAsync();
             await _sources.StartAllAsync();
             LogSourceHealth();
+            RefreshHardwareSensors();
             RefreshFanSensorChoices();
             await RenderRuntimePageAsync();
 
@@ -585,6 +586,9 @@ public partial class MainWindow : Window
 
             FanChannelsListBox.SelectedIndex = fanIndex;
             RefreshFanSensorChoices();
+
+            if (FanChannelsListBox.SelectedIndex == fanIndex)
+                FanSensorComboBox.Text = sensor.Key;
 
             Log(
                 $"INFO assigned hardware sensor '{sensor.Key}' to " +
