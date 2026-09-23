@@ -2,14 +2,22 @@ using System.Globalization;
 using System.IO.Ports;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using LIS2.Core;
 using LIS2.Display;
+using LIS2.Sources;
 
 namespace LIS2.App;
 
 public partial class MainWindow : Window
 {
     private readonly SettingsStore _settingsStore = new();
+    private readonly DataSourceRegistry _sources = new();
+    private readonly PageScheduler _pageScheduler = new();
+    private readonly EventQueue _eventQueue = new();
+    private readonly DisplayRuntime _displayRuntime;
+    private readonly DispatcherTimer _pageTimer;
+
     private AppSettings _settings = new();
     private ILis2Transport? _transport;
     private Lis2Device? _device;
@@ -18,6 +26,36 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        _displayRuntime = new DisplayRuntime(
+            new TemplateRenderer(),
+            _pageScheduler,
+            _eventQueue);
+
+        _pageTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(5)
+        };
+        _pageTimer.Tick += PageTimer_Tick;
+
+        _sources.Add(new ClockDataSource());
+
+        _pageScheduler.ReplacePages(new[]
+        {
+            new DisplayPage(
+                "clock",
+                "Clock",
+                "{Clock.Time}",
+                "{Clock.Date}",
+                TimeSpan.FromSeconds(5)),
+            new DisplayPage(
+                "status",
+                "Status",
+                "LIS2 Control Center",
+                "Virtual/Serial ready",
+                TimeSpan.FromSeconds(5))
+        });
+
         Loaded += MainWindow_Loaded;
         Closed += MainWindow_Closed;
     }
@@ -30,7 +68,10 @@ public partial class MainWindow : Window
             RefreshPorts();
             ApplySettingsToUi();
             await ReconnectAsync();
-            await RenderBothAsync();
+
+            await _sources.StartAllAsync();
+            await RenderRuntimePageAsync();
+            _pageTimer.Start();
         }
         catch (Exception ex)
         {
@@ -40,8 +81,46 @@ public partial class MainWindow : Window
 
     private async void MainWindow_Closed(object? sender, EventArgs e)
     {
+        _pageTimer.Stop();
+
+        await _sources.StopAllAsync();
+        await _sources.DisposeAsync();
+
         if (_device is not null)
             await _device.DisposeAsync();
+    }
+
+    private async void PageTimer_Tick(object? sender, EventArgs e)
+    {
+        try
+        {
+            await RenderRuntimePageAsync();
+        }
+        catch (Exception ex)
+        {
+            Log($"ERR  page runtime: {ex.Message}");
+        }
+    }
+
+    private async Task RenderRuntimePageAsync()
+    {
+        var nextFrame = _displayRuntime.RenderNext(
+            _sources.Snapshot(),
+            DateTimeOffset.Now);
+
+        if (nextFrame is null)
+            return;
+
+        _frame = nextFrame;
+        await WriteFrameAsync(nextFrame);
+        RefreshPreview();
+    }
+
+    private async Task WriteFrameAsync(DisplayFrame frame)
+    {
+        var device = RequireDevice();
+        await device.WriteLineAsync(1, frame.Line1);
+        await device.WriteLineAsync(2, frame.Line2);
     }
 
     private void ApplySettingsToUi()
@@ -131,6 +210,7 @@ public partial class MainWindow : Window
             _settings.PortName = PortComboBox.SelectedItem as string;
             await _settingsStore.SaveAsync(_settings);
             await ReconnectAsync();
+            await WriteFrameAsync(_frame);
         }
         catch (Exception ex)
         {
@@ -173,20 +253,14 @@ public partial class MainWindow : Window
     {
         try
         {
-            await RenderBothAsync();
+            _frame = DisplayFrame.Create(Line1TextBox.Text, Line2TextBox.Text);
+            await WriteFrameAsync(_frame);
+            RefreshPreview();
         }
         catch (Exception ex)
         {
             ShowError(ex);
         }
-    }
-
-    private async Task RenderBothAsync()
-    {
-        _frame = DisplayFrame.Create(Line1TextBox.Text, Line2TextBox.Text);
-        await RequireDevice().WriteLineAsync(1, _frame.Line1);
-        await RequireDevice().WriteLineAsync(2, _frame.Line2);
-        RefreshPreview();
     }
 
     private async void Clear_Click(object sender, RoutedEventArgs e)
