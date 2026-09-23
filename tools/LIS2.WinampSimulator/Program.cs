@@ -12,7 +12,7 @@ using var pipe = new NamedPipeClientStream(
     PipeDirection.Out,
     PipeOptions.Asynchronous);
 
-await pipe.ConnectAsync(TimeSpan.FromSeconds(5));
+await pipe.ConnectAsync(5000);
 
 await using var writer = new StreamWriter(
     pipe,
