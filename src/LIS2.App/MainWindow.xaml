@@ -134,6 +134,101 @@
                     </GroupBox>
                 </Grid>
 
+                <GroupBox Header="Fan control configuration" Foreground="#F0F0F0" Margin="0,0,0,14">
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <ListBox x:Name="FanChannelsListBox"
+                                     Height="190"
+                                     SelectionChanged="FanChannelsListBox_SelectionChanged"/>
+                            <Button Content="Refresh sensors"
+                                    Click="RefreshFanSensors_Click"
+                                    Padding="10,4"
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Left"/>
+                        </StackPanel>
+
+                        <Grid Grid.Column="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="90"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <TextBox x:Name="FanNameTextBox" Grid.Row="0" Grid.Column="1" Margin="0,0,0,8"/>
+
+                            <TextBlock Grid.Row="0" Grid.Column="3" Text="Mode" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="FanModeComboBox" Grid.Row="0" Grid.Column="4" Margin="0,0,0,8">
+                                <ComboBoxItem Content="Fixed"/>
+                                <ComboBoxItem Content="Curve"/>
+                                <ComboBoxItem Content="Follow"/>
+                                <ComboBoxItem Content="External"/>
+                                <ComboBoxItem Content="Off"/>
+                            </ComboBox>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Sensor" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="FanSensorComboBox"
+                                      Grid.Row="1"
+                                      Grid.Column="1"
+                                      Grid.ColumnSpan="4"
+                                      IsEditable="True"
+                                      IsTextSearchEnabled="True"
+                                      Margin="0,0,0,8"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Fixed %" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <TextBox x:Name="FanFixedTextBox" Grid.Row="2" Grid.Column="1" Width="70" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="3" Text="Minimum %" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <TextBox x:Name="FanMinimumTextBox" Grid.Row="2" Grid.Column="4" Margin="0,0,0,8"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Maximum %" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <TextBox x:Name="FanMaximumTextBox" Grid.Row="3" Grid.Column="1" Width="70" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="3" Text="Fail-safe %" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <TextBox x:Name="FanFailSafeTextBox" Grid.Row="3" Grid.Column="4" Margin="0,0,0,8"/>
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Curve" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <TextBox x:Name="FanCurveTextBox"
+                                     Grid.Row="4"
+                                     Grid.Column="1"
+                                     Grid.ColumnSpan="4"
+                                     Margin="0,0,0,8"
+                                     ToolTip="Format: 40:40;60:80;75:100"/>
+
+                            <CheckBox x:Name="FanAllowStopCheckBox"
+                                      Grid.Row="5"
+                                      Grid.Column="1"
+                                      Grid.ColumnSpan="2"
+                                      Content="Allow 0% / stop"
+                                      Margin="0,0,0,8"/>
+
+                            <Button Grid.Row="6"
+                                    Grid.Column="1"
+                                    Content="Save fan channel"
+                                    Click="SaveFanChannel_Click"
+                                    Padding="12,5"
+                                    HorizontalAlignment="Left"/>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+
                 <GroupBox Header="Pages" Foreground="#F0F0F0" Margin="0,0,0,14">
                     <Grid Margin="10">
                         <Grid.ColumnDefinitions>
