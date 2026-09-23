@@ -4,8 +4,8 @@ namespace LIS2.Sources;
 
 public sealed class LibreHardwareMonitorDataSource : IDataSource
 {
-    private readonly Dictionary<string, object?> _values =
-        new(StringComparer.OrdinalIgnoreCase);
+    private IReadOnlyDictionary<string, object?> _values =
+        new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
 
     private Computer? _computer;
     private CancellationTokenSource? _cts;
@@ -13,7 +13,8 @@ public sealed class LibreHardwareMonitorDataSource : IDataSource
 
     public string Id => "Hardware";
 
-    public IReadOnlyDictionary<string, object?> Values => _values;
+    public IReadOnlyDictionary<string, object?> Values =>
+        Volatile.Read(ref _values);
 
     public event EventHandler? Changed;
 
@@ -92,10 +93,11 @@ public sealed class LibreHardwareMonitorDataSource : IDataSource
         foreach (var hardware in _computer.Hardware)
             ReadHardware(hardware, next);
 
-        _values.Clear();
-
-        foreach (var pair in next)
-            _values[pair.Key] = pair.Value;
+        Volatile.Write(
+            ref _values,
+            new Dictionary<string, object?>(
+                next,
+                StringComparer.OrdinalIgnoreCase));
 
         Changed?.Invoke(this, EventArgs.Empty);
     }
