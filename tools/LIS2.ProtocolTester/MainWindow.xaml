@@ -16,8 +16,11 @@
 
         <GroupBox Header="Connection" Grid.Row="0" Margin="0,0,0,10">
             <DockPanel Margin="10">
+                <CheckBox x:Name="VirtualModeCheckBox" Content="Virtual LIS2" IsChecked="True"
+                          Checked="VirtualModeChanged" Unchecked="VirtualModeChanged"
+                          VerticalAlignment="Center" Margin="0,0,14,0"/>
                 <TextBlock Text="COM port:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                <ComboBox x:Name="PortComboBox" Width="140" Margin="0,0,8,0"/>
+                <ComboBox x:Name="PortComboBox" Width="140" Margin="0,0,8,0" IsEnabled="False"/>
                 <Button Content="Refresh" Click="RefreshPorts_Click" Padding="14,5" Margin="0,0,8,0"/>
                 <Button x:Name="ConnectButton" Content="Connect" Click="Connect_Click" Padding="14,5" Margin="0,0,8,0"/>
                 <TextBlock x:Name="ConnectionStatus" Text="Disconnected" VerticalAlignment="Center"/>
