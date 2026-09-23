@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>LIS2.App</AssemblyName>
+    <RootNamespace>LIS2.App</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LIS2.Core\LIS2.Core.csproj" />
+    <ProjectReference Include="..\LIS2.Display\LIS2.Display.csproj" />
+  </ItemGroup>
+</Project>
