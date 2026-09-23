@@ -40,22 +40,6 @@ public partial class MainWindow : Window
 
         _sources.Add(new ClockDataSource());
 
-        _pageScheduler.ReplacePages(new[]
-        {
-            new DisplayPage(
-                "clock",
-                "Clock",
-                "{Clock.Time}",
-                "{Clock.Date}",
-                TimeSpan.FromSeconds(5)),
-            new DisplayPage(
-                "status",
-                "Status",
-                "LIS2 Control Center",
-                "Virtual/Serial ready",
-                TimeSpan.FromSeconds(5))
-        });
-
         Loaded += MainWindow_Loaded;
         Closed += MainWindow_Closed;
     }
@@ -65,12 +49,17 @@ public partial class MainWindow : Window
         try
         {
             _settings = await _settingsStore.LoadAsync();
+            _settings.EnsureDefaults();
+
             RefreshPorts();
             ApplySettingsToUi();
-            await ReconnectAsync();
+            LoadPagesIntoRuntime();
+            BindPages();
 
+            await ReconnectAsync();
             await _sources.StartAllAsync();
             await RenderRuntimePageAsync();
+
             _pageTimer.Start();
         }
         catch (Exception ex)
@@ -114,6 +103,8 @@ public partial class MainWindow : Window
         _frame = nextFrame;
         await WriteFrameAsync(nextFrame);
         RefreshPreview();
+
+        _pageTimer.Interval = _displayRuntime.SuggestedDuration;
     }
 
     private async Task WriteFrameAsync(DisplayFrame frame)
@@ -121,6 +112,124 @@ public partial class MainWindow : Window
         var device = RequireDevice();
         await device.WriteLineAsync(1, frame.Line1);
         await device.WriteLineAsync(2, frame.Line2);
+    }
+
+    private void LoadPagesIntoRuntime()
+    {
+        _pageScheduler.ReplacePages(
+            _settings.Pages.Select(page =>
+                new DisplayPage(
+                    page.Id,
+                    page.Name,
+                    page.Line1Template,
+                    page.Line2Template,
+                    TimeSpan.FromSeconds(Math.Max(1, page.DurationSeconds)),
+                    page.Priority)));
+    }
+
+    private void BindPages()
+    {
+        PagesListBox.DisplayMemberPath = nameof(PageDefinition.Name);
+        PagesListBox.ItemsSource = null;
+        PagesListBox.ItemsSource = _settings.Pages;
+
+        if (_settings.Pages.Count > 0 && PagesListBox.SelectedIndex < 0)
+            PagesListBox.SelectedIndex = 0;
+    }
+
+    private void PagesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (PagesListBox.SelectedItem is not PageDefinition page)
+            return;
+
+        PageNameTextBox.Text = page.Name;
+        PageLine1TextBox.Text = page.Line1Template;
+        PageLine2TextBox.Text = page.Line2Template;
+        PageDurationTextBox.Text = page.DurationSeconds.ToString(CultureInfo.InvariantCulture);
+    }
+
+    private async void AddPage_Click(object sender, RoutedEventArgs e)
+    {
+        var page = new PageDefinition
+        {
+            Name = "New page",
+            Line1Template = "New page",
+            Line2Template = "{Clock.Time}",
+            DurationSeconds = 5
+        };
+
+        _settings.Pages.Add(page);
+        await PersistPagesAsync();
+        BindPages();
+        PagesListBox.SelectedItem = page;
+    }
+
+    private async void DeletePage_Click(object sender, RoutedEventArgs e)
+    {
+        if (PagesListBox.SelectedItem is not PageDefinition page)
+            return;
+
+        _settings.Pages.Remove(page);
+        _settings.EnsureDefaults();
+
+        await PersistPagesAsync();
+        BindPages();
+        LoadPagesIntoRuntime();
+    }
+
+    private async void SavePage_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (PagesListBox.SelectedItem is not PageDefinition page)
+                throw new InvalidOperationException("Select a page first.");
+
+            if (!int.TryParse(PageDurationTextBox.Text, out var duration) || duration < 1)
+                throw new InvalidOperationException("Page duration must be at least 1 second.");
+
+            page.Name = string.IsNullOrWhiteSpace(PageNameTextBox.Text)
+                ? "Page"
+                : PageNameTextBox.Text.Trim();
+            page.Line1Template = PageLine1TextBox.Text;
+            page.Line2Template = PageLine2TextBox.Text;
+            page.DurationSeconds = duration;
+
+            await PersistPagesAsync();
+            LoadPagesIntoRuntime();
+            BindPages();
+            PagesListBox.SelectedItem = page;
+
+            Log($"INFO saved page '{page.Name}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async Task PersistPagesAsync()
+    {
+        await _settingsStore.SaveAsync(_settings);
+    }
+
+    private async void TestEvent_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var now = DateTimeOffset.Now;
+            _eventQueue.Add(new DisplayEvent(
+                "demo",
+                DisplayFrame.Create("** EVENT TEST **", "Overlay for 5 sec"),
+                100,
+                now.AddSeconds(5)));
+
+            await RenderRuntimePageAsync();
+            Log("INFO event overlay queued for 5 seconds");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
     }
 
     private void ApplySettingsToUi()
@@ -164,12 +273,15 @@ public partial class MainWindow : Window
                 throw new InvalidOperationException("Select a COM port before using the serial transport.");
 
             _transport = new SerialLis2Transport(_settings.PortName);
+            VirtualStateText.Text = "Virtual state is unavailable while Serial transport is active.";
         }
         else
         {
             var virtualTransport = new VirtualLis2Transport();
             virtualTransport.Written += Transport_Written;
+            virtualTransport.StateChanged += VirtualTransport_StateChanged;
             _transport = virtualTransport;
+            UpdateVirtualState(virtualTransport.State);
         }
 
         _device = new Lis2Device(_transport);
@@ -185,6 +297,29 @@ public partial class MainWindow : Window
 
         Log($"INFO connected using {_settings.TransportMode} transport");
     }
+
+    private void VirtualTransport_StateChanged(object? sender, EventArgs e)
+    {
+        if (sender is VirtualLis2Transport transport)
+            Dispatcher.Invoke(() => UpdateVirtualState(transport.State));
+    }
+
+    private void UpdateVirtualState(VirtualLis2State state)
+    {
+        VirtualStateText.Text =
+            $"Brightness: {FormatBrightness(state.Brightness)} | " +
+            $"Fans: {state.Fan1}/{state.Fan2}/{state.Fan3}/{state.Fan4}%";
+    }
+
+    private static string FormatBrightness(Lis2Brightness brightness) =>
+        brightness switch
+        {
+            Lis2Brightness.Percent100 => "100%",
+            Lis2Brightness.Percent75 => "75%",
+            Lis2Brightness.Percent50 => "50%",
+            Lis2Brightness.Percent25 => "25%",
+            _ => "?"
+        };
 
     private void TransportModeChanged(object sender, SelectionChangedEventArgs e)
     {
