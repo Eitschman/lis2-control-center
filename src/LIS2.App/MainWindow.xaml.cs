@@ -486,11 +486,11 @@ public partial class MainWindow : Window
             : "Waiting for Winamp";
 
         WinampConnectionDetailText.Text = connected
-            ? $"Receiving snapshots on \\.\pipe\LIS2ControlCenter.Winamp" +
+            ? @"Receiving snapshots on \\.\pipe\LIS2ControlCenter.Winamp" +
               (_winampSource.LastSnapshotAt is not null
                   ? $" • last update {_winampSource.LastSnapshotAt.Value.ToLocalTime():HH:mm:ss}"
                   : string.Empty)
-            : "Listening on \\.\pipe\LIS2ControlCenter.Winamp — no recent plugin/simulator data.";
+            : @"Listening on \\.\pipe\LIS2ControlCenter.Winamp — no recent plugin/simulator data.";
     }
 
     private static string? GetWinampValue(
