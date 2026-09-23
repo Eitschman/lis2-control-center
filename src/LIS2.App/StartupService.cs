@@ -31,7 +31,7 @@ public sealed class StartupService
         if (string.IsNullOrWhiteSpace(executable))
             throw new InvalidOperationException("Unable to determine the application executable path.");
 
-        var fileName = Path.GetFileName(executable);
+        var fileName = System.IO.Path.GetFileName(executable);
 
         if (string.Equals(fileName, "dotnet.exe", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(fileName, "testhost.exe", StringComparison.OrdinalIgnoreCase))
