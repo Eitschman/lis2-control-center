@@ -2,6 +2,8 @@ namespace LIS2.App;
 
 public sealed class FanSettings
 {
+    public bool AutomaticControlEnabled { get; set; }
+
     public FanChannelSettings[] Channels { get; set; } =
     {
         new() { Name = "Fan 1" },
