@@ -23,11 +23,11 @@
                 <Button Content="Winamp" Padding="10" Margin="0,0,0,6" IsEnabled="False"/>
                 <Button Content="Hardware" Padding="10" Margin="0,0,0,6" IsEnabled="False"/>
                 <Button Content="Fan Control" Padding="10" Margin="0,0,0,6" IsEnabled="False"/>
-                <Button Content="Settings" Padding="10" Margin="0,0,0,6" IsEnabled="False"/>
+                <Button Content="Settings" Padding="10" Margin="0,0,0,6" Click="Settings_Click"/>
                 <Button Content="Diagnostics" Padding="10" IsEnabled="False"/>
                 <Separator Margin="0,18,0,12"/>
-                <TextBlock Text="Development mode" FontWeight="Bold"/>
-                <TextBlock Text="Virtual LIS2 transport" Foreground="#A9B1B8" Margin="0,4,0,0"/>
+                <TextBlock Text="Transport" FontWeight="Bold"/>
+                <TextBlock x:Name="TransportSummaryText" Text="Virtual LIS2" Foreground="#A9B1B8" Margin="0,4,0,0"/>
             </StackPanel>
         </Border>
 
@@ -126,6 +126,29 @@
                         </Grid>
                     </GroupBox>
                 </Grid>
+
+                <GroupBox Header="Device settings" Foreground="#F0F0F0" Margin="0,0,0,14">
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Transport" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ComboBox x:Name="TransportModeComboBox" Grid.Column="1" SelectionChanged="TransportModeChanged" Margin="0,0,16,0">
+                            <ComboBoxItem Content="Virtual" IsSelected="True"/>
+                            <ComboBoxItem Content="Serial"/>
+                        </ComboBox>
+                        <TextBlock Grid.Column="2" Text="COM port" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ComboBox x:Name="PortComboBox" Grid.Column="3" IsEnabled="False" Margin="0,0,10,0"/>
+                        <StackPanel Grid.Column="4" Orientation="Horizontal">
+                            <Button Content="Refresh" Click="RefreshPorts_Click" Padding="12,5" Margin="0,0,6,0"/>
+                            <Button Content="Apply / reconnect" Click="ApplyDeviceSettings_Click" Padding="12,5"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
 
                 <GroupBox Header="Protocol log" Foreground="#F0F0F0">
                     <TextBox x:Name="LogTextBox" Margin="10" Height="180" IsReadOnly="True"
