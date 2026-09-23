@@ -38,3 +38,23 @@ jobs:
 
       - name: Test
         run: dotnet test .\LIS2ControlCenter.sln --configuration Release --no-build --verbosity normal
+
+  winamp-plugin:
+    name: Winamp plugin x86
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Win32 plugin
+        run: cmake -S .\native\LIS2.WinampPlugin -B .\native\LIS2.WinampPlugin\build -A Win32
+
+      - name: Build Win32 plugin
+        run: cmake --build .\native\LIS2.WinampPlugin\build --config Release
+
+      - name: Upload gen_lis2.dll
+        uses: actions/upload-artifact@v4
+        with:
+          name: gen_lis2-win32
+          path: native/LIS2.WinampPlugin/build/Release/gen_lis2.dll
