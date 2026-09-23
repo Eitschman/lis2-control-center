@@ -65,4 +65,43 @@ public sealed class DisplayRuntimeTests
         Assert.NotNull(frame);
         Assert.StartsWith("WARNING", frame.Line1);
     }
+
+    [Fact]
+    public void RenderNext_SkipsPageWhenVisibilityDoesNotMatch()
+    {
+        var scheduler = new PageScheduler();
+        scheduler.ReplacePages(new[]
+        {
+            new DisplayPage(
+                "winamp",
+                "Winamp",
+                "{Winamp.Artist}",
+                "{Winamp.Title}",
+                TimeSpan.FromSeconds(5),
+                VisibilityExpression: "Winamp.State=Playing"),
+            new DisplayPage(
+                "clock",
+                "Clock",
+                "{Clock.Time}",
+                "{Clock.Date}",
+                TimeSpan.FromSeconds(5))
+        });
+
+        var runtime = new DisplayRuntime(
+            new TemplateRenderer(),
+            scheduler,
+            new EventQueue());
+
+        var frame = runtime.RenderNext(
+            new Dictionary<string, object?>
+            {
+                ["Winamp.State"] = "Stopped",
+                ["Clock.Time"] = "12:34",
+                ["Clock.Date"] = "23.09.2026"
+            },
+            DateTimeOffset.UtcNow);
+
+        Assert.NotNull(frame);
+        Assert.StartsWith("12:34", frame.Line1);
+    }
 }
