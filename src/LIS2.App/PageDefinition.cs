@@ -8,4 +8,5 @@ public sealed class PageDefinition
     public string Line2Template { get; set; } = string.Empty;
     public int DurationSeconds { get; set; } = 5;
     public int Priority { get; set; }
+    public string? VisibilityExpression { get; set; }
 }
