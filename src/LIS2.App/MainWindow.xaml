@@ -5,8 +5,8 @@
         Width="1240" Height="820"
         MinWidth="1040" MinHeight="700"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource AppBackgroundBrush}"
-        Foreground="{StaticResource TextBrush}">
+        Background="{DynamicResource AppBackgroundBrush}"
+        Foreground="{DynamicResource TextBrush}">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -15,7 +15,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
-        <Border Grid.Column="0" Background="#171B20" BorderBrush="#252B32" BorderThickness="0,0,1,0">
+        <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="0,0,1,0">
             <Grid Margin="18">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -45,12 +45,12 @@
                     <StackPanel Margin="4,0,0,0">
                         <TextBlock x:Name="TransportSummaryText"
                                    Text="Virtual LIS2"
-                                   Foreground="#E8EAED"
+                                   Foreground="{DynamicResource TextBrush}"
                                    FontSize="13"
                                    TextWrapping="Wrap"/>
                         <StackPanel Orientation="Horizontal" Margin="0,7,0,8">
-                            <Ellipse Width="9" Height="9" Fill="{StaticResource AccentBrush}" Margin="0,0,7,0"/>
-                            <TextBlock Text="Connected" Foreground="{StaticResource AccentBrush}"/>
+                            <Ellipse Width="9" Height="9" Fill="{DynamicResource AccentBrush}" Margin="0,0,7,0"/>
+                            <TextBlock Text="Connected" Foreground="{DynamicResource AccentBrush}"/>
                         </StackPanel>
                         <Button Content="Change..."
                                 Tag="6"
@@ -62,10 +62,10 @@
 
                 <StackPanel Grid.Row="2" Margin="4,12,0,10">
                     <Separator Margin="0,0,0,12"/>
-                    <TextBlock Text="ⓘ  LIS2 Control Center" Foreground="#D7DCE2"/>
-                    <TextBlock Text="Development build" FontSize="11" Foreground="#737C88" Margin="25,3,0,8"/>
-                    <TextBlock Text="◉  GitHub" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,5"/>
-                    <TextBlock Text="ⓘ  About" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="ⓘ  LIS2 Control Center" Foreground="{DynamicResource TextBrush}"/>
+                    <TextBlock Text="Development build" FontSize="11" Foreground="{DynamicResource DisabledTextBrush}" Margin="25,3,0,8"/>
+                    <TextBlock Text="◉  GitHub" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,5"/>
+                    <TextBlock Text="ⓘ  About" Foreground="{DynamicResource MutedBrush}"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -82,16 +82,16 @@
                     <TextBlock x:Name="SectionTitleText" Text="Dashboard" FontSize="30" FontWeight="SemiBold"/>
                     <TextBlock x:Name="SectionSubtitleText"
                                Text="Overview and quick access to the most important functions."
-                               Foreground="{StaticResource MutedBrush}"
+                               Foreground="{DynamicResource MutedBrush}"
                                Margin="0,5,0,0"/>
                 </StackPanel>
                 <Border x:Name="ConnectionBadge"
                         DockPanel.Dock="Right"
-                        Background="#1D3325"
+                        Background="{DynamicResource StatusBadgeBrush}"
                         CornerRadius="14"
                         Padding="14,9"
                         HorizontalAlignment="Right">
-                    <TextBlock x:Name="ConnectionText" Text="Disconnected" Foreground="#B9F7C8" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="ConnectionText" Text="Disconnected" Foreground="{DynamicResource StatusBadgeTextBrush}" FontWeight="SemiBold"/>
                 </Border>
             </DockPanel>
 
@@ -120,18 +120,18 @@
                                 <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}">
                                     <StackPanel>
                                         <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12"/>
-                                        <Border Background="#030A06" BorderBrush="#324239" BorderThickness="1" CornerRadius="6" Padding="24,20">
+                                        <Border Background="{DynamicResource VfdBackgroundBrush}" BorderBrush="{DynamicResource VfdBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="24,20">
                                             <StackPanel>
                                                 <TextBlock x:Name="PreviewLine1"
                                                            Text="                    "
                                                            FontFamily="Consolas"
                                                            FontSize="31"
-                                                           Foreground="{StaticResource AccentBrush}"/>
+                                                           Foreground="{DynamicResource AccentBrush}"/>
                                                 <TextBlock x:Name="PreviewLine2"
                                                            Text="                    "
                                                            FontFamily="Consolas"
                                                            FontSize="31"
-                                                           Foreground="{StaticResource AccentBrush}"/>
+                                                           Foreground="{DynamicResource AccentBrush}"/>
                                             </StackPanel>
                                         </Border>
                                     </StackPanel>
@@ -143,7 +143,7 @@
                                             <TextBlock Text="System Status" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
                                             <TextBlock x:Name="VirtualStateText"
                                                        Text="State available when Virtual transport is active."
-                                                       Foreground="{StaticResource MutedBrush}"
+                                                       Foreground="{DynamicResource MutedBrush}"
                                                        TextWrapping="Wrap"/>
                                         </StackPanel>
                                     </Border>
@@ -164,19 +164,19 @@
                                              Height="190"
                                              IsReadOnly="True"
                                              FontFamily="Consolas"
-                                             Background="#0C0F13"
-                                             Foreground="#D8DEE4"
+                                             Background="{DynamicResource LogBackgroundBrush}"
+                                             Foreground="{DynamicResource LogTextBrush}"
                                              VerticalScrollBarVisibility="Auto"
                                              TextWrapping="NoWrap"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Background="#141A20"
-                                    BorderBrush="#222A32"
+                            <Border Background="{DynamicResource TipBackgroundBrush}"
+                                    BorderBrush="{DynamicResource TipBorderBrush}"
                                     BorderThickness="1"
                                     CornerRadius="6"
                                     Padding="12,9">
-                                <TextBlock Foreground="{StaticResource MutedBrush}"
+                                <TextBlock Foreground="{DynamicResource MutedBrush}"
                                            Text="💡  Tip: Use the navigation on the left to access display settings, page editor, Winamp integration, hardware and fan control."
                                            TextWrapping="Wrap"/>
                             </Border>
@@ -304,11 +304,11 @@
                                 <StackPanel>
                                     <TextBlock Text="Winamp Integration" FontWeight="SemiBold" FontSize="18"/>
                                     <TextBlock Text="The host listens on \\.\pipe\LIS2ControlCenter.Winamp."
-                                               Foreground="{StaticResource MutedBrush}"
+                                               Foreground="{DynamicResource MutedBrush}"
                                                Margin="0,8,0,0"/>
                                     <TextBlock Text="The native gen_lis2.dll sends artist, title, album, playback state, position and timing."
                                                TextWrapping="Wrap"
-                                               Foreground="{StaticResource MutedBrush}"
+                                               Foreground="{DynamicResource MutedBrush}"
                                                Margin="0,5,0,0"/>
                                 </StackPanel>
                             </Border>
@@ -317,7 +317,7 @@
                                     <TextBlock Text="Available page variables" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
                                     <TextBlock FontFamily="Consolas"
                                                Text="{}{Winamp.State}   {Winamp.Artist}   {Winamp.Title}   {Winamp.Album}&#x0a;{Winamp.Elapsed}   {Winamp.Duration}   {Winamp.PlaylistPosition}   {Winamp.PlaylistCount}"
-                                               Foreground="#D8DEE4"/>
+                                               Foreground="{DynamicResource LogTextBrush}"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -332,7 +332,7 @@
                                 <StackPanel>
                                     <TextBlock Text="Hardware Monitoring" FontWeight="SemiBold" FontSize="18"/>
                                     <TextBlock Text="LibreHardwareMonitor provides CPU, GPU, memory, storage, motherboard and fan sensor values."
-                                               Foreground="{StaticResource MutedBrush}"
+                                               Foreground="{DynamicResource MutedBrush}"
                                                TextWrapping="Wrap"
                                                Margin="0,8,0,0"/>
                                 </StackPanel>
@@ -341,7 +341,7 @@
                                 <StackPanel>
                                     <TextBlock Text="Sensor usage" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
                                     <TextBlock Text="Hardware values are available to page templates with the Hardware.* prefix and can be selected as fan-control sensors."
-                                               Foreground="{StaticResource MutedBrush}"
+                                               Foreground="{DynamicResource MutedBrush}"
                                                TextWrapping="Wrap"/>
                                     <Button Content="Refresh fan sensor list" Click="RefreshFanSensors_Click" HorizontalAlignment="Left" Margin="0,12,0,0"/>
                                 </StackPanel>
@@ -507,6 +507,36 @@
                                 </StackPanel>
                             </Border>
 
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="Appearance" FontWeight="SemiBold" FontSize="18" Margin="0,0,0,12"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="220"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="Theme"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0"/>
+                                        <ComboBox x:Name="ThemeModeComboBox"
+                                                  Grid.Column="1"
+                                                  SelectionChanged="ThemeModeChanged">
+                                            <ComboBoxItem Content="System default" Tag="System"/>
+                                            <ComboBoxItem Content="Light" Tag="Light"/>
+                                            <ComboBoxItem Content="Dark" Tag="Dark"/>
+                                        </ComboBox>
+                                        <TextBlock Grid.Column="2"
+                                                   Margin="14,0,0,0"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource MutedBrush}"
+                                                   Text="System default follows the Windows app theme automatically."
+                                                   TextWrapping="Wrap"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
                             <Border Style="{StaticResource CardBorderStyle}">
                                 <StackPanel>
                                     <TextBlock Text="Windows" FontWeight="SemiBold" FontSize="18" Margin="0,0,0,12"/>
@@ -534,8 +564,8 @@
                                              Height="280"
                                              IsReadOnly="True"
                                              FontFamily="Consolas"
-                                             Background="#0C0F13"
-                                             Foreground="#D8DEE4"
+                                             Background="{DynamicResource LogBackgroundBrush}"
+                                             Foreground="{DynamicResource LogTextBrush}"
                                              VerticalScrollBarVisibility="Auto"
                                              HorizontalScrollBarVisibility="Auto"
                                              TextWrapping="NoWrap"/>
@@ -549,8 +579,8 @@
                                              Height="260"
                                              IsReadOnly="True"
                                              FontFamily="Consolas"
-                                             Background="#0C0F13"
-                                             Foreground="#D8DEE4"
+                                             Background="{DynamicResource LogBackgroundBrush}"
+                                             Foreground="{DynamicResource LogTextBrush}"
                                              VerticalScrollBarVisibility="Auto"
                                              HorizontalScrollBarVisibility="Auto"
                                              TextWrapping="NoWrap"/>
