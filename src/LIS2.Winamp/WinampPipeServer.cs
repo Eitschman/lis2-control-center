@@ -93,7 +93,7 @@ public sealed class WinampPipeServer : IAsyncDisposable
         }
     }
 
-    internal static WinampSnapshot ToSnapshot(WinampMessage message) =>
+    public static WinampSnapshot ToSnapshot(WinampMessage message) =>
         new(
             ParseState(message.State),
             message.Artist,
