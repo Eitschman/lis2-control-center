@@ -10,5 +10,6 @@
     <ProjectReference Include="..\LIS2.Display\LIS2.Display.csproj" />
     <ProjectReference Include="..\LIS2.Sources\LIS2.Sources.csproj" />
     <ProjectReference Include="..\LIS2.Fans\LIS2.Fans.csproj" />
+    <ProjectReference Include="..\LIS2.Winamp\LIS2.Winamp.csproj" />
   </ItemGroup>
 </Project>
