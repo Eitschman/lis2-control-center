@@ -43,6 +43,7 @@ public partial class MainWindow : Window
 
         _sources.Add(new ClockDataSource());
         _sources.Add(new WinampDataSource());
+        _sources.Add(new LibreHardwareMonitorDataSource());
 
         Loaded += MainWindow_Loaded;
         Closed += MainWindow_Closed;
@@ -62,6 +63,7 @@ public partial class MainWindow : Window
 
             await ReconnectAsync();
             await _sources.StartAllAsync();
+            LogSourceHealth();
             await RenderRuntimePageAsync();
 
             _pageTimer.Start();
@@ -92,6 +94,19 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             Log($"ERR  page runtime: {ex.Message}");
+        }
+    }
+
+    private void LogSourceHealth()
+    {
+        foreach (var source in _sources.Sources)
+        {
+            var error = _sources.Errors[source.Id];
+
+            if (string.IsNullOrWhiteSpace(error))
+                Log($"INFO source '{source.Id}' started");
+            else
+                Log($"WARN source '{source.Id}' failed: {error}");
         }
     }
 
