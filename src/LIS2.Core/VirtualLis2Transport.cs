@@ -8,7 +8,10 @@ public sealed class VirtualLis2Transport : ILis2Transport
 
     public IReadOnlyList<byte[]> Writes => _writes;
 
+    public VirtualLis2State State { get; } = new();
+
     public event EventHandler<VirtualLis2WriteEventArgs>? Written;
+    public event EventHandler? StateChanged;
 
     public Task OpenAsync(CancellationToken cancellationToken = default)
     {
@@ -33,7 +36,11 @@ public sealed class VirtualLis2Transport : ILis2Transport
 
         var copy = data.ToArray();
         _writes.Add(copy);
+
+        VirtualLis2ProtocolInterpreter.Apply(State, copy);
+
         Written?.Invoke(this, new VirtualLis2WriteEventArgs(copy));
+        StateChanged?.Invoke(this, EventArgs.Empty);
         return Task.CompletedTask;
     }
 
