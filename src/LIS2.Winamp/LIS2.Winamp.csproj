@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>LIS2.Winamp</AssemblyName>
+    <RootNamespace>LIS2.Winamp</RootNamespace>
+  </PropertyGroup>
+</Project>
