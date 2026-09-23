@@ -795,8 +795,8 @@ public partial class MainWindow : Window
     private void UpdateVirtualState(VirtualLis2State state)
     {
         VirtualStateText.Text =
-            $"Brightness: {FormatBrightness(state.Brightness)} | " +
-            $"Fans: {state.Fan1}/{state.Fan2}/{state.Fan3}/{state.Fan4}%";
+            $"Brightness: {FormatBrightness(state.Brightness)}{Environment.NewLine}" +
+            $"Fans: {state.Fan1}% / {state.Fan2}% / {state.Fan3}% / {state.Fan4}%";
     }
 
     private static string FormatBrightness(Lis2Brightness brightness) =>
