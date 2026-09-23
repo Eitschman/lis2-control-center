@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Sources", "src\LIS2.So
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Fans", "src\LIS2.Fans\LIS2.Fans.csproj", "{A91B799F-7617-47FA-9CB4-291555221002}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Winamp", "src\LIS2.Winamp\LIS2.Winamp.csproj", "{781F21A8-6E62-4E5E-A8E1-A21855221003}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.App", "src\LIS2.App\LIS2.App.csproj", "{3C41882A-72D5-43D6-A8C1-D358B5503103}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.ProtocolTester", "tools\LIS2.ProtocolTester\LIS2.ProtocolTester.csproj", "{5D7C0A1D-7A36-4D53-A5C7-0D9A84DAA101}"
@@ -21,6 +23,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Sources.Tests", "tests\LIS2.Sources.Tests\LIS2.Sources.Tests.csproj", "{92DD4FC9-1DA0-48F6-8B93-7CC8C1202012}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Fans.Tests", "tests\LIS2.Fans.Tests\LIS2.Fans.Tests.csproj", "{EC95FB35-651E-44A0-8E80-3E219D202013}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Winamp.Tests", "tests\LIS2.Winamp.Tests\LIS2.Winamp.Tests.csproj", "{14EEC12B-98E5-417C-BDFC-921EA2202014}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +48,10 @@ Global
 		{A91B799F-7617-47FA-9CB4-291555221002}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A91B799F-7617-47FA-9CB4-291555221002}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A91B799F-7617-47FA-9CB4-291555221002}.Release|Any CPU.Build.0 = Release|Any CPU
+		{781F21A8-6E62-4E5E-A8E1-A21855221003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{781F21A8-6E62-4E5E-A8E1-A21855221003}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{781F21A8-6E62-4E5E-A8E1-A21855221003}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{781F21A8-6E62-4E5E-A8E1-A21855221003}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3C41882A-72D5-43D6-A8C1-D358B5503103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3C41882A-72D5-43D6-A8C1-D358B5503103}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C41882A-72D5-43D6-A8C1-D358B5503103}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -68,5 +76,9 @@ Global
 		{EC95FB35-651E-44A0-8E80-3E219D202013}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC95FB35-651E-44A0-8E80-3E219D202013}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC95FB35-651E-44A0-8E80-3E219D202013}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14EEC12B-98E5-417C-BDFC-921EA2202014}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14EEC12B-98E5-417C-BDFC-921EA2202014}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14EEC12B-98E5-417C-BDFC-921EA2202014}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14EEC12B-98E5-417C-BDFC-921EA2202014}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
