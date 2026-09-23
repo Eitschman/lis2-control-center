@@ -87,7 +87,7 @@
                            FontSize="16"
                            Margin="4,18,0,24"/>
 
-                <StackPanel Grid.Row="1">
+                <StackPanel x:Name="NavigationPanel" Grid.Row="1">
                     <Button Content="⌂   Dashboard" Tag="0" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
                     <Button Content="▣   Display" Tag="1" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
                     <Button Content="▤   Pages" Tag="2" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
@@ -351,7 +351,7 @@
                                 <StackPanel>
                                     <TextBlock Text="Available page variables" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
                                     <TextBlock FontFamily="Consolas"
-                                               Text="{Winamp.State}   {Winamp.Artist}   {Winamp.Title}   {Winamp.Album}&#x0a;{Winamp.Elapsed}   {Winamp.Duration}   {Winamp.PlaylistPosition}   {Winamp.PlaylistCount}"
+                                               Text="{}{Winamp.State}   {Winamp.Artist}   {Winamp.Title}   {Winamp.Album}&#x0a;{Winamp.Elapsed}   {Winamp.Duration}   {Winamp.PlaylistPosition}   {Winamp.PlaylistCount}"
                                                Foreground="#D8DEE4"/>
                                 </StackPanel>
                             </Border>
