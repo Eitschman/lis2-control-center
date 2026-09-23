@@ -20,6 +20,7 @@ public partial class MainWindow : Window
     private readonly DisplayRuntime _displayRuntime;
     private readonly DispatcherTimer _pageTimer;
     private readonly DispatcherTimer _fanTimer;
+    private readonly DispatcherTimer _hardwareTimer;
     private readonly FanController _fanController = new();
     private int[]? _lastAutomaticFanOutputs;
     private readonly TrayIconService _trayIcon = new();
@@ -53,6 +54,12 @@ public partial class MainWindow : Window
             Interval = TimeSpan.FromSeconds(2)
         };
         _fanTimer.Tick += FanTimer_Tick;
+
+        _hardwareTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        _hardwareTimer.Tick += HardwareTimer_Tick;
 
         _sources.Add(new ClockDataSource());
         _sources.Add(new WinampDataSource());
@@ -132,6 +139,9 @@ public partial class MainWindow : Window
         SectionSubtitleText.Text = Sections[index].Subtitle;
         UpdateNavigationSelection(index);
 
+        if (index == 4)
+            RefreshHardwareSensors();
+
         if (index == 5)
             RefreshFanSensorChoices();
 
@@ -166,6 +176,7 @@ public partial class MainWindow : Window
 
             _pageTimer.Start();
             _fanTimer.Start();
+            _hardwareTimer.Start();
 
             RefreshDiagnostics();
 
@@ -212,6 +223,7 @@ public partial class MainWindow : Window
     {
         _pageTimer.Stop();
         _fanTimer.Stop();
+        _hardwareTimer.Stop();
 
         await _sources.StopAllAsync();
         await _sources.DisposeAsync();
@@ -399,6 +411,190 @@ public partial class MainWindow : Window
 
     private void RefreshFanSensors_Click(object sender, RoutedEventArgs e) =>
         RefreshFanSensorChoices();
+
+    private void HardwareTimer_Tick(object? sender, EventArgs e)
+    {
+        if (MainTabs.SelectedIndex == 4)
+            RefreshHardwareSensors();
+    }
+
+    private void HardwareFilterChanged(object sender, EventArgs e)
+    {
+        if (IsLoaded)
+            RefreshHardwareSensors();
+    }
+
+    private void RefreshHardware_Click(object sender, RoutedEventArgs e)
+    {
+        RefreshHardwareSensors();
+        RefreshFanSensorChoices();
+    }
+
+    private void HardwareSensorsListBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (HardwareSensorsListBox.SelectedItem is HardwareSensorRow sensor)
+        {
+            SelectedHardwareSensorText.Text =
+                $"{sensor.Name} — {sensor.DisplayValue}{Environment.NewLine}{sensor.Key}";
+        }
+        else
+        {
+            SelectedHardwareSensorText.Text = "Select a sensor above.";
+        }
+    }
+
+    private void RefreshHardwareSensors()
+    {
+        var snapshot = _sources.Snapshot();
+        var selectedKey =
+            (HardwareSensorsListBox.SelectedItem as HardwareSensorRow)?.Key;
+
+        var search = HardwareSearchTextBox.Text?.Trim() ?? string.Empty;
+        var typeFilter =
+            HardwareTypeComboBox.SelectedItem is ComboBoxItem { Tag: string tag }
+                ? tag
+                : "All";
+
+        var rows = snapshot
+            .Where(pair =>
+                pair.Key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase) &&
+                !pair.Key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase) &&
+                IsNumericValue(pair.Value))
+            .Select(pair => CreateHardwareSensorRow(pair.Key, pair.Value, snapshot))
+            .Where(row =>
+                MatchesHardwareTypeFilter(row.Type, typeFilter) &&
+                (string.IsNullOrWhiteSpace(search) ||
+                 row.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                 row.Key.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                 row.Type.Contains(search, StringComparison.OrdinalIgnoreCase)))
+            .OrderBy(row => row.Type, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(row => row.Name, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        HardwareSensorsListBox.ItemsSource = rows;
+
+        if (selectedKey is not null)
+        {
+            HardwareSensorsListBox.SelectedItem =
+                rows.FirstOrDefault(row =>
+                    string.Equals(
+                        row.Key,
+                        selectedKey,
+                        StringComparison.OrdinalIgnoreCase));
+        }
+
+        var hardwareError = _sources.Errors.TryGetValue("Hardware", out var error)
+            ? error
+            : null;
+
+        HardwareSummaryText.Text =
+            !string.IsNullOrWhiteSpace(hardwareError)
+                ? $"Hardware source error: {hardwareError}"
+                : $"{rows.Length} visible sensor(s) / " +
+                  $"{snapshot.Count(pair => pair.Key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase) && !pair.Key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase))} total values";
+    }
+
+    private static HardwareSensorRow CreateHardwareSensorRow(
+        string key,
+        object? rawValue,
+        IReadOnlyDictionary<string, object?> snapshot)
+    {
+        var parts = key.Split('.');
+        var hardwareName = parts.Length > 1
+            ? HumanizeSensorName(parts[1])
+            : "Hardware";
+        var type = parts.Length > 2
+            ? parts[2]
+            : "Other";
+        var sensorName = parts.Length > 3
+            ? HumanizeSensorName(string.Join(" ", parts.Skip(3)))
+            : key;
+
+        var value = TryConvertToDouble(rawValue, out var number) && number is not null
+            ? number.Value.ToString("0.##", CultureInfo.CurrentCulture)
+            : Convert.ToString(rawValue, CultureInfo.CurrentCulture) ?? "-";
+
+        var unit = snapshot.TryGetValue($"{key}.Unit", out var rawUnit)
+            ? Convert.ToString(rawUnit, CultureInfo.CurrentCulture) ?? string.Empty
+            : string.Empty;
+
+        return new HardwareSensorRow(
+            key,
+            $"{hardwareName} — {sensorName}",
+            type,
+            value,
+            unit);
+    }
+
+    private static string HumanizeSensorName(string value) =>
+        value.Replace('_', ' ').Trim();
+
+    private static bool MatchesHardwareTypeFilter(
+        string sensorType,
+        string filter)
+    {
+        if (string.Equals(filter, "All", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        var knownTypes = new HashSet<string>(
+            new[]
+            {
+                "Temperature",
+                "Load",
+                "Fan",
+                "Clock",
+                "Voltage",
+                "Power",
+                "Data",
+                "Throughput"
+            },
+            StringComparer.OrdinalIgnoreCase);
+
+        if (string.Equals(filter, "Other", StringComparison.OrdinalIgnoreCase))
+            return !knownTypes.Contains(sensorType);
+
+        return string.Equals(
+            sensorType,
+            filter,
+            StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async void AssignHardwareSensorToFan_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        try
+        {
+            if (HardwareSensorsListBox.SelectedItem is not HardwareSensorRow sensor)
+                throw new InvalidOperationException("Select a hardware sensor first.");
+
+            if (sender is not System.Windows.Controls.Button { Tag: string tag } ||
+                !int.TryParse(tag, out var fanIndex) ||
+                fanIndex < 0 ||
+                fanIndex >= _settings.Fans.Channels.Length)
+            {
+                return;
+            }
+
+            var channel = _settings.Fans.Channels[fanIndex];
+            channel.SensorKey = sensor.Key;
+
+            await _settingsStore.SaveAsync(_settings);
+
+            FanChannelsListBox.SelectedIndex = fanIndex;
+            RefreshFanSensorChoices();
+
+            Log(
+                $"INFO assigned hardware sensor '{sensor.Key}' to " +
+                $"{channel.Name}");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
 
     private void RefreshFanSensorChoices()
     {
