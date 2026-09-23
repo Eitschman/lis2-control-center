@@ -8,5 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\LIS2.Core\LIS2.Core.csproj" />
     <ProjectReference Include="..\LIS2.Display\LIS2.Display.csproj" />
+    <ProjectReference Include="..\LIS2.Sources\LIS2.Sources.csproj" />
   </ItemGroup>
 </Project>
