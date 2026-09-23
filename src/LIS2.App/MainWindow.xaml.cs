@@ -23,7 +23,9 @@ public partial class MainWindow : Window
     private readonly FanController _fanController = new();
     private int[]? _lastAutomaticFanOutputs;
     private readonly TrayIconService _trayIcon = new();
+    private readonly StartupService _startupService = new();
     private bool _allowClose;
+    private bool _loadingStartupSetting;
 
     private AppSettings _settings = new();
     private ILis2Transport? _transport;
@@ -74,6 +76,11 @@ public partial class MainWindow : Window
             RefreshPorts();
             ApplySettingsToUi();
             AutomaticFanControlCheckBox.IsChecked = _settings.Fans.AutomaticControlEnabled;
+
+            _loadingStartupSetting = true;
+            StartWithWindowsCheckBox.IsChecked = _startupService.IsEnabled();
+            _loadingStartupSetting = false;
+
             LoadPagesIntoRuntime();
             BindPages();
             BindFanChannels();
@@ -86,6 +93,15 @@ public partial class MainWindow : Window
 
             _pageTimer.Start();
             _fanTimer.Start();
+
+            RefreshDiagnostics();
+
+            if (Environment.GetCommandLineArgs().Any(
+                    arg => string.Equals(arg, "--minimized", StringComparison.OrdinalIgnoreCase)))
+            {
+                Hide();
+                _trayIcon.SetStatus("running in tray");
+            }
         }
         catch (Exception ex)
         {
@@ -758,6 +774,77 @@ public partial class MainWindow : Window
 
     private void Settings_Click(object sender, RoutedEventArgs e) =>
         PortComboBox.Focus();
+
+    private void Diagnostics_Click(object sender, RoutedEventArgs e)
+    {
+        RefreshDiagnostics();
+        DiagnosticsTextBox.Focus();
+    }
+
+    private void RefreshDiagnostics_Click(object sender, RoutedEventArgs e) =>
+        RefreshDiagnostics();
+
+    private void RefreshDiagnostics()
+    {
+        var snapshot = _sources.Snapshot();
+        var lines = new List<string>
+        {
+            $"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
+            $"Transport: {_settings.TransportMode}",
+            $"Connected: {_device?.IsConnected == true}",
+            $"Port: {_settings.PortName ?? "-"}",
+            $"Frame line 1: {_frame.Line1}",
+            $"Frame line 2: {_frame.Line2}",
+            $"Automatic fan control: {_settings.Fans.AutomaticControlEnabled}",
+            $"Data values: {snapshot.Count}",
+            ""
+        };
+
+        foreach (var source in _sources.Sources.OrderBy(source => source.Id))
+        {
+            var error = _sources.Errors[source.Id];
+            lines.Add(
+                string.IsNullOrWhiteSpace(error)
+                    ? $"Source {source.Id}: OK ({source.Values.Count} values)"
+                    : $"Source {source.Id}: ERROR - {error}");
+        }
+
+        lines.Add("");
+
+        for (var index = 0; index < _settings.Fans.Channels.Length; index++)
+        {
+            var channel = _settings.Fans.Channels[index];
+            lines.Add(
+                $"Fan {index + 1}: {channel.Name}, mode={channel.Mode}, " +
+                $"sensor={channel.SensorKey ?? "-"}, fixed={channel.FixedPercent}%, " +
+                $"min={channel.MinimumPercent}%, max={channel.MaximumPercent}%, " +
+                $"fail-safe={channel.FailSafePercent}%");
+        }
+
+        DiagnosticsTextBox.Text = string.Join(Environment.NewLine, lines);
+    }
+
+    private void StartWithWindowsChanged(object sender, RoutedEventArgs e)
+    {
+        if (_loadingStartupSetting || !IsLoaded)
+            return;
+
+        try
+        {
+            _startupService.SetEnabled(StartWithWindowsCheckBox.IsChecked == true);
+            Log(StartWithWindowsCheckBox.IsChecked == true
+                ? "INFO Windows autostart enabled"
+                : "INFO Windows autostart disabled");
+        }
+        catch (Exception ex)
+        {
+            _loadingStartupSetting = true;
+            StartWithWindowsCheckBox.IsChecked = _startupService.IsEnabled();
+            _loadingStartupSetting = false;
+            ShowError(ex);
+        }
+    }
+
 
     private async void SendLine1_Click(object sender, RoutedEventArgs e)
     {
