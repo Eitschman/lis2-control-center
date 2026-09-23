@@ -58,7 +58,8 @@ public sealed class SerialLis2Transport : ILis2Transport
         if (_port?.IsOpen != true)
             throw new InvalidOperationException("LIS2 serial port is not connected.");
 
-        _port.Write(data.Span);
+        var buffer = data.ToArray();
+        _port.Write(buffer, 0, buffer.Length);
         return Task.CompletedTask;
     }
 
