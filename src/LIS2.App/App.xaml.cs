@@ -56,10 +56,7 @@ public partial class App : System.Windows.Application
 
         try
         {
-            var settings = new SettingsStore()
-                .LoadAsync()
-                .GetAwaiter()
-                .GetResult();
+            var settings = new SettingsStore().Load();
 
             mode = Enum.TryParse<AppThemeMode>(
                 settings.ThemeMode,
