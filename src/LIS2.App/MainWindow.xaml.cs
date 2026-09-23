@@ -7,6 +7,7 @@ using LIS2.Core;
 using LIS2.Display;
 using LIS2.Fans;
 using LIS2.Sources;
+using LIS2.Winamp;
 
 namespace LIS2.App;
 
@@ -41,6 +42,7 @@ public partial class MainWindow : Window
         _pageTimer.Tick += PageTimer_Tick;
 
         _sources.Add(new ClockDataSource());
+        _sources.Add(new WinampDataSource());
 
         Loaded += MainWindow_Loaded;
         Closed += MainWindow_Closed;
