@@ -99,18 +99,31 @@
 
                     <Separator Margin="4,18,4,16"/>
 
-                    <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,5"/>
-                    <TextBlock x:Name="TransportSummaryText"
-                               Text="Virtual LIS2"
-                               Foreground="{StaticResource MutedBrush}"
-                               Margin="4,0,0,4"
-                               TextWrapping="Wrap"/>
+                    <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8"/>
+                    <StackPanel Margin="4,0,0,0">
+                        <TextBlock x:Name="TransportSummaryText"
+                                   Text="Virtual LIS2"
+                                   Foreground="#E8EAED"
+                                   FontSize="13"
+                                   TextWrapping="Wrap"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,7,0,8">
+                            <Ellipse Width="9" Height="9" Fill="{StaticResource AccentBrush}" Margin="0,0,7,0"/>
+                            <TextBlock Text="Connected" Foreground="{StaticResource AccentBrush}"/>
+                        </StackPanel>
+                        <Button Content="Change..."
+                                Tag="6"
+                                Click="Navigation_Click"
+                                HorizontalAlignment="Left"
+                                MinWidth="110"/>
+                    </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Margin="4,12,0,10">
                     <Separator Margin="0,0,0,12"/>
-                    <TextBlock Text="LIS2 Control Center" Foreground="{StaticResource MutedBrush}"/>
-                    <TextBlock Text="Development build" FontSize="11" Foreground="#737C88" Margin="0,3,0,0"/>
+                    <TextBlock Text="ⓘ  LIS2 Control Center" Foreground="#D7DCE2"/>
+                    <TextBlock Text="Development build" FontSize="11" Foreground="#737C88" Margin="25,3,0,8"/>
+                    <TextBlock Text="◉  GitHub" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,5"/>
+                    <TextBlock Text="ⓘ  About" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -202,7 +215,7 @@
                                 </StackPanel>
                             </Grid>
 
-                            <Border Style="{StaticResource CardBorderStyle}">
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                                 <StackPanel>
                                     <TextBlock Text="Recent Log" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
                                     <TextBox x:Name="DashboardLogMirror"
@@ -214,6 +227,16 @@
                                              VerticalScrollBarVisibility="Auto"
                                              TextWrapping="NoWrap"/>
                                 </StackPanel>
+                            </Border>
+
+                            <Border Background="#141A20"
+                                    BorderBrush="#222A32"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="12,9">
+                                <TextBlock Foreground="{StaticResource MutedBrush}"
+                                           Text="💡  Tip: Use the navigation on the left to access display settings, page editor, Winamp integration, hardware and fan control."
+                                           TextWrapping="Wrap"/>
                             </Border>
                         </StackPanel>
                     </ScrollViewer>
