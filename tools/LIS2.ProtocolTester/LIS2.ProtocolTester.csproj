@@ -8,5 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+    <ProjectReference Include="..\..\src\LIS2.Core\LIS2.Core.csproj" />
   </ItemGroup>
 </Project>
