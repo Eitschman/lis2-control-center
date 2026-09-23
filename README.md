@@ -50,3 +50,18 @@ This repository intentionally does **not** contain MCC binaries, original VL Sys
 ## Guiding principle
 
 > **Preserve the hardware. Replace the limitations of its software.**
+
+
+## Development builds
+
+GitHub Actions validates every change on Windows.
+
+For successful builds on `main` (and manual workflow runs), the workflow also produces downloadable artifacts:
+
+- `LIS2-Control-Center-win-x64` — self-contained Windows x64 application
+- `LIS2-ProtocolTester-win-x64` — self-contained Windows x64 protocol tester
+- `gen_lis2-win32` — native 32-bit Winamp general-purpose plugin
+
+The two .NET artifacts are self-contained and therefore do not require a separate .NET 8 runtime installation.
+
+The Winamp plugin is intentionally 32-bit because it is loaded into classic Winamp's process.
