@@ -76,10 +76,12 @@ public partial class MainWindow : Window
             AutomaticFanControlCheckBox.IsChecked = _settings.Fans.AutomaticControlEnabled;
             LoadPagesIntoRuntime();
             BindPages();
+            BindFanChannels();
 
             await ReconnectAsync();
             await _sources.StartAllAsync();
             LogSourceHealth();
+            RefreshFanSensorChoices();
             await RenderRuntimePageAsync();
 
             _pageTimer.Start();
@@ -255,6 +257,208 @@ public partial class MainWindow : Window
         if (_settings.Fans.AutomaticControlEnabled)
             await ApplyAutomaticFanControlAsync();
     }
+
+    private void BindFanChannels()
+    {
+        FanChannelsListBox.DisplayMemberPath = nameof(FanChannelSettings.Name);
+        FanChannelsListBox.ItemsSource = null;
+        FanChannelsListBox.ItemsSource = _settings.Fans.Channels;
+
+        if (FanChannelsListBox.SelectedIndex < 0)
+            FanChannelsListBox.SelectedIndex = 0;
+    }
+
+    private void FanChannelsListBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (FanChannelsListBox.SelectedItem is not FanChannelSettings channel)
+            return;
+
+        FanNameTextBox.Text = channel.Name;
+        SelectFanMode(channel.Mode);
+        FanSensorComboBox.Text = channel.SensorKey ?? string.Empty;
+        FanFixedTextBox.Text = channel.FixedPercent.ToString(CultureInfo.InvariantCulture);
+        FanMinimumTextBox.Text = channel.MinimumPercent.ToString(CultureInfo.InvariantCulture);
+        FanMaximumTextBox.Text = channel.MaximumPercent.ToString(CultureInfo.InvariantCulture);
+        FanFailSafeTextBox.Text = channel.FailSafePercent.ToString(CultureInfo.InvariantCulture);
+        FanAllowStopCheckBox.IsChecked = channel.AllowStop;
+        FanCurveTextBox.Text = FormatFanCurve(channel.Curve);
+    }
+
+    private void SelectFanMode(string mode)
+    {
+        foreach (var item in FanModeComboBox.Items.OfType<ComboBoxItem>())
+        {
+            if (string.Equals(
+                    Convert.ToString(item.Content, CultureInfo.InvariantCulture),
+                    mode,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                FanModeComboBox.SelectedItem = item;
+                return;
+            }
+        }
+
+        FanModeComboBox.SelectedIndex = 0;
+    }
+
+    private string GetSelectedFanMode() =>
+        FanModeComboBox.SelectedItem is ComboBoxItem item
+            ? Convert.ToString(item.Content, CultureInfo.InvariantCulture) ?? "Fixed"
+            : "Fixed";
+
+    private void RefreshFanSensors_Click(object sender, RoutedEventArgs e) =>
+        RefreshFanSensorChoices();
+
+    private void RefreshFanSensorChoices()
+    {
+        var current = FanSensorComboBox.Text;
+
+        var sensorKeys = _sources.Snapshot()
+            .Where(pair =>
+                pair.Key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase) &&
+                !pair.Key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase) &&
+                IsNumericValue(pair.Value))
+            .OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(pair => pair.Key)
+            .ToArray();
+
+        FanSensorComboBox.ItemsSource = sensorKeys;
+        FanSensorComboBox.Text = current;
+    }
+
+    private static bool IsNumericValue(object? value)
+    {
+        if (value is null)
+            return false;
+
+        try
+        {
+            _ = Convert.ToDouble(value, CultureInfo.InvariantCulture);
+            return true;
+        }
+        catch (Exception ex) when (
+            ex is FormatException or InvalidCastException or OverflowException)
+        {
+            return false;
+        }
+    }
+
+    private async void SaveFanChannel_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (FanChannelsListBox.SelectedItem is not FanChannelSettings channel)
+                throw new InvalidOperationException("Select a fan channel first.");
+
+            var fixedPercent = ParsePercent(FanFixedTextBox.Text, "Fixed output");
+            var minimumPercent = ParsePercent(FanMinimumTextBox.Text, "Minimum output");
+            var maximumPercent = ParsePercent(FanMaximumTextBox.Text, "Maximum output");
+            var failSafePercent = ParsePercent(FanFailSafeTextBox.Text, "Fail-safe output");
+
+            if (minimumPercent > maximumPercent)
+                throw new InvalidOperationException(
+                    "Minimum fan output must not be greater than maximum output.");
+
+            var mode = GetSelectedFanMode();
+
+            if (!Enum.TryParse<FanMode>(mode, ignoreCase: true, out _))
+                throw new InvalidOperationException($"Unknown fan mode '{mode}'.");
+
+            var curve = ParseFanCurve(FanCurveTextBox.Text);
+
+            if (string.Equals(mode, nameof(FanMode.Curve), StringComparison.OrdinalIgnoreCase) &&
+                curve.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "Curve mode requires at least one temperature/output point.");
+            }
+
+            channel.Name = string.IsNullOrWhiteSpace(FanNameTextBox.Text)
+                ? $"Fan {FanChannelsListBox.SelectedIndex + 1}"
+                : FanNameTextBox.Text.Trim();
+            channel.Mode = mode;
+            channel.SensorKey = string.IsNullOrWhiteSpace(FanSensorComboBox.Text)
+                ? null
+                : FanSensorComboBox.Text.Trim();
+            channel.FixedPercent = fixedPercent;
+            channel.MinimumPercent = minimumPercent;
+            channel.MaximumPercent = maximumPercent;
+            channel.FailSafePercent = failSafePercent;
+            channel.AllowStop = FanAllowStopCheckBox.IsChecked == true;
+            channel.Curve = curve;
+
+            await _settingsStore.SaveAsync(_settings);
+
+            _lastAutomaticFanOutputs = null;
+            FanChannelsListBox.Items.Refresh();
+
+            Log($"INFO saved fan channel '{channel.Name}'");
+
+            if (_settings.Fans.AutomaticControlEnabled)
+                await ApplyAutomaticFanControlAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private static List<FanCurvePointSettings> ParseFanCurve(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return new List<FanCurvePointSettings>();
+
+        var points = new List<FanCurvePointSettings>();
+
+        foreach (var token in text.Split(
+                     ';',
+                     StringSplitOptions.RemoveEmptyEntries |
+                     StringSplitOptions.TrimEntries))
+        {
+            var parts = token.Split(
+                ':',
+                StringSplitOptions.TrimEntries);
+
+            if (parts.Length != 2 ||
+                !double.TryParse(
+                    parts[0],
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out var temperature) ||
+                !int.TryParse(
+                    parts[1],
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out var output) ||
+                output is < 0 or > 100)
+            {
+                throw new InvalidOperationException(
+                    $"Invalid curve point '{token}'. Use temperature:percent, e.g. 60:80.");
+            }
+
+            points.Add(new FanCurvePointSettings
+            {
+                Temperature = temperature,
+                OutputPercent = output
+            });
+        }
+
+        return points
+            .OrderBy(point => point.Temperature)
+            .ToList();
+    }
+
+    private static string FormatFanCurve(
+        IEnumerable<FanCurvePointSettings> curve) =>
+        string.Join(
+            ";",
+            curve
+                .OrderBy(point => point.Temperature)
+                .Select(point =>
+                    $"{point.Temperature.ToString("0.##", CultureInfo.InvariantCulture)}:" +
+                    $"{point.OutputPercent.ToString(CultureInfo.InvariantCulture)}"));
 
     private async void PageTimer_Tick(object? sender, EventArgs e)
     {
