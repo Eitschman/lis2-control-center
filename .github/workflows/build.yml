@@ -39,6 +39,44 @@ jobs:
       - name: Test
         run: dotnet test .\LIS2ControlCenter.sln --configuration Release --no-build --verbosity normal
 
+      - name: Publish LIS2 Control Center
+        if: github.event_name != 'pull_request'
+        run: >
+          dotnet publish .\src\LIS2.App\LIS2.App.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          -p:DebugType=None
+          -p:DebugSymbols=false
+          --output .\artifacts\LIS2ControlCenter
+
+      - name: Publish Protocol Tester
+        if: github.event_name != 'pull_request'
+        run: >
+          dotnet publish .\tools\LIS2.ProtocolTester\LIS2.ProtocolTester.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          -p:DebugType=None
+          -p:DebugSymbols=false
+          --output .\artifacts\LIS2.ProtocolTester
+
+      - name: Upload LIS2 Control Center
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: LIS2-Control-Center-win-x64
+          path: artifacts/LIS2ControlCenter/
+          if-no-files-found: error
+
+      - name: Upload Protocol Tester
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: LIS2-ProtocolTester-win-x64
+          path: artifacts/LIS2.ProtocolTester/
+          if-no-files-found: error
+
   winamp-plugin:
     name: Winamp plugin x86
     runs-on: windows-latest
@@ -58,3 +96,4 @@ jobs:
         with:
           name: gen_lis2-win32
           path: native/LIS2.WinampPlugin/build/Release/gen_lis2.dll
+          if-no-files-found: error
