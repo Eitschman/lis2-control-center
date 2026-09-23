@@ -2,18 +2,26 @@ using System.Globalization;
 using System.IO.Ports;
 using System.Windows;
 using System.Windows.Controls;
+using LIS2.Core;
 
 namespace LIS2.ProtocolTester;
 
 public partial class MainWindow : Window
 {
-    private readonly Lis2SerialConnection _connection = new();
+    private ILis2Transport? _transport;
+    private Lis2Device? _device;
 
     public MainWindow()
     {
         InitializeComponent();
         RefreshPorts();
-        Closed += (_, _) => _connection.Dispose();
+        Closed += MainWindow_Closed;
+    }
+
+    private async void MainWindow_Closed(object? sender, EventArgs e)
+    {
+        if (_device is not null)
+            await _device.DisposeAsync();
     }
 
     private void RefreshPorts_Click(object sender, RoutedEventArgs e) => RefreshPorts();
@@ -35,26 +43,49 @@ public partial class MainWindow : Window
         Log($"INFO ports: {(ports.Length == 0 ? "<none>" : string.Join(", ", ports))}");
     }
 
-    private void Connect_Click(object sender, RoutedEventArgs e)
+    private void VirtualModeChanged(object sender, RoutedEventArgs e)
+    {
+        PortComboBox.IsEnabled = VirtualModeCheckBox.IsChecked != true;
+    }
+
+    private async void Connect_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            if (_connection.IsOpen)
+            if (_device?.IsConnected == true)
             {
-                _connection.Close();
+                await _device.DisposeAsync();
+                _device = null;
+                _transport = null;
                 ConnectionStatus.Text = "Disconnected";
                 ConnectButton.Content = "Connect";
                 Log("INFO disconnected");
                 return;
             }
 
-            if (PortComboBox.SelectedItem is not string portName)
-                throw new InvalidOperationException("Select a COM port first.");
+            if (VirtualModeCheckBox.IsChecked == true)
+            {
+                var virtualTransport = new VirtualLis2Transport();
+                virtualTransport.Written += VirtualTransport_Written;
+                _transport = virtualTransport;
+                Log("INFO using Virtual LIS2 transport");
+            }
+            else
+            {
+                if (PortComboBox.SelectedItem is not string portName)
+                    throw new InvalidOperationException("Select a COM port first.");
 
-            _connection.Open(portName);
-            ConnectionStatus.Text = $"Connected: {portName} @ 19200 8N1";
+                _transport = new SerialLis2Transport(portName);
+                Log($"INFO using serial transport {portName} 19200 8N1; handshake=None; DTR=False; RTS=False");
+            }
+
+            _device = new Lis2Device(_transport);
+            await _device.ConnectAsync();
+
+            ConnectionStatus.Text = VirtualModeCheckBox.IsChecked == true
+                ? "Connected: Virtual LIS2"
+                : $"Connected: {PortComboBox.SelectedItem} @ 19200 8N1";
             ConnectButton.Content = "Disconnect";
-            Log($"INFO connected {portName} 19200 8N1; handshake=None; DTR=False; RTS=False");
         }
         catch (Exception ex)
         {
@@ -62,33 +93,74 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Clear_Click(object sender, RoutedEventArgs e) =>
-        TrySend(Lis2Protocol.Clear, "Clear");
+    private void VirtualTransport_Written(object? sender, VirtualLis2WriteEventArgs e) =>
+        Log($"VIRT {FormatHex(e.Data)}");
 
-    private void SendLine1_Click(object sender, RoutedEventArgs e) =>
-        TrySend(Lis2Protocol.WriteLine(1, 0, Line1TextBox.Text), $"Line1 \"{Line1TextBox.Text}\"");
-
-    private void SendLine2_Click(object sender, RoutedEventArgs e) =>
-        TrySend(Lis2Protocol.WriteLine(2, 0, Line2TextBox.Text), $"Line2 \"{Line2TextBox.Text}\"");
-
-    private void Brightness_Click(object sender, RoutedEventArgs e)
+    private async void Clear_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { Tag: string tag })
-            return;
-
-        var brightness = tag switch
+        try
         {
-            "100" => Brightness.Percent100,
-            "75" => Brightness.Percent75,
-            "50" => Brightness.Percent50,
-            "25" => Brightness.Percent25,
-            _ => throw new InvalidOperationException("Unknown brightness selection.")
-        };
-
-        TrySend(Lis2Protocol.SetBrightness(brightness), $"Brightness {tag}%");
+            await RequireDevice().ClearAsync();
+            Log("CMD  Clear");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
     }
 
-    private void SendFans_Click(object sender, RoutedEventArgs e)
+    private async void SendLine1_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await RequireDevice().WriteLineAsync(1, Line1TextBox.Text);
+            Log($"CMD  Line1 \"{Line1TextBox.Text}\"");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void SendLine2_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await RequireDevice().WriteLineAsync(2, Line2TextBox.Text);
+            Log($"CMD  Line2 \"{Line2TextBox.Text}\"");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void Brightness_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (sender is not Button { Tag: string tag })
+                return;
+
+            var brightness = tag switch
+            {
+                "100" => Lis2Brightness.Percent100,
+                "75" => Lis2Brightness.Percent75,
+                "50" => Lis2Brightness.Percent50,
+                "25" => Lis2Brightness.Percent25,
+                _ => throw new InvalidOperationException("Unknown brightness selection.")
+            };
+
+            await RequireDevice().SetBrightnessAsync(brightness);
+            Log($"CMD  Brightness {tag}%");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void SendFans_Click(object sender, RoutedEventArgs e)
     {
         try
         {
@@ -100,8 +172,8 @@ public partial class MainWindow : Window
                 ParsePercent(Fan4TextBox.Text, "Fan 4")
             };
 
-            var command = Lis2Protocol.SetFans(values[0], values[1], values[2], values[3]);
-            TrySend(command, $"Fans {string.Join("/", values)}%");
+            await RequireDevice().SetFansAsync(values[0], values[1], values[2], values[3]);
+            Log($"CMD  Fans {string.Join("/", values)}%");
         }
         catch (Exception ex)
         {
@@ -109,7 +181,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void ProgramCharacter_Click(object sender, RoutedEventArgs e)
+    private async void ProgramCharacter_Click(object sender, RoutedEventArgs e)
     {
         try
         {
@@ -123,40 +195,39 @@ public partial class MainWindow : Window
                 throw new InvalidOperationException("Enter exactly 8 row values.");
 
             var rows = rowTokens
-                .Select(value => int.Parse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture))
+                .Select(value => byte.Parse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture))
                 .ToArray();
 
-            if (rows.Any(value => value is < 0 or > 0x1F))
+            if (rows.Any(value => value > 0x1F))
                 throw new InvalidOperationException("Each custom-character row must be between 00 and 1F.");
 
-            for (var row = 0; row < 8; row++)
-                TrySend(Lis2Protocol.ProgramCharacterRow(slot, row, rows[row]), $"CG slot={slot} row={row} data={rows[row]:X2}");
+            await RequireDevice().ProgramCharacterAsync(slot, rows);
+            Log($"CMD  Program character slot {slot}: {FormatHex(rows)}");
         }
         catch (Exception ex)
         {
             ShowError(ex);
         }
+    }
+
+    private Lis2Device RequireDevice()
+    {
+        if (_device?.IsConnected != true)
+            throw new InvalidOperationException("Connect to the LIS2 transport first.");
+
+        return _device;
     }
 
     private static int ParsePercent(string text, string name)
     {
         if (!int.TryParse(text, out var value) || value is < 0 or > 100)
             throw new InvalidOperationException($"{name} must be between 0 and 100.");
+
         return value;
     }
 
-    private void TrySend(byte[] command, string semantic)
-    {
-        try
-        {
-            _connection.Send(command);
-            Log($"TX   {string.Join(" ", command.Select(b => b.ToString("X2", CultureInfo.InvariantCulture)))}    {semantic}");
-        }
-        catch (Exception ex)
-        {
-            ShowError(ex);
-        }
-    }
+    private static string FormatHex(IEnumerable<byte> bytes) =>
+        string.Join(" ", bytes.Select(value => value.ToString("X2", CultureInfo.InvariantCulture)));
 
     private void ShowError(Exception ex)
     {
