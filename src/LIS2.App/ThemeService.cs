@@ -40,7 +40,7 @@ public static class ThemeService
             useLight ? "Themes/Light.xaml" : "Themes/Dark.xaml",
             UriKind.Relative);
 
-        var dictionaries = Application.Current.Resources.MergedDictionaries;
+        var dictionaries = System.Windows.Application.Current.Resources.MergedDictionaries;
 
         if (dictionaries.Count == 0)
         {
