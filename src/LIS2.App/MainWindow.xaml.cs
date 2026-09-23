@@ -66,6 +66,75 @@ public partial class MainWindow : Window
         Closed += MainWindow_Closed;
     }
 
+    private static readonly (string Title, string Subtitle)[] Sections =
+    [
+        ("Dashboard", "Overview and quick access to the most important functions."),
+        ("Display", "VFD output, brightness and direct display tests."),
+        ("Pages", "Create and edit the rotating 20x2 display pages."),
+        ("Winamp", "Winamp integration, pipe transport and available media variables."),
+        ("Hardware", "LibreHardwareMonitor data sources and sensor availability."),
+        ("Fan Control", "Manual output, automatic control, curves and safety limits."),
+        ("Settings", "LIS2 transport, COM port and Windows startup behavior."),
+        ("Diagnostics", "Runtime state, data-source health and protocol traffic.")
+    ];
+
+    private void Navigation_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button { Tag: string tag } ||
+            !int.TryParse(tag, out var index) ||
+            index < 0 ||
+            index >= MainTabs.Items.Count)
+        {
+            return;
+        }
+
+        MainTabs.SelectedIndex = index;
+        UpdateNavigationSelection(index);
+    }
+
+    private void UpdateNavigationSelection(int selectedIndex)
+    {
+        foreach (var button in NavigationPanel.Children.OfType<System.Windows.Controls.Button>())
+        {
+            var isSelected =
+                button.Tag is string tag &&
+                int.TryParse(tag, out var index) &&
+                index == selectedIndex;
+
+            button.Background = isSelected
+                ? new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(23, 59, 37))
+                : System.Windows.Media.Brushes.Transparent;
+
+            button.Foreground = isSelected
+                ? new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(105, 238, 138))
+                : new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(232, 234, 237));
+        }
+    }
+
+    private void MainTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!ReferenceEquals(e.Source, MainTabs))
+            return;
+
+        var index = MainTabs.SelectedIndex;
+
+        if (index < 0 || index >= Sections.Length)
+            return;
+
+        SectionTitleText.Text = Sections[index].Title;
+        SectionSubtitleText.Text = Sections[index].Subtitle;
+        UpdateNavigationSelection(index);
+
+        if (index == 5)
+            RefreshFanSensorChoices();
+
+        if (index == 7)
+            RefreshDiagnostics();
+    }
+
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         try
@@ -1010,7 +1079,12 @@ public partial class MainWindow : Window
 
     private void Log(string text)
     {
-        LogTextBox.AppendText($"[{DateTime.Now:HH:mm:ss.fff}] {text}{Environment.NewLine}");
+        var line = $"[{DateTime.Now:HH:mm:ss.fff}] {text}{Environment.NewLine}";
+
+        LogTextBox.AppendText(line);
         LogTextBox.ScrollToEnd();
+
+        DashboardLogMirror.AppendText(line);
+        DashboardLogMirror.ScrollToEnd();
     }
 }
