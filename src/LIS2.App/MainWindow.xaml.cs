@@ -89,6 +89,29 @@ public partial class MainWindow : Window
         }
 
         MainTabs.SelectedIndex = index;
+        UpdateNavigationSelection(index);
+    }
+
+    private void UpdateNavigationSelection(int selectedIndex)
+    {
+        foreach (var button in NavigationPanel.Children.OfType<System.Windows.Controls.Button>())
+        {
+            var isSelected =
+                button.Tag is string tag &&
+                int.TryParse(tag, out var index) &&
+                index == selectedIndex;
+
+            button.Background = isSelected
+                ? new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(23, 59, 37))
+                : System.Windows.Media.Brushes.Transparent;
+
+            button.Foreground = isSelected
+                ? new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(105, 238, 138))
+                : new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(232, 234, 237));
+        }
     }
 
     private void MainTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -103,6 +126,7 @@ public partial class MainWindow : Window
 
         SectionTitleText.Text = Sections[index].Title;
         SectionSubtitleText.Text = Sections[index].Subtitle;
+        UpdateNavigationSelection(index);
 
         if (index == 5)
             RefreshFanSensorChoices();
