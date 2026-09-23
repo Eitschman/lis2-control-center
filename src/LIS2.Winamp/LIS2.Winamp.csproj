@@ -3,4 +3,7 @@
     <AssemblyName>LIS2.Winamp</AssemblyName>
     <RootNamespace>LIS2.Winamp</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LIS2.Sources\LIS2.Sources.csproj" />
+  </ItemGroup>
 </Project>
