@@ -127,6 +127,60 @@
                     </GroupBox>
                 </Grid>
 
+                <GroupBox Header="Pages" Foreground="#F0F0F0" Margin="0,0,0,14">
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="220"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <ListBox x:Name="PagesListBox" Height="150" SelectionChanged="PagesListBox_SelectionChanged"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="Add" Click="AddPage_Click" Padding="10,4" Margin="0,0,6,0"/>
+                                <Button Content="Delete" Click="DeletePage_Click" Padding="10,4"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Grid Grid.Column="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <TextBox x:Name="PageNameTextBox" Grid.Row="0" Grid.Column="1" Margin="0,0,0,8"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Line 1" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <TextBox x:Name="PageLine1TextBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,8"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Line 2" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <TextBox x:Name="PageLine2TextBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,8"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Duration (s)" Margin="0,0,8,8" VerticalAlignment="Center"/>
+                            <TextBox x:Name="PageDurationTextBox" Grid.Row="3" Grid.Column="1" Width="70" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+
+                            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                                <Button Content="Save page" Click="SavePage_Click" Padding="12,5" Margin="0,0,6,0"/>
+                                <Button Content="Test event (5 s)" Click="TestEvent_Click" Padding="12,5"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Virtual LIS2 state" Foreground="#F0F0F0" Margin="0,0,0,14">
+                    <TextBlock x:Name="VirtualStateText" Margin="10" FontFamily="Consolas"
+                               Text="State available when Virtual transport is active."/>
+                </GroupBox>
+
                 <GroupBox Header="Device settings" Foreground="#F0F0F0" Margin="0,0,0,14">
                     <Grid Margin="10">
                         <Grid.ColumnDefinitions>
