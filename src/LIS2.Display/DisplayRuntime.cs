@@ -16,17 +16,26 @@ public sealed class DisplayRuntime
         _events = events ?? throw new ArgumentNullException(nameof(events));
     }
 
+    public TimeSpan SuggestedDuration { get; private set; } = TimeSpan.FromSeconds(5);
+
     public DisplayFrame? RenderNext(
         IReadOnlyDictionary<string, object?> values,
         DateTimeOffset now)
     {
         var activeEvent = _events.Peek(now);
         if (activeEvent is not null)
+        {
+            SuggestedDuration = TimeSpan.FromSeconds(1);
             return activeEvent.Frame;
+        }
 
         var page = _scheduler.Next();
         if (page is null)
             return null;
+
+        SuggestedDuration = page.Duration <= TimeSpan.Zero
+            ? TimeSpan.FromSeconds(1)
+            : page.Duration;
 
         return _renderer.RenderFrame(
             page.Line1Template,
