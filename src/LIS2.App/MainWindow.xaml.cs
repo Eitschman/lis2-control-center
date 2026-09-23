@@ -20,6 +20,8 @@ public partial class MainWindow : Window
     private readonly DisplayRuntime _displayRuntime;
     private readonly DispatcherTimer _pageTimer;
     private readonly FanController _fanController = new();
+    private readonly TrayIconService _trayIcon = new();
+    private bool _allowClose;
 
     private AppSettings _settings = new();
     private ILis2Transport? _transport;
@@ -46,7 +48,11 @@ public partial class MainWindow : Window
         _sources.Add(new WinampDataSource());
         _sources.Add(new LibreHardwareMonitorDataSource());
 
+        _trayIcon.ShowRequested += TrayIcon_ShowRequested;
+        _trayIcon.ExitRequested += TrayIcon_ExitRequested;
+
         Loaded += MainWindow_Loaded;
+        Closing += MainWindow_Closing;
         Closed += MainWindow_Closed;
     }
 
@@ -75,6 +81,32 @@ public partial class MainWindow : Window
         }
     }
 
+    private void MainWindow_Closing(
+        object? sender,
+        System.ComponentModel.CancelEventArgs e)
+    {
+        if (_allowClose)
+            return;
+
+        e.Cancel = true;
+        Hide();
+        _trayIcon.SetStatus("running in tray");
+    }
+
+    private void TrayIcon_ShowRequested(object? sender, EventArgs e)
+    {
+        Show();
+        WindowState = WindowState.Normal;
+        Activate();
+    }
+
+    private void TrayIcon_ExitRequested(object? sender, EventArgs e)
+    {
+        _allowClose = true;
+        Close();
+        Application.Current.Shutdown();
+    }
+
     private async void MainWindow_Closed(object? sender, EventArgs e)
     {
         _pageTimer.Stop();
@@ -84,6 +116,8 @@ public partial class MainWindow : Window
 
         if (_device is not null)
             await _device.DisposeAsync();
+
+        _trayIcon.Dispose();
     }
 
     private async void PageTimer_Tick(object? sender, EventArgs e)
@@ -324,6 +358,7 @@ public partial class MainWindow : Window
             : "Virtual LIS2 transport";
 
         Log($"INFO connected using {_settings.TransportMode} transport");
+        _trayIcon.SetStatus(ConnectionText.Text);
     }
 
     private void VirtualTransport_StateChanged(object? sender, EventArgs e)
