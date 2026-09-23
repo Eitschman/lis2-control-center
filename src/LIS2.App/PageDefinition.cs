@@ -1,0 +1,11 @@
+namespace LIS2.App;
+
+public sealed class PageDefinition
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    public string Name { get; set; } = "Page";
+    public string Line1Template { get; set; } = string.Empty;
+    public string Line2Template { get; set; } = string.Empty;
+    public int DurationSeconds { get; set; } = 5;
+    public int Priority { get; set; }
+}
