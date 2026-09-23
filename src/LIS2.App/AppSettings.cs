@@ -12,6 +12,9 @@ public sealed class AppSettings
     {
         if (Pages.Count == 0)
             Pages = CreateDefaultPages();
+
+        Fans ??= new FanSettings();
+        Fans.EnsureDefaults();
     }
 
     private static List<PageDefinition> CreateDefaultPages() =>
