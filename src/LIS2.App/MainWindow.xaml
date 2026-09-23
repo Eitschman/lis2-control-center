@@ -5,66 +5,8 @@
         Width="1240" Height="820"
         MinWidth="1040" MinHeight="700"
         WindowStartupLocation="CenterScreen"
-        Background="#0E1114"
-        Foreground="#F3F4F6">
-    <Window.Resources>
-        <SolidColorBrush x:Key="PanelBrush" Color="#171B20"/>
-        <SolidColorBrush x:Key="PanelBorderBrush" Color="#343A42"/>
-        <SolidColorBrush x:Key="MutedBrush" Color="#AAB2BD"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#69EE8A"/>
-        <SolidColorBrush x:Key="AccentDarkBrush" Color="#173B25"/>
-
-        <Style TargetType="GroupBox">
-            <Setter Property="Foreground" Value="#F3F4F6"/>
-            <Setter Property="Margin" Value="0,0,0,14"/>
-            <Setter Property="Padding" Value="4"/>
-        </Style>
-
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#11151A"/>
-            <Setter Property="Foreground" Value="#F3F4F6"/>
-            <Setter Property="BorderBrush" Value="#3A414B"/>
-            <Setter Property="Padding" Value="7,5"/>
-        </Style>
-
-        <Style TargetType="ComboBox">
-            <Setter Property="Background" Value="#11151A"/>
-            <Setter Property="Foreground" Value="#F3F4F6"/>
-            <Setter Property="BorderBrush" Value="#3A414B"/>
-            <Setter Property="Padding" Value="6,4"/>
-        </Style>
-
-        <Style TargetType="ListBox">
-            <Setter Property="Background" Value="#11151A"/>
-            <Setter Property="Foreground" Value="#F3F4F6"/>
-            <Setter Property="BorderBrush" Value="#3A414B"/>
-        </Style>
-
-        <Style TargetType="Button">
-            <Setter Property="Padding" Value="12,6"/>
-            <Setter Property="Background" Value="#353B45"/>
-            <Setter Property="Foreground" Value="#F3F4F6"/>
-            <Setter Property="BorderBrush" Value="#4A515C"/>
-        </Style>
-
-        <Style x:Key="NavButtonStyle" TargetType="Button">
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Padding" Value="14,11"/>
-            <Setter Property="Margin" Value="0,0,0,5"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#E8EAED"/>
-            <Setter Property="FontSize" Value="14"/>
-        </Style>
-
-        <Style x:Key="CardBorderStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource PanelBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="7"/>
-            <Setter Property="Padding" Value="16"/>
-        </Style>
-    </Window.Resources>
+        Background="{StaticResource AppBackgroundBrush}"
+        Foreground="{StaticResource TextBrush}">
 
     <Grid>
         <Grid.ColumnDefinitions>
