@@ -101,16 +101,20 @@ public partial class MainWindow : Window
                 int.TryParse(tag, out var index) &&
                 index == selectedIndex;
 
-            button.Background = isSelected
-                ? new System.Windows.Media.SolidColorBrush(
-                    System.Windows.Media.Color.FromRgb(23, 59, 37))
-                : System.Windows.Media.Brushes.Transparent;
-
-            button.Foreground = isSelected
-                ? new System.Windows.Media.SolidColorBrush(
-                    System.Windows.Media.Color.FromRgb(105, 238, 138))
-                : new System.Windows.Media.SolidColorBrush(
-                    System.Windows.Media.Color.FromRgb(232, 234, 237));
+            if (isSelected)
+            {
+                button.SetResourceReference(
+                    System.Windows.Controls.Control.BackgroundProperty,
+                    "AccentDarkBrush");
+                button.SetResourceReference(
+                    System.Windows.Controls.Control.ForegroundProperty,
+                    "AccentBrush");
+            }
+            else
+            {
+                button.ClearValue(System.Windows.Controls.Control.BackgroundProperty);
+                button.ClearValue(System.Windows.Controls.Control.ForegroundProperty);
+            }
         }
     }
 
@@ -725,7 +729,47 @@ public partial class MainWindow : Window
         if (_settings.PortName is not null && PortComboBox.Items.Contains(_settings.PortName))
             PortComboBox.SelectedItem = _settings.PortName;
 
+        var themeMode = Enum.TryParse<AppThemeMode>(
+            _settings.ThemeMode,
+            ignoreCase: true,
+            out var parsedTheme)
+            ? parsedTheme
+            : AppThemeMode.System;
+
+        foreach (var item in ThemeModeComboBox.Items.OfType<ComboBoxItem>())
+        {
+            if (item.Tag is string tag &&
+                string.Equals(tag, themeMode.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                ThemeModeComboBox.SelectedItem = item;
+                break;
+            }
+        }
+
+        ThemeService.Apply(themeMode);
+        UpdateNavigationSelection(MainTabs.SelectedIndex);
         UpdateTransportUi();
+    }
+
+    private async void ThemeModeChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded ||
+            ThemeModeComboBox.SelectedItem is not ComboBoxItem { Tag: string tag } ||
+            !Enum.TryParse<AppThemeMode>(tag, ignoreCase: true, out var mode))
+        {
+            return;
+        }
+
+        _settings.ThemeMode = mode.ToString();
+        ThemeService.Apply(mode);
+        UpdateNavigationSelection(MainTabs.SelectedIndex);
+
+        await _settingsStore.SaveAsync(_settings);
+
+        Log(
+            mode == AppThemeMode.System
+                ? $"INFO theme set to System default ({(ThemeService.IsDarkEffective ? "Dark" : "Light")})"
+                : $"INFO theme set to {mode}");
     }
 
     private void RefreshPorts()
