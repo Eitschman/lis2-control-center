@@ -5,25 +5,20 @@ namespace LIS2.Winamp;
 public sealed class WinampDataSource : IDataSource
 {
     private readonly WinampPipeServer _server = new();
+
     private IReadOnlyDictionary<string, object?> _values =
-        new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["State"] = WinampPlaybackState.Unknown.ToString(),
-            ["Artist"] = null,
-            ["Title"] = null,
-            ["Album"] = null,
-            ["PlaylistPosition"] = null,
-            ["PlaylistCount"] = null,
-            ["Elapsed"] = null,
-            ["Duration"] = null,
-            ["BitrateKbps"] = null,
-            ["SampleRateHz"] = null
-        };
+        CreateInitialValues();
 
     public string Id => "Winamp";
 
     public IReadOnlyDictionary<string, object?> Values =>
         Volatile.Read(ref _values);
+
+    public DateTimeOffset? LastSnapshotAt { get; private set; }
+
+    public bool IsRecentlyConnected =>
+        LastSnapshotAt is not null &&
+        DateTimeOffset.UtcNow - LastSnapshotAt.Value < TimeSpan.FromSeconds(3);
 
     public event EventHandler? Changed;
 
@@ -40,9 +35,29 @@ public sealed class WinampDataSource : IDataSource
 
     private void Server_SnapshotReceived(object? sender, WinampSnapshot snapshot)
     {
-        Volatile.Write(ref _values, WinampValues.FromSnapshot(snapshot));
+        LastSnapshotAt = DateTimeOffset.UtcNow;
+
+        Volatile.Write(
+            ref _values,
+            WinampValues.FromSnapshot(snapshot));
+
         Changed?.Invoke(this, EventArgs.Empty);
     }
+
+    private static IReadOnlyDictionary<string, object?> CreateInitialValues() =>
+        new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["State"] = WinampPlaybackState.Unknown.ToString(),
+            ["Artist"] = null,
+            ["Title"] = null,
+            ["Album"] = null,
+            ["PlaylistPosition"] = null,
+            ["PlaylistCount"] = null,
+            ["Elapsed"] = null,
+            ["Duration"] = null,
+            ["BitrateKbps"] = null,
+            ["SampleRateHz"] = null
+        };
 
     public async ValueTask DisposeAsync()
     {
