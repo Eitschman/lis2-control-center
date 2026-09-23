@@ -114,7 +114,7 @@ public partial class MainWindow : Window
     {
         _allowClose = true;
         Close();
-        Application.Current.Shutdown();
+        System.Windows.Application.Current.Shutdown();
     }
 
     private async void MainWindow_Closed(object? sender, EventArgs e)
