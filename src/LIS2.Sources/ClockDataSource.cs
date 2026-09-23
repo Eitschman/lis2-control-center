@@ -2,13 +2,16 @@ namespace LIS2.Sources;
 
 public sealed class ClockDataSource : IDataSource
 {
-    private readonly Dictionary<string, object?> _values = new(StringComparer.OrdinalIgnoreCase);
+    private IReadOnlyDictionary<string, object?> _values =
+        new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+
     private CancellationTokenSource? _cts;
     private Task? _loopTask;
 
     public string Id => "Clock";
 
-    public IReadOnlyDictionary<string, object?> Values => _values;
+    public IReadOnlyDictionary<string, object?> Values =>
+        Volatile.Read(ref _values);
 
     public event EventHandler? Changed;
 
@@ -62,10 +65,15 @@ public sealed class ClockDataSource : IDataSource
     {
         var now = DateTime.Now;
 
-        _values["Time"] = now.ToString("HH:mm:ss");
-        _values["Date"] = now.ToString("dd.MM.yyyy");
-        _values["Day"] = now.ToString("dddd");
+        IReadOnlyDictionary<string, object?> next =
+            new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Time"] = now.ToString("HH:mm:ss"),
+                ["Date"] = now.ToString("dd.MM.yyyy"),
+                ["Day"] = now.ToString("dddd")
+            };
 
+        Volatile.Write(ref _values, next);
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
