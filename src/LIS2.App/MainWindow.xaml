@@ -326,28 +326,143 @@
 
                 <!-- Hardware -->
                 <TabItem Header="Hardware">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel>
-                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
-                                <StackPanel>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
                                     <TextBlock Text="Hardware Monitoring" FontWeight="SemiBold" FontSize="18"/>
-                                    <TextBlock Text="LibreHardwareMonitor provides CPU, GPU, memory, storage, motherboard and fan sensor values."
+                                    <TextBlock x:Name="HardwareSummaryText"
+                                               Text="Waiting for LibreHardwareMonitor values..."
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               Margin="0,6,0,0"/>
+                                </StackPanel>
+
+                                <TextBox x:Name="HardwareSearchTextBox"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center"
+                                         ToolTip="Search by sensor name or key"
+                                         TextChanged="HardwareFilterChanged"/>
+
+                                <ComboBox x:Name="HardwareTypeComboBox"
+                                          Grid.Column="3"
+                                          VerticalAlignment="Center"
+                                          SelectionChanged="HardwareFilterChanged">
+                                    <ComboBoxItem Content="All types" Tag="All" IsSelected="True"/>
+                                    <ComboBoxItem Content="Temperature" Tag="Temperature"/>
+                                    <ComboBoxItem Content="Load" Tag="Load"/>
+                                    <ComboBoxItem Content="Fan" Tag="Fan"/>
+                                    <ComboBoxItem Content="Clock" Tag="Clock"/>
+                                    <ComboBoxItem Content="Voltage" Tag="Voltage"/>
+                                    <ComboBoxItem Content="Power" Tag="Power"/>
+                                    <ComboBoxItem Content="Data" Tag="Data"/>
+                                    <ComboBoxItem Content="Throughput" Tag="Throughput"/>
+                                    <ComboBoxItem Content="Other" Tag="Other"/>
+                                </ComboBox>
+
+                                <Button Grid.Column="5"
+                                        Content="Refresh"
+                                        Click="RefreshHardware_Click"
+                                        VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0" Margin="8,0,8,7">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2.1*"/>
+                                        <ColumnDefinition Width="1.1*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                        <ColumnDefinition Width="2.8*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Sensor" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="1" Text="Type" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="2" Text="Value" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="3" Text="Template key" FontWeight="SemiBold"/>
+                                </Grid>
+
+                                <ListBox x:Name="HardwareSensorsListBox"
+                                         Grid.Row="1"
+                                         SelectionChanged="HardwareSensorsListBox_SelectionChanged">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="2,1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="2.1*"/>
+                                                    <ColumnDefinition Width="1.1*"/>
+                                                    <ColumnDefinition Width="1*"/>
+                                                    <ColumnDefinition Width="2.8*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding Name}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding Type}"
+                                                           Foreground="{DynamicResource MutedBrush}"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding DisplayValue}"
+                                                           FontFamily="Consolas"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="{Binding Key}"
+                                                           FontFamily="Consolas"
+                                                           Foreground="{DynamicResource MutedBrush}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Selected sensor" FontWeight="SemiBold" FontSize="16"/>
+                                    <TextBlock x:Name="SelectedHardwareSensorText"
+                                               Text="Select a sensor above."
                                                Foreground="{DynamicResource MutedBrush}"
                                                TextWrapping="Wrap"
-                                               Margin="0,8,0,0"/>
+                                               Margin="0,5,16,0"/>
                                 </StackPanel>
-                            </Border>
-                            <Border Style="{StaticResource CardBorderStyle}">
-                                <StackPanel>
-                                    <TextBlock Text="Sensor usage" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
-                                    <TextBlock Text="Hardware values are available to page templates with the Hardware.* prefix and can be selected as fan-control sensors."
-                                               Foreground="{DynamicResource MutedBrush}"
-                                               TextWrapping="Wrap"/>
-                                    <Button Content="Refresh fan sensor list" Click="RefreshFanSensors_Click" HorizontalAlignment="Left" Margin="0,12,0,0"/>
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="Use for Fan 1" Tag="0" Click="AssignHardwareSensorToFan_Click" Margin="0,0,7,0"/>
+                                    <Button Content="Fan 2" Tag="1" Click="AssignHardwareSensorToFan_Click" Margin="0,0,7,0"/>
+                                    <Button Content="Fan 3" Tag="2" Click="AssignHardwareSensorToFan_Click" Margin="0,0,7,0"/>
+                                    <Button Content="Fan 4" Tag="3" Click="AssignHardwareSensorToFan_Click"/>
                                 </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </ScrollViewer>
+                            </Grid>
+                        </Border>
+                    </Grid>
                 </TabItem>
 
                 <!-- Fan Control -->
