@@ -6,6 +6,7 @@ public sealed class AppSettings
     public string? PortName { get; set; }
     public int BrightnessPercent { get; set; } = 100;
     public List<PageDefinition> Pages { get; set; } = CreateDefaultPages();
+    public FanSettings Fans { get; set; } = new();
 
     public void EnsureDefaults()
     {
