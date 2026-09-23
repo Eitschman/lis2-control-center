@@ -32,6 +32,14 @@ public sealed class AppSettings
                 Line1Template = "LIS2 Control Center",
                 Line2Template = "Virtual/Serial ready",
                 DurationSeconds = 5
+            },
+            new PageDefinition
+            {
+                Id = "winamp",
+                Name = "Winamp",
+                Line1Template = "{Winamp.Artist}",
+                Line2Template = "{Winamp.Title}",
+                DurationSeconds = 5
             }
         };
 }
