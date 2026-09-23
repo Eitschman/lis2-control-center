@@ -128,7 +128,8 @@ public partial class MainWindow : Window
                     page.Line1Template,
                     page.Line2Template,
                     TimeSpan.FromSeconds(Math.Max(1, page.DurationSeconds)),
-                    page.Priority)));
+                    page.Priority,
+                    page.VisibilityExpression)));
     }
 
     private void BindPages()
