@@ -24,6 +24,7 @@ public partial class MainWindow : Window
     private AppSettings _settings = new();
     private ILis2Transport? _transport;
     private Lis2Device? _device;
+    private DisplayFrameWriter? _frameWriter;
     private DisplayFrame _frame = DisplayFrame.Create(string.Empty, string.Empty);
 
     public MainWindow()
@@ -128,9 +129,10 @@ public partial class MainWindow : Window
 
     private async Task WriteFrameAsync(DisplayFrame frame)
     {
-        var device = RequireDevice();
-        await device.WriteLineAsync(1, frame.Line1);
-        await device.WriteLineAsync(2, frame.Line2);
+        if (_frameWriter is null)
+            throw new InvalidOperationException("LIS2 display writer is not initialized.");
+
+        await _frameWriter.WriteAsync(frame);
     }
 
     private void LoadPagesIntoRuntime()
@@ -288,6 +290,7 @@ public partial class MainWindow : Window
         {
             await _device.DisposeAsync();
             _device = null;
+            _frameWriter = null;
             _transport = null;
         }
 
@@ -310,6 +313,7 @@ public partial class MainWindow : Window
 
         _device = new Lis2Device(_transport);
         await _device.ConnectAsync();
+        _frameWriter = new DisplayFrameWriter(_device);
 
         ConnectionText.Text = _settings.TransportMode == "Serial"
             ? $"Connected: {_settings.PortName}"
@@ -385,7 +389,7 @@ public partial class MainWindow : Window
         try
         {
             _frame = DisplayFrame.Create(Line1TextBox.Text, _frame.Line2);
-            await RequireDevice().WriteLineAsync(1, _frame.Line1);
+            await WriteFrameAsync(_frame);
             RefreshPreview();
         }
         catch (Exception ex)
@@ -399,7 +403,7 @@ public partial class MainWindow : Window
         try
         {
             _frame = DisplayFrame.Create(_frame.Line1, Line2TextBox.Text);
-            await RequireDevice().WriteLineAsync(2, _frame.Line2);
+            await WriteFrameAsync(_frame);
             RefreshPreview();
         }
         catch (Exception ex)
@@ -427,6 +431,7 @@ public partial class MainWindow : Window
         try
         {
             await RequireDevice().ClearAsync();
+            _frameWriter?.Reset();
             _frame = DisplayFrame.Create(string.Empty, string.Empty);
             RefreshPreview();
         }
