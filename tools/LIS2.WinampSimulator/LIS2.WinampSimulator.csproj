@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>LIS2.WinampSimulator</AssemblyName>
+    <RootNamespace>LIS2.WinampSimulator</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\LIS2.Winamp\LIS2.Winamp.csproj" />
+  </ItemGroup>
+</Project>
