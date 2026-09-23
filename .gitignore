@@ -1,0 +1,50 @@
+# Build
+[Bb]in/
+[Oo]bj/
+artifacts/
+publish/
+
+# IDEs
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Tests / coverage
+TestResults/
+coverage/
+coverage.*
+*.coverage
+*.coveragexml
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Local configuration / secrets
+settings.local.json
+*.secrets.json
+.env
+.env.*
+!.env.example
+
+# Diagnostics / captures
+diagnostics/
+captures/
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Proprietary / redistributable binaries
+MCC.exe
+mcc*.exe
+*.msi
