@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO.Ports;
 using System.Windows;
 using System.Windows.Controls;
 using LIS2.Core;
@@ -8,17 +9,15 @@ namespace LIS2.App;
 
 public partial class MainWindow : Window
 {
-    private readonly VirtualLis2Transport _transport = new();
-    private readonly Lis2Device _device;
+    private readonly SettingsStore _settingsStore = new();
+    private AppSettings _settings = new();
+    private ILis2Transport? _transport;
+    private Lis2Device? _device;
     private DisplayFrame _frame = DisplayFrame.Create(string.Empty, string.Empty);
 
     public MainWindow()
     {
         InitializeComponent();
-
-        _transport.Written += Transport_Written;
-        _device = new Lis2Device(_transport);
-
         Loaded += MainWindow_Loaded;
         Closed += MainWindow_Closed;
     }
@@ -27,9 +26,10 @@ public partial class MainWindow : Window
     {
         try
         {
-            await _device.ConnectAsync();
-            ConnectionText.Text = "Virtual LIS2 connected";
-            Log("INFO Virtual LIS2 connected");
+            _settings = await _settingsStore.LoadAsync();
+            RefreshPorts();
+            ApplySettingsToUi();
+            await ReconnectAsync();
             await RenderBothAsync();
         }
         catch (Exception ex)
@@ -40,15 +40,113 @@ public partial class MainWindow : Window
 
     private async void MainWindow_Closed(object? sender, EventArgs e)
     {
-        await _device.DisposeAsync();
+        if (_device is not null)
+            await _device.DisposeAsync();
     }
+
+    private void ApplySettingsToUi()
+    {
+        TransportModeComboBox.SelectedIndex =
+            string.Equals(_settings.TransportMode, "Serial", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+
+        if (_settings.PortName is not null && PortComboBox.Items.Contains(_settings.PortName))
+            PortComboBox.SelectedItem = _settings.PortName;
+
+        UpdateTransportUi();
+    }
+
+    private void RefreshPorts()
+    {
+        var selected = PortComboBox.SelectedItem as string ?? _settings.PortName;
+        var ports = SerialPort.GetPortNames()
+            .OrderBy(port => port, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        PortComboBox.ItemsSource = ports;
+
+        if (selected is not null && ports.Contains(selected))
+            PortComboBox.SelectedItem = selected;
+        else if (ports.Length > 0)
+            PortComboBox.SelectedIndex = 0;
+    }
+
+    private async Task ReconnectAsync()
+    {
+        if (_device is not null)
+        {
+            await _device.DisposeAsync();
+            _device = null;
+            _transport = null;
+        }
+
+        if (string.Equals(_settings.TransportMode, "Serial", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.IsNullOrWhiteSpace(_settings.PortName))
+                throw new InvalidOperationException("Select a COM port before using the serial transport.");
+
+            _transport = new SerialLis2Transport(_settings.PortName);
+        }
+        else
+        {
+            var virtualTransport = new VirtualLis2Transport();
+            virtualTransport.Written += Transport_Written;
+            _transport = virtualTransport;
+        }
+
+        _device = new Lis2Device(_transport);
+        await _device.ConnectAsync();
+
+        ConnectionText.Text = _settings.TransportMode == "Serial"
+            ? $"Connected: {_settings.PortName}"
+            : "Virtual LIS2 connected";
+
+        TransportSummaryText.Text = _settings.TransportMode == "Serial"
+            ? $"Serial: {_settings.PortName}"
+            : "Virtual LIS2 transport";
+
+        Log($"INFO connected using {_settings.TransportMode} transport");
+    }
+
+    private void TransportModeChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded)
+            return;
+
+        UpdateTransportUi();
+    }
+
+    private void UpdateTransportUi()
+    {
+        var serial = TransportModeComboBox.SelectedIndex == 1;
+        PortComboBox.IsEnabled = serial;
+    }
+
+    private void RefreshPorts_Click(object sender, RoutedEventArgs e) => RefreshPorts();
+
+    private async void ApplyDeviceSettings_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            _settings.TransportMode = TransportModeComboBox.SelectedIndex == 1 ? "Serial" : "Virtual";
+            _settings.PortName = PortComboBox.SelectedItem as string;
+            await _settingsStore.SaveAsync(_settings);
+            await ReconnectAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private void Settings_Click(object sender, RoutedEventArgs e) =>
+        PortComboBox.Focus();
 
     private async void SendLine1_Click(object sender, RoutedEventArgs e)
     {
         try
         {
             _frame = DisplayFrame.Create(Line1TextBox.Text, _frame.Line2);
-            await _device.WriteLineAsync(1, _frame.Line1);
+            await RequireDevice().WriteLineAsync(1, _frame.Line1);
             RefreshPreview();
         }
         catch (Exception ex)
@@ -62,7 +160,7 @@ public partial class MainWindow : Window
         try
         {
             _frame = DisplayFrame.Create(_frame.Line1, Line2TextBox.Text);
-            await _device.WriteLineAsync(2, _frame.Line2);
+            await RequireDevice().WriteLineAsync(2, _frame.Line2);
             RefreshPreview();
         }
         catch (Exception ex)
@@ -86,8 +184,8 @@ public partial class MainWindow : Window
     private async Task RenderBothAsync()
     {
         _frame = DisplayFrame.Create(Line1TextBox.Text, Line2TextBox.Text);
-        await _device.WriteLineAsync(1, _frame.Line1);
-        await _device.WriteLineAsync(2, _frame.Line2);
+        await RequireDevice().WriteLineAsync(1, _frame.Line1);
+        await RequireDevice().WriteLineAsync(2, _frame.Line2);
         RefreshPreview();
     }
 
@@ -95,7 +193,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            await _device.ClearAsync();
+            await RequireDevice().ClearAsync();
             _frame = DisplayFrame.Create(string.Empty, string.Empty);
             RefreshPreview();
         }
@@ -121,7 +219,9 @@ public partial class MainWindow : Window
                 _ => throw new InvalidOperationException("Unknown brightness.")
             };
 
-            await _device.SetBrightnessAsync(brightness);
+            _settings.BrightnessPercent = int.Parse(tag, CultureInfo.InvariantCulture);
+            await _settingsStore.SaveAsync(_settings);
+            await RequireDevice().SetBrightnessAsync(brightness);
         }
         catch (Exception ex)
         {
@@ -138,7 +238,7 @@ public partial class MainWindow : Window
             var fan3 = ParsePercent(Fan3TextBox.Text, "Fan 3");
             var fan4 = ParsePercent(Fan4TextBox.Text, "Fan 4");
 
-            await _device.SetFansAsync(fan1, fan2, fan3, fan4);
+            await RequireDevice().SetFansAsync(fan1, fan2, fan3, fan4);
         }
         catch (Exception ex)
         {
@@ -151,6 +251,11 @@ public partial class MainWindow : Window
         var hex = string.Join(" ", e.Data.Select(b => b.ToString("X2", CultureInfo.InvariantCulture)));
         Dispatcher.Invoke(() => Log($"TX   {hex}"));
     }
+
+    private Lis2Device RequireDevice() =>
+        _device?.IsConnected == true
+            ? _device
+            : throw new InvalidOperationException("LIS2 device is not connected.");
 
     private void RefreshPreview()
     {
