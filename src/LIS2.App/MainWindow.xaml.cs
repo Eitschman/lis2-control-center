@@ -19,7 +19,9 @@ public partial class MainWindow : Window
     private readonly EventQueue _eventQueue = new();
     private readonly DisplayRuntime _displayRuntime;
     private readonly DispatcherTimer _pageTimer;
+    private readonly DispatcherTimer _fanTimer;
     private readonly FanController _fanController = new();
+    private int[]? _lastAutomaticFanOutputs;
     private readonly TrayIconService _trayIcon = new();
     private bool _allowClose;
 
@@ -44,6 +46,12 @@ public partial class MainWindow : Window
         };
         _pageTimer.Tick += PageTimer_Tick;
 
+        _fanTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(2)
+        };
+        _fanTimer.Tick += FanTimer_Tick;
+
         _sources.Add(new ClockDataSource());
         _sources.Add(new WinampDataSource());
         _sources.Add(new LibreHardwareMonitorDataSource());
@@ -65,6 +73,7 @@ public partial class MainWindow : Window
 
             RefreshPorts();
             ApplySettingsToUi();
+            AutomaticFanControlCheckBox.IsChecked = _settings.Fans.AutomaticControlEnabled;
             LoadPagesIntoRuntime();
             BindPages();
 
@@ -74,6 +83,7 @@ public partial class MainWindow : Window
             await RenderRuntimePageAsync();
 
             _pageTimer.Start();
+            _fanTimer.Start();
         }
         catch (Exception ex)
         {
@@ -110,6 +120,7 @@ public partial class MainWindow : Window
     private async void MainWindow_Closed(object? sender, EventArgs e)
     {
         _pageTimer.Stop();
+        _fanTimer.Stop();
 
         await _sources.StopAllAsync();
         await _sources.DisposeAsync();
@@ -118,6 +129,131 @@ public partial class MainWindow : Window
             await _device.DisposeAsync();
 
         _trayIcon.Dispose();
+    }
+
+    private async void FanTimer_Tick(object? sender, EventArgs e)
+    {
+        if (!_settings.Fans.AutomaticControlEnabled)
+            return;
+
+        try
+        {
+            await ApplyAutomaticFanControlAsync();
+        }
+        catch (Exception ex)
+        {
+            Log($"ERR  automatic fan control: {ex.Message}");
+        }
+    }
+
+    private async Task ApplyAutomaticFanControlAsync()
+    {
+        if (_device?.IsConnected != true)
+            return;
+
+        var snapshot = _sources.Snapshot();
+        var outputs = new int[4];
+
+        for (var index = 0; index < 4; index++)
+        {
+            var stored = _settings.Fans.Channels[index];
+            var mode = Enum.TryParse<FanMode>(
+                stored.Mode,
+                ignoreCase: true,
+                out var parsedMode)
+                ? parsedMode
+                : FanMode.Fixed;
+
+            var configuration = new FanChannelConfiguration
+            {
+                Mode = mode,
+                SensorKey = stored.SensorKey,
+                FixedPercent = stored.FixedPercent,
+                MinimumPercent = stored.MinimumPercent,
+                MaximumPercent = stored.MaximumPercent,
+                FailSafePercent = stored.FailSafePercent,
+                AllowStop = stored.AllowStop,
+                Curve = stored.Curve
+                    .Select(point => new FanCurvePoint(
+                        point.Temperature,
+                        point.OutputPercent))
+                    .ToList()
+            };
+
+            double? sensorValue = null;
+            var sensorValid = true;
+
+            if (mode is FanMode.Curve or FanMode.Follow)
+            {
+                sensorValid =
+                    !string.IsNullOrWhiteSpace(stored.SensorKey) &&
+                    snapshot.TryGetValue(stored.SensorKey, out var rawValue) &&
+                    TryConvertToDouble(rawValue, out sensorValue);
+            }
+
+            outputs[index] = _fanController.CalculateOutput(
+                configuration,
+                sensorValue,
+                externalPercent: null,
+                sensorValid);
+        }
+
+        if (_lastAutomaticFanOutputs is not null &&
+            outputs.SequenceEqual(_lastAutomaticFanOutputs))
+        {
+            return;
+        }
+
+        await RequireDevice().SetFansAsync(
+            outputs[0],
+            outputs[1],
+            outputs[2],
+            outputs[3]);
+
+        _lastAutomaticFanOutputs = outputs;
+        Log($"INFO automatic fan outputs: {string.Join("/", outputs)}%");
+    }
+
+    private static bool TryConvertToDouble(object? value, out double? result)
+    {
+        result = null;
+
+        if (value is null)
+            return false;
+
+        try
+        {
+            result = Convert.ToDouble(
+                value,
+                CultureInfo.InvariantCulture);
+            return true;
+        }
+        catch (Exception ex) when (
+            ex is FormatException or InvalidCastException or OverflowException)
+        {
+            return false;
+        }
+    }
+
+    private async void AutomaticFanControlChanged(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (!IsLoaded)
+            return;
+
+        _settings.Fans.AutomaticControlEnabled =
+            AutomaticFanControlCheckBox.IsChecked == true;
+
+        _lastAutomaticFanOutputs = null;
+        await _settingsStore.SaveAsync(_settings);
+
+        Log(_settings.Fans.AutomaticControlEnabled
+            ? "INFO automatic fan control enabled"
+            : "INFO automatic fan control disabled");
+
+        if (_settings.Fans.AutomaticControlEnabled)
+            await ApplyAutomaticFanControlAsync();
     }
 
     private async void PageTimer_Tick(object? sender, EventArgs e)
