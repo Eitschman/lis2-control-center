@@ -5,6 +5,7 @@ public sealed class DisplayRuntime
     private readonly TemplateRenderer _renderer;
     private readonly PageScheduler _scheduler;
     private readonly EventQueue _events;
+    private readonly VisibilityEvaluator _visibility = new();
 
     public DisplayRuntime(
         TemplateRenderer renderer,
@@ -29,7 +30,9 @@ public sealed class DisplayRuntime
             return activeEvent.Frame;
         }
 
-        var page = _scheduler.Next();
+        var page = _scheduler.Next(candidate =>
+            _visibility.IsVisible(candidate.VisibilityExpression, values));
+
         if (page is null)
             return null;
 
