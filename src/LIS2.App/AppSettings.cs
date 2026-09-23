@@ -39,7 +39,8 @@ public sealed class AppSettings
                 Name = "Winamp",
                 Line1Template = "{Winamp.Artist}",
                 Line2Template = "{Winamp.Title}",
-                DurationSeconds = 5
+                DurationSeconds = 5,
+                VisibilityExpression = "Winamp.State=Playing"
             }
         };
 }
