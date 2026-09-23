@@ -13,7 +13,59 @@ public sealed class DisplayTests
         Assert.Equal(20, frame.Line2.Length);
         Assert.StartsWith("ABC", frame.Line1);
         Assert.StartsWith("XYZ", frame.Line2);
+    
+
+    [Fact]
+    public void PageScheduler_RotatesPages()
+    {
+        var scheduler = new PageScheduler();
+        scheduler.ReplacePages(new[]
+        {
+            new DisplayPage("one", "One", "A", "B", TimeSpan.FromSeconds(2)),
+            new DisplayPage("two", "Two", "C", "D", TimeSpan.FromSeconds(2))
+        });
+
+        Assert.Equal("one", scheduler.Next()!.Id);
+        Assert.Equal("two", scheduler.Next()!.Id);
+        Assert.Equal("one", scheduler.Next()!.Id);
     }
+
+    [Fact]
+    public void EventQueue_ReturnsHighestPriorityActiveEvent()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var queue = new EventQueue();
+
+        queue.Add(new DisplayEvent(
+            "info",
+            DisplayFrame.Create("Info", ""),
+            10,
+            now.AddMinutes(1)));
+
+        queue.Add(new DisplayEvent(
+            "critical",
+            DisplayFrame.Create("Critical", ""),
+            100,
+            now.AddMinutes(1)));
+
+        Assert.Equal("critical", queue.Peek(now)!.Id);
+    }
+
+    [Fact]
+    public void EventQueue_DropsExpiredEvents()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var queue = new EventQueue();
+
+        queue.Add(new DisplayEvent(
+            "expired",
+            DisplayFrame.Create("Old", ""),
+            100,
+            now.AddSeconds(-1)));
+
+        Assert.Null(queue.Peek(now));
+    }
+}
 
     [Fact]
     public void Frame_TruncatesLongLines()
