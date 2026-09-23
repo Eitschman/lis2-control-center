@@ -5,6 +5,7 @@ public sealed class AppSettings
     public string TransportMode { get; set; } = "Virtual";
     public string? PortName { get; set; }
     public int BrightnessPercent { get; set; } = 100;
+    public string ThemeMode { get; set; } = nameof(AppThemeMode.System);
     public List<PageDefinition> Pages { get; set; } = CreateDefaultPages();
     public FanSettings Fans { get; set; } = new();
 
