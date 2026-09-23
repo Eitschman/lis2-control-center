@@ -289,6 +289,7 @@
                 </GroupBox>
 
                 <GroupBox Header="Device settings" Foreground="#F0F0F0" Margin="0,0,0,14">
+                    <StackPanel>
                     <Grid Margin="10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -314,6 +315,7 @@
                               Checked="StartWithWindowsChanged"
                               Unchecked="StartWithWindowsChanged"
                               Margin="10,0,10,10"/>
+                    </StackPanel>
                 </GroupBox>
 
                 <GroupBox Header="Diagnostics" Foreground="#F0F0F0" Margin="0,0,0,14">
