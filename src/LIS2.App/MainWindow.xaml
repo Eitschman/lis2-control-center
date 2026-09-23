@@ -24,7 +24,7 @@
                 <Button Content="Hardware" Padding="10" Margin="0,0,0,6" IsEnabled="False"/>
                 <Button Content="Fan Control" Padding="10" Margin="0,0,0,6" IsEnabled="False"/>
                 <Button Content="Settings" Padding="10" Margin="0,0,0,6" Click="Settings_Click"/>
-                <Button Content="Diagnostics" Padding="10" IsEnabled="False"/>
+                <Button Content="Diagnostics" Padding="10" Click="Diagnostics_Click"/>
                 <Separator Margin="0,18,0,12"/>
                 <TextBlock Text="Transport" FontWeight="Bold"/>
                 <TextBlock x:Name="TransportSummaryText" Text="Virtual LIS2" Foreground="#A9B1B8" Margin="0,4,0,0"/>
@@ -308,6 +308,36 @@
                             <Button Content="Refresh" Click="RefreshPorts_Click" Padding="12,5" Margin="0,0,6,0"/>
                             <Button Content="Apply / reconnect" Click="ApplyDeviceSettings_Click" Padding="12,5"/>
                         </StackPanel>
+                    </Grid>
+                    <CheckBox x:Name="StartWithWindowsCheckBox"
+                              Content="Start LIS2 Control Center with Windows (minimized to tray)"
+                              Checked="StartWithWindowsChanged"
+                              Unchecked="StartWithWindowsChanged"
+                              Margin="10,0,10,10"/>
+                </GroupBox>
+
+                <GroupBox Header="Diagnostics" Foreground="#F0F0F0" Margin="0,0,0,14">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBox x:Name="DiagnosticsTextBox"
+                                 Grid.Row="0"
+                                 Height="220"
+                                 IsReadOnly="True"
+                                 FontFamily="Consolas"
+                                 Background="#0C0E10"
+                                 Foreground="#D8DEE4"
+                                 VerticalScrollBarVisibility="Auto"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 TextWrapping="NoWrap"/>
+                        <Button Grid.Row="1"
+                                Content="Refresh diagnostics"
+                                Click="RefreshDiagnostics_Click"
+                                HorizontalAlignment="Right"
+                                Padding="12,5"
+                                Margin="0,8,0,0"/>
                     </Grid>
                 </GroupBox>
 
