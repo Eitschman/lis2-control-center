@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>LIS2.Sources</AssemblyName>
+    <RootNamespace>LIS2.Sources</RootNamespace>
+  </PropertyGroup>
+</Project>
