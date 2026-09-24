@@ -595,8 +595,8 @@ public partial class MainWindow : Window
         {
             await QueueDisplayEventAsync(
                 $"warning-{Guid.NewGuid():N}",
-                "!! WARNING !!",
-                "Test notification",
+                LocalizationService.Translate("!! WARNING !!"),
+                LocalizationService.Translate("Test notification"),
                 priority: 100,
                 duration: TimeSpan.FromSeconds(8));
 
@@ -794,10 +794,11 @@ public partial class MainWindow : Window
                 IsNumericValue(pair.Value))
             .Select(pair => CreateHardwareSensorRow(pair.Key, pair.Value, snapshot))
             .Where(row =>
-                MatchesHardwareTypeFilter(row.Type, typeFilter) &&
+                MatchesHardwareTypeFilter(row.TypeKey, typeFilter) &&
                 (string.IsNullOrWhiteSpace(search) ||
                  row.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.Key.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                 row.TypeKey.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.Type.Contains(search, StringComparison.OrdinalIgnoreCase)))
             .OrderBy(row => row.Type, StringComparer.OrdinalIgnoreCase)
             .ThenBy(row => row.Name, StringComparer.OrdinalIgnoreCase)
@@ -860,6 +861,7 @@ public partial class MainWindow : Window
             key,
             $"{hardwareName} — {sensorName}",
             type,
+            LocalizationService.Translate(type),
             value,
             unit);
     }
@@ -1072,7 +1074,9 @@ public partial class MainWindow : Window
                 output is < 0 or > 100)
             {
                 throw new InvalidOperationException(
-                    $"Invalid curve point '{token}'. Use temperature:percent, e.g. 60:80.");
+                    LocalizationService.Format(
+                        "Invalid curve point '{0}'. Use temperature:percent, e.g. 60:80.",
+                        token));
             }
 
             points.Add(new FanCurvePointSettings
@@ -1141,7 +1145,8 @@ public partial class MainWindow : Window
     private async Task WriteFrameAsync(DisplayFrame frame)
     {
         if (_frameWriter is null)
-            throw new InvalidOperationException("LIS2 display writer is not initialized.");
+            throw new InvalidOperationException(
+                LocalizationService.Translate("LIS2 display writer is not initialized."));
 
         await _frameWriter.WriteAsync(frame);
     }
@@ -1224,7 +1229,7 @@ public partial class MainWindow : Window
                     LocalizationService.Translate("Page duration must be at least 1 second."));
 
             page.Name = string.IsNullOrWhiteSpace(PageNameTextBox.Text)
-                ? "Page"
+                ? LocalizationService.Translate("Page")
                 : PageNameTextBox.Text.Trim();
             page.Line1Template = PageLine1TextBox.Text;
             page.Line2Template = PageLine2TextBox.Text;
@@ -1257,8 +1262,8 @@ public partial class MainWindow : Window
         {
             await QueueDisplayEventAsync(
                 $"page-test-{Guid.NewGuid():N}",
-                "** EVENT TEST **",
-                "Overlay for 5 sec",
+                LocalizationService.Translate("** EVENT TEST **"),
+                LocalizationService.Translate("Overlay for 5 sec"),
                 priority: 100,
                 duration: TimeSpan.FromSeconds(5));
 
@@ -1481,6 +1486,41 @@ public partial class MainWindow : Window
         PortComboBox.IsEnabled = serial;
     }
 
+    private void UpdateConnectionUiLocalization()
+    {
+        if (string.Equals(_settings.TransportMode, "Serial", StringComparison.OrdinalIgnoreCase))
+        {
+            ConnectionText.Text = LocalizationService.Format(
+                "Connected: {0}",
+                _settings.PortName ?? "-");
+            TransportSummaryText.Text = LocalizationService.Format(
+                "Serial: {0}",
+                _settings.PortName ?? "-");
+            VirtualStateText.Text = LocalizationService.Translate(
+                "Virtual state is unavailable while Serial transport is active.");
+        }
+        else
+        {
+            ConnectionText.Text =
+                LocalizationService.Translate("Virtual LIS2 connected");
+            TransportSummaryText.Text =
+                LocalizationService.Translate("Virtual LIS2 transport");
+
+            if (_transport is VirtualLis2Transport virtualTransport)
+                UpdateVirtualState(virtualTransport.State);
+        }
+
+        _trayIcon.SetStatus(ConnectionText.Text);
+    }
+
+    private static string LocalizeTransportMode(string mode) =>
+        string.Equals(mode, "Serial", StringComparison.OrdinalIgnoreCase)
+            ? LocalizationService.Translate("Serial")
+            : LocalizationService.Translate("Virtual");
+
+    private static string LocalizeBoolean(bool value) =>
+        LocalizationService.Translate(value ? "Yes" : "No");
+
     private void RefreshPorts_Click(object sender, RoutedEventArgs e) => RefreshPorts();
 
     private async void ApplyDeviceSettings_Click(object sender, RoutedEventArgs e)
@@ -1524,13 +1564,13 @@ public partial class MainWindow : Window
                 LocalizeTransportMode(_settings.TransportMode)),
             LocalizationService.Format(
                 "Connected: {0}",
-                _device?.IsConnected == true),
+                LocalizeBoolean(_device?.IsConnected == true)),
             LocalizationService.Format("Port: {0}", _settings.PortName ?? "-"),
             LocalizationService.Format("Frame line 1: {0}", _frame.Line1),
             LocalizationService.Format("Frame line 2: {0}", _frame.Line2),
             LocalizationService.Format(
                 "Automatic fan control: {0}",
-                _settings.Fans.AutomaticControlEnabled),
+                LocalizeBoolean(_settings.Fans.AutomaticControlEnabled)),
             LocalizationService.Format("Data values: {0}", snapshot.Count),
             ""
         };
@@ -1556,10 +1596,16 @@ public partial class MainWindow : Window
         {
             var channel = _settings.Fans.Channels[index];
             lines.Add(
-                $"Fan {index + 1}: {channel.Name}, mode={channel.Mode}, " +
-                $"sensor={channel.SensorKey ?? "-"}, fixed={channel.FixedPercent}%, " +
-                $"min={channel.MinimumPercent}%, max={channel.MaximumPercent}%, " +
-                $"fail-safe={channel.FailSafePercent}%");
+                LocalizationService.Format(
+                    "Fan {0}: {1}, mode={2}, sensor={3}, fixed={4}%, min={5}%, max={6}%, fail-safe={7}%",
+                    index + 1,
+                    channel.Name,
+                    LocalizationService.Translate(channel.Mode),
+                    channel.SensorKey ?? "-",
+                    channel.FixedPercent,
+                    channel.MinimumPercent,
+                    channel.MaximumPercent,
+                    channel.FailSafePercent));
         }
 
         DiagnosticsTextBox.Text = string.Join(Environment.NewLine, lines);
@@ -1657,7 +1703,8 @@ public partial class MainWindow : Window
                 "75" => Lis2Brightness.Percent75,
                 "50" => Lis2Brightness.Percent50,
                 "25" => Lis2Brightness.Percent25,
-                _ => throw new InvalidOperationException("Unknown brightness.")
+                _ => throw new InvalidOperationException(
+                    LocalizationService.Translate("Unknown brightness."))
             };
 
             _settings.BrightnessPercent = int.Parse(tag, CultureInfo.InvariantCulture);
