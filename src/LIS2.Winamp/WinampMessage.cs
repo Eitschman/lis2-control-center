@@ -13,4 +13,7 @@ public sealed class WinampMessage
     public double? DurationSeconds { get; set; }
     public int? BitrateKbps { get; set; }
     public int? SampleRateHz { get; set; }
+    public int? VuLeft { get; set; }
+    public int? VuRight { get; set; }
+    public int[]? Spectrum { get; set; }
 }
