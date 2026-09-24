@@ -1015,7 +1015,9 @@ public partial class MainWindow : Window
             }
 
             channel.Name = string.IsNullOrWhiteSpace(FanNameTextBox.Text)
-                ? $"Fan {FanChannelsListBox.SelectedIndex + 1}"
+                ? LocalizationService.Format(
+                    "Fan {0}",
+                    FanChannelsListBox.SelectedIndex + 1)
                 : FanNameTextBox.Text.Trim();
             channel.Mode = mode;
             channel.SensorKey = string.IsNullOrWhiteSpace(FanSensorComboBox.Text)
@@ -1723,10 +1725,18 @@ public partial class MainWindow : Window
         {
             var requested = new[]
             {
-                ParsePercent(Fan1TextBox.Text, "Fan 1"),
-                ParsePercent(Fan2TextBox.Text, "Fan 2"),
-                ParsePercent(Fan3TextBox.Text, "Fan 3"),
-                ParsePercent(Fan4TextBox.Text, "Fan 4")
+                ParsePercent(
+                    Fan1TextBox.Text,
+                    LocalizationService.Translate("Fan 1")),
+                ParsePercent(
+                    Fan2TextBox.Text,
+                    LocalizationService.Translate("Fan 2")),
+                ParsePercent(
+                    Fan3TextBox.Text,
+                    LocalizationService.Translate("Fan 3")),
+                ParsePercent(
+                    Fan4TextBox.Text,
+                    LocalizationService.Translate("Fan 4"))
             };
 
             var outputs = new int[4];
@@ -1774,7 +1784,8 @@ public partial class MainWindow : Window
     private Lis2Device RequireDevice() =>
         _device?.IsConnected == true
             ? _device
-            : throw new InvalidOperationException("LIS2 device is not connected.");
+            : throw new InvalidOperationException(
+                LocalizationService.Translate("LIS2 device is not connected."));
 
     private void RefreshPreview()
     {
