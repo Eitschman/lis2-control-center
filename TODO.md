@@ -14,7 +14,7 @@ This document tracks feature work for LIS2 Control Center. It is intentionally s
 - [x] Add convenient duplicate-page action.
 - [x] Improve page preview/editing workflow.
 - [ ] Add optional conditional visibility based on source values.
-- [ ] Add reusable page/display presets.
+- [x] Add reusable page/display presets.
 
 The original MCC's "Auto User" concept is useful inspiration here, but the new implementation should remain source-agnostic and more flexible.
 
@@ -54,8 +54,8 @@ The original MCC included a "CG Builder"; this is a confirmed useful product cap
 - [x] Add friendly aliases/favorites for frequently used sensors.
 - [x] Persist sensor favorites.
 - [x] Add ready-made display presets such as CPU, GPU, memory, temperatures and fans.
-- [ ] Gracefully identify sensors that disappeared or changed after a hardware/driver update.
-- [ ] Consider grouping sensors by hardware device in the browser.
+- [x] Gracefully identify sensors that disappeared or changed after a hardware/driver update.
+- [x] Group sensors by hardware device in the browser.
 
 Historical MCC versions integrated MBM5/SpeedFan and offered predefined monitoring choices. LIS2 Control Center should provide similar convenience without coupling the display engine to a particular monitoring backend.
 
