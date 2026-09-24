@@ -409,10 +409,20 @@
 
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                                 <StackPanel>
-                                    <TextBlock Text="Custom Characters / CG Builder" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12"/>
+                                    <DockPanel Margin="0,0,0,12">
+                                        <TextBlock Text="Custom Characters / CG Builder"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="16"
+                                                   DockPanel.Dock="Left"/>
+                                        <CheckBox x:Name="ProgramCustomGlyphsOnConnectCheckBox"
+                                                  Content="Program saved glyphs on connect"
+                                                  Checked="ProgramCustomGlyphsOnConnectChanged"
+                                                  Unchecked="ProgramCustomGlyphsOnConnectChanged"
+                                                  DockPanel.Dock="Right"/>
+                                    </DockPanel>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="160"/>
+                                            <ColumnDefinition Width="190"/>
                                             <ColumnDefinition Width="220"/>
                                             <ColumnDefinition Width="24"/>
                                             <ColumnDefinition Width="*"/>
@@ -421,7 +431,12 @@
                                             <TextBlock Text="Slot" Margin="0,0,0,5"/>
                                             <ComboBox x:Name="CustomGlyphSlotComboBox" SelectionChanged="CustomGlyphSlotChanged" Margin="0,0,0,10"/>
                                             <TextBlock Text="Name" Margin="0,0,0,5"/>
-                                            <TextBox x:Name="CustomGlyphNameTextBox"/>
+                                            <TextBox x:Name="CustomGlyphNameTextBox" TextChanged="CustomGlyphNameChanged"/>
+                                            <TextBlock Text="Template key" Margin="0,10,0,4" Foreground="{DynamicResource MutedBrush}"/>
+                                            <TextBlock x:Name="CustomGlyphTemplateKeyText"
+                                                       Text="{Glyph.1}"
+                                                       FontFamily="Consolas"
+                                                       TextWrapping="Wrap"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1">
                                             <TextBlock Text="5x8 bitmap (8 rows)" Margin="0,0,0,5"/>
@@ -436,18 +451,34 @@
                                                 Background="{DynamicResource VfdBackgroundBrush}"
                                                 BorderBrush="{DynamicResource VfdBorderBrush}"
                                                 BorderThickness="1" CornerRadius="5" Padding="16">
-                                            <TextBlock x:Name="CustomGlyphPreview"
-                                                       FontFamily="Consolas"
-                                                       FontSize="22"
-                                                       Foreground="{DynamicResource VfdTextBrush}"
-                                                       Text="·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····"/>
+                                            <StackPanel>
+                                                <TextBlock x:Name="CustomGlyphPreview"
+                                                           FontFamily="Consolas"
+                                                           FontSize="22"
+                                                           Foreground="{DynamicResource VfdTextBrush}"
+                                                           Text="·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····"/>
+                                                <TextBlock Text="20x2 template preview"
+                                                           Foreground="{DynamicResource MutedBrush}"
+                                                           Margin="0,12,0,4"/>
+                                                <TextBlock x:Name="CustomGlyphLinePreview"
+                                                           FontFamily="Consolas"
+                                                           FontSize="18"
+                                                           Foreground="{DynamicResource VfdTextBrush}"/>
+                                            </StackPanel>
                                         </Border>
                                     </Grid>
                                     <WrapPanel Margin="0,12,0,0">
-                                        <Button Content="Save glyph" Click="SaveCustomGlyph_Click" Margin="0,0,7,0"/>
-                                        <Button Content="Send slot to LIS2" Click="SendCustomGlyph_Click" Margin="0,0,7,0"/>
-                                        <Button Content="Send all 8 slots" Click="SendAllCustomGlyphs_Click"/>
+                                        <Button Content="Save glyph" Click="SaveCustomGlyph_Click" Margin="0,0,7,7"/>
+                                        <Button Content="Send slot to LIS2" Click="SendCustomGlyph_Click" Margin="0,0,7,7"/>
+                                        <Button Content="Send all 8 slots" Click="SendAllCustomGlyphs_Click" Margin="0,0,14,7"/>
+                                        <Button Content="Load set..." Click="LoadCustomGlyphSet_Click" Margin="0,0,7,7"/>
+                                        <Button Content="Save set..." Click="SaveCustomGlyphSet_Click" Margin="0,0,7,7"/>
+                                        <Button Content="Load examples" Click="LoadExampleGlyphSet_Click" Margin="0,0,0,7"/>
                                     </WrapPanel>
+                                    <TextBlock Text="Use {Glyph.Name} or {Glyph.1} through {Glyph.8} in page templates."
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,0"/>
                                 </StackPanel>
                             </Border>
 
