@@ -60,7 +60,7 @@ public partial class MainWindow : Window
 
         _pageTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(100)
+            Interval = TimeSpan.FromSeconds(5)
         };
         _pageTimer.Tick += PageTimer_Tick;
 
@@ -513,7 +513,18 @@ public partial class MainWindow : Window
 
     private void WinampSource_Changed(object? sender, EventArgs e)
     {
-        Dispatcher.BeginInvoke(RefreshWinampView);
+        Dispatcher.BeginInvoke(async () =>
+        {
+            try
+            {
+                RefreshWinampView();
+                await RenderRuntimePageAsync();
+            }
+            catch (Exception ex)
+            {
+                Log($"ERR  Winamp-triggered page render: {ex.Message}");
+            }
+        });
     }
 
     private void WinampTimer_Tick(object? sender, EventArgs e)
@@ -1292,6 +1303,7 @@ public partial class MainWindow : Window
         await WriteFrameAsync(nextFrame);
         RefreshPreview();
 
+        _pageTimer.Interval = _displayRuntime.SuggestedDuration;
     }
 
     private async Task WriteFrameAsync(DisplayFrame frame)
