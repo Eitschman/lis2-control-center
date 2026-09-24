@@ -878,22 +878,49 @@
                                             <ColumnDefinition Width="220"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0"
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0"
                                                    Text="Theme"
                                                    VerticalAlignment="Center"
-                                                   Margin="0,0,8,0"/>
+                                                   Margin="0,0,8,10"/>
                                         <ComboBox x:Name="ThemeModeComboBox"
-                                                  Grid.Column="1"
+                                                  Grid.Row="0" Grid.Column="1"
+                                                  Margin="0,0,0,10"
                                                   SelectionChanged="ThemeModeChanged">
                                             <ComboBoxItem Content="System default" Tag="System"/>
                                             <ComboBoxItem Content="Light" Tag="Light"/>
                                             <ComboBoxItem Content="Dark" Tag="Dark"/>
                                         </ComboBox>
-                                        <TextBlock Grid.Column="2"
-                                                   Margin="14,0,0,0"
+                                        <TextBlock Grid.Row="0" Grid.Column="2"
+                                                   Margin="14,0,0,10"
                                                    VerticalAlignment="Center"
                                                    Foreground="{DynamicResource MutedBrush}"
                                                    Text="System default follows the Windows app theme automatically."
+                                                   TextWrapping="Wrap"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0"
+                                                   Text="Language"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0"/>
+                                        <ComboBox x:Name="LanguageModeComboBox"
+                                                  Grid.Row="1" Grid.Column="1"
+                                                  SelectionChanged="LanguageModeChanged">
+                                            <ComboBoxItem Content="System default" Tag="System"/>
+                                            <ComboBoxItem Content="English" Tag="English"/>
+                                            <ComboBoxItem Content="Deutsch" Tag="German"/>
+                                            <ComboBoxItem Content="Français" Tag="French"/>
+                                            <ComboBoxItem Content="Türkçe" Tag="Turkish"/>
+                                            <ComboBoxItem Content="Русский" Tag="Russian"/>
+                                        </ComboBox>
+                                        <TextBlock Grid.Row="1" Grid.Column="2"
+                                                   Margin="14,0,0,0"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource MutedBrush}"
+                                                   Text="System default uses the Windows display language."
                                                    TextWrapping="Wrap"/>
                                     </Grid>
                                 </StackPanel>
