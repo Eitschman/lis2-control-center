@@ -24,6 +24,15 @@ public static class LocalizationService
         {
             ["de"] = new(StringComparer.Ordinal)
             {
+                ["VU / Spectrum"]="VU / Spektrum",
+                ["No visualization data"]="Keine Visualisierungsdaten",
+                ["Live visualization data"]="Live-Visualisierungsdaten",
+                ["Left"]="Links",
+                ["Right"]="Rechts",
+                ["Create Now Playing page"]="Now-Playing-Seite erstellen",
+                ["Create VU page"]="VU-Seite erstellen",
+                ["Create Spectrum page"]="Spektrum-Seite erstellen",
+                ["Unknown Winamp preset '{0}'."]="Unbekanntes Winamp-Preset '{0}'.",
                 ["Program saved glyphs on connect"]="Gespeicherte Glyphen beim Verbinden programmieren",
                 ["20x2 template preview"]="20x2-Template-Vorschau",
                 ["Save glyph"]="Glyphe speichern",
@@ -186,6 +195,15 @@ public static class LocalizationService
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
+                ["VU / Spectrum"]="VU / Spectre",
+                ["No visualization data"]="Aucune donnée de visualisation",
+                ["Live visualization data"]="Données de visualisation en direct",
+                ["Left"]="Gauche",
+                ["Right"]="Droite",
+                ["Create Now Playing page"]="Créer une page Now Playing",
+                ["Create VU page"]="Créer une page VU",
+                ["Create Spectrum page"]="Créer une page Spectre",
+                ["Unknown Winamp preset '{0}'."]="Préréglage Winamp inconnu « {0} ».",
                 ["Program saved glyphs on connect"]="Programmer les glyphes enregistrés à la connexion",
                 ["20x2 template preview"]="Aperçu du modèle 20x2",
                 ["Save glyph"]="Enregistrer le glyphe",
@@ -353,6 +371,15 @@ public static class LocalizationService
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
+                ["VU / Spectrum"]="VU / Spektrum",
+                ["No visualization data"]="Görselleştirme verisi yok",
+                ["Live visualization data"]="Canlı görselleştirme verisi",
+                ["Left"]="Sol",
+                ["Right"]="Sağ",
+                ["Create Now Playing page"]="Now Playing sayfası oluştur",
+                ["Create VU page"]="VU sayfası oluştur",
+                ["Create Spectrum page"]="Spektrum sayfası oluştur",
+                ["Unknown Winamp preset '{0}'."]="Bilinmeyen Winamp hazır ayarı '{0}'.",
                 ["Program saved glyphs on connect"]="Bağlantıda kayıtlı glifleri programla",
                 ["20x2 template preview"]="20x2 şablon önizlemesi",
                 ["Save glyph"]="Glifi kaydet",
@@ -528,6 +555,15 @@ public static class LocalizationService
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
+                ["VU / Spectrum"]="VU / Спектр",
+                ["No visualization data"]="Нет данных визуализации",
+                ["Live visualization data"]="Данные визуализации в реальном времени",
+                ["Left"]="Левый",
+                ["Right"]="Правый",
+                ["Create Now Playing page"]="Создать страницу Now Playing",
+                ["Create VU page"]="Создать страницу VU",
+                ["Create Spectrum page"]="Создать страницу спектра",
+                ["Unknown Winamp preset '{0}'."]="Неизвестный шаблон Winamp «{0}».",
                 ["Program saved glyphs on connect"]="Программировать сохранённые глифы при подключении",
                 ["20x2 template preview"]="Предпросмотр шаблона 20x2",
                 ["Save glyph"]="Сохранить глиф",
