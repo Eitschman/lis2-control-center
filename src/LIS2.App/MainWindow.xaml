@@ -145,9 +145,19 @@
                 <StackPanel Grid.Row="2" Margin="4,12,0,10">
                     <Separator Margin="0,0,0,12"/>
                     <TextBlock Text="ⓘ  LIS2 Control Center" Foreground="{DynamicResource TextBrush}"/>
-                    <TextBlock Text="Development build" FontSize="11" Foreground="{DynamicResource DisabledTextBrush}" Margin="25,3,0,8"/>
-                    <TextBlock Text="◉  GitHub" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,5"/>
-                    <TextBlock Text="ⓘ  About" Foreground="{DynamicResource MutedBrush}"/>
+                    <TextBlock x:Name="FooterVersionText"
+                               FontSize="11"
+                               Foreground="{DynamicResource DisabledTextBrush}"
+                               Margin="25,3,0,8"/>
+                    <TextBlock Text="◉  GitHub"
+                               Foreground="{DynamicResource MutedBrush}"
+                               Margin="0,0,0,5"
+                               Cursor="Hand"
+                               MouseLeftButtonUp="GitHub_MouseLeftButtonUp"/>
+                    <TextBlock Text="ⓘ  About"
+                               Foreground="{DynamicResource MutedBrush}"
+                               Cursor="Hand"
+                               MouseLeftButtonUp="About_MouseLeftButtonUp"/>
                 </StackPanel>
             </Grid>
         </Border>
