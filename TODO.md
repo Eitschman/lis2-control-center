@@ -51,9 +51,9 @@ The original MCC included a "CG Builder"; this is a confirmed useful product cap
 - [x] Search/filter sensors.
 - [x] Show values, units and template keys.
 - [x] Assign a selected sensor directly to a fan channel.
-- [ ] Add friendly aliases/favorites for frequently used sensors.
-- [ ] Persist sensor favorites.
-- [ ] Add ready-made display presets such as CPU, GPU, memory, temperatures and fans.
+- [x] Add friendly aliases/favorites for frequently used sensors.
+- [x] Persist sensor favorites.
+- [x] Add ready-made display presets such as CPU, GPU, memory, temperatures and fans.
 - [ ] Gracefully identify sensors that disappeared or changed after a hardware/driver update.
 - [ ] Consider grouping sensors by hardware device in the browser.
 
