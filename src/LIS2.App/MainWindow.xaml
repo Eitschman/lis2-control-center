@@ -521,10 +521,10 @@
                                     <TextBox x:Name="PageNameTextBox" Grid.Row="0" Grid.Column="1" Margin="0,0,0,10"/>
 
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Line 1" Margin="0,0,10,10" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="PageLine1TextBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,10"/>
+                                    <TextBox x:Name="PageLine1TextBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" TextChanged="PageEditorChanged"/>
 
                                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Line 2" Margin="0,0,10,10" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="PageLine2TextBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,10"/>
+                                    <TextBox x:Name="PageLine2TextBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,10" TextChanged="PageEditorChanged"/>
 
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Duration (s)" Margin="0,0,10,10" VerticalAlignment="Center"/>
                                     <TextBox x:Name="PageDurationTextBox" Grid.Row="3" Grid.Column="1" Width="100" HorizontalAlignment="Left" Margin="0,0,0,10"/>
