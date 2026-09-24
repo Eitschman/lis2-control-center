@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Ports;
@@ -59,6 +60,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         Icon = TrayIconService.CreateWindowIcon();
         LocalizationService.ApplyTo(this);
+        FooterVersionText.Text = LocalizationService.Format("Version {0}", AppInfo.Version);
 
         _displayRuntime = new DisplayRuntime(
             new TemplateRenderer(),
@@ -142,6 +144,35 @@ public partial class MainWindow : Window
         ("Settings", "LIS2 transport, COM port and Windows startup behavior."),
         ("Diagnostics", "Runtime state, data-source health and protocol traffic.")
     ];
+
+    private void GitHub_MouseLeftButtonUp(
+        object sender,
+        System.Windows.Input.MouseButtonEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = AppInfo.RepositoryUrl,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private void About_MouseLeftButtonUp(
+        object sender,
+        System.Windows.Input.MouseButtonEventArgs e)
+    {
+        var about = new AboutWindow
+        {
+            Owner = this
+        };
+        about.ShowDialog();
+    }
 
     private void Navigation_Click(object sender, RoutedEventArgs e)
     {
