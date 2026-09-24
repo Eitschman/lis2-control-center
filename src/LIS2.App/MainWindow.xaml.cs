@@ -23,6 +23,9 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _hardwareTimer;
     private readonly DispatcherTimer _winampTimer;
     private readonly DispatcherTimer _eventUiTimer;
+    private readonly DispatcherTimer _pageEditorPreviewTimer;
+    private readonly PingPongScroller _pageEditorLine1Scroller = new();
+    private readonly PingPongScroller _pageEditorLine2Scroller = new();
     private readonly WinampDataSource _winampSource = new();
     private readonly FanController _fanController = new();
     private int[]? _lastAutomaticFanOutputs;
@@ -57,7 +60,7 @@ public partial class MainWindow : Window
 
         _pageTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromSeconds(5)
+            Interval = TimeSpan.FromMilliseconds(100)
         };
         _pageTimer.Tick += PageTimer_Tick;
 
@@ -84,6 +87,12 @@ public partial class MainWindow : Window
             Interval = TimeSpan.FromSeconds(1)
         };
         _eventUiTimer.Tick += EventUiTimer_Tick;
+
+        _pageEditorPreviewTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(100)
+        };
+        _pageEditorPreviewTimer.Tick += PageEditorPreviewTimer_Tick;
 
         _eventQueue.Changed += EventQueue_Changed;
         _winampSource.Changed += WinampSource_Changed;
@@ -218,6 +227,7 @@ public partial class MainWindow : Window
             _hardwareTimer.Start();
             _winampTimer.Start();
             _eventUiTimer.Start();
+            _pageEditorPreviewTimer.Start();
 
             RefreshEventsView();
             RefreshDiagnostics();
@@ -268,6 +278,7 @@ public partial class MainWindow : Window
         _hardwareTimer.Stop();
         _winampTimer.Stop();
         _eventUiTimer.Stop();
+        _pageEditorPreviewTimer.Stop();
         _eventQueue.Changed -= EventQueue_Changed;
         _winampSource.Changed -= WinampSource_Changed;
 
@@ -796,9 +807,6 @@ public partial class MainWindow : Window
 
     private void HardwareTimer_Tick(object? sender, EventArgs e)
     {
-        if (MainTabs.SelectedIndex == 2)
-            RefreshPageEditorPreview();
-
         if (MainTabs.SelectedIndex == 5)
             RefreshHardwareSensors();
     }
@@ -1284,7 +1292,6 @@ public partial class MainWindow : Window
         await WriteFrameAsync(nextFrame);
         RefreshPreview();
 
-        _pageTimer.Interval = _displayRuntime.SuggestedDuration;
     }
 
     private async Task WriteFrameAsync(DisplayFrame frame)
@@ -1438,6 +1445,12 @@ public partial class MainWindow : Window
             RefreshPageEditorPreview();
     }
 
+    private void PageEditorPreviewTimer_Tick(object? sender, EventArgs e)
+    {
+        if (MainTabs.SelectedIndex == 2)
+            RefreshPageEditorPreview();
+    }
+
     private void RefreshPageEditorPreview()
     {
         if (PageEditorPreviewLine1 is null || PageEditorPreviewLine2 is null)
@@ -1445,10 +1458,26 @@ public partial class MainWindow : Window
 
         var renderer = new TemplateRenderer();
         var values = _sources.Snapshot();
-        PageEditorPreviewLine1.Text = DisplayFrame.Normalize(
-            renderer.Render(PageLine1TextBox.Text ?? string.Empty, values));
-        PageEditorPreviewLine2.Text = DisplayFrame.Normalize(
-            renderer.Render(PageLine2TextBox.Text ?? string.Empty, values));
+        var now = DateTimeOffset.Now;
+
+        var rawLine1 = renderer.Render(PageLine1TextBox.Text ?? string.Empty, values);
+        var rawLine2 = renderer.Render(PageLine2TextBox.Text ?? string.Empty, values);
+
+        var mode1 = ParseOverflowMode(GetComboBoxTag(PageLine1OverflowComboBox, "PingPong"));
+        var mode2 = ParseOverflowMode(GetComboBoxTag(PageLine2OverflowComboBox, "PingPong"));
+
+        var step = int.TryParse(PageScrollSpeedTextBox.Text, out var stepMs)
+            ? TimeSpan.FromMilliseconds(Math.Clamp(stepMs, 50, 5000))
+            : PingPongScroller.StepInterval;
+
+        var pause = int.TryParse(PageEdgePauseTextBox.Text, out var pauseMs)
+            ? TimeSpan.FromMilliseconds(Math.Clamp(pauseMs, 0, 10000))
+            : PingPongScroller.EdgePause;
+
+        PageEditorPreviewLine1.Text =
+            _pageEditorLine1Scroller.Render(rawLine1, now, mode1, step, pause);
+        PageEditorPreviewLine2.Text =
+            _pageEditorLine2Scroller.Render(rawLine2, now, mode2, step, pause);
     }
 
     private static DisplayOverflowMode ParseOverflowMode(string? value) =>
