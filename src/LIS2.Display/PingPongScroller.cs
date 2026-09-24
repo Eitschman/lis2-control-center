@@ -21,7 +21,7 @@ public sealed class PingPongScroller
         TimeSpan? stepInterval = null,
         TimeSpan? edgePause = null)
     {
-        var safe = Lis2Protocol.ToSafeAscii(value ?? string.Empty);
+        var safe = Lis2Protocol.ToSafeDisplayText(value ?? string.Empty);
         var step = Normalize(stepInterval, StepInterval);
         var pause = Normalize(edgePause, EdgePause);
 
@@ -54,7 +54,7 @@ public sealed class PingPongScroller
 
     public void Reset(string? value, DateTimeOffset now, TimeSpan? edgePause = null)
     {
-        _text = Lis2Protocol.ToSafeAscii(value ?? string.Empty);
+        _text = Lis2Protocol.ToSafeDisplayText(value ?? string.Empty);
         _offset = 0;
         _direction = 1;
         _nextChangeAt = _text.Length > DisplayFrame.Width
