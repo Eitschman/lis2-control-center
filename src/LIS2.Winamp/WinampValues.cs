@@ -21,7 +21,10 @@ public static class WinampValues
             ["VuLeft"] = snapshot.VuLeft,
             ["VuRight"] = snapshot.VuRight,
             ["Vu"] = FormatVu(snapshot.VuLeft, snapshot.VuRight),
-            ["Spectrum"] = FormatSpectrum(snapshot.Spectrum)
+            ["Spectrum"] = FormatSpectrum(snapshot.Spectrum),
+            ["SpectrumPeak"] = snapshot.Spectrum is { Count: > 0 }
+                ? snapshot.Spectrum.Max()
+                : null
         };
     }
 
@@ -45,13 +48,18 @@ public static class WinampValues
 
         const string levels = " .:-=+*#";
         var width = Math.Min(20, spectrum.Count);
+        var peak = spectrum.Take(width).Select(value => Math.Max(0, value)).DefaultIfEmpty().Max();
+
+        // Winamp's analyzer data is commonly 0..255, but some input/fallback
+        // paths use the classic 0..15 range. Scale both ranges visibly.
+        var scaleMaximum = peak <= 15 ? 15.0 : 255.0;
         var chars = new char[width];
 
         for (var index = 0; index < width; index++)
         {
-            var value = Math.Clamp(spectrum[index], 0, 255);
-            var level = (int)Math.Round(value / 255.0 * (levels.Length - 1));
-            chars[index] = levels[level];
+            var value = Math.Clamp(spectrum[index], 0, (int)scaleMaximum);
+            var level = (int)Math.Round(value / scaleMaximum * (levels.Length - 1));
+            chars[index] = levels[Math.Clamp(level, 0, levels.Length - 1)];
         }
 
         return new string(chars);
