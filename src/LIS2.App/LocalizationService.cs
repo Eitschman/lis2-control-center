@@ -121,7 +121,6 @@ public static class LocalizationService
                 ["Source {0}: ERROR - {1}"]="Quelle {0}: FEHLER - {1}",
                 ["Brightness: {0}"]="Helligkeit: {0}",
                 ["Fans: {0}% / {1}% / {2}% / {3}%"]="Lüfter: {0}% / {1}% / {2}% / {3}%",
-                ["Connected: {0}"]="Verbunden: {0}",
                 ["Receiving snapshots on {0}"]="Empfängt Snapshots auf {0}",
                 ["last update {0}"]="letzte Aktualisierung {0}",
                 ["Listening on {0} — no recent plugin/simulator data."]="Lauscht auf {0} — keine aktuellen Plugin-/Simulator-Daten.",
