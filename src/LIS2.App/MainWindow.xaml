@@ -407,6 +407,50 @@
                                 </StackPanel>
                             </Border>
 
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="Custom Characters / CG Builder" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="160"/>
+                                            <ColumnDefinition Width="220"/>
+                                            <ColumnDefinition Width="24"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Slot" Margin="0,0,0,5"/>
+                                            <ComboBox x:Name="CustomGlyphSlotComboBox" SelectionChanged="CustomGlyphSlotChanged" Margin="0,0,0,10"/>
+                                            <TextBlock Text="Name" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="CustomGlyphNameTextBox"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="5x8 bitmap (8 rows)" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="CustomGlyphRowsTextBox"
+                                                     FontFamily="Consolas"
+                                                     AcceptsReturn="True"
+                                                     Height="150"
+                                                     TextChanged="CustomGlyphRowsChanged"
+                                                     Text="00000&#10;00000&#10;00000&#10;00000&#10;00000&#10;00000&#10;00000&#10;00000"/>
+                                        </StackPanel>
+                                        <Border Grid.Column="3"
+                                                Background="{DynamicResource VfdBackgroundBrush}"
+                                                BorderBrush="{DynamicResource VfdBorderBrush}"
+                                                BorderThickness="1" CornerRadius="5" Padding="16">
+                                            <TextBlock x:Name="CustomGlyphPreview"
+                                                       FontFamily="Consolas"
+                                                       FontSize="22"
+                                                       Foreground="{DynamicResource VfdTextBrush}"
+                                                       Text="·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····"/>
+                                        </Border>
+                                    </Grid>
+                                    <WrapPanel Margin="0,12,0,0">
+                                        <Button Content="Save glyph" Click="SaveCustomGlyph_Click" Margin="0,0,7,0"/>
+                                        <Button Content="Send slot to LIS2" Click="SendCustomGlyph_Click" Margin="0,0,7,0"/>
+                                        <Button Content="Send all 8 slots" Click="SendAllCustomGlyphs_Click"/>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
                             <Border Style="{StaticResource CardBorderStyle}">
                                 <StackPanel>
                                     <TextBlock Text="Brightness" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12"/>
