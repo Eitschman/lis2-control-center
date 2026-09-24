@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -172,6 +173,20 @@ public static class LocalizationService
             }
         };
 
+    private sealed class OriginalValues
+    {
+        public string? Text { get; set; }
+        public string? Content { get; set; }
+        public string? Header { get; set; }
+        public string? ToolTip { get; set; }
+        public bool TextCaptured { get; set; }
+        public bool ContentCaptured { get; set; }
+        public bool HeaderCaptured { get; set; }
+        public bool ToolTipCaptured { get; set; }
+    }
+
+    private static readonly ConditionalWeakTable<DependencyObject, OriginalValues> Originals = new();
+
     private static AppLanguageMode _mode = AppLanguageMode.System;
     private static string _languageCode = "en";
 
@@ -197,19 +212,56 @@ public static class LocalizationService
             : english;
     }
 
+    public static string Format(string english, params object?[] args) =>
+        string.Format(CultureInfo.CurrentCulture, Translate(english), args);
+
     public static void ApplyTo(DependencyObject root)
     {
+        var originals = Originals.GetOrCreateValue(root);
+
         if (root is TextBlock textBlock)
-            textBlock.Text = TranslateKnown(textBlock.Text);
+        {
+            if (!originals.TextCaptured)
+            {
+                originals.Text = FindEnglishSource(textBlock.Text);
+                originals.TextCaptured = true;
+            }
+
+            textBlock.Text = TranslateKnown(originals.Text ?? string.Empty);
+        }
 
         if (root is ContentControl contentControl && contentControl.Content is string content)
-            contentControl.Content = TranslateKnown(content);
+        {
+            if (!originals.ContentCaptured)
+            {
+                originals.Content = FindEnglishSource(content);
+                originals.ContentCaptured = true;
+            }
+
+            contentControl.Content = TranslateKnown(originals.Content ?? string.Empty);
+        }
 
         if (root is HeaderedContentControl headered && headered.Header is string header)
-            headered.Header = TranslateKnown(header);
+        {
+            if (!originals.HeaderCaptured)
+            {
+                originals.Header = FindEnglishSource(header);
+                originals.HeaderCaptured = true;
+            }
+
+            headered.Header = TranslateKnown(originals.Header ?? string.Empty);
+        }
 
         if (root is FrameworkElement element && element.ToolTip is string tooltip)
-            element.ToolTip = TranslateKnown(tooltip);
+        {
+            if (!originals.ToolTipCaptured)
+            {
+                originals.ToolTip = FindEnglishSource(tooltip);
+                originals.ToolTipCaptured = true;
+            }
+
+            element.ToolTip = TranslateKnown(originals.ToolTip ?? string.Empty);
+        }
 
         if (root is ItemsControl itemsControl)
         {
