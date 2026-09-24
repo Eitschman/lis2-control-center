@@ -180,11 +180,11 @@ These are deliberately lower priority than making the core LIS2 experience compl
 - [x] Unit tests for Core, Display, Sources, Fans and Winamp mapping.
 - [x] Self-contained Windows build artifact.
 - [x] Native Winamp x86 build artifact.
-- [ ] Add an application startup smoke test so WPF resource/startup regressions are caught by CI.
+- [x] Add an application startup smoke test so WPF resource/startup regressions are caught by CI.
 - [ ] Add tests around theme resource loading.
 - [ ] Add tests for settings migration/defaulting.
 - [ ] Add more fan safety edge-case tests.
-- [ ] Review async/UI-thread boundaries.
+- [x] Review async/UI-thread boundaries for display rendering; serialize/coalesce overlapping render requests.
 - [ ] Review data-source concurrency and snapshot semantics.
 - [ ] Add release/versioning workflow when the application reaches an alpha milestone.
 
