@@ -10,4 +10,7 @@ public sealed record WinampSnapshot(
     TimeSpan? Elapsed,
     TimeSpan? Duration,
     int? BitrateKbps,
-    int? SampleRateHz);
+    int? SampleRateHz,
+    int? VuLeft,
+    int? VuRight,
+    IReadOnlyList<int>? Spectrum);
