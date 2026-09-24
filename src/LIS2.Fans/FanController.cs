@@ -6,12 +6,24 @@ public sealed class FanController
         FanChannelConfiguration configuration,
         double? sensorValue = null,
         int? externalPercent = null,
-        bool sensorValid = true)
+        bool sensorValid = true,
+        double? previousSensorValue = null,
+        int? previousOutputPercent = null)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
         if (!sensorValid)
             return Clamp(configuration.FailSafePercent, configuration, allowZero: false);
+
+        if (configuration.Mode == FanMode.Curve &&
+            sensorValue is not null &&
+            previousSensorValue is not null &&
+            previousOutputPercent is not null &&
+            configuration.HysteresisDegrees > 0 &&
+            Math.Abs(sensorValue.Value - previousSensorValue.Value) < configuration.HysteresisDegrees)
+        {
+            return Clamp(previousOutputPercent.Value, configuration, configuration.AllowStop);
+        }
 
         var output = configuration.Mode switch
         {
