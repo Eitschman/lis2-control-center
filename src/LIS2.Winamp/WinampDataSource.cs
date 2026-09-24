@@ -4,6 +4,7 @@ namespace LIS2.Winamp;
 
 public sealed class WinampDataSource : IDataSource
 {
+    private static readonly TimeSpan ConnectedTimeout = TimeSpan.FromSeconds(3);
     private readonly WinampPipeServer _server = new();
 
     private IReadOnlyDictionary<string, object?> _values =
@@ -11,14 +12,33 @@ public sealed class WinampDataSource : IDataSource
 
     public string Id => "Winamp";
 
-    public IReadOnlyDictionary<string, object?> Values =>
-        Volatile.Read(ref _values);
+    public IReadOnlyDictionary<string, object?> Values
+    {
+        get
+        {
+            var current = Volatile.Read(ref _values);
+            var result = new Dictionary<string, object?>(
+                current,
+                StringComparer.OrdinalIgnoreCase);
+
+            var connected = IsRecentlyConnected;
+            result["Connected"] = connected;
+            result["SnapshotAgeSeconds"] = LastSnapshotAt is null
+                ? null
+                : Math.Max(0, (DateTimeOffset.UtcNow - LastSnapshotAt.Value).TotalSeconds);
+
+            if (!connected)
+                result["State"] = WinampPlaybackState.Unknown.ToString();
+
+            return result;
+        }
+    }
 
     public DateTimeOffset? LastSnapshotAt { get; private set; }
 
     public bool IsRecentlyConnected =>
         LastSnapshotAt is not null &&
-        DateTimeOffset.UtcNow - LastSnapshotAt.Value < TimeSpan.FromSeconds(3);
+        DateTimeOffset.UtcNow - LastSnapshotAt.Value < ConnectedTimeout;
 
     public event EventHandler? Changed;
 
@@ -60,7 +80,9 @@ public sealed class WinampDataSource : IDataSource
             ["VuLeft"] = null,
             ["VuRight"] = null,
             ["Vu"] = string.Empty,
-            ["Spectrum"] = string.Empty
+            ["Spectrum"] = string.Empty,
+            ["Connected"] = false,
+            ["SnapshotAgeSeconds"] = null
         };
 
     public async ValueTask DisposeAsync()
