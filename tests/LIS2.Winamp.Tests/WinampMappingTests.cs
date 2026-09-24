@@ -28,6 +28,29 @@ public sealed class WinampMappingTests
     }
 
     [Fact]
+    public void NativePluginCamelCaseJson_DeserializesAllFields()
+    {
+        const string json =
+            """
+            {"type":"snapshot","state":"playing","artist":"Iron Maiden","title":"The Trooper","album":"Piece of Mind","playlistPosition":3,"playlistCount":12,"elapsedSeconds":65,"durationSeconds":245,"bitrateKbps":320,"sampleRateHz":44100}
+            """;
+
+        var message = WinampPipeServer.DeserializeMessage(json);
+
+        Assert.NotNull(message);
+        Assert.Equal("playing", message.State);
+        Assert.Equal("Iron Maiden", message.Artist);
+        Assert.Equal("The Trooper", message.Title);
+        Assert.Equal("Piece of Mind", message.Album);
+        Assert.Equal(3, message.PlaylistPosition);
+        Assert.Equal(12, message.PlaylistCount);
+        Assert.Equal(65, message.ElapsedSeconds);
+        Assert.Equal(245, message.DurationSeconds);
+        Assert.Equal(320, message.BitrateKbps);
+        Assert.Equal(44100, message.SampleRateHz);
+    }
+
+    [Fact]
     public void Snapshot_ExposesDisplayValues()
     {
         var snapshot = new WinampSnapshot(
