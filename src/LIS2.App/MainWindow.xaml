@@ -902,6 +902,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
                         <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
@@ -926,7 +927,7 @@
                                 <TextBox x:Name="HardwareSearchTextBox"
                                          Grid.Column="1"
                                          VerticalAlignment="Center"
-                                         ToolTip="Search by sensor name or key"
+                                         ToolTip="Search by sensor name, alias or key"
                                          TextChanged="HardwareFilterChanged"/>
 
                                 <ComboBox x:Name="HardwareTypeComboBox"
@@ -934,6 +935,7 @@
                                           VerticalAlignment="Center"
                                           SelectionChanged="HardwareFilterChanged">
                                     <ComboBoxItem Content="All types" Tag="All" IsSelected="True"/>
+                                    <ComboBoxItem Content="Favorites" Tag="Favorites"/>
                                     <ComboBoxItem Content="Temperature" Tag="Temperature"/>
                                     <ComboBoxItem Content="Load" Tag="Load"/>
                                     <ComboBoxItem Content="Fan" Tag="Fan"/>
@@ -961,15 +963,17 @@
 
                                 <Grid Grid.Row="0" Margin="8,0,8,7">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="34"/>
                                         <ColumnDefinition Width="2.1*"/>
                                         <ColumnDefinition Width="1.1*"/>
                                         <ColumnDefinition Width="1*"/>
                                         <ColumnDefinition Width="2.8*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="Sensor" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="1" Text="Type" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="2" Text="Value" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="3" Text="Template key" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="1" Text="Sensor" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="2" Text="Type" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="3" Text="Value" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold"/>
                                 </Grid>
 
                                 <ListBox x:Name="HardwareSensorsListBox"
@@ -979,6 +983,7 @@
                                         <DataTemplate>
                                             <Grid Margin="2,1">
                                                 <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="34"/>
                                                     <ColumnDefinition Width="2.1*"/>
                                                     <ColumnDefinition Width="1.1*"/>
                                                     <ColumnDefinition Width="1*"/>
@@ -986,18 +991,25 @@
                                                 </Grid.ColumnDefinitions>
 
                                                 <TextBlock Grid.Column="0"
-                                                           Text="{Binding Name}"
-                                                           TextTrimming="CharacterEllipsis"
-                                                           Margin="0,0,10,0"/>
-                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding FavoriteMarker}"
+                                                           Foreground="{DynamicResource AccentBrush}"/>
+                                                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                                    <TextBlock Text="{Binding DisplayName}"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Name}"
+                                                               Foreground="{DynamicResource MutedBrush}"
+                                                               FontSize="11"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="2"
                                                            Text="{Binding Type}"
                                                            Foreground="{DynamicResource MutedBrush}"
                                                            Margin="0,0,10,0"/>
-                                                <TextBlock Grid.Column="2"
+                                                <TextBlock Grid.Column="3"
                                                            Text="{Binding DisplayValue}"
                                                            FontFamily="Consolas"
                                                            Margin="0,0,10,0"/>
-                                                <TextBlock Grid.Column="3"
+                                                <TextBlock Grid.Column="4"
                                                            Text="{Binding Key}"
                                                            FontFamily="Consolas"
                                                            Foreground="{DynamicResource MutedBrush}"
@@ -1009,10 +1021,11 @@
                             </Grid>
                         </Border>
 
-                        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
+                        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="18"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
@@ -1022,15 +1035,59 @@
                                                Text="Select a sensor above."
                                                Foreground="{DynamicResource MutedBrush}"
                                                TextWrapping="Wrap"
-                                               Margin="0,5,16,0"/>
+                                               Margin="0,5,0,10"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="220"/>
+                                            <ColumnDefinition Width="14"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="14"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Alias" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="HardwareAliasTextBox" Grid.Column="1"/>
+                                        <CheckBox x:Name="HardwareFavoriteCheckBox"
+                                                  Grid.Column="3"
+                                                  Content="Favorite"
+                                                  VerticalAlignment="Center"/>
+                                        <Button Grid.Column="5"
+                                                Content="Save sensor"
+                                                Click="SaveHardwarePreference_Click"/>
+                                    </Grid>
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                     <Button Content="Use for Fan 1" Tag="0" Click="AssignHardwareSensorToFan_Click" Margin="0,0,7,0"/>
                                     <Button Content="Fan 2" Tag="1" Click="AssignHardwareSensorToFan_Click" Margin="0,0,7,0"/>
                                     <Button Content="Fan 3" Tag="2" Click="AssignHardwareSensorToFan_Click" Margin="0,0,7,0"/>
                                     <Button Content="Fan 4" Tag="3" Click="AssignHardwareSensorToFan_Click"/>
                                 </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Display presets" FontWeight="SemiBold" FontSize="16"/>
+                                    <TextBlock Text="Create display pages automatically from sensors available on this computer."
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               Margin="0,5,20,0"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <WrapPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <Button Content="CPU" Tag="CPU" Click="CreateHardwarePreset_Click" Margin="0,0,7,0"/>
+                                    <Button Content="GPU" Tag="GPU" Click="CreateHardwarePreset_Click" Margin="0,0,7,0"/>
+                                    <Button Content="Memory" Tag="Memory" Click="CreateHardwarePreset_Click" Margin="0,0,7,0"/>
+                                    <Button Content="Temperatures" Tag="Temperatures" Click="CreateHardwarePreset_Click" Margin="0,0,7,0"/>
+                                    <Button Content="Fans" Tag="Fans" Click="CreateHardwarePreset_Click"/>
+                                </WrapPanel>
                             </Grid>
                         </Border>
                     </Grid>
