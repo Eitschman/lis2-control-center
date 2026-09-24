@@ -8,6 +8,11 @@ public sealed class WinampPipeServer : IAsyncDisposable
 {
     public const string PipeName = "LIS2ControlCenter.Winamp";
 
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private CancellationTokenSource? _cts;
     private Task? _serverTask;
 
@@ -81,7 +86,7 @@ public sealed class WinampPipeServer : IAsyncDisposable
     {
         try
         {
-            var message = JsonSerializer.Deserialize<WinampMessage>(json);
+            var message = JsonSerializer.Deserialize<WinampMessage>(json, JsonOptions);
             if (message is null)
                 return;
 
