@@ -842,11 +842,15 @@ public partial class MainWindow : Window
         {
             SelectedHardwareSensorText.Text =
                 $"{sensor.Name} — {sensor.DisplayValue}{Environment.NewLine}{sensor.Key}";
+            HardwareAliasTextBox.Text = sensor.Alias;
+            HardwareFavoriteCheckBox.IsChecked = sensor.IsFavorite;
         }
         else
         {
             SelectedHardwareSensorText.Text =
                 LocalizationService.Translate("Select a sensor above.");
+            HardwareAliasTextBox.Text = string.Empty;
+            HardwareFavoriteCheckBox.IsChecked = false;
         }
     }
 
@@ -869,14 +873,16 @@ public partial class MainWindow : Window
                 IsNumericValue(pair.Value))
             .Select(pair => CreateHardwareSensorRow(pair.Key, pair.Value, snapshot))
             .Where(row =>
-                MatchesHardwareTypeFilter(row.TypeKey, typeFilter) &&
+                MatchesHardwareTypeFilter(row, typeFilter) &&
                 (string.IsNullOrWhiteSpace(search) ||
                  row.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                 row.Alias.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.Key.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.TypeKey.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.Type.Contains(search, StringComparison.OrdinalIgnoreCase)))
-            .OrderBy(row => row.Type, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(row => row.Name, StringComparer.OrdinalIgnoreCase)
+            .OrderByDescending(row => row.IsFavorite)
+            .ThenBy(row => row.Type, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(row => row.DisplayName, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
         HardwareSensorsListBox.ItemsSource = rows;
@@ -908,7 +914,7 @@ public partial class MainWindow : Window
                     totalHardwareValues);
     }
 
-    private static HardwareSensorRow CreateHardwareSensorRow(
+    private HardwareSensorRow CreateHardwareSensorRow(
         string key,
         object? rawValue,
         IReadOnlyDictionary<string, object?> snapshot)
@@ -932,24 +938,33 @@ public partial class MainWindow : Window
             ? Convert.ToString(rawUnit, CultureInfo.CurrentCulture) ?? string.Empty
             : string.Empty;
 
+        var preference = _settings.HardwareSensorPreferences
+            .FirstOrDefault(item =>
+                string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase));
+
         return new HardwareSensorRow(
             key,
             $"{hardwareName} — {sensorName}",
             type,
             LocalizationService.Translate(type),
             value,
-            unit);
+            unit,
+            preference?.Alias ?? string.Empty,
+            preference?.IsFavorite == true);
     }
 
     private static string HumanizeSensorName(string value) =>
         value.Replace('_', ' ').Trim();
 
     private static bool MatchesHardwareTypeFilter(
-        string sensorType,
+        HardwareSensorRow row,
         string filter)
     {
         if (string.Equals(filter, "All", StringComparison.OrdinalIgnoreCase))
             return true;
+
+        if (string.Equals(filter, "Favorites", StringComparison.OrdinalIgnoreCase))
+            return row.IsFavorite;
 
         var knownTypes = new HashSet<string>(
             new[]
@@ -966,12 +981,210 @@ public partial class MainWindow : Window
             StringComparer.OrdinalIgnoreCase);
 
         if (string.Equals(filter, "Other", StringComparison.OrdinalIgnoreCase))
-            return !knownTypes.Contains(sensorType);
+            return !knownTypes.Contains(row.TypeKey);
 
         return string.Equals(
-            sensorType,
+            row.TypeKey,
             filter,
             StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async void SaveHardwarePreference_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (HardwareSensorsListBox.SelectedItem is not HardwareSensorRow sensor)
+                throw new InvalidOperationException(
+                    LocalizationService.Translate("Select a hardware sensor first."));
+
+            var preference = _settings.HardwareSensorPreferences
+                .FirstOrDefault(item =>
+                    string.Equals(item.Key, sensor.Key, StringComparison.OrdinalIgnoreCase));
+
+            var alias = HardwareAliasTextBox.Text?.Trim() ?? string.Empty;
+            var favorite = HardwareFavoriteCheckBox.IsChecked == true;
+
+            if (preference is null)
+            {
+                preference = new HardwareSensorPreferenceSettings { Key = sensor.Key };
+                _settings.HardwareSensorPreferences.Add(preference);
+            }
+
+            preference.Alias = alias;
+            preference.IsFavorite = favorite;
+
+            if (string.IsNullOrWhiteSpace(preference.Alias) && !preference.IsFavorite)
+                _settings.HardwareSensorPreferences.Remove(preference);
+
+            await _settingsStore.SaveAsync(_settings);
+            RefreshHardwareSensors();
+
+            HardwareSensorsListBox.SelectedItem =
+                HardwareSensorsListBox.Items
+                    .OfType<HardwareSensorRow>()
+                    .FirstOrDefault(row =>
+                        string.Equals(row.Key, sensor.Key, StringComparison.OrdinalIgnoreCase));
+
+            Log($"INFO saved hardware sensor preference for '{sensor.Key}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void CreateHardwarePreset_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (sender is not System.Windows.Controls.Button { Tag: string preset })
+                return;
+
+            var page = CreateHardwarePresetPage(preset);
+            _settings.Pages.Add(page);
+
+            await PersistPagesAsync();
+            LoadPagesIntoRuntime();
+            BindPages();
+
+            MainTabs.SelectedIndex = 2;
+            UpdateNavigationSelection(2);
+            PagesListBox.SelectedItem = page;
+
+            Log($"INFO created hardware display preset '{preset}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private PageDefinition CreateHardwarePresetPage(string preset)
+    {
+        var rows = GetCurrentHardwareSensorRows();
+
+        HardwareSensorRow? First(string type, params string[] terms) =>
+            rows
+                .Where(row =>
+                    string.Equals(row.TypeKey, type, StringComparison.OrdinalIgnoreCase) &&
+                    (terms.Length == 0 ||
+                     terms.Any(term =>
+                         row.Name.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                         row.Key.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                         row.Alias.Contains(term, StringComparison.OrdinalIgnoreCase))))
+                .OrderByDescending(row => row.IsFavorite)
+                .FirstOrDefault();
+
+        HardwareSensorRow[] FirstTwo(string type) =>
+            rows
+                .Where(row => string.Equals(row.TypeKey, type, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(row => row.IsFavorite)
+                .Take(2)
+                .ToArray();
+
+        static string Line(string label, HardwareSensorRow sensor) =>
+            $"{label} {{{sensor.Key}}}{sensor.Unit}";
+
+        return preset switch
+        {
+            "CPU" => CreateTwoSensorPreset(
+                "CPU",
+                First("Load", "CPU", "Processor"),
+                First("Temperature", "CPU", "Processor"),
+                "CPU",
+                "Temp"),
+
+            "GPU" => CreateTwoSensorPreset(
+                "GPU",
+                First("Load", "GPU", "Graphics"),
+                First("Temperature", "GPU", "Graphics"),
+                "GPU",
+                "Temp"),
+
+            "Memory" => CreateTwoSensorPreset(
+                "Memory",
+                First("Load", "Memory", "RAM"),
+                First("Data", "Memory", "RAM"),
+                "RAM",
+                "Used"),
+
+            "Temperatures" => CreatePairPreset(
+                "Temperatures",
+                FirstTwo("Temperature"),
+                "T1",
+                "T2"),
+
+            "Fans" => CreatePairPreset(
+                "Fans",
+                FirstTwo("Fan"),
+                "Fan1",
+                "Fan2"),
+
+            _ => throw new InvalidOperationException(
+                LocalizationService.Format("Unknown hardware preset '{0}'.", preset))
+        };
+
+        PageDefinition CreateTwoSensorPreset(
+            string name,
+            HardwareSensorRow? first,
+            HardwareSensorRow? second,
+            string firstLabel,
+            string secondLabel)
+        {
+            if (first is null && second is null)
+                throw new InvalidOperationException(
+                    LocalizationService.Format(
+                        "No matching sensors are currently available for preset '{0}'.",
+                        name));
+
+            return new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = name,
+                Line1Template = first is null ? name : Line(firstLabel, first),
+                Line2Template = second is null ? string.Empty : Line(secondLabel, second),
+                DurationSeconds = 5,
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "PingPong"
+            };
+        }
+
+        PageDefinition CreatePairPreset(
+            string name,
+            IReadOnlyList<HardwareSensorRow> pair,
+            string firstLabel,
+            string secondLabel)
+        {
+            if (pair.Count == 0)
+                throw new InvalidOperationException(
+                    LocalizationService.Format(
+                        "No matching sensors are currently available for preset '{0}'.",
+                        name));
+
+            return new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = name,
+                Line1Template = Line(firstLabel, pair[0]),
+                Line2Template = pair.Count > 1 ? Line(secondLabel, pair[1]) : string.Empty,
+                DurationSeconds = 5,
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "PingPong"
+            };
+        }
+    }
+
+    private HardwareSensorRow[] GetCurrentHardwareSensorRows()
+    {
+        var snapshot = _sources.Snapshot();
+
+        return snapshot
+            .Where(pair =>
+                pair.Key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase) &&
+                !pair.Key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase) &&
+                IsNumericValue(pair.Value))
+            .Select(pair => CreateHardwareSensorRow(pair.Key, pair.Value, snapshot))
+            .ToArray();
     }
 
     private async void AssignHardwareSensorToFan_Click(
