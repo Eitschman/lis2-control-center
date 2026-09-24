@@ -24,6 +24,15 @@ public static class LocalizationService
         {
             ["de"] = new(StringComparer.Ordinal)
             {
+                ["Preset"]="Preset",
+                ["Create from preset"]="Aus Preset erstellen",
+                ["General"]="Allgemein",
+                ["Clock & date"]="Uhr & Datum",
+                ["LIS2 status"]="LIS2-Status",
+                ["Unavailable"]="Nicht verfügbar",
+                ["{0} visible sensor(s) / {1} total values · {2} unavailable configured sensor(s)"]="{0} sichtbare Sensor(en) / {1} Werte insgesamt · {2} konfigurierte Sensor(en) nicht verfügbar",
+                ["The selected hardware sensor is currently unavailable."]="Der ausgewählte Hardware-Sensor ist derzeit nicht verfügbar.",
+                ["Unknown page preset '{0}'."]="Unbekanntes Seiten-Preset '{0}'.",
                 ["The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"]="Das VFD-Spektrum verwendet alle acht Custom-Character-Slots. Soll das aktuelle Glyph-Set durch die acht Spektrum-Balkenstufen ersetzt werden?",
                 ["VU / Spectrum"]="VU / Spektrum",
                 ["No visualization data"]="Keine Visualisierungsdaten",
@@ -196,6 +205,15 @@ public static class LocalizationService
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
+                ["Preset"]="Préréglage",
+                ["Create from preset"]="Créer depuis le préréglage",
+                ["General"]="Général",
+                ["Clock & date"]="Heure et date",
+                ["LIS2 status"]="État LIS2",
+                ["Unavailable"]="Indisponible",
+                ["{0} visible sensor(s) / {1} total values · {2} unavailable configured sensor(s)"]="{0} capteur(s) visible(s) / {1} valeurs au total · {2} capteur(s) configuré(s) indisponible(s)",
+                ["The selected hardware sensor is currently unavailable."]="Le capteur matériel sélectionné est actuellement indisponible.",
+                ["Unknown page preset '{0}'."]="Préréglage de page inconnu « {0} ».",
                 ["The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"]="Le spectre VFD utilise les huit emplacements de caractères personnalisés. Remplacer le jeu de glyphes actuel par les huit niveaux de barres du spectre ?",
                 ["VU / Spectrum"]="VU / Spectre",
                 ["No visualization data"]="Aucune donnée de visualisation",
@@ -373,6 +391,15 @@ public static class LocalizationService
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
+                ["Preset"]="Hazır ayar",
+                ["Create from preset"]="Hazır ayardan oluştur",
+                ["General"]="Genel",
+                ["Clock & date"]="Saat ve tarih",
+                ["LIS2 status"]="LIS2 durumu",
+                ["Unavailable"]="Kullanılamıyor",
+                ["{0} visible sensor(s) / {1} total values · {2} unavailable configured sensor(s)"]="{0} görünür sensör / toplam {1} değer · {2} yapılandırılmış sensör kullanılamıyor",
+                ["The selected hardware sensor is currently unavailable."]="Seçilen donanım sensörü şu anda kullanılamıyor.",
+                ["Unknown page preset '{0}'."]="Bilinmeyen sayfa hazır ayarı '{0}'.",
                 ["The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"]="VFD spektrumu sekiz özel karakter yuvasının tamamını kullanır. Geçerli glif seti sekiz spektrum çubuk seviyesiyle değiştirilsin mi?",
                 ["VU / Spectrum"]="VU / Spektrum",
                 ["No visualization data"]="Görselleştirme verisi yok",
@@ -558,6 +585,15 @@ public static class LocalizationService
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
+                ["Preset"]="Шаблон",
+                ["Create from preset"]="Создать из шаблона",
+                ["General"]="Общее",
+                ["Clock & date"]="Часы и дата",
+                ["LIS2 status"]="Состояние LIS2",
+                ["Unavailable"]="Недоступен",
+                ["{0} visible sensor(s) / {1} total values · {2} unavailable configured sensor(s)"]="{0} видимых датчиков / {1} значений всего · {2} настроенных датчиков недоступно",
+                ["The selected hardware sensor is currently unavailable."]="Выбранный аппаратный датчик сейчас недоступен.",
+                ["Unknown page preset '{0}'."]="Неизвестный шаблон страницы «{0}».",
                 ["The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"]="Спектр VFD использует все восемь слотов пользовательских символов. Заменить текущий набор глифов восемью уровнями спектральных столбиков?",
                 ["VU / Spectrum"]="VU / Спектр",
                 ["No visualization data"]="Нет данных визуализации",
