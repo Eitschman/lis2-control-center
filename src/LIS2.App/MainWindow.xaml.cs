@@ -195,6 +195,7 @@ public partial class MainWindow : Window
 
             LoadPagesIntoRuntime();
             BindPages();
+            BindCustomGlyphs();
             BindFanChannels();
 
             await ReconnectAsync();
@@ -1507,6 +1508,147 @@ public partial class MainWindow : Window
         {
             ShowError(ex);
         }
+    }
+
+    private void BindCustomGlyphs()
+    {
+        CustomGlyphSlotComboBox.ItemsSource = Enumerable.Range(1, 8).ToArray();
+        if (CustomGlyphSlotComboBox.SelectedIndex < 0)
+            CustomGlyphSlotComboBox.SelectedIndex = 0;
+        LoadSelectedGlyphIntoEditor();
+    }
+
+    private void CustomGlyphSlotChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (IsLoaded)
+            LoadSelectedGlyphIntoEditor();
+    }
+
+    private void LoadSelectedGlyphIntoEditor()
+    {
+        if (CustomGlyphSlotComboBox.SelectedItem is not int slot ||
+            slot < 1 || slot > _settings.CustomGlyphs.Count)
+            return;
+
+        var glyph = _settings.CustomGlyphs[slot - 1];
+        CustomGlyphNameTextBox.Text = glyph.Name;
+        CustomGlyphRowsTextBox.Text = string.Join(
+            Environment.NewLine,
+            glyph.Rows.Select(row => Convert.ToString(row, 2).PadLeft(5, '0')));
+        RefreshGlyphPreview(glyph.Rows);
+    }
+
+    private byte[] ReadGlyphEditor()
+    {
+        var lines = (CustomGlyphRowsTextBox.Text ?? string.Empty)
+            .Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+        if (lines.Length != 8)
+            throw new InvalidOperationException("A custom character needs exactly eight rows.");
+
+        var rows = new byte[8];
+        for (var index = 0; index < lines.Length; index++)
+        {
+            var row = lines[index].Trim();
+            if (row.Length != 5 || row.Any(ch => ch is not ('0' or '1')))
+                throw new InvalidOperationException("Each custom-character row must contain exactly five 0/1 pixels.");
+
+            rows[index] = Convert.ToByte(row, 2);
+        }
+
+        return rows;
+    }
+
+    private async void SaveCustomGlyph_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (CustomGlyphSlotComboBox.SelectedItem is not int slot)
+                return;
+
+            var rows = ReadGlyphEditor();
+            var glyph = _settings.CustomGlyphs[slot - 1];
+            glyph.Name = string.IsNullOrWhiteSpace(CustomGlyphNameTextBox.Text)
+                ? $"Glyph {slot}"
+                : CustomGlyphNameTextBox.Text.Trim();
+            glyph.Rows = rows;
+
+            await _settingsStore.SaveAsync(_settings);
+            RefreshGlyphPreview(rows);
+            Log($"INFO saved custom glyph {slot} '{glyph.Name}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void SendCustomGlyph_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (CustomGlyphSlotComboBox.SelectedItem is not int slot)
+                return;
+
+            var rows = ReadGlyphEditor();
+            if (_customCharacterManager is null)
+                throw new InvalidOperationException(LocalizationService.Translate("LIS2 device is not connected."));
+
+            await _customCharacterManager.ProgramSlotAsync(slot, rows, force: true);
+            RefreshGlyphPreview(rows);
+            Log($"INFO programmed custom glyph slot {slot}");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void SendAllCustomGlyphs_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (_customCharacterManager is null)
+                throw new InvalidOperationException(LocalizationService.Translate("LIS2 device is not connected."));
+
+            await _customCharacterManager.ProgramAllAsync(
+                _settings.CustomGlyphs.Select(glyph => glyph.Rows).ToArray(),
+                force: true);
+            Log("INFO programmed all eight custom glyph slots");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private void CustomGlyphRowsChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!IsLoaded || CustomGlyphPreview is null)
+            return;
+
+        try
+        {
+            RefreshGlyphPreview(ReadGlyphEditor());
+        }
+        catch
+        {
+            CustomGlyphPreview.Text = "Invalid 5x8 bitmap";
+        }
+    }
+
+    private void RefreshGlyphPreview(IReadOnlyList<byte> rows)
+    {
+        if (CustomGlyphPreview is null)
+            return;
+
+        CustomGlyphPreview.Text = string.Join(
+            Environment.NewLine,
+            rows.Select(row =>
+                new string(
+                    Enumerable.Range(0, 5)
+                        .Select(column => (row & (1 << (4 - column))) != 0 ? '█' : '·')
+                        .ToArray())));
     }
 
     private void ApplySettingsToUi()
