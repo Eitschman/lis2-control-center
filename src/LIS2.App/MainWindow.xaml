@@ -264,6 +264,7 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Grid.Column="0" Text="Fan 1" VerticalAlignment="Center"/>
                                             <Slider x:Name="DashboardFan1Slider"
+                                                Style="{StaticResource FanSliderStyle}"
                                                     Grid.Column="1"
                                                     Minimum="0" Maximum="100" Value="100"
                                                     TickFrequency="1" IsSnapToTickEnabled="True"
@@ -284,6 +285,7 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Grid.Column="0" Text="Fan 2" VerticalAlignment="Center"/>
                                             <Slider x:Name="DashboardFan2Slider"
+                                                Style="{StaticResource FanSliderStyle}"
                                                     Grid.Column="1"
                                                     Minimum="0" Maximum="100" Value="100"
                                                     TickFrequency="1" IsSnapToTickEnabled="True"
@@ -304,6 +306,7 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Grid.Column="0" Text="Fan 3" VerticalAlignment="Center"/>
                                             <Slider x:Name="DashboardFan3Slider"
+                                                Style="{StaticResource FanSliderStyle}"
                                                     Grid.Column="1"
                                                     Minimum="0" Maximum="100" Value="100"
                                                     TickFrequency="1" IsSnapToTickEnabled="True"
@@ -324,6 +327,7 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Grid.Column="0" Text="Fan 4" VerticalAlignment="Center"/>
                                             <Slider x:Name="DashboardFan4Slider"
+                                                Style="{StaticResource FanSliderStyle}"
                                                     Grid.Column="1"
                                                     Minimum="0" Maximum="100" Value="100"
                                                     TickFrequency="1" IsSnapToTickEnabled="True"
@@ -932,6 +936,7 @@
 
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Fan 1" VerticalAlignment="Center"/>
                                         <Slider x:Name="Fan1Slider"
+                                                Style="{StaticResource FanSliderStyle}"
                                                 Grid.Row="0" Grid.Column="1"
                                                 Minimum="0" Maximum="100" Value="100"
                                                 TickFrequency="1" IsSnapToTickEnabled="True"
@@ -945,6 +950,7 @@
 
                                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Fan 2" VerticalAlignment="Center"/>
                                         <Slider x:Name="Fan2Slider"
+                                                Style="{StaticResource FanSliderStyle}"
                                                 Grid.Row="2" Grid.Column="1"
                                                 Minimum="0" Maximum="100" Value="100"
                                                 TickFrequency="1" IsSnapToTickEnabled="True"
@@ -958,6 +964,7 @@
 
                                         <TextBlock Grid.Row="4" Grid.Column="0" Text="Fan 3" VerticalAlignment="Center"/>
                                         <Slider x:Name="Fan3Slider"
+                                                Style="{StaticResource FanSliderStyle}"
                                                 Grid.Row="4" Grid.Column="1"
                                                 Minimum="0" Maximum="100" Value="100"
                                                 TickFrequency="1" IsSnapToTickEnabled="True"
@@ -971,6 +978,7 @@
 
                                         <TextBlock Grid.Row="6" Grid.Column="0" Text="Fan 4" VerticalAlignment="Center"/>
                                         <Slider x:Name="Fan4Slider"
+                                                Style="{StaticResource FanSliderStyle}"
                                                 Grid.Row="6" Grid.Column="1"
                                                 Minimum="0" Maximum="100" Value="100"
                                                 TickFrequency="1" IsSnapToTickEnabled="True"
