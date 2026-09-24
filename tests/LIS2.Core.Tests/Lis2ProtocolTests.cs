@@ -62,4 +62,23 @@ public sealed class Lis2ProtocolTests
     [InlineData(101)]
     public void Fans_RejectInvalidPercentages(int value) =>
         Assert.Throws<ArgumentOutOfRangeException>(() => Lis2Protocol.SetFans(value, 100, 100, 100));
+    [Fact]
+    public void WriteLine_EncodesCustomGlyphSlotAsRawCharacterByte()
+    {
+        var text = $"A{Lis2Protocol.CustomGlyph(3)}B";
+        var actual = Lis2Protocol.WriteLine(1, 0, text);
+
+        Assert.Equal(
+            new byte[] { 0xA1, 0x00, 0xA7, 0x41, 0x03, 0x42 },
+            actual);
+    }
+
+    [Fact]
+    public void SafeDisplayText_PreservesCustomGlyphSentinels()
+    {
+        var glyph = Lis2Protocol.CustomGlyph(8);
+        var actual = Lis2Protocol.ToSafeDisplayText($"ä{glyph}!");
+
+        Assert.Equal($"ae{glyph}!", actual);
+    }
 }
