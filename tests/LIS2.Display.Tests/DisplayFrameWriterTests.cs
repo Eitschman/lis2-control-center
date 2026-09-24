@@ -74,4 +74,18 @@ public sealed class DisplayFrameWriterTests
 
         Assert.Equal(4, transport.Writes.Count);
     }
+    [Fact]
+    public async Task CustomGlyphCell_WritesRawSlotByte()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var device = new Lis2Device(transport);
+        await device.ConnectAsync();
+
+        var writer = new DisplayFrameWriter(device);
+        var glyph = Lis2Protocol.CustomGlyph(4);
+
+        await writer.WriteAsync(DisplayFrame.Create($"A{glyph}B", string.Empty));
+
+        Assert.Equal(0x04, transport.Writes[0][4]);
+    }
 }
