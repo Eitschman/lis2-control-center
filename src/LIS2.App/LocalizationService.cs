@@ -604,6 +604,19 @@ public static class LocalizationService
 
     public static void ApplyTo(DependencyObject root)
     {
+        ArgumentNullException.ThrowIfNull(root);
+
+        var visited = new HashSet<DependencyObject>(ReferenceEqualityComparer.Instance);
+        ApplyTo(root, visited);
+    }
+
+    private static void ApplyTo(
+        DependencyObject root,
+        HashSet<DependencyObject> visited)
+    {
+        if (!visited.Add(root))
+            return;
+
         var originals = Originals.GetOrCreateValue(root);
 
         if (root is TextBlock textBlock)
@@ -662,12 +675,12 @@ public static class LocalizationService
         if (root is ItemsControl itemsControl)
         {
             foreach (var item in itemsControl.Items.OfType<DependencyObject>())
-                ApplyTo(item);
+                ApplyTo(item, visited);
         }
 
         var count = VisualTreeHelper.GetChildrenCount(root);
         for (var index = 0; index < count; index++)
-            ApplyTo(VisualTreeHelper.GetChild(root, index));
+            ApplyTo(VisualTreeHelper.GetChild(root, index), visited);
     }
 
     private static string TranslateKnown(string value)
