@@ -108,3 +108,34 @@ Non-responsibilities:
 - no page rendering
 
 This separation keeps the native plugin intentionally small and makes the host side independently testable.
+
+
+## VU and spectrum telemetry
+
+The native general-purpose plug-in also retrieves Winamp's in-process visualization data.
+
+- `IPC_GETVUDATAFUNC` supplies per-channel VU values in the range 0..255.
+- `IPC_GETSADATAFUNC` supplies the classic analyzer data buffer from inside the Winamp process.
+- `gen_lis2.dll` downsamples the analyzer data to 20 bands before sending it over the named pipe.
+- visualization snapshots are currently sent at a deliberately modest 5 Hz (200 ms) cadence so the 20x2 VFD and serial link are not treated like a high-frame-rate visualization device.
+
+The named-pipe message can additionally contain:
+
+```json
+{
+  "vuLeft": 180,
+  "vuRight": 164,
+  "spectrum": [12, 18, 24, 40, 88, 120, 90, 64, 48, 32, 20, 16, 12, 8, 6, 4, 3, 2, 1, 0]
+}
+```
+
+The application exposes these as:
+
+- `{Winamp.VuLeft}`
+- `{Winamp.VuRight}`
+- `{Winamp.Vu}` — a preformatted 20-character stereo VU line
+- `{Winamp.Spectrum}` — a preformatted 20-character spectrum line
+
+Visualization data is optional. Older plug-ins / simulators that omit these fields remain compatible.
+
+The application treats Winamp as disconnected after snapshots become stale. This deliberately forces `Winamp.State` back to `Unknown` for page visibility evaluation so a `Winamp.State=Playing` page cannot remain stuck after Winamp or the plug-in exits.
