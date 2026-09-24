@@ -1022,7 +1022,8 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="14"/>
                                             <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
+                                                                                <RowDefinition Height="Auto"/>
+</Grid.RowDefinitions>
 
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Fan 1" VerticalAlignment="Center"/>
                                         <Slider x:Name="Fan1Slider"
@@ -1169,14 +1170,30 @@
                                         <TextBox x:Name="FanCurveTextBox"
                                                  Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4"
                                                  Margin="0,0,0,10"
+                                                 TextChanged="FanCurveTextChanged"
                                                  ToolTip="Format: 40:40;60:80;75:100"/>
 
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Hysteresis °C" Margin="0,0,8,10" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="FanHysteresisTextBox"
+                                                 Grid.Row="5" Grid.Column="1"
+                                                 Width="90" HorizontalAlignment="Left"
+                                                 Text="1.0" Margin="0,0,0,10"/>
                                         <CheckBox x:Name="FanAllowStopCheckBox"
-                                                  Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2"
+                                                  Grid.Row="5" Grid.Column="3" Grid.ColumnSpan="2"
                                                   Content="Allow 0% / stop"
                                                   Margin="0,0,0,10"/>
 
-                                        <Button Grid.Row="6" Grid.Column="1"
+                                        <StackPanel Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4" Margin="0,0,0,10">
+                                            <TextBlock x:Name="FanLiveStatusText"
+                                                       Text="Sensor: -  |  Output: -"
+                                                       FontFamily="Consolas"
+                                                       Margin="0,0,0,6"/>
+                                            <Border BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="4">
+                                                <Canvas x:Name="FanCurvePreviewCanvas" Width="360" Height="120"/>
+                                            </Border>
+                                        </StackPanel>
+
+                                        <Button Grid.Row="7" Grid.Column="1"
                                                 Content="Save fan channel"
                                                 Click="SaveFanChannel_Click"
                                                 HorizontalAlignment="Left"/>
