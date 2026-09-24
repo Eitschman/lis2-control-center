@@ -1100,7 +1100,8 @@
 
                                 <ListBox x:Name="HardwareSensorsListBox"
                                          Grid.Row="1"
-                                         SelectionChanged="HardwareSensorsListBox_SelectionChanged">
+                                         SelectionChanged="HardwareSensorsListBox_SelectionChanged"
+                                         HorizontalContentAlignment="Stretch">
                                     <ListBox.GroupStyle>
                                         <GroupStyle>
                                             <GroupStyle.HeaderTemplate>
