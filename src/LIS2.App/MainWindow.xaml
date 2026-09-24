@@ -160,15 +160,49 @@
 
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                                 <StackPanel>
-                                    <TextBlock Text="Recent Log" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
-                                    <TextBox x:Name="DashboardLogMirror"
-                                             Height="190"
-                                             IsReadOnly="True"
-                                             FontFamily="Consolas"
-                                             Background="{DynamicResource LogBackgroundBrush}"
-                                             Foreground="{DynamicResource LogTextBrush}"
-                                             VerticalScrollBarVisibility="Auto"
-                                             TextWrapping="NoWrap"/>
+                                    <TextBlock Text="Fan Outputs" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="34"/>
+                                            <ColumnDefinition Width="26"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="34"/>
+                                            <ColumnDefinition Width="26"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="34"/>
+                                            <ColumnDefinition Width="26"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="34"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="Fan 1" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBox x:Name="DashboardFan1TextBox" Grid.Column="1" Text="100"/>
+                                        <TextBlock Grid.Column="2" Text="%" VerticalAlignment="Center" Margin="6,0,0,0"/>
+
+                                        <TextBlock Grid.Column="4" Text="Fan 2" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBox x:Name="DashboardFan2TextBox" Grid.Column="5" Text="100"/>
+                                        <TextBlock Grid.Column="6" Text="%" VerticalAlignment="Center" Margin="6,0,0,0"/>
+
+                                        <TextBlock Grid.Column="8" Text="Fan 3" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBox x:Name="DashboardFan3TextBox" Grid.Column="9" Text="100"/>
+                                        <TextBlock Grid.Column="10" Text="%" VerticalAlignment="Center" Margin="6,0,0,0"/>
+
+                                        <TextBlock Grid.Column="12" Text="Fan 4" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBox x:Name="DashboardFan4TextBox" Grid.Column="13" Text="100"/>
+                                        <TextBlock Grid.Column="14" Text="%" VerticalAlignment="Center" Margin="6,0,12,0"/>
+
+                                        <Button Grid.Column="15"
+                                                Content="Apply"
+                                                Click="DashboardFans_Click"
+                                                HorizontalAlignment="Right"
+                                                MinWidth="100"/>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
 
@@ -248,7 +282,19 @@
 
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Text="Pages" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
-                                    <ListBox x:Name="PagesListBox" Height="310" SelectionChanged="PagesListBox_SelectionChanged"/>
+                                    <ListBox x:Name="PagesListBox"
+                                             Height="310"
+                                             SelectionChanged="PagesListBox_SelectionChanged">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <CheckBox Content="{Binding Name}"
+                                                          IsChecked="{Binding Enabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                          Checked="PageEnabledChanged"
+                                                          Unchecked="PageEnabledChanged"
+                                                          Padding="2"/>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
                                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                                         <Button Content="Add" Click="AddPage_Click" Margin="0,0,7,0"/>
                                         <Button Content="Delete" Click="DeletePage_Click"/>
