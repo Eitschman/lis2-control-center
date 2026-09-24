@@ -210,6 +210,7 @@ public partial class MainWindow : Window
             RefreshWinampView();
             RefreshHardwareSensors();
             RefreshFanSensorChoices();
+            RefreshPageEditorPreview();
             await RenderRuntimePageAsync();
 
             _pageTimer.Start();
@@ -795,6 +796,9 @@ public partial class MainWindow : Window
 
     private void HardwareTimer_Tick(object? sender, EventArgs e)
     {
+        if (MainTabs.SelectedIndex == 2)
+            RefreshPageEditorPreview();
+
         if (MainTabs.SelectedIndex == 5)
             RefreshHardwareSensors();
     }
