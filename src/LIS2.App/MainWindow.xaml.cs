@@ -33,6 +33,8 @@ public partial class MainWindow : Window
     private readonly StartupService _startupService = new();
     private bool _allowClose;
     private bool _loadingStartupSetting;
+    private bool _customGlyphUiInitialized;
+    private bool _fanUiInitialized;
 
     private sealed record AppearanceChoice(string Value, string Label);
 
@@ -173,11 +175,11 @@ public partial class MainWindow : Window
         if (index == 5)
             RefreshHardwareSensors();
 
+        if (index == 1)
+            EnsureCustomGlyphUiInitialized();
+
         if (index == 6)
-        {
-            RefreshFanSensorChoices();
-            RefreshFanLiveStatus();
-        }
+            EnsureFanUiInitialized();
 
         if (index == 8)
             RefreshDiagnostics();
@@ -200,8 +202,6 @@ public partial class MainWindow : Window
 
             LoadPagesIntoRuntime();
             BindPages();
-            BindCustomGlyphs();
-            BindFanChannels();
 
             await ReconnectAsync();
             await _sources.StartAllAsync();
@@ -416,6 +416,25 @@ public partial class MainWindow : Window
             await ApplyAutomaticFanControlAsync();
     }
 
+    private void EnsureFanUiInitialized()
+    {
+        if (_fanUiInitialized)
+            return;
+
+        try
+        {
+            BindFanChannels();
+            RefreshFanSensorChoices();
+            RefreshFanLiveStatus();
+            _fanUiInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            Log($"ERR  fan UI initialization: {ex}");
+            ShowError(ex);
+        }
+    }
+
     private void BindFanChannels()
     {
         FanChannelsListBox.DisplayMemberPath = nameof(FanChannelSettings.DisplayName);
@@ -430,21 +449,28 @@ public partial class MainWindow : Window
         object sender,
         SelectionChangedEventArgs e)
     {
-        if (FanChannelsListBox.SelectedItem is not FanChannelSettings channel)
-            return;
+        try
+        {
+            if (FanChannelsListBox.SelectedItem is not FanChannelSettings channel)
+                return;
 
-        FanNameTextBox.Text = channel.Name;
-        SelectFanMode(channel.Mode);
-        FanSensorComboBox.Text = channel.SensorKey ?? string.Empty;
-        FanFixedTextBox.Text = channel.FixedPercent.ToString(CultureInfo.InvariantCulture);
-        FanMinimumTextBox.Text = channel.MinimumPercent.ToString(CultureInfo.InvariantCulture);
-        FanMaximumTextBox.Text = channel.MaximumPercent.ToString(CultureInfo.InvariantCulture);
-        FanFailSafeTextBox.Text = channel.FailSafePercent.ToString(CultureInfo.InvariantCulture);
-        FanHysteresisTextBox.Text = channel.HysteresisDegrees.ToString("0.##", CultureInfo.InvariantCulture);
-        FanAllowStopCheckBox.IsChecked = channel.AllowStop;
-        FanCurveTextBox.Text = FormatFanCurve(channel.Curve);
-        RefreshFanCurvePreview(channel.Curve);
-        RefreshFanLiveStatus();
+            FanNameTextBox.Text = channel.Name;
+            SelectFanMode(channel.Mode);
+            FanSensorComboBox.Text = channel.SensorKey ?? string.Empty;
+            FanFixedTextBox.Text = channel.FixedPercent.ToString(CultureInfo.InvariantCulture);
+            FanMinimumTextBox.Text = channel.MinimumPercent.ToString(CultureInfo.InvariantCulture);
+            FanMaximumTextBox.Text = channel.MaximumPercent.ToString(CultureInfo.InvariantCulture);
+            FanFailSafeTextBox.Text = channel.FailSafePercent.ToString(CultureInfo.InvariantCulture);
+            FanHysteresisTextBox.Text = channel.HysteresisDegrees.ToString("0.##", CultureInfo.InvariantCulture);
+            FanAllowStopCheckBox.IsChecked = channel.AllowStop;
+            FanCurveTextBox.Text = FormatFanCurve(channel.Curve);
+            RefreshFanCurvePreview(channel.Curve);
+            RefreshFanLiveStatus();
+        }
+        catch (Exception ex)
+        {
+            Log($"ERR  fan channel selection: {ex}");
+        }
     }
 
     private void SelectFanMode(string mode)
@@ -1527,6 +1553,23 @@ public partial class MainWindow : Window
         }
     }
 
+    private void EnsureCustomGlyphUiInitialized()
+    {
+        if (_customGlyphUiInitialized)
+            return;
+
+        try
+        {
+            BindCustomGlyphs();
+            _customGlyphUiInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            Log($"ERR  custom glyph UI initialization: {ex}");
+            ShowError(ex);
+        }
+    }
+
     private void BindCustomGlyphs()
     {
         CustomGlyphSlotComboBox.ItemsSource = Enumerable.Range(1, 8).ToArray();
@@ -1537,8 +1580,17 @@ public partial class MainWindow : Window
 
     private void CustomGlyphSlotChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (IsLoaded)
+        if (!IsLoaded)
+            return;
+
+        try
+        {
             LoadSelectedGlyphIntoEditor();
+        }
+        catch (Exception ex)
+        {
+            Log($"ERR  custom glyph selection: {ex}");
+        }
     }
 
     private void LoadSelectedGlyphIntoEditor()
