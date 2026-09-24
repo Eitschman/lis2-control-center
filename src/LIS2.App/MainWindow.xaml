@@ -434,7 +434,7 @@
                                             <TextBox x:Name="CustomGlyphNameTextBox" TextChanged="CustomGlyphNameChanged"/>
                                             <TextBlock Text="Template key" Margin="0,10,0,4" Foreground="{DynamicResource MutedBrush}"/>
                                             <TextBlock x:Name="CustomGlyphTemplateKeyText"
-                                                       Text="{Glyph.1}"
+                                                       Text="{}{Glyph.1}"
                                                        FontFamily="Consolas"
                                                        TextWrapping="Wrap"/>
                                         </StackPanel>
