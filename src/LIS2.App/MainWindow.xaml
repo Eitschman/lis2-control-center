@@ -1131,7 +1131,7 @@
                                                     <TextBlock Text="{Binding FavoriteMarker}"
                                                                Foreground="{DynamicResource AccentBrush}"/>
                                                     <TextBlock Text="{Binding AvailabilityMarker}"
-                                                               Foreground="{DynamicResource WarningBrush}"
+                                                               Foreground="{DynamicResource DangerBrush}"
                                                                Margin="2,0,0,0"/>
                                                 </StackPanel>
                                                 <StackPanel Grid.Column="1" Margin="0,0,10,0">
