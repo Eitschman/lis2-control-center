@@ -289,8 +289,7 @@
                                             <DataTemplate>
                                                 <CheckBox Content="{Binding Name}"
                                                           IsChecked="{Binding Enabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                          Checked="PageEnabledChanged"
-                                                          Unchecked="PageEnabledChanged"
+                                                          Click="PageEnabledChanged"
                                                           Padding="2"/>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
