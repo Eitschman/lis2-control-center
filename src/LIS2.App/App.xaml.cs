@@ -146,10 +146,12 @@ public partial class App : System.Windows.Application
         try
         {
             System.Windows.MessageBox.Show(
-                "LIS2 Control Center could not start.\n\n" +
-                "A diagnostic log was written to:\n" +
+                LocalizationService.Translate("LIS2 Control Center could not start.") +
+                Environment.NewLine + Environment.NewLine +
+                LocalizationService.Translate("A diagnostic log was written to:") +
+                Environment.NewLine +
                 GetStartupErrorPath() +
-                "\n\n" +
+                Environment.NewLine + Environment.NewLine +
                 ex.Message,
                 "LIS2 Control Center",
                 MessageBoxButton.OK,

@@ -18,7 +18,8 @@ public sealed class StartupService
     {
         using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: true)
             ?? throw new InvalidOperationException(
-                "Unable to open the current-user Windows startup registry key.");
+                LocalizationService.Translate(
+                    "Unable to open the current-user Windows startup registry key."));
 
         if (!enabled)
         {
@@ -29,7 +30,9 @@ public sealed class StartupService
         var executable = Environment.ProcessPath;
 
         if (string.IsNullOrWhiteSpace(executable))
-            throw new InvalidOperationException("Unable to determine the application executable path.");
+            throw new InvalidOperationException(
+                LocalizationService.Translate(
+                    "Unable to determine the application executable path."));
 
         var fileName = System.IO.Path.GetFileName(executable);
 
@@ -37,7 +40,8 @@ public sealed class StartupService
             string.Equals(fileName, "testhost.exe", StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidOperationException(
-                "Windows autostart is available only when running the published LIS2ControlCenter.exe.");
+                LocalizationService.Translate(
+                    "Windows autostart is available only when running the published LIS2ControlCenter.exe."));
         }
 
         key.SetValue(

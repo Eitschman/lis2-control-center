@@ -396,7 +396,7 @@ public partial class MainWindow : Window
 
     private void BindFanChannels()
     {
-        FanChannelsListBox.DisplayMemberPath = nameof(FanChannelSettings.Name);
+        FanChannelsListBox.DisplayMemberPath = nameof(FanChannelSettings.DisplayName);
         FanChannelsListBox.ItemsSource = null;
         FanChannelsListBox.ItemsSource = _settings.Fans.Channels;
 
@@ -427,7 +427,7 @@ public partial class MainWindow : Window
         foreach (var item in FanModeComboBox.Items.OfType<ComboBoxItem>())
         {
             if (string.Equals(
-                    Convert.ToString(item.Content, CultureInfo.InvariantCulture),
+                    Convert.ToString(item.Tag, CultureInfo.InvariantCulture),
                     mode,
                     StringComparison.OrdinalIgnoreCase))
             {
@@ -440,9 +440,9 @@ public partial class MainWindow : Window
     }
 
     private string GetSelectedFanMode() =>
-        FanModeComboBox.SelectedItem is ComboBoxItem item
-            ? Convert.ToString(item.Content, CultureInfo.InvariantCulture) ?? "Fixed"
-            : "Fixed";
+        FanModeComboBox.SelectedItem is ComboBoxItem { Tag: string tag }
+            ? tag
+            : nameof(FanMode.Fixed);
 
     private void RefreshFanSensors_Click(object sender, RoutedEventArgs e) =>
         RefreshFanSensorChoices();
@@ -505,12 +505,18 @@ public partial class MainWindow : Window
             ? $"{LocalizationService.Translate("Connected")} • {localizedState}"
             : LocalizationService.Translate("Waiting for Winamp");
 
+        const string winampPipe = @"\\.\pipe\LIS2ControlCenter.Winamp";
+
         WinampConnectionDetailText.Text = connected
-            ? @"Receiving snapshots on \\.\pipe\LIS2ControlCenter.Winamp" +
+            ? LocalizationService.Format("Receiving snapshots on {0}", winampPipe) +
               (_winampSource.LastSnapshotAt is not null
-                  ? $" • last update {_winampSource.LastSnapshotAt.Value.ToLocalTime():HH:mm:ss}"
+                  ? " • " + LocalizationService.Format(
+                      "last update {0}",
+                      _winampSource.LastSnapshotAt.Value.ToLocalTime().ToString("HH:mm:ss", CultureInfo.CurrentCulture))
                   : string.Empty)
-            : @"Listening on \\.\pipe\LIS2ControlCenter.Winamp — no recent plugin/simulator data.";
+            : LocalizationService.Format(
+                "Listening on {0} — no recent plugin/simulator data.",
+                winampPipe);
     }
 
     private static string? GetWinampValue(
@@ -559,7 +565,8 @@ public partial class MainWindow : Window
                 durationSeconds is < 1 or > 3600)
             {
                 throw new InvalidOperationException(
-                    "Event duration must be between 1 and 3600 seconds.");
+                    LocalizationService.Translate(
+                        "Event duration must be between 1 and 3600 seconds."));
             }
 
             var line1 = EventLine1TextBox.Text ?? string.Empty;
@@ -588,8 +595,8 @@ public partial class MainWindow : Window
         {
             await QueueDisplayEventAsync(
                 $"warning-{Guid.NewGuid():N}",
-                "!! WARNING !!",
-                "Test notification",
+                LocalizationService.Translate("!! WARNING !!"),
+                LocalizationService.Translate("Test notification"),
                 priority: 100,
                 duration: TimeSpan.FromSeconds(8));
 
@@ -629,13 +636,14 @@ public partial class MainWindow : Window
         if (EventQueueListBox.SelectedItem is EventQueueRow row)
         {
             SelectedEventText.Text =
-                $"ID: {row.Id}{Environment.NewLine}" +
-                $"Priority: {row.PriorityName} ({row.Priority}) • " +
-                $"Expires: {row.ExpiresAt.ToLocalTime():HH:mm:ss}";
+                $"{LocalizationService.Translate("ID")}: {row.Id}{Environment.NewLine}" +
+                $"{LocalizationService.Translate("Priority")}: {row.PriorityName} ({row.Priority}) • " +
+                $"{LocalizationService.Translate("Expires")}: {row.ExpiresAt.ToLocalTime():HH:mm:ss}";
         }
         else
         {
-            SelectedEventText.Text = "Select an event to inspect it.";
+            SelectedEventText.Text =
+                LocalizationService.Translate("Select an event to inspect it.");
         }
     }
 
@@ -658,7 +666,7 @@ public partial class MainWindow : Window
                     FormatEventPriority(displayEvent.Priority),
                     displayEvent.ExpiresAt,
                     remaining <= TimeSpan.Zero
-                        ? "expired"
+                        ? LocalizationService.Translate("expired")
                         : $"{Math.Ceiling(remaining.TotalSeconds):0}s");
             })
             .ToArray();
@@ -693,7 +701,8 @@ public partial class MainWindow : Window
                 CultureInfo.InvariantCulture,
                 out var priority))
         {
-            throw new InvalidOperationException("Select a valid event priority.");
+            throw new InvalidOperationException(
+                LocalizationService.Translate("Select a valid event priority."));
         }
 
         return priority;
@@ -785,10 +794,11 @@ public partial class MainWindow : Window
                 IsNumericValue(pair.Value))
             .Select(pair => CreateHardwareSensorRow(pair.Key, pair.Value, snapshot))
             .Where(row =>
-                MatchesHardwareTypeFilter(row.Type, typeFilter) &&
+                MatchesHardwareTypeFilter(row.TypeKey, typeFilter) &&
                 (string.IsNullOrWhiteSpace(search) ||
                  row.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.Key.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                 row.TypeKey.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.Type.Contains(search, StringComparison.OrdinalIgnoreCase)))
             .OrderBy(row => row.Type, StringComparer.OrdinalIgnoreCase)
             .ThenBy(row => row.Name, StringComparer.OrdinalIgnoreCase)
@@ -810,11 +820,17 @@ public partial class MainWindow : Window
             ? error
             : null;
 
+        var totalHardwareValues = snapshot.Count(pair =>
+            pair.Key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase) &&
+            !pair.Key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase));
+
         HardwareSummaryText.Text =
             !string.IsNullOrWhiteSpace(hardwareError)
-                ? $"Hardware source error: {hardwareError}"
-                : $"{rows.Length} visible sensor(s) / " +
-                  $"{snapshot.Count(pair => pair.Key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase) && !pair.Key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase))} total values";
+                ? LocalizationService.Format("Hardware source error: {0}", hardwareError)
+                : LocalizationService.Format(
+                    "{0} visible sensor(s) / {1} total values",
+                    rows.Length,
+                    totalHardwareValues);
     }
 
     private static HardwareSensorRow CreateHardwareSensorRow(
@@ -845,6 +861,7 @@ public partial class MainWindow : Window
             key,
             $"{hardwareName} — {sensorName}",
             type,
+            LocalizationService.Translate(type),
             value,
             unit);
     }
@@ -889,7 +906,8 @@ public partial class MainWindow : Window
         try
         {
             if (HardwareSensorsListBox.SelectedItem is not HardwareSensorRow sensor)
-                throw new InvalidOperationException("Select a hardware sensor first.");
+                throw new InvalidOperationException(
+                    LocalizationService.Translate("Select a hardware sensor first."));
 
             if (sender is not System.Windows.Controls.Button { Tag: string tag } ||
                 !int.TryParse(tag, out var fanIndex) ||
@@ -959,21 +977,32 @@ public partial class MainWindow : Window
         try
         {
             if (FanChannelsListBox.SelectedItem is not FanChannelSettings channel)
-                throw new InvalidOperationException("Select a fan channel first.");
+                throw new InvalidOperationException(
+                    LocalizationService.Translate("Select a fan channel first."));
 
-            var fixedPercent = ParsePercent(FanFixedTextBox.Text, "Fixed output");
-            var minimumPercent = ParsePercent(FanMinimumTextBox.Text, "Minimum output");
-            var maximumPercent = ParsePercent(FanMaximumTextBox.Text, "Maximum output");
-            var failSafePercent = ParsePercent(FanFailSafeTextBox.Text, "Fail-safe output");
+            var fixedPercent = ParsePercent(
+                FanFixedTextBox.Text,
+                LocalizationService.Translate("Fixed output"));
+            var minimumPercent = ParsePercent(
+                FanMinimumTextBox.Text,
+                LocalizationService.Translate("Minimum output"));
+            var maximumPercent = ParsePercent(
+                FanMaximumTextBox.Text,
+                LocalizationService.Translate("Maximum output"));
+            var failSafePercent = ParsePercent(
+                FanFailSafeTextBox.Text,
+                LocalizationService.Translate("Fail-safe output"));
 
             if (minimumPercent > maximumPercent)
                 throw new InvalidOperationException(
-                    "Minimum fan output must not be greater than maximum output.");
+                    LocalizationService.Translate(
+                        "Minimum fan output must not be greater than maximum output."));
 
             var mode = GetSelectedFanMode();
 
             if (!Enum.TryParse<FanMode>(mode, ignoreCase: true, out _))
-                throw new InvalidOperationException($"Unknown fan mode '{mode}'.");
+                throw new InvalidOperationException(
+                    LocalizationService.Format("Unknown fan mode '{0}'.", mode));
 
             var curve = ParseFanCurve(FanCurveTextBox.Text);
 
@@ -981,11 +1010,14 @@ public partial class MainWindow : Window
                 curve.Count == 0)
             {
                 throw new InvalidOperationException(
-                    "Curve mode requires at least one temperature/output point.");
+                    LocalizationService.Translate(
+                        "Curve mode requires at least one temperature/output point."));
             }
 
             channel.Name = string.IsNullOrWhiteSpace(FanNameTextBox.Text)
-                ? $"Fan {FanChannelsListBox.SelectedIndex + 1}"
+                ? LocalizationService.Format(
+                    "Fan {0}",
+                    FanChannelsListBox.SelectedIndex + 1)
                 : FanNameTextBox.Text.Trim();
             channel.Mode = mode;
             channel.SensorKey = string.IsNullOrWhiteSpace(FanSensorComboBox.Text)
@@ -1044,7 +1076,9 @@ public partial class MainWindow : Window
                 output is < 0 or > 100)
             {
                 throw new InvalidOperationException(
-                    $"Invalid curve point '{token}'. Use temperature:percent, e.g. 60:80.");
+                    LocalizationService.Format(
+                        "Invalid curve point '{0}'. Use temperature:percent, e.g. 60:80.",
+                        token));
             }
 
             points.Add(new FanCurvePointSettings
@@ -1113,7 +1147,8 @@ public partial class MainWindow : Window
     private async Task WriteFrameAsync(DisplayFrame frame)
     {
         if (_frameWriter is null)
-            throw new InvalidOperationException("LIS2 display writer is not initialized.");
+            throw new InvalidOperationException(
+                LocalizationService.Translate("LIS2 display writer is not initialized."));
 
         await _frameWriter.WriteAsync(frame);
     }
@@ -1158,8 +1193,8 @@ public partial class MainWindow : Window
     {
         var page = new PageDefinition
         {
-            Name = "New page",
-            Line1Template = "New page",
+            Name = LocalizationService.Translate("New page"),
+            Line1Template = LocalizationService.Translate("New page"),
             Line2Template = "{Clock.Time}",
             DurationSeconds = 5
         };
@@ -1188,13 +1223,15 @@ public partial class MainWindow : Window
         try
         {
             if (PagesListBox.SelectedItem is not PageDefinition page)
-                throw new InvalidOperationException("Select a page first.");
+                throw new InvalidOperationException(
+                    LocalizationService.Translate("Select a page first."));
 
             if (!int.TryParse(PageDurationTextBox.Text, out var duration) || duration < 1)
-                throw new InvalidOperationException("Page duration must be at least 1 second.");
+                throw new InvalidOperationException(
+                    LocalizationService.Translate("Page duration must be at least 1 second."));
 
             page.Name = string.IsNullOrWhiteSpace(PageNameTextBox.Text)
-                ? "Page"
+                ? LocalizationService.Translate("Page")
                 : PageNameTextBox.Text.Trim();
             page.Line1Template = PageLine1TextBox.Text;
             page.Line2Template = PageLine2TextBox.Text;
@@ -1227,8 +1264,8 @@ public partial class MainWindow : Window
         {
             await QueueDisplayEventAsync(
                 $"page-test-{Guid.NewGuid():N}",
-                "** EVENT TEST **",
-                "Overlay for 5 sec",
+                LocalizationService.Translate("** EVENT TEST **"),
+                LocalizationService.Translate("Overlay for 5 sec"),
                 priority: 100,
                 duration: TimeSpan.FromSeconds(5));
 
@@ -1328,6 +1365,11 @@ public partial class MainWindow : Window
         RefreshWinampView();
         RefreshEventsView();
         RefreshHardwareSensors();
+        RefreshFanSensorChoices();
+        FanChannelsListBox.Items.Refresh();
+        UpdateTransportUi();
+        UpdateConnectionUiLocalization();
+        RefreshDiagnostics();
         _trayIcon.ApplyLocalization();
 
         await _settingsStore.SaveAsync(_settings);
@@ -1375,10 +1417,13 @@ public partial class MainWindow : Window
         if (string.Equals(_settings.TransportMode, "Serial", StringComparison.OrdinalIgnoreCase))
         {
             if (string.IsNullOrWhiteSpace(_settings.PortName))
-                throw new InvalidOperationException("Select a COM port before using the serial transport.");
+                throw new InvalidOperationException(
+                    LocalizationService.Translate(
+                        "Select a COM port before using the serial transport."));
 
             _transport = new SerialLis2Transport(_settings.PortName);
-            VirtualStateText.Text = "Virtual state is unavailable while Serial transport is active.";
+            VirtualStateText.Text = LocalizationService.Translate(
+                "Virtual state is unavailable while Serial transport is active.");
         }
         else
         {
@@ -1393,13 +1438,7 @@ public partial class MainWindow : Window
         await _device.ConnectAsync();
         _frameWriter = new DisplayFrameWriter(_device);
 
-        ConnectionText.Text = _settings.TransportMode == "Serial"
-            ? $"Connected: {_settings.PortName}"
-            : "Virtual LIS2 connected";
-
-        TransportSummaryText.Text = _settings.TransportMode == "Serial"
-            ? $"Serial: {_settings.PortName}"
-            : "Virtual LIS2 transport";
+        UpdateConnectionUiLocalization();
 
         Log($"INFO connected using {_settings.TransportMode} transport");
         _trayIcon.SetStatus(ConnectionText.Text);
@@ -1414,8 +1453,16 @@ public partial class MainWindow : Window
     private void UpdateVirtualState(VirtualLis2State state)
     {
         VirtualStateText.Text =
-            $"Brightness: {FormatBrightness(state.Brightness)}{Environment.NewLine}" +
-            $"Fans: {state.Fan1}% / {state.Fan2}% / {state.Fan3}% / {state.Fan4}%";
+            LocalizationService.Format(
+                "Brightness: {0}",
+                FormatBrightness(state.Brightness)) +
+            Environment.NewLine +
+            LocalizationService.Format(
+                "Fans: {0}% / {1}% / {2}% / {3}%",
+                state.Fan1,
+                state.Fan2,
+                state.Fan3,
+                state.Fan4);
     }
 
     private static string FormatBrightness(Lis2Brightness brightness) =>
@@ -1441,6 +1488,49 @@ public partial class MainWindow : Window
         var serial = TransportModeComboBox.SelectedIndex == 1;
         PortComboBox.IsEnabled = serial;
     }
+
+    private void UpdateConnectionUiLocalization()
+    {
+        var connected = _device?.IsConnected == true;
+
+        if (string.Equals(_settings.TransportMode, "Serial", StringComparison.OrdinalIgnoreCase))
+        {
+            ConnectionText.Text = connected
+                ? LocalizationService.Format(
+                    "Connected: {0}",
+                    _settings.PortName ?? "-")
+                : LocalizationService.Translate("Disconnected");
+
+            TransportSummaryText.Text = LocalizationService.Format(
+                "Serial: {0}",
+                _settings.PortName ?? "-");
+
+            VirtualStateText.Text = LocalizationService.Translate(
+                "Virtual state is unavailable while Serial transport is active.");
+        }
+        else
+        {
+            ConnectionText.Text = connected
+                ? LocalizationService.Translate("Virtual LIS2 connected")
+                : LocalizationService.Translate("Disconnected");
+
+            TransportSummaryText.Text =
+                LocalizationService.Translate("Virtual LIS2 transport");
+
+            if (_transport is VirtualLis2Transport virtualTransport)
+                UpdateVirtualState(virtualTransport.State);
+        }
+
+        _trayIcon.SetStatus(ConnectionText.Text);
+    }
+
+    private static string LocalizeTransportMode(string mode) =>
+        string.Equals(mode, "Serial", StringComparison.OrdinalIgnoreCase)
+            ? LocalizationService.Translate("Serial")
+            : LocalizationService.Translate("Virtual");
+
+    private static string LocalizeBoolean(bool value) =>
+        LocalizationService.Translate(value ? "Yes" : "No");
 
     private void RefreshPorts_Click(object sender, RoutedEventArgs e) => RefreshPorts();
 
@@ -1477,14 +1567,22 @@ public partial class MainWindow : Window
         var snapshot = _sources.Snapshot();
         var lines = new List<string>
         {
-            $"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
-            $"Transport: {_settings.TransportMode}",
-            $"Connected: {_device?.IsConnected == true}",
-            $"Port: {_settings.PortName ?? "-"}",
-            $"Frame line 1: {_frame.Line1}",
-            $"Frame line 2: {_frame.Line2}",
-            $"Automatic fan control: {_settings.Fans.AutomaticControlEnabled}",
-            $"Data values: {snapshot.Count}",
+            LocalizationService.Format(
+                "Time: {0}",
+                DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture)),
+            LocalizationService.Format(
+                "Transport: {0}",
+                LocalizeTransportMode(_settings.TransportMode)),
+            LocalizationService.Format(
+                "Connected: {0}",
+                LocalizeBoolean(_device?.IsConnected == true)),
+            LocalizationService.Format("Port: {0}", _settings.PortName ?? "-"),
+            LocalizationService.Format("Frame line 1: {0}", _frame.Line1),
+            LocalizationService.Format("Frame line 2: {0}", _frame.Line2),
+            LocalizationService.Format(
+                "Automatic fan control: {0}",
+                LocalizeBoolean(_settings.Fans.AutomaticControlEnabled)),
+            LocalizationService.Format("Data values: {0}", snapshot.Count),
             ""
         };
 
@@ -1493,8 +1591,14 @@ public partial class MainWindow : Window
             var error = _sources.Errors[source.Id];
             lines.Add(
                 string.IsNullOrWhiteSpace(error)
-                    ? $"Source {source.Id}: OK ({source.Values.Count} values)"
-                    : $"Source {source.Id}: ERROR - {error}");
+                    ? LocalizationService.Format(
+                        "Source {0}: OK ({1} values)",
+                        source.Id,
+                        source.Values.Count)
+                    : LocalizationService.Format(
+                        "Source {0}: ERROR - {1}",
+                        source.Id,
+                        error));
         }
 
         lines.Add("");
@@ -1503,10 +1607,16 @@ public partial class MainWindow : Window
         {
             var channel = _settings.Fans.Channels[index];
             lines.Add(
-                $"Fan {index + 1}: {channel.Name}, mode={channel.Mode}, " +
-                $"sensor={channel.SensorKey ?? "-"}, fixed={channel.FixedPercent}%, " +
-                $"min={channel.MinimumPercent}%, max={channel.MaximumPercent}%, " +
-                $"fail-safe={channel.FailSafePercent}%");
+                LocalizationService.Format(
+                    "Fan {0}: {1}, mode={2}, sensor={3}, fixed={4}%, min={5}%, max={6}%, fail-safe={7}%",
+                    index + 1,
+                    channel.Name,
+                    LocalizationService.Translate(channel.Mode),
+                    channel.SensorKey ?? "-",
+                    channel.FixedPercent,
+                    channel.MinimumPercent,
+                    channel.MaximumPercent,
+                    channel.FailSafePercent));
         }
 
         DiagnosticsTextBox.Text = string.Join(Environment.NewLine, lines);
@@ -1604,7 +1714,8 @@ public partial class MainWindow : Window
                 "75" => Lis2Brightness.Percent75,
                 "50" => Lis2Brightness.Percent50,
                 "25" => Lis2Brightness.Percent25,
-                _ => throw new InvalidOperationException("Unknown brightness.")
+                _ => throw new InvalidOperationException(
+                    LocalizationService.Translate("Unknown brightness."))
             };
 
             _settings.BrightnessPercent = int.Parse(tag, CultureInfo.InvariantCulture);
@@ -1623,10 +1734,18 @@ public partial class MainWindow : Window
         {
             var requested = new[]
             {
-                ParsePercent(Fan1TextBox.Text, "Fan 1"),
-                ParsePercent(Fan2TextBox.Text, "Fan 2"),
-                ParsePercent(Fan3TextBox.Text, "Fan 3"),
-                ParsePercent(Fan4TextBox.Text, "Fan 4")
+                ParsePercent(
+                    Fan1TextBox.Text,
+                    LocalizationService.Translate("Fan 1")),
+                ParsePercent(
+                    Fan2TextBox.Text,
+                    LocalizationService.Translate("Fan 2")),
+                ParsePercent(
+                    Fan3TextBox.Text,
+                    LocalizationService.Translate("Fan 3")),
+                ParsePercent(
+                    Fan4TextBox.Text,
+                    LocalizationService.Translate("Fan 4"))
             };
 
             var outputs = new int[4];
@@ -1674,7 +1793,8 @@ public partial class MainWindow : Window
     private Lis2Device RequireDevice() =>
         _device?.IsConnected == true
             ? _device
-            : throw new InvalidOperationException("LIS2 device is not connected.");
+            : throw new InvalidOperationException(
+                LocalizationService.Translate("LIS2 device is not connected."));
 
     private void RefreshPreview()
     {
@@ -1685,7 +1805,10 @@ public partial class MainWindow : Window
     private static int ParsePercent(string value, string label)
     {
         if (!int.TryParse(value, out var result) || result is < 0 or > 100)
-            throw new InvalidOperationException($"{label} must be between 0 and 100.");
+            throw new InvalidOperationException(
+                LocalizationService.Format(
+                    "{0} must be between 0 and 100.",
+                    label));
 
         return result;
     }
