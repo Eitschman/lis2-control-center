@@ -1156,7 +1156,8 @@
                                                            Text="{Binding Key}"
                                                            FontFamily="Consolas"
                                                            Foreground="{DynamicResource MutedBrush}"
-                                                           TextTrimming="CharacterEllipsis"/>
+                                                           TextTrimming="CharacterEllipsis"
+                                                           VerticalAlignment="Top"/>
                                             </Grid>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
