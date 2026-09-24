@@ -76,4 +76,51 @@ public sealed class FanControllerTests
 
         Assert.Equal(0, _controller.CalculateOutput(configuration));
     }
+    [Fact]
+    public void CurveMode_HysteresisKeepsPreviousOutputForSmallSensorChange()
+    {
+        var configuration = new FanChannelConfiguration
+        {
+            Mode = FanMode.Curve,
+            MinimumPercent = 30,
+            HysteresisDegrees = 2,
+            Curve =
+            {
+                new FanCurvePoint(40, 40),
+                new FanCurvePoint(60, 80)
+            }
+        };
+
+        Assert.Equal(
+            60,
+            _controller.CalculateOutput(
+                configuration,
+                sensorValue: 50.9,
+                previousSensorValue: 50,
+                previousOutputPercent: 60));
+    }
+
+    [Fact]
+    public void CurveMode_HysteresisRecalculatesAfterThreshold()
+    {
+        var configuration = new FanChannelConfiguration
+        {
+            Mode = FanMode.Curve,
+            MinimumPercent = 30,
+            HysteresisDegrees = 1,
+            Curve =
+            {
+                new FanCurvePoint(40, 40),
+                new FanCurvePoint(60, 80)
+            }
+        };
+
+        Assert.Equal(
+            64,
+            _controller.CalculateOutput(
+                configuration,
+                sensorValue: 52,
+                previousSensorValue: 50,
+                previousOutputPercent: 60));
+    }
 }
