@@ -24,6 +24,14 @@ public static class LocalizationService
         {
             ["de"] = new(StringComparer.Ordinal)
             {
+                ["About LIS2 Control Center"]="Über LIS2 Control Center",
+                ["Version {0}"]="Version {0}",
+                ["Build"]="Build",
+                ["Runtime"]="Runtime",
+                ["Architecture"]="Architektur",
+                ["Operating system"]="Betriebssystem",
+                ["Application data"]="Anwendungsdaten",
+                ["Close"]="Schließen",
                 ["Preset"]="Preset",
                 ["Create from preset"]="Aus Preset erstellen",
                 ["General"]="Allgemein",
@@ -205,6 +213,14 @@ public static class LocalizationService
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
+                ["About LIS2 Control Center"]="À propos de LIS2 Control Center",
+                ["Version {0}"]="Version {0}",
+                ["Build"]="Build",
+                ["Runtime"]="Runtime",
+                ["Architecture"]="Architecture",
+                ["Operating system"]="Système d’exploitation",
+                ["Application data"]="Données de l’application",
+                ["Close"]="Fermer",
                 ["Preset"]="Préréglage",
                 ["Create from preset"]="Créer depuis le préréglage",
                 ["General"]="Général",
@@ -391,6 +407,14 @@ public static class LocalizationService
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
+                ["About LIS2 Control Center"]="LIS2 Control Center hakkında",
+                ["Version {0}"]="Sürüm {0}",
+                ["Build"]="Derleme",
+                ["Runtime"]="Çalışma zamanı",
+                ["Architecture"]="Mimari",
+                ["Operating system"]="İşletim sistemi",
+                ["Application data"]="Uygulama verileri",
+                ["Close"]="Kapat",
                 ["Preset"]="Hazır ayar",
                 ["Create from preset"]="Hazır ayardan oluştur",
                 ["General"]="Genel",
@@ -585,6 +609,14 @@ public static class LocalizationService
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
+                ["About LIS2 Control Center"]="О LIS2 Control Center",
+                ["Version {0}"]="Версия {0}",
+                ["Build"]="Сборка",
+                ["Runtime"]="Среда выполнения",
+                ["Architecture"]="Архитектура",
+                ["Operating system"]="Операционная система",
+                ["Application data"]="Данные приложения",
+                ["Close"]="Закрыть",
                 ["Preset"]="Шаблон",
                 ["Create from preset"]="Создать из шаблона",
                 ["General"]="Общее",
