@@ -81,6 +81,7 @@ public sealed class WinampDataSource : IDataSource
             ["VuRight"] = null,
             ["Vu"] = string.Empty,
             ["Spectrum"] = string.Empty,
+            ["SpectrumRaw"] = null,
             ["SpectrumPeak"] = null,
             ["Connected"] = false,
             ["SnapshotAgeSeconds"] = null
