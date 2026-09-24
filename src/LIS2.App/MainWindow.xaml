@@ -510,8 +510,19 @@
 
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Text="Pages" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
+
+                                    <TextBlock Text="Preset" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,4"/>
+                                    <ComboBox x:Name="PagePresetComboBox"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Id"
+                                              Margin="0,0,0,6"/>
+                                    <Button Content="Create from preset"
+                                            Click="CreatePagePreset_Click"
+                                            HorizontalAlignment="Stretch"
+                                            Margin="0,0,0,12"/>
+
                                     <ListBox x:Name="PagesListBox"
-                                             Height="310"
+                                             Height="250"
                                              SelectionChanged="PagesListBox_SelectionChanged">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
@@ -1046,6 +1057,7 @@
                                           SelectionChanged="HardwareFilterChanged">
                                     <ComboBoxItem Content="All types" Tag="All" IsSelected="True"/>
                                     <ComboBoxItem Content="Favorites" Tag="Favorites"/>
+                                    <ComboBoxItem Content="Unavailable" Tag="Unavailable"/>
                                     <ComboBoxItem Content="Temperature" Tag="Temperature"/>
                                     <ComboBoxItem Content="Load" Tag="Load"/>
                                     <ComboBoxItem Content="Fan" Tag="Fan"/>
@@ -1089,6 +1101,21 @@
                                 <ListBox x:Name="HardwareSensorsListBox"
                                          Grid.Row="1"
                                          SelectionChanged="HardwareSensorsListBox_SelectionChanged">
+                                    <ListBox.GroupStyle>
+                                        <GroupStyle>
+                                            <GroupStyle.HeaderTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="{DynamicResource AppBackgroundBrush}"
+                                                            Padding="8,6"
+                                                            Margin="0,8,0,4">
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource TextBrush}"/>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </GroupStyle.HeaderTemplate>
+                                        </GroupStyle>
+                                    </ListBox.GroupStyle>
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <Grid Margin="2,1">
@@ -1100,13 +1127,17 @@
                                                     <ColumnDefinition Width="2.8*"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <TextBlock Grid.Column="0"
-                                                           Text="{Binding FavoriteMarker}"
-                                                           Foreground="{DynamicResource AccentBrush}"/>
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding FavoriteMarker}"
+                                                               Foreground="{DynamicResource AccentBrush}"/>
+                                                    <TextBlock Text="{Binding AvailabilityMarker}"
+                                                               Foreground="{DynamicResource WarningBrush}"
+                                                               Margin="2,0,0,0"/>
+                                                </StackPanel>
                                                 <StackPanel Grid.Column="1" Margin="0,0,10,0">
                                                     <TextBlock Text="{Binding DisplayName}"
                                                                TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Text="{Binding Name}"
+                                                    <TextBlock Text="{Binding SensorName}"
                                                                Foreground="{DynamicResource MutedBrush}"
                                                                FontSize="11"
                                                                TextTrimming="CharacterEllipsis"/>
