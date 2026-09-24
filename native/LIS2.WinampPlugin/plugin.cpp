@@ -28,8 +28,10 @@ VuGetFunc g_vuGet = nullptr;
 
 char g_description[] = "LIS2 Control Center (gen_lis2.dll)";
 
-bool IsValidFunctionPointer(LRESULT raw) =>
-    raw != 0 && raw != 1 && raw != -1;
+bool IsValidFunctionPointer(LRESULT raw)
+{
+    return raw != 0 && raw != 1 && raw != -1;
+}
 
 std::string JsonEscape(const std::string& value)
 {
