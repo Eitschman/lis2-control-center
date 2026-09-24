@@ -26,6 +26,9 @@ public partial class MainWindow : Window
     private readonly WinampDataSource _winampSource = new();
     private readonly FanController _fanController = new();
     private int[]? _lastAutomaticFanOutputs;
+    private readonly double?[] _lastAutomaticFanSensorValues = new double?[4];
+    private readonly double?[] _currentFanSensorValues = new double?[4];
+    private CustomCharacterManager? _customCharacterManager;
     private readonly TrayIconService _trayIcon = new();
     private readonly StartupService _startupService = new();
     private bool _allowClose;
@@ -169,7 +172,10 @@ public partial class MainWindow : Window
             RefreshHardwareSensors();
 
         if (index == 6)
+        {
             RefreshFanSensorChoices();
+            RefreshFanLiveStatus();
+        }
 
         if (index == 8)
             RefreshDiagnostics();
@@ -192,6 +198,7 @@ public partial class MainWindow : Window
 
             LoadPagesIntoRuntime();
             BindPages();
+            BindCustomGlyphs();
             BindFanChannels();
 
             await ReconnectAsync();
@@ -310,6 +317,7 @@ public partial class MainWindow : Window
                 MinimumPercent = stored.MinimumPercent,
                 MaximumPercent = stored.MaximumPercent,
                 FailSafePercent = stored.FailSafePercent,
+                HysteresisDegrees = stored.HysteresisDegrees,
                 AllowStop = stored.AllowStop,
                 Curve = stored.Curve
                     .Select(point => new FanCurvePoint(
@@ -329,28 +337,38 @@ public partial class MainWindow : Window
                     TryConvertToDouble(rawValue, out sensorValue);
             }
 
+            _currentFanSensorValues[index] = sensorValid ? sensorValue : null;
+
             outputs[index] = _fanController.CalculateOutput(
                 configuration,
                 sensorValue,
                 externalPercent: null,
-                sensorValid);
+                sensorValid,
+                previousSensorValue: _lastAutomaticFanSensorValues[index],
+                previousOutputPercent: _lastAutomaticFanOutputs?[index]);
         }
 
-        if (_lastAutomaticFanOutputs is not null &&
-            outputs.SequenceEqual(_lastAutomaticFanOutputs))
+        var outputsChanged =
+            _lastAutomaticFanOutputs is null ||
+            !outputs.SequenceEqual(_lastAutomaticFanOutputs);
+
+        for (var index = 0; index < _lastAutomaticFanSensorValues.Length; index++)
+            _lastAutomaticFanSensorValues[index] = _currentFanSensorValues[index];
+
+        if (outputsChanged)
         {
-            return;
+            await RequireDevice().SetFansAsync(
+                outputs[0],
+                outputs[1],
+                outputs[2],
+                outputs[3]);
+
+            _lastAutomaticFanOutputs = outputs;
+            UpdateFanOutputFields(outputs);
+            Log($"INFO automatic fan outputs: {string.Join("/", outputs)}%");
         }
 
-        await RequireDevice().SetFansAsync(
-            outputs[0],
-            outputs[1],
-            outputs[2],
-            outputs[3]);
-
-        _lastAutomaticFanOutputs = outputs;
-        UpdateFanOutputFields(outputs);
-        Log($"INFO automatic fan outputs: {string.Join("/", outputs)}%");
+        RefreshFanLiveStatus();
     }
 
     private static bool TryConvertToDouble(object? value, out double? result)
@@ -385,6 +403,7 @@ public partial class MainWindow : Window
             AutomaticFanControlCheckBox.IsChecked == true;
 
         _lastAutomaticFanOutputs = null;
+        Array.Clear(_lastAutomaticFanSensorValues);
         await _settingsStore.SaveAsync(_settings);
 
         Log(_settings.Fans.AutomaticControlEnabled
@@ -419,8 +438,11 @@ public partial class MainWindow : Window
         FanMinimumTextBox.Text = channel.MinimumPercent.ToString(CultureInfo.InvariantCulture);
         FanMaximumTextBox.Text = channel.MaximumPercent.ToString(CultureInfo.InvariantCulture);
         FanFailSafeTextBox.Text = channel.FailSafePercent.ToString(CultureInfo.InvariantCulture);
+        FanHysteresisTextBox.Text = channel.HysteresisDegrees.ToString("0.##", CultureInfo.InvariantCulture);
         FanAllowStopCheckBox.IsChecked = channel.AllowStop;
         FanCurveTextBox.Text = FormatFanCurve(channel.Curve);
+        RefreshFanCurvePreview(channel.Curve);
+        RefreshFanLiveStatus();
     }
 
     private void SelectFanMode(string mode)
@@ -994,6 +1016,17 @@ public partial class MainWindow : Window
                 FanFailSafeTextBox.Text,
                 LocalizationService.Translate("Fail-safe output"));
 
+            if (!double.TryParse(
+                    FanHysteresisTextBox.Text,
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out var hysteresis) ||
+                hysteresis < 0 ||
+                hysteresis > 20)
+            {
+                throw new InvalidOperationException("Hysteresis must be between 0 and 20 degrees.");
+            }
+
             if (minimumPercent > maximumPercent)
                 throw new InvalidOperationException(
                     LocalizationService.Translate(
@@ -1028,12 +1061,15 @@ public partial class MainWindow : Window
             channel.MinimumPercent = minimumPercent;
             channel.MaximumPercent = maximumPercent;
             channel.FailSafePercent = failSafePercent;
+            channel.HysteresisDegrees = hysteresis;
             channel.AllowStop = FanAllowStopCheckBox.IsChecked == true;
             channel.Curve = curve;
+            RefreshFanCurvePreview(curve);
 
             await _settingsStore.SaveAsync(_settings);
 
             _lastAutomaticFanOutputs = null;
+            Array.Clear(_lastAutomaticFanSensorValues);
             FanChannelsListBox.Items.Refresh();
 
             Log($"INFO saved fan channel '{channel.Name}'");
@@ -1045,6 +1081,79 @@ public partial class MainWindow : Window
         {
             ShowError(ex);
         }
+    }
+
+    private void RefreshFanLiveStatus()
+    {
+        if (FanLiveStatusText is null)
+            return;
+
+        var index = FanChannelsListBox.SelectedIndex;
+        if (index < 0 || index >= 4)
+        {
+            FanLiveStatusText.Text = "-";
+            return;
+        }
+
+        var channel = _settings.Fans.Channels[index];
+        double? sensor = null;
+        var snapshot = _sources.Snapshot();
+        if (!string.IsNullOrWhiteSpace(channel.SensorKey) &&
+            snapshot.TryGetValue(channel.SensorKey, out var rawSensor))
+        {
+            TryConvertToDouble(rawSensor, out sensor);
+        }
+
+        var output = _lastAutomaticFanOutputs?[index];
+        FanLiveStatusText.Text =
+            $"Sensor: {(sensor is null ? "-" : sensor.Value.ToString("0.##", CultureInfo.CurrentCulture))}  |  " +
+            $"Output: {(output is null ? "-" : output.Value.ToString(CultureInfo.CurrentCulture) + "%")}";
+    }
+
+    private void FanCurveTextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!IsLoaded || FanCurvePreviewCanvas is null)
+            return;
+
+        try
+        {
+            RefreshFanCurvePreview(ParseFanCurve(FanCurveTextBox.Text));
+        }
+        catch
+        {
+            FanCurvePreviewCanvas.Children.Clear();
+        }
+    }
+
+    private void RefreshFanCurvePreview(IEnumerable<FanCurvePointSettings> curve)
+    {
+        if (FanCurvePreviewCanvas is null)
+            return;
+
+        FanCurvePreviewCanvas.Children.Clear();
+        var points = curve.OrderBy(point => point.Temperature).ToArray();
+        if (points.Length == 0)
+            return;
+
+        const double width = 360;
+        const double height = 120;
+        var minTemp = Math.Min(0, points.Min(point => point.Temperature));
+        var maxTemp = Math.Max(minTemp + 1, points.Max(point => point.Temperature));
+
+        var polyline = new System.Windows.Shapes.Polyline
+        {
+            Stroke = (System.Windows.Media.Brush)FindResource("AccentBrush"),
+            StrokeThickness = 2
+        };
+
+        foreach (var point in points)
+        {
+            var x = (point.Temperature - minTemp) / (maxTemp - minTemp) * width;
+            var y = height - Math.Clamp(point.OutputPercent, 0, 100) / 100.0 * height;
+            polyline.Points.Add(new System.Windows.Point(x, y));
+        }
+
+        FanCurvePreviewCanvas.Children.Add(polyline);
     }
 
     private static List<FanCurvePointSettings> ParseFanCurve(string text)
@@ -1167,7 +1276,11 @@ public partial class MainWindow : Window
                         page.Line2Template,
                         TimeSpan.FromSeconds(Math.Max(1, page.DurationSeconds)),
                         page.Priority,
-                        page.VisibilityExpression)));
+                        page.VisibilityExpression,
+                        ParseOverflowMode(page.Line1OverflowMode),
+                        ParseOverflowMode(page.Line2OverflowMode),
+                        TimeSpan.FromMilliseconds(Math.Clamp(page.ScrollStepMilliseconds, 50, 5000)),
+                        TimeSpan.FromMilliseconds(Math.Clamp(page.ScrollEdgePauseMilliseconds, 0, 10000)))));
 
         _displayRuntime.ResetPageSelection();
     }
@@ -1210,6 +1323,11 @@ public partial class MainWindow : Window
         PageLine2TextBox.Text = page.Line2Template;
         PageDurationTextBox.Text = page.DurationSeconds.ToString(CultureInfo.InvariantCulture);
         PageVisibilityTextBox.Text = page.VisibilityExpression ?? string.Empty;
+        SelectComboBoxTag(PageLine1OverflowComboBox, page.Line1OverflowMode);
+        SelectComboBoxTag(PageLine2OverflowComboBox, page.Line2OverflowMode);
+        PageScrollSpeedTextBox.Text = page.ScrollStepMilliseconds.ToString(CultureInfo.InvariantCulture);
+        PageEdgePauseTextBox.Text = page.ScrollEdgePauseMilliseconds.ToString(CultureInfo.InvariantCulture);
+        RefreshPageEditorPreview();
     }
 
     private async void AddPage_Click(object sender, RoutedEventArgs e)
@@ -1226,6 +1344,100 @@ public partial class MainWindow : Window
         await PersistPagesAsync();
         BindPages();
         PagesListBox.SelectedItem = page;
+    }
+
+    private async void DuplicatePage_Click(object sender, RoutedEventArgs e)
+    {
+        if (PagesListBox.SelectedItem is not PageDefinition source)
+            return;
+
+        var copy = new PageDefinition
+        {
+            Id = Guid.NewGuid().ToString("N"),
+            Name = source.Name + " copy",
+            Line1Template = source.Line1Template,
+            Line2Template = source.Line2Template,
+            DurationSeconds = source.DurationSeconds,
+            Enabled = source.Enabled,
+            Priority = source.Priority,
+            VisibilityExpression = source.VisibilityExpression,
+            Line1OverflowMode = source.Line1OverflowMode,
+            Line2OverflowMode = source.Line2OverflowMode,
+            ScrollStepMilliseconds = source.ScrollStepMilliseconds,
+            ScrollEdgePauseMilliseconds = source.ScrollEdgePauseMilliseconds
+        };
+
+        var index = _settings.Pages.IndexOf(source);
+        _settings.Pages.Insert(index + 1, copy);
+        await PersistPagesAsync();
+        BindPages();
+        LoadPagesIntoRuntime();
+        PagesListBox.SelectedItem = copy;
+    }
+
+    private async void MovePageUp_Click(object sender, RoutedEventArgs e) =>
+        await MoveSelectedPageAsync(-1);
+
+    private async void MovePageDown_Click(object sender, RoutedEventArgs e) =>
+        await MoveSelectedPageAsync(1);
+
+    private async Task MoveSelectedPageAsync(int delta)
+    {
+        var index = PagesListBox.SelectedIndex;
+        var target = index + delta;
+
+        if (index < 0 || target < 0 || target >= _settings.Pages.Count)
+            return;
+
+        var page = _settings.Pages[index];
+        _settings.Pages.RemoveAt(index);
+        _settings.Pages.Insert(target, page);
+
+        await PersistPagesAsync();
+        BindPages();
+        LoadPagesIntoRuntime();
+        PagesListBox.SelectedIndex = target;
+    }
+
+    private void PageEditorChanged(object sender, EventArgs e)
+    {
+        if (IsLoaded)
+            RefreshPageEditorPreview();
+    }
+
+    private void RefreshPageEditorPreview()
+    {
+        if (PageEditorPreviewLine1 is null || PageEditorPreviewLine2 is null)
+            return;
+
+        var renderer = new TemplateRenderer();
+        var values = _sources.Snapshot();
+        PageEditorPreviewLine1.Text = DisplayFrame.Normalize(
+            renderer.Render(PageLine1TextBox.Text ?? string.Empty, values));
+        PageEditorPreviewLine2.Text = DisplayFrame.Normalize(
+            renderer.Render(PageLine2TextBox.Text ?? string.Empty, values));
+    }
+
+    private static DisplayOverflowMode ParseOverflowMode(string? value) =>
+        Enum.TryParse<DisplayOverflowMode>(value, true, out var mode)
+            ? mode
+            : DisplayOverflowMode.PingPong;
+
+    private static string GetComboBoxTag(System.Windows.Controls.ComboBox comboBox, string fallback) =>
+        comboBox.SelectedItem is ComboBoxItem { Tag: string tag } ? tag : fallback;
+
+    private static void SelectComboBoxTag(System.Windows.Controls.ComboBox comboBox, string? value)
+    {
+        foreach (var item in comboBox.Items.OfType<ComboBoxItem>())
+        {
+            if (string.Equals(Convert.ToString(item.Tag), value, StringComparison.OrdinalIgnoreCase))
+            {
+                comboBox.SelectedItem = item;
+                return;
+            }
+        }
+
+        comboBox.SelectedIndex = 0;
     }
 
     private async void DeletePage_Click(object sender, RoutedEventArgs e)
@@ -1262,6 +1474,19 @@ public partial class MainWindow : Window
             page.VisibilityExpression = string.IsNullOrWhiteSpace(PageVisibilityTextBox.Text)
                 ? null
                 : PageVisibilityTextBox.Text.Trim();
+            page.Line1OverflowMode = GetComboBoxTag(PageLine1OverflowComboBox, "PingPong");
+            page.Line2OverflowMode = GetComboBoxTag(PageLine2OverflowComboBox, "PingPong");
+
+            if (!int.TryParse(PageScrollSpeedTextBox.Text, out var scrollSpeed) ||
+                scrollSpeed is < 50 or > 5000)
+                throw new InvalidOperationException("Scroll step must be between 50 and 5000 ms.");
+
+            if (!int.TryParse(PageEdgePauseTextBox.Text, out var edgePause) ||
+                edgePause is < 0 or > 10000)
+                throw new InvalidOperationException("Edge pause must be between 0 and 10000 ms.");
+
+            page.ScrollStepMilliseconds = scrollSpeed;
+            page.ScrollEdgePauseMilliseconds = edgePause;
 
             await PersistPagesAsync();
             LoadPagesIntoRuntime();
@@ -1298,6 +1523,147 @@ public partial class MainWindow : Window
         {
             ShowError(ex);
         }
+    }
+
+    private void BindCustomGlyphs()
+    {
+        CustomGlyphSlotComboBox.ItemsSource = Enumerable.Range(1, 8).ToArray();
+        if (CustomGlyphSlotComboBox.SelectedIndex < 0)
+            CustomGlyphSlotComboBox.SelectedIndex = 0;
+        LoadSelectedGlyphIntoEditor();
+    }
+
+    private void CustomGlyphSlotChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (IsLoaded)
+            LoadSelectedGlyphIntoEditor();
+    }
+
+    private void LoadSelectedGlyphIntoEditor()
+    {
+        if (CustomGlyphSlotComboBox.SelectedItem is not int slot ||
+            slot < 1 || slot > _settings.CustomGlyphs.Count)
+            return;
+
+        var glyph = _settings.CustomGlyphs[slot - 1];
+        CustomGlyphNameTextBox.Text = glyph.Name;
+        CustomGlyphRowsTextBox.Text = string.Join(
+            Environment.NewLine,
+            glyph.Rows.Select(row => Convert.ToString(row, 2).PadLeft(5, '0')));
+        RefreshGlyphPreview(glyph.Rows);
+    }
+
+    private byte[] ReadGlyphEditor()
+    {
+        var lines = (CustomGlyphRowsTextBox.Text ?? string.Empty)
+            .Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+        if (lines.Length != 8)
+            throw new InvalidOperationException("A custom character needs exactly eight rows.");
+
+        var rows = new byte[8];
+        for (var index = 0; index < lines.Length; index++)
+        {
+            var row = lines[index].Trim();
+            if (row.Length != 5 || row.Any(ch => ch is not ('0' or '1')))
+                throw new InvalidOperationException("Each custom-character row must contain exactly five 0/1 pixels.");
+
+            rows[index] = Convert.ToByte(row, 2);
+        }
+
+        return rows;
+    }
+
+    private async void SaveCustomGlyph_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (CustomGlyphSlotComboBox.SelectedItem is not int slot)
+                return;
+
+            var rows = ReadGlyphEditor();
+            var glyph = _settings.CustomGlyphs[slot - 1];
+            glyph.Name = string.IsNullOrWhiteSpace(CustomGlyphNameTextBox.Text)
+                ? $"Glyph {slot}"
+                : CustomGlyphNameTextBox.Text.Trim();
+            glyph.Rows = rows;
+
+            await _settingsStore.SaveAsync(_settings);
+            RefreshGlyphPreview(rows);
+            Log($"INFO saved custom glyph {slot} '{glyph.Name}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void SendCustomGlyph_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (CustomGlyphSlotComboBox.SelectedItem is not int slot)
+                return;
+
+            var rows = ReadGlyphEditor();
+            if (_customCharacterManager is null)
+                throw new InvalidOperationException(LocalizationService.Translate("LIS2 device is not connected."));
+
+            await _customCharacterManager.ProgramSlotAsync(slot, rows, force: true);
+            RefreshGlyphPreview(rows);
+            Log($"INFO programmed custom glyph slot {slot}");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void SendAllCustomGlyphs_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (_customCharacterManager is null)
+                throw new InvalidOperationException(LocalizationService.Translate("LIS2 device is not connected."));
+
+            await _customCharacterManager.ProgramAllAsync(
+                _settings.CustomGlyphs.Select(glyph => glyph.Rows).ToArray(),
+                force: true);
+            Log("INFO programmed all eight custom glyph slots");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private void CustomGlyphRowsChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!IsLoaded || CustomGlyphPreview is null)
+            return;
+
+        try
+        {
+            RefreshGlyphPreview(ReadGlyphEditor());
+        }
+        catch
+        {
+            CustomGlyphPreview.Text = "Invalid 5x8 bitmap";
+        }
+    }
+
+    private void RefreshGlyphPreview(IReadOnlyList<byte> rows)
+    {
+        if (CustomGlyphPreview is null)
+            return;
+
+        CustomGlyphPreview.Text = string.Join(
+            Environment.NewLine,
+            rows.Select(row =>
+                new string(
+                    Enumerable.Range(0, 5)
+                        .Select(column => (row & (1 << (4 - column))) != 0 ? '█' : '·')
+                        .ToArray())));
     }
 
     private void ApplySettingsToUi()
@@ -1464,6 +1830,7 @@ public partial class MainWindow : Window
         _device = new Lis2Device(_transport);
         await _device.ConnectAsync();
         _frameWriter = new DisplayFrameWriter(_device);
+        _customCharacterManager = new CustomCharacterManager(_device);
 
         UpdateConnectionUiLocalization();
 

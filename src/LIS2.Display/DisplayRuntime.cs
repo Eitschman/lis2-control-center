@@ -54,8 +54,21 @@ public sealed class DisplayRuntime
         var rawLine1 = _renderer.Render(_activePage.Line1Template, values);
         var rawLine2 = _renderer.Render(_activePage.Line2Template, values);
 
-        var line1 = _line1Scroller.Render(rawLine1, now);
-        var line2 = _line2Scroller.Render(rawLine2, now);
+        var step = _activePage.ScrollStepInterval;
+        var pause = _activePage.ScrollEdgePause;
+
+        var line1 = _line1Scroller.Render(
+            rawLine1,
+            now,
+            _activePage.Line1OverflowMode,
+            step,
+            pause);
+        var line2 = _line2Scroller.Render(
+            rawLine2,
+            now,
+            _activePage.Line2OverflowMode,
+            step,
+            pause);
 
         SuggestedDuration = CalculateNextDelay(now);
 
@@ -87,10 +100,12 @@ public sealed class DisplayRuntime
         {
             _line1Scroller.Reset(
                 _renderer.Render(next.Line1Template, values),
-                now);
+                now,
+                next.ScrollEdgePause);
             _line2Scroller.Reset(
                 _renderer.Render(next.Line2Template, values),
-                now);
+                now,
+                next.ScrollEdgePause);
         }
     }
 
@@ -102,11 +117,15 @@ public sealed class DisplayRuntime
 
         var nextDelay = untilPageChange;
 
-        var line1Delay = _line1Scroller.TimeUntilNextChange(now);
+        var line1Delay = _line1Scroller.TimeUntilNextChange(
+            now,
+            _activePage?.Line1OverflowMode ?? DisplayOverflowMode.PingPong);
         if (line1Delay != Timeout.InfiniteTimeSpan && line1Delay < nextDelay)
             nextDelay = line1Delay;
 
-        var line2Delay = _line2Scroller.TimeUntilNextChange(now);
+        var line2Delay = _line2Scroller.TimeUntilNextChange(
+            now,
+            _activePage?.Line2OverflowMode ?? DisplayOverflowMode.PingPong);
         if (line2Delay != Timeout.InfiniteTimeSpan && line2Delay < nextDelay)
             nextDelay = line2Delay;
 

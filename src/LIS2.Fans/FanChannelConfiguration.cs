@@ -8,6 +8,7 @@ public sealed class FanChannelConfiguration
     public int MinimumPercent { get; set; } = 30;
     public int MaximumPercent { get; set; } = 100;
     public int FailSafePercent { get; set; } = 100;
+    public double HysteresisDegrees { get; set; } = 1.0;
     public bool AllowStop { get; set; }
     public List<FanCurvePoint> Curve { get; set; } = new();
 }

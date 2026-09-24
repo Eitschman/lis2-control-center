@@ -225,4 +225,61 @@ public sealed class DisplayRuntimeTests
         Assert.NotNull(frame);
         Assert.StartsWith("12:34", frame.Line1);
     }
+    [Fact]
+    public void RenderNext_TruncateOverflowDoesNotScroll()
+    {
+        var scheduler = new PageScheduler();
+        scheduler.ReplacePages(new[]
+        {
+            new DisplayPage(
+                "static",
+                "Static",
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                string.Empty,
+                TimeSpan.FromSeconds(10),
+                Line1OverflowMode: DisplayOverflowMode.Truncate)
+        });
+
+        var runtime = new DisplayRuntime(
+            new TemplateRenderer(),
+            scheduler,
+            new EventQueue());
+
+        var now = DateTimeOffset.UtcNow;
+        var first = runtime.RenderNext(new Dictionary<string, object?>(), now);
+        var later = runtime.RenderNext(new Dictionary<string, object?>(), now.AddSeconds(2));
+
+        Assert.Equal("ABCDEFGHIJKLMNOPQRST", first!.Line1);
+        Assert.Equal(first.Line1, later!.Line1);
+    }
+
+    [Fact]
+    public void RenderNext_MarqueeWrapsToStart()
+    {
+        var scheduler = new PageScheduler();
+        scheduler.ReplacePages(new[]
+        {
+            new DisplayPage(
+                "marquee",
+                "Marquee",
+                "ABCDEFGHIJKLMNOPQRSTUV",
+                string.Empty,
+                TimeSpan.FromSeconds(10),
+                Line1OverflowMode: DisplayOverflowMode.Marquee,
+                ScrollStepInterval: TimeSpan.FromMilliseconds(100),
+                ScrollEdgePause: TimeSpan.FromMilliseconds(100))
+        });
+
+        var runtime = new DisplayRuntime(
+            new TemplateRenderer(),
+            scheduler,
+            new EventQueue());
+
+        var now = DateTimeOffset.UtcNow;
+        var first = runtime.RenderNext(new Dictionary<string, object?>(), now);
+        var moved = runtime.RenderNext(new Dictionary<string, object?>(), now.AddMilliseconds(100));
+
+        Assert.Equal("ABCDEFGHIJKLMNOPQRST", first!.Line1);
+        Assert.Equal("BCDEFGHIJKLMNOPQRSTU", moved!.Line1);
+    }
 }

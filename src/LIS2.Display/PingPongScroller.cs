@@ -14,24 +14,36 @@ public sealed class PingPongScroller
 
     public bool IsScrolling => _text.Length > DisplayFrame.Width;
 
-    public string Render(string? value, DateTimeOffset now)
+    public string Render(
+        string? value,
+        DateTimeOffset now,
+        DisplayOverflowMode mode = DisplayOverflowMode.PingPong,
+        TimeSpan? stepInterval = null,
+        TimeSpan? edgePause = null)
     {
         var safe = Lis2Protocol.ToSafeAscii(value ?? string.Empty);
+        var step = Normalize(stepInterval, StepInterval);
+        var pause = Normalize(edgePause, EdgePause);
 
         if (!string.Equals(_text, safe, StringComparison.Ordinal))
-            Reset(safe, now);
+            Reset(safe, now, pause);
 
         if (_text.Length <= DisplayFrame.Width)
             return DisplayFrame.Normalize(_text);
 
-        AdvanceUntil(now);
+        if (mode == DisplayOverflowMode.Truncate)
+            return _text[..DisplayFrame.Width];
+
+        AdvanceUntil(now, mode, step, pause);
 
         return _text.Substring(_offset, DisplayFrame.Width);
     }
 
-    public TimeSpan TimeUntilNextChange(DateTimeOffset now)
+    public TimeSpan TimeUntilNextChange(
+        DateTimeOffset now,
+        DisplayOverflowMode mode = DisplayOverflowMode.PingPong)
     {
-        if (!IsScrolling)
+        if (!IsScrolling || mode == DisplayOverflowMode.Truncate)
             return Timeout.InfiniteTimeSpan;
 
         var remaining = _nextChangeAt - now;
@@ -40,40 +52,63 @@ public sealed class PingPongScroller
             : remaining;
     }
 
-    public void Reset(string? value, DateTimeOffset now)
+    public void Reset(string? value, DateTimeOffset now, TimeSpan? edgePause = null)
     {
         _text = Lis2Protocol.ToSafeAscii(value ?? string.Empty);
         _offset = 0;
         _direction = 1;
         _nextChangeAt = _text.Length > DisplayFrame.Width
-            ? now + EdgePause
+            ? now + Normalize(edgePause, EdgePause)
             : DateTimeOffset.MaxValue;
     }
 
-    private void AdvanceUntil(DateTimeOffset now)
+    private void AdvanceUntil(
+        DateTimeOffset now,
+        DisplayOverflowMode mode,
+        TimeSpan stepInterval,
+        TimeSpan edgePause)
     {
         var maxOffset = _text.Length - DisplayFrame.Width;
 
         while (now >= _nextChangeAt)
         {
+            if (mode == DisplayOverflowMode.Marquee)
+            {
+                _offset++;
+                if (_offset > maxOffset)
+                {
+                    _offset = 0;
+                    _nextChangeAt += edgePause;
+                }
+                else
+                {
+                    _nextChangeAt += stepInterval;
+                }
+
+                continue;
+            }
+
             _offset += _direction;
 
             if (_offset >= maxOffset)
             {
                 _offset = maxOffset;
                 _direction = -1;
-                _nextChangeAt += EdgePause;
+                _nextChangeAt += edgePause;
             }
             else if (_offset <= 0)
             {
                 _offset = 0;
                 _direction = 1;
-                _nextChangeAt += EdgePause;
+                _nextChangeAt += edgePause;
             }
             else
             {
-                _nextChangeAt += StepInterval;
+                _nextChangeAt += stepInterval;
             }
         }
     }
+
+    private static TimeSpan Normalize(TimeSpan? value, TimeSpan fallback) =>
+        value is null || value <= TimeSpan.Zero ? fallback : value.Value;
 }
