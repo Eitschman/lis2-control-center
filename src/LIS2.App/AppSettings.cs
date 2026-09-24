@@ -9,6 +9,7 @@ public sealed class AppSettings
     public string LanguageMode { get; set; } = nameof(AppLanguageMode.System);
     public List<PageDefinition> Pages { get; set; } = CreateDefaultPages();
     public List<CustomGlyphSettings> CustomGlyphs { get; set; } = CreateDefaultGlyphs();
+    public List<HardwareSensorPreferenceSettings> HardwareSensorPreferences { get; set; } = new();
     public FanSettings Fans { get; set; } = new();
 
     public void EnsureDefaults()
@@ -21,6 +22,13 @@ public sealed class AppSettings
 
         foreach (var glyph in CustomGlyphs)
             glyph.EnsureDefaults();
+
+        HardwareSensorPreferences ??= new List<HardwareSensorPreferenceSettings>();
+        HardwareSensorPreferences = HardwareSensorPreferences
+            .Where(preference => !string.IsNullOrWhiteSpace(preference.Key))
+            .GroupBy(preference => preference.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.Last())
+            .ToList();
 
         Fans ??= new FanSettings();
         Fans.EnsureDefaults();
