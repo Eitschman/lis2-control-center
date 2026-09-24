@@ -21,6 +21,7 @@ public partial class MainWindow : Window
     private readonly PageScheduler _pageScheduler = new();
     private readonly EventQueue _eventQueue = new();
     private readonly DisplayRuntime _displayRuntime;
+    private readonly AsyncCoalescingRunner _renderRunner = new();
     private readonly DispatcherTimer _pageTimer;
     private readonly DispatcherTimer _fanTimer;
     private readonly DispatcherTimer _hardwareTimer;
@@ -239,6 +240,12 @@ public partial class MainWindow : Window
             RefreshEventsView();
             RefreshDiagnostics();
 
+            if (IsSmokeTestMode())
+            {
+                await RunStartupSmokeTestAsync();
+                return;
+            }
+
             if (Environment.GetCommandLineArgs().Any(
                     arg => string.Equals(arg, "--minimized", StringComparison.OrdinalIgnoreCase)))
             {
@@ -248,9 +255,46 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
+            if (IsSmokeTestMode())
+            {
+                Log($"ERR  startup smoke test: {ex}");
+                _allowClose = true;
+                Environment.ExitCode = 1;
+                System.Windows.Application.Current.Shutdown(1);
+                return;
+            }
+
             ShowError(ex);
         }
     }
+
+    private async Task RunStartupSmokeTestAsync()
+    {
+        Hide();
+
+        for (var index = 0; index < MainTabs.Items.Count; index++)
+        {
+            MainTabs.SelectedIndex = index;
+            UpdateNavigationSelection(index);
+            MainTabs.UpdateLayout();
+            await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+        }
+
+        await RenderRuntimePageAsync();
+
+        Log("INFO startup smoke test completed");
+        _allowClose = true;
+        Environment.ExitCode = 0;
+        Close();
+        System.Windows.Application.Current.Shutdown(0);
+    }
+
+    private static bool IsSmokeTestMode() =>
+        Environment.GetCommandLineArgs().Any(
+            arg => string.Equals(
+                arg,
+                "--smoke-test",
+                StringComparison.OrdinalIgnoreCase));
 
     private void MainWindow_Closing(
         object? sender,
@@ -1693,7 +1737,10 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task RenderRuntimePageAsync()
+    private Task RenderRuntimePageAsync() =>
+        _renderRunner.RunAsync(RenderRuntimePageCoreAsync);
+
+    private async Task RenderRuntimePageCoreAsync()
     {
         var nextFrame = _displayRuntime.RenderNext(
             CreateDisplayValues(),
@@ -1706,6 +1753,8 @@ public partial class MainWindow : Window
         await WriteFrameAsync(nextFrame);
         RefreshPreview();
 
+        // Keep the established scheduler-driven timing. The coalescing runner
+        // only prevents overlapping renders; it does not change page cadence.
         _pageTimer.Interval = _displayRuntime.SuggestedDuration;
     }
 
