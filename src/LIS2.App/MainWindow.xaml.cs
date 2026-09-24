@@ -116,6 +116,20 @@ public partial class MainWindow : Window
         Closed += MainWindow_Closed;
     }
 
+    private static readonly (string Id, string Label, string Category)[] PagePresetDefinitions =
+    [
+        ("Clock", "Clock & date", "General"),
+        ("Status", "LIS2 status", "General"),
+        ("CPU", "CPU", "Hardware"),
+        ("GPU", "GPU", "Hardware"),
+        ("Memory", "Memory", "Hardware"),
+        ("Temperatures", "Temperatures", "Hardware"),
+        ("Fans", "Fans", "Hardware"),
+        ("WinampNowPlaying", "Winamp Now Playing", "Winamp"),
+        ("WinampVU", "Winamp VU", "Winamp"),
+        ("WinampSpectrum", "Winamp Spectrum", "Winamp")
+    ];
+
     private static readonly (string Title, string Subtitle)[] Sections =
     [
         ("Dashboard", "Overview and quick access to the most important functions."),
@@ -753,90 +767,18 @@ public partial class MainWindow : Window
 
     private async void CreateWinampPreset_Click(object sender, RoutedEventArgs e)
     {
-        try
+        if (sender is not System.Windows.Controls.Button { Tag: string preset })
+            return;
+
+        var presetId = preset switch
         {
-            if (sender is not System.Windows.Controls.Button { Tag: string preset })
-                return;
+            "NowPlaying" => "WinampNowPlaying",
+            "VU" => "WinampVU",
+            "Spectrum" => "WinampSpectrum",
+            _ => preset
+        };
 
-            if (string.Equals(preset, "Spectrum", StringComparison.OrdinalIgnoreCase) &&
-                !BuiltInGlyphSets.IsSpectrumSet(_settings.CustomGlyphs))
-            {
-                var result = System.Windows.MessageBox.Show(
-                    this,
-                    LocalizationService.Translate(
-                        "The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"),
-                    "LIS2 Control Center",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                if (result != MessageBoxResult.Yes)
-                    return;
-
-                await ApplyGlyphSetAsync(
-                    BuiltInGlyphSets.CreateSpectrumSet(),
-                    forceProgram: true);
-            }
-
-            var page = preset switch
-            {
-                "NowPlaying" => new PageDefinition
-                {
-                    Id = Guid.NewGuid().ToString("N"),
-                    Name = "Winamp Now Playing",
-                    Line1Template = "{Winamp.Artist}",
-                    Line2Template = "{Winamp.Title}",
-                    DurationSeconds = 7,
-                    VisibilityExpression = "Winamp.State=Playing",
-                    Line1OverflowMode = "PingPong",
-                    Line2OverflowMode = "PingPong",
-                    ScrollStepMilliseconds = 250,
-                    ScrollEdgePauseMilliseconds = 800
-                },
-                "VU" => new PageDefinition
-                {
-                    Id = Guid.NewGuid().ToString("N"),
-                    Name = "Winamp VU",
-                    Line1Template = "{Winamp.Title}",
-                    Line2Template = "{Winamp.Vu}",
-                    DurationSeconds = 7,
-                    VisibilityExpression = "Winamp.State=Playing",
-                    Line1OverflowMode = "PingPong",
-                    Line2OverflowMode = "Truncate",
-                    ScrollStepMilliseconds = 250,
-                    ScrollEdgePauseMilliseconds = 800
-                },
-                "Spectrum" => new PageDefinition
-                {
-                    Id = Guid.NewGuid().ToString("N"),
-                    Name = "Winamp Spectrum",
-                    Line1Template = "{Winamp.Artist}",
-                    Line2Template = "{Winamp.SpectrumGlyphs}",
-                    DurationSeconds = 7,
-                    VisibilityExpression = "Winamp.State=Playing",
-                    Line1OverflowMode = "PingPong",
-                    Line2OverflowMode = "Truncate",
-                    ScrollStepMilliseconds = 250,
-                    ScrollEdgePauseMilliseconds = 800
-                },
-                _ => throw new InvalidOperationException(
-                    LocalizationService.Format("Unknown Winamp preset '{0}'.", preset))
-            };
-
-            _settings.Pages.Add(page);
-            await PersistPagesAsync();
-            LoadPagesIntoRuntime();
-            BindPages();
-
-            MainTabs.SelectedIndex = 2;
-            UpdateNavigationSelection(2);
-            PagesListBox.SelectedItem = page;
-
-            Log($"INFO created Winamp display preset '{preset}'");
-        }
-        catch (Exception ex)
-        {
-            ShowError(ex);
-        }
+        await CreatePageFromPresetAsync(presetId);
     }
 
     private static string FormatSampleRate(string? raw)
@@ -1269,28 +1211,10 @@ public partial class MainWindow : Window
 
     private async void CreateHardwarePreset_Click(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            if (sender is not System.Windows.Controls.Button { Tag: string preset })
-                return;
+        if (sender is not System.Windows.Controls.Button { Tag: string preset })
+            return;
 
-            var page = CreateHardwarePresetPage(preset);
-            _settings.Pages.Add(page);
-
-            await PersistPagesAsync();
-            LoadPagesIntoRuntime();
-            BindPages();
-
-            MainTabs.SelectedIndex = 2;
-            UpdateNavigationSelection(2);
-            PagesListBox.SelectedItem = page;
-
-            Log($"INFO created hardware display preset '{preset}'");
-        }
-        catch (Exception ex)
-        {
-            ShowError(ex);
-        }
+        await CreatePageFromPresetAsync(preset);
     }
 
     private PageDefinition CreateHardwarePresetPage(string preset)
@@ -1791,12 +1715,157 @@ public partial class MainWindow : Window
 
     private void BindPages()
     {
+        RefreshPagePresetChoices();
+
         PagesListBox.ItemsSource = null;
         PagesListBox.ItemsSource = _settings.Pages;
 
         if (_settings.Pages.Count > 0 && PagesListBox.SelectedIndex < 0)
             PagesListBox.SelectedIndex = 0;
     }
+
+    private void RefreshPagePresetChoices()
+    {
+        if (PagePresetComboBox is null)
+            return;
+
+        var selectedId = PagePresetComboBox.SelectedValue as string;
+
+        PagePresetComboBox.ItemsSource = PagePresetDefinitions
+            .Select(definition => new PagePresetChoice(
+                definition.Id,
+                $"{LocalizationService.Translate(definition.Category)} · " +
+                LocalizationService.Translate(definition.Label),
+                definition.Category))
+            .ToArray();
+
+        if (selectedId is not null)
+            PagePresetComboBox.SelectedValue = selectedId;
+
+        if (PagePresetComboBox.SelectedIndex < 0)
+            PagePresetComboBox.SelectedIndex = 0;
+    }
+
+    private async void CreatePagePreset_Click(object sender, RoutedEventArgs e)
+    {
+        if (PagePresetComboBox.SelectedValue is not string presetId)
+            return;
+
+        await CreatePageFromPresetAsync(presetId);
+    }
+
+    private async Task CreatePageFromPresetAsync(string presetId)
+    {
+        try
+        {
+            if (string.Equals(
+                    presetId,
+                    "WinampSpectrum",
+                    StringComparison.OrdinalIgnoreCase) &&
+                !BuiltInGlyphSets.IsSpectrumSet(_settings.CustomGlyphs))
+            {
+                var result = System.Windows.MessageBox.Show(
+                    this,
+                    LocalizationService.Translate(
+                        "The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"),
+                    "LIS2 Control Center",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result != MessageBoxResult.Yes)
+                    return;
+
+                await ApplyGlyphSetAsync(
+                    BuiltInGlyphSets.CreateSpectrumSet(),
+                    forceProgram: true);
+            }
+
+            var page = CreatePagePresetDefinition(presetId);
+            _settings.Pages.Add(page);
+
+            await PersistPagesAsync();
+            LoadPagesIntoRuntime();
+            BindPages();
+
+            MainTabs.SelectedIndex = 2;
+            UpdateNavigationSelection(2);
+            PagesListBox.SelectedItem = page;
+
+            Log($"INFO created display preset '{presetId}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private PageDefinition CreatePagePresetDefinition(string presetId) =>
+        presetId switch
+        {
+            "Clock" => new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = "Clock",
+                Line1Template = "{Clock.Time}",
+                Line2Template = "{Clock.Date}",
+                DurationSeconds = 5,
+                Line1OverflowMode = "Truncate",
+                Line2OverflowMode = "Truncate"
+            },
+            "Status" => new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = "LIS2 Status",
+                Line1Template = "LIS2 Control Center",
+                Line2Template = "Ready",
+                DurationSeconds = 5,
+                Line1OverflowMode = "Truncate",
+                Line2OverflowMode = "Truncate"
+            },
+            "CPU" or "GPU" or "Memory" or "Temperatures" or "Fans" =>
+                CreateHardwarePresetPage(presetId),
+            "WinampNowPlaying" => new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = "Winamp Now Playing",
+                Line1Template = "{Winamp.Artist}",
+                Line2Template = "{Winamp.Title}",
+                DurationSeconds = 7,
+                VisibilityExpression = "Winamp.State=Playing",
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "PingPong",
+                ScrollStepMilliseconds = 250,
+                ScrollEdgePauseMilliseconds = 800
+            },
+            "WinampVU" => new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = "Winamp VU",
+                Line1Template = "{Winamp.Title}",
+                Line2Template = "{Winamp.Vu}",
+                DurationSeconds = 7,
+                VisibilityExpression = "Winamp.State=Playing",
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "Truncate",
+                ScrollStepMilliseconds = 250,
+                ScrollEdgePauseMilliseconds = 800
+            },
+            "WinampSpectrum" => new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = "Winamp Spectrum",
+                Line1Template = "{Winamp.Artist}",
+                Line2Template = "{Winamp.SpectrumGlyphs}",
+                DurationSeconds = 7,
+                VisibilityExpression = "Winamp.State=Playing",
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "Truncate",
+                ScrollStepMilliseconds = 250,
+                ScrollEdgePauseMilliseconds = 800
+            },
+            _ => throw new InvalidOperationException(
+                LocalizationService.Format("Unknown page preset '{0}'.", presetId))
+        };
 
     private async void PageEnabledChanged(object sender, RoutedEventArgs e)
     {
@@ -2597,6 +2666,7 @@ public partial class MainWindow : Window
 
         RefreshAppearanceChoices(selectedTheme, mode);
         LocalizationService.ApplyTo(this);
+        RefreshPagePresetChoices();
         RefreshLocalizedSectionHeader();
         RefreshWinampView();
         RefreshEventsView();
