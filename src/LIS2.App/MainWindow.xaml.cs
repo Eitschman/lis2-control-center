@@ -42,6 +42,7 @@ public partial class MainWindow : Window
     private bool _customGlyphUiInitialized;
     private bool _loadingCustomGlyphSetting;
     private bool _fanUiInitialized;
+    private bool _lastWinampConnected;
     private bool _applyingAppearanceSettings;
 
     private sealed record AppearanceChoice(string Value, string Label);
@@ -221,6 +222,7 @@ public partial class MainWindow : Window
             await _sources.StartAllAsync();
             LogSourceHealth();
             RefreshWinampView();
+            _lastWinampConnected = _winampSource.IsRecentlyConnected;
             RefreshHardwareSensors();
             RefreshFanSensorChoices();
             RefreshPageEditorPreview();
@@ -531,10 +533,26 @@ public partial class MainWindow : Window
         });
     }
 
-    private void WinampTimer_Tick(object? sender, EventArgs e)
+    private async void WinampTimer_Tick(object? sender, EventArgs e)
     {
+        var connected = _winampSource.IsRecentlyConnected;
+
         if (MainTabs.SelectedIndex == 3)
             RefreshWinampView();
+
+        if (connected != _lastWinampConnected)
+        {
+            _lastWinampConnected = connected;
+
+            try
+            {
+                await RenderRuntimePageAsync();
+            }
+            catch (Exception ex)
+            {
+                Log($"ERR  Winamp connection-state page render: {ex.Message}");
+            }
+        }
     }
 
     private void RefreshWinampView()
@@ -552,6 +570,9 @@ public partial class MainWindow : Window
         var playlistCount = GetWinampValue(values, "PlaylistCount") ?? "-";
         var bitrate = GetWinampValue(values, "BitrateKbps");
         var sampleRate = GetWinampValue(values, "SampleRateHz");
+        var vuLeft = GetWinampInt(values, "VuLeft");
+        var vuRight = GetWinampInt(values, "VuRight");
+        var spectrum = GetWinampValue(values, "Spectrum") ?? string.Empty;
 
         var connected = _winampSource.IsRecentlyConnected;
 
@@ -580,6 +601,17 @@ public partial class MainWindow : Window
                 ? "-"
                 : $"{bitrate ?? "-"} kbps / {FormatSampleRate(sampleRate)}";
 
+        WinampVuLeftBar.Value = connected ? Math.Clamp(vuLeft ?? 0, 0, 255) : 0;
+        WinampVuRightBar.Value = connected ? Math.Clamp(vuRight ?? 0, 0, 255) : 0;
+        WinampVuLeftText.Text = connected ? (vuLeft ?? 0).ToString(CultureInfo.InvariantCulture) : "-";
+        WinampVuRightText.Text = connected ? (vuRight ?? 0).ToString(CultureInfo.InvariantCulture) : "-";
+        WinampSpectrumText.Text = connected
+            ? (string.IsNullOrEmpty(spectrum) ? new string(' ', 20) : spectrum.PadRight(20)[..Math.Min(20, spectrum.PadRight(20).Length)])
+            : new string(' ', 20);
+        WinampTelemetryStatusText.Text = connected
+            ? LocalizationService.Translate("Live visualization data")
+            : LocalizationService.Translate("No visualization data");
+
         WinampStatusText.Text = connected
             ? $"{LocalizationService.Translate("Connected")} • {localizedState}"
             : LocalizationService.Translate("Waiting for Winamp");
@@ -607,6 +639,93 @@ public partial class MainWindow : Window
 
         var text = Convert.ToString(raw, CultureInfo.CurrentCulture);
         return string.IsNullOrWhiteSpace(text) ? null : text;
+    }
+
+    private static int? GetWinampInt(
+        IReadOnlyDictionary<string, object?> values,
+        string key)
+    {
+        if (!values.TryGetValue(key, out var raw) || raw is null)
+            return null;
+
+        try
+        {
+            return Convert.ToInt32(raw, CultureInfo.InvariantCulture);
+        }
+        catch (Exception ex) when (
+            ex is FormatException or InvalidCastException or OverflowException)
+        {
+            return null;
+        }
+    }
+
+    private async void CreateWinampPreset_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (sender is not System.Windows.Controls.Button { Tag: string preset })
+                return;
+
+            var page = preset switch
+            {
+                "NowPlaying" => new PageDefinition
+                {
+                    Id = Guid.NewGuid().ToString("N"),
+                    Name = "Winamp Now Playing",
+                    Line1Template = "{Winamp.Artist}",
+                    Line2Template = "{Winamp.Title}",
+                    DurationSeconds = 7,
+                    VisibilityExpression = "Winamp.State=Playing",
+                    Line1OverflowMode = "PingPong",
+                    Line2OverflowMode = "PingPong",
+                    ScrollStepMilliseconds = 250,
+                    ScrollEdgePauseMilliseconds = 800
+                },
+                "VU" => new PageDefinition
+                {
+                    Id = Guid.NewGuid().ToString("N"),
+                    Name = "Winamp VU",
+                    Line1Template = "{Winamp.Title}",
+                    Line2Template = "{Winamp.Vu}",
+                    DurationSeconds = 7,
+                    VisibilityExpression = "Winamp.State=Playing",
+                    Line1OverflowMode = "PingPong",
+                    Line2OverflowMode = "Truncate",
+                    ScrollStepMilliseconds = 250,
+                    ScrollEdgePauseMilliseconds = 800
+                },
+                "Spectrum" => new PageDefinition
+                {
+                    Id = Guid.NewGuid().ToString("N"),
+                    Name = "Winamp Spectrum",
+                    Line1Template = "{Winamp.Artist}",
+                    Line2Template = "{Winamp.Spectrum}",
+                    DurationSeconds = 7,
+                    VisibilityExpression = "Winamp.State=Playing",
+                    Line1OverflowMode = "PingPong",
+                    Line2OverflowMode = "Truncate",
+                    ScrollStepMilliseconds = 250,
+                    ScrollEdgePauseMilliseconds = 800
+                },
+                _ => throw new InvalidOperationException(
+                    LocalizationService.Format("Unknown Winamp preset '{0}'.", preset))
+            };
+
+            _settings.Pages.Add(page);
+            await PersistPagesAsync();
+            LoadPagesIntoRuntime();
+            BindPages();
+
+            MainTabs.SelectedIndex = 2;
+            UpdateNavigationSelection(2);
+            PagesListBox.SelectedItem = page;
+
+            Log($"INFO created Winamp display preset '{preset}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
     }
 
     private static string FormatSampleRate(string? raw)
