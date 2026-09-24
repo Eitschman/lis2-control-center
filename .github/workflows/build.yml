@@ -39,6 +39,15 @@ jobs:
       - name: Test
         run: dotnet test .\LIS2ControlCenter.sln --configuration Release --no-build --verbosity normal
 
+      - name: WPF startup smoke test
+        run: >
+          dotnet run
+          --project .\src\LIS2.App\LIS2.App.csproj
+          --configuration Release
+          --no-build
+          --
+          --smoke-test
+
       - name: Publish LIS2 Control Center
         if: github.event_name != 'pull_request'
         run: >
