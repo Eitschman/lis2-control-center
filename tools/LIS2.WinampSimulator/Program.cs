@@ -48,7 +48,12 @@ for (var trackIndex = 0; trackIndex < tracks.Length; trackIndex++)
             ElapsedSeconds = elapsed,
             DurationSeconds = track.Duration,
             BitrateKbps = 320,
-            SampleRateHz = 44100
+            SampleRateHz = 44100,
+            VuLeft = 90 + ((elapsed * 17) % 150),
+            VuRight = 70 + ((elapsed * 29) % 170),
+            Spectrum = Enumerable.Range(0, 20)
+                .Select(index => (index * 31 + elapsed * 23) % 256)
+                .ToArray()
         };
 
         var json = JsonSerializer.Serialize(message);
