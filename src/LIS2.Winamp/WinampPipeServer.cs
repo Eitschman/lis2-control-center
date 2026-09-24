@@ -114,7 +114,10 @@ public sealed class WinampPipeServer : IAsyncDisposable
             ToTimeSpan(message.ElapsedSeconds),
             ToTimeSpan(message.DurationSeconds),
             message.BitrateKbps,
-            message.SampleRateHz);
+            message.SampleRateHz,
+            message.VuLeft,
+            message.VuRight,
+            message.Spectrum);
 
     private static WinampPlaybackState ParseState(string? value) =>
         value?.Trim().ToLowerInvariant() switch
