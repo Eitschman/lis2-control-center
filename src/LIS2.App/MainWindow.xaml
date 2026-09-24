@@ -30,15 +30,15 @@
                            Margin="4,18,0,24"/>
 
                 <StackPanel x:Name="NavigationPanel" Grid.Row="1">
-                    <Button Content="⌂   Dashboard" Tag="0" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="▣   Display" Tag="1" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="▤   Pages" Tag="2" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="♫   Winamp" Tag="3" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="⚠   Events" Tag="4" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="▦   Hardware" Tag="5" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="✽   Fan Control" Tag="6" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="⚙   Settings" Tag="7" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="∿   Diagnostics" Tag="8" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="{DynamicResource NavDashboard}" Tag="0" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="{DynamicResource NavDisplay}" Tag="1" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="{DynamicResource NavPages}" Tag="2" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="{DynamicResource NavWinamp}" Tag="3" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="{DynamicResource NavEvents}" Tag="4" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="{DynamicResource NavHardware}" Tag="5" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="{DynamicResource NavFanControl}" Tag="6" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="{DynamicResource NavSettings}" Tag="7" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="{DynamicResource NavDiagnostics}" Tag="8" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
 
                     <Separator Margin="4,18,4,16"/>
 
@@ -845,7 +845,7 @@
                         <StackPanel>
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                                 <StackPanel>
-                                    <TextBlock Text="Device / Transport" FontWeight="SemiBold" FontSize="18" Margin="0,0,0,12"/>
+                                    <TextBlock Text="{DynamicResource SettingsDeviceTransport}" FontWeight="SemiBold" FontSize="18" Margin="0,0,0,12"/>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="100"/>
@@ -854,16 +854,16 @@
                                             <ColumnDefinition Width="180"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="Transport" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Column="0" Text="{DynamicResource SettingsTransport}" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                         <ComboBox x:Name="TransportModeComboBox" Grid.Column="1" SelectionChanged="TransportModeChanged" Margin="0,0,16,0">
                                             <ComboBoxItem Content="Virtual" IsSelected="True"/>
                                             <ComboBoxItem Content="Serial"/>
                                         </ComboBox>
-                                        <TextBlock Grid.Column="2" Text="COM port" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Column="2" Text="{DynamicResource SettingsComPort}" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                         <ComboBox x:Name="PortComboBox" Grid.Column="3" IsEnabled="False" Margin="0,0,10,0"/>
                                         <StackPanel Grid.Column="4" Orientation="Horizontal">
-                                            <Button Content="Refresh" Click="RefreshPorts_Click" Margin="0,0,7,0"/>
-                                            <Button Content="Apply / reconnect" Click="ApplyDeviceSettings_Click"/>
+                                            <Button Content="{DynamicResource SettingsRefresh}" Click="RefreshPorts_Click" Margin="0,0,7,0"/>
+                                            <Button Content="{DynamicResource SettingsApplyReconnect}" Click="ApplyDeviceSettings_Click"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
@@ -871,7 +871,7 @@
 
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                                 <StackPanel>
-                                    <TextBlock Text="Appearance" FontWeight="SemiBold" FontSize="18" Margin="0,0,0,12"/>
+                                    <TextBlock Text="{DynamicResource SettingsAppearance}" FontWeight="SemiBold" FontSize="18" Margin="0,0,0,12"/>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="100"/>
@@ -879,21 +879,49 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0"
-                                                   Text="Theme"
+                                                   Text="{DynamicResource SettingsTheme}"
                                                    VerticalAlignment="Center"
                                                    Margin="0,0,8,0"/>
                                         <ComboBox x:Name="ThemeModeComboBox"
                                                   Grid.Column="1"
                                                   SelectionChanged="ThemeModeChanged">
-                                            <ComboBoxItem Content="System default" Tag="System"/>
-                                            <ComboBoxItem Content="Light" Tag="Light"/>
-                                            <ComboBoxItem Content="Dark" Tag="Dark"/>
+                                            <ComboBoxItem Content="{DynamicResource SettingsSystemDefault}" Tag="System"/>
+                                            <ComboBoxItem Content="{DynamicResource SettingsLight}" Tag="Light"/>
+                                            <ComboBoxItem Content="{DynamicResource SettingsDark}" Tag="Dark"/>
                                         </ComboBox>
                                         <TextBlock Grid.Column="2"
                                                    Margin="14,0,0,0"
                                                    VerticalAlignment="Center"
                                                    Foreground="{DynamicResource MutedBrush}"
-                                                   Text="System default follows the Windows app theme automatically."
+                                                   Text="{DynamicResource SettingsThemeHint}"
+                                                   TextWrapping="Wrap"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,14,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="220"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{DynamicResource SettingsLanguage}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0"/>
+                                        <ComboBox x:Name="LanguageComboBox"
+                                                  Grid.Column="1"
+                                                  SelectionChanged="LanguageChanged">
+                                            <ComboBoxItem Content="{DynamicResource SettingsSystemDefault}" Tag="System"/>
+                                            <ComboBoxItem Content="English" Tag="en"/>
+                                            <ComboBoxItem Content="Deutsch" Tag="de"/>
+                                            <ComboBoxItem Content="Français" Tag="fr"/>
+                                            <ComboBoxItem Content="Türkçe" Tag="tr"/>
+                                            <ComboBoxItem Content="Русский" Tag="ru"/>
+                                        </ComboBox>
+                                        <TextBlock Grid.Column="2"
+                                                   Margin="14,0,0,0"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource MutedBrush}"
+                                                   Text="{DynamicResource SettingsLanguageHint}"
                                                    TextWrapping="Wrap"/>
                                     </Grid>
                                 </StackPanel>
@@ -901,9 +929,9 @@
 
                             <Border Style="{StaticResource CardBorderStyle}">
                                 <StackPanel>
-                                    <TextBlock Text="Windows" FontWeight="SemiBold" FontSize="18" Margin="0,0,0,12"/>
+                                    <TextBlock Text="{DynamicResource SettingsWindows}" FontWeight="SemiBold" FontSize="18" Margin="0,0,0,12"/>
                                     <CheckBox x:Name="StartWithWindowsCheckBox"
-                                              Content="Start LIS2 Control Center with Windows (minimized to tray)"
+                                              Content="{DynamicResource SettingsAutostart}"
                                               Checked="StartWithWindowsChanged"
                                               Unchecked="StartWithWindowsChanged"/>
                                 </StackPanel>
