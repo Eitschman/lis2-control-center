@@ -172,7 +172,10 @@ public partial class MainWindow : Window
             RefreshHardwareSensors();
 
         if (index == 6)
+        {
             RefreshFanSensorChoices();
+            RefreshFanLiveStatus();
+        }
 
         if (index == 8)
             RefreshDiagnostics();
