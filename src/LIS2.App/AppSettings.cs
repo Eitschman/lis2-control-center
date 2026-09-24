@@ -8,6 +8,7 @@ public sealed class AppSettings
     public string ThemeMode { get; set; } = nameof(AppThemeMode.System);
     public string LanguageMode { get; set; } = nameof(AppLanguageMode.System);
     public List<PageDefinition> Pages { get; set; } = CreateDefaultPages();
+    public List<CustomGlyphSettings> CustomGlyphs { get; set; } = CreateDefaultGlyphs();
     public FanSettings Fans { get; set; } = new();
 
     public void EnsureDefaults()
@@ -15,9 +16,20 @@ public sealed class AppSettings
         if (Pages.Count == 0)
             Pages = CreateDefaultPages();
 
+        if (CustomGlyphs is null || CustomGlyphs.Count != 8)
+            CustomGlyphs = CreateDefaultGlyphs();
+
+        foreach (var glyph in CustomGlyphs)
+            glyph.EnsureDefaults();
+
         Fans ??= new FanSettings();
         Fans.EnsureDefaults();
     }
+
+    private static List<CustomGlyphSettings> CreateDefaultGlyphs() =>
+        Enumerable.Range(1, 8)
+            .Select(slot => new CustomGlyphSettings { Name = $"Glyph {slot}" })
+            .ToList();
 
     private static List<PageDefinition> CreateDefaultPages() =>
         new()
