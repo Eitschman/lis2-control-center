@@ -2177,9 +2177,12 @@ public partial class MainWindow : Window
             return string.Empty;
 
         var normalized = new string(
-            name.Trim()
+            Lis2Protocol.ToSafeAscii(name.Trim())
                 .Select(character =>
-                    char.IsLetterOrDigit(character) || character is '_' or '-'
+                    character is >= 'A' and <= 'Z' ||
+                    character is >= 'a' and <= 'z' ||
+                    character is >= '0' and <= '9' ||
+                    character is '_' or '-'
                         ? character
                         : '_')
                 .ToArray());
