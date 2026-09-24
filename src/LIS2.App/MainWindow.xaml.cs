@@ -396,7 +396,7 @@ public partial class MainWindow : Window
 
     private void BindFanChannels()
     {
-        FanChannelsListBox.DisplayMemberPath = nameof(FanChannelSettings.Name);
+        FanChannelsListBox.DisplayMemberPath = nameof(FanChannelSettings.DisplayName);
         FanChannelsListBox.ItemsSource = null;
         FanChannelsListBox.ItemsSource = _settings.Fans.Channels;
 
