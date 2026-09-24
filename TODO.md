@@ -91,11 +91,11 @@ Do not infer electrical limits or safe fan-stop behavior solely from screenshots
 - [x] Bitrate/sample rate.
 - [x] Winamp simulator.
 - [x] Live Now Playing/status page in the Windows application.
-- [ ] Improve stale/disconnect/reconnect diagnostics.
-- [ ] Add optional display-page presets for Now Playing.
-- [ ] Add configurable title/artist scrolling.
-- [ ] Investigate a lightweight VU/level visualization.
-- [ ] Investigate an optional small spectrum display using custom characters.
+- [x] Improve stale/disconnect/reconnect diagnostics.
+- [x] Add optional display-page presets for Now Playing.
+- [x] Add configurable title/artist scrolling.
+- [x] Investigate a lightweight VU/level visualization.
+- [x] Investigate an optional small spectrum display using custom characters.
 - [ ] Keep spectrum/VU optional: a 20x2 character VFD and serial update rate make high-resolution visualization a poor fit.
 - [ ] Do not make the Winamp plugin responsible for LIS2 hardware access; it remains metadata/events only.
 
