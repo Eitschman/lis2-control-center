@@ -3103,7 +3103,16 @@ public partial class MainWindow : Window
     private void ShowError(Exception ex)
     {
         Log($"ERR  {ex.Message}");
-        System.Windows.MessageBox.Show(this, ex.Message, "LIS2 Control Center", MessageBoxButton.OK, MessageBoxImage.Error);
+
+        if (IsSmokeTestMode())
+            throw new InvalidOperationException("UI smoke test encountered an application error.", ex);
+
+        System.Windows.MessageBox.Show(
+            this,
+            ex.Message,
+            "LIS2 Control Center",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
     }
 
     private void Log(string text)
