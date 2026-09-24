@@ -35,7 +35,7 @@ public static class WinampValues
         var leftBars = (int)Math.Round(l / 255.0 * 8);
         var rightBars = (int)Math.Round(r / 255.0 * 8);
 
-        return $"L{new string('|', leftBars).PadRight(8)} R{new string('|', rightBars).PadRight(8)}";
+        return $"L{new string('|', leftBars).PadRight(8)}  R{new string('|', rightBars).PadRight(8)}";
     }
 
     public static string FormatSpectrum(IReadOnlyList<int>? spectrum)
