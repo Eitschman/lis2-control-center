@@ -37,9 +37,9 @@ Historical MCC material indicates that track information could scroll while ordi
 - [x] 5-pixel-wide row editing with the LIS2 character RAM constraints visible in the UI.
 - [x] Live preview.
 - [x] Send one slot or all slots to the device.
-- [ ] Save/load glyph sets as project-owned files.
-- [ ] Allow custom glyphs to be referenced conveniently from page templates.
-- [ ] Ship a small set of independently created example glyphs/icons.
+- [x] Save/load glyph sets as project-owned files.
+- [x] Allow custom glyphs to be referenced conveniently from page templates.
+- [x] Ship a small set of independently created example glyphs/icons.
 - [ ] Validate every custom-character operation on real LIS2 hardware before treating it as stable.
 
 The original MCC included a "CG Builder"; this is a confirmed useful product capability, not a reason to copy proprietary artwork.
