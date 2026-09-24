@@ -573,6 +573,7 @@ public partial class MainWindow : Window
         var vuLeft = GetWinampInt(values, "VuLeft");
         var vuRight = GetWinampInt(values, "VuRight");
         var spectrum = GetWinampValue(values, "Spectrum") ?? string.Empty;
+        var spectrumPeak = GetWinampInt(values, "SpectrumPeak");
 
         var connected = _winampSource.IsRecentlyConnected;
 
@@ -609,7 +610,9 @@ public partial class MainWindow : Window
             ? (string.IsNullOrEmpty(spectrum) ? new string(' ', 20) : spectrum.PadRight(20)[..Math.Min(20, spectrum.PadRight(20).Length)])
             : new string(' ', 20);
         WinampTelemetryStatusText.Text = connected
-            ? LocalizationService.Translate("Live visualization data")
+            ? LocalizationService.Format(
+                "Live visualization data · spectrum peak {0}",
+                spectrumPeak?.ToString(CultureInfo.InvariantCulture) ?? "-")
             : LocalizationService.Translate("No visualization data");
 
         WinampStatusText.Text = connected
