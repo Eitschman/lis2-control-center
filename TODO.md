@@ -20,11 +20,14 @@ The original MCC's "Auto User" concept is useful inspiration here, but the new i
 
 ### Scrolling / marquee
 
-- [ ] Add overflow policy per display line/field: truncate, scroll/marquee, or static crop.
-- [ ] Add configurable scroll speed and pause at start/end.
-- [ ] Avoid unnecessary serial writes when the visible frame has not changed.
-- [ ] Define sensible behavior when both lines scroll.
-- [ ] Make long Winamp titles/artists a primary test case.
+- [x] Automatically ping-pong scroll display lines longer than 20 characters.
+- [x] Pause briefly at both scroll edges.
+- [x] Keep page rotation timing independent from scrolling cadence.
+- [x] Avoid unnecessary serial writes when the visible frame has not changed.
+- [x] Support both lines scrolling independently.
+- [x] Use long Winamp titles/artists as a primary use case.
+- [ ] Add optional per-line overflow policy: ping-pong, truncate/static crop, or one-way marquee.
+- [ ] Make scroll speed and edge pause user-configurable.
 
 Historical MCC material indicates that track information could scroll while ordinary long text was more limited. The new renderer should make scrolling a general feature.
 

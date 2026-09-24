@@ -6,6 +6,11 @@ public sealed class DisplayRuntime
     private readonly PageScheduler _scheduler;
     private readonly EventQueue _events;
     private readonly VisibilityEvaluator _visibility = new();
+    private readonly PingPongScroller _line1Scroller = new();
+    private readonly PingPongScroller _line2Scroller = new();
+
+    private DisplayPage? _activePage;
+    private DateTimeOffset _activePageUntil = DateTimeOffset.MinValue;
 
     public DisplayRuntime(
         TemplateRenderer renderer,
@@ -30,19 +35,82 @@ public sealed class DisplayRuntime
             return activeEvent.Frame;
         }
 
-        var page = _scheduler.Next(candidate =>
-            _visibility.IsVisible(candidate.VisibilityExpression, values));
+        if (_activePage is null ||
+            now >= _activePageUntil ||
+            !_visibility.IsVisible(_activePage.VisibilityExpression, values))
+        {
+            SelectNextPage(values, now);
+        }
 
-        if (page is null)
+        if (_activePage is null)
             return null;
 
-        SuggestedDuration = page.Duration <= TimeSpan.Zero
-            ? TimeSpan.FromSeconds(1)
-            : page.Duration;
+        var rawLine1 = _renderer.Render(_activePage.Line1Template, values);
+        var rawLine2 = _renderer.Render(_activePage.Line2Template, values);
 
-        return _renderer.RenderFrame(
-            page.Line1Template,
-            page.Line2Template,
-            values);
+        var line1 = _line1Scroller.Render(rawLine1, now);
+        var line2 = _line2Scroller.Render(rawLine2, now);
+
+        SuggestedDuration = CalculateNextDelay(now);
+
+        return new DisplayFrame(line1, line2);
     }
+
+    private void SelectNextPage(
+        IReadOnlyDictionary<string, object?> values,
+        DateTimeOffset now)
+    {
+        var next = _scheduler.Next(candidate =>
+            _visibility.IsVisible(candidate.VisibilityExpression, values));
+
+        if (next is null)
+        {
+            _activePage = null;
+            _activePageUntil = DateTimeOffset.MinValue;
+            return;
+        }
+
+        var pageChanged =
+            _activePage is null ||
+            !string.Equals(_activePage.Id, next.Id, StringComparison.OrdinalIgnoreCase);
+
+        _activePage = next;
+        _activePageUntil = now + NormalizePageDuration(next.Duration);
+
+        if (pageChanged)
+        {
+            _line1Scroller.Reset(
+                _renderer.Render(next.Line1Template, values),
+                now);
+            _line2Scroller.Reset(
+                _renderer.Render(next.Line2Template, values),
+                now);
+        }
+    }
+
+    private TimeSpan CalculateNextDelay(DateTimeOffset now)
+    {
+        var untilPageChange = _activePageUntil - now;
+        if (untilPageChange <= TimeSpan.Zero)
+            return TimeSpan.FromMilliseconds(1);
+
+        var nextDelay = untilPageChange;
+
+        var line1Delay = _line1Scroller.TimeUntilNextChange(now);
+        if (line1Delay != Timeout.InfiniteTimeSpan && line1Delay < nextDelay)
+            nextDelay = line1Delay;
+
+        var line2Delay = _line2Scroller.TimeUntilNextChange(now);
+        if (line2Delay != Timeout.InfiniteTimeSpan && line2Delay < nextDelay)
+            nextDelay = line2Delay;
+
+        return nextDelay < TimeSpan.FromMilliseconds(1)
+            ? TimeSpan.FromMilliseconds(1)
+            : nextDelay;
+    }
+
+    private static TimeSpan NormalizePageDuration(TimeSpan duration) =>
+        duration <= TimeSpan.Zero
+            ? TimeSpan.FromSeconds(1)
+            : duration;
 }
