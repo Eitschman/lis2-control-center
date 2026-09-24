@@ -115,7 +115,7 @@ This separation keeps the native plugin intentionally small and makes the host s
 The native general-purpose plug-in also retrieves Winamp's in-process visualization data.
 
 - `IPC_GETVUDATAFUNC` supplies per-channel VU values in the range 0..255.
-- `IPC_GETSADATAFUNC` supplies the classic analyzer data buffer from inside the Winamp process.
+- `IPC_GETSADATAFUNC` parameter 2 supplies the Winamp 5.5+ analyzer callback; the plug-in passes its own 158-byte buffer and receives 150 bytes of analyzer data. Parameter 0 is the deprecated static-buffer API and is intentionally not used.
 - `gen_lis2.dll` downsamples the analyzer data to 20 bands before sending it over the named pipe.
 - visualization snapshots are currently sent at a deliberately modest 5 Hz (200 ms) cadence so the 20x2 VFD and serial link are not treated like a high-frame-rate visualization device.
 
