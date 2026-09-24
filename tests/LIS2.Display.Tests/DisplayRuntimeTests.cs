@@ -143,6 +143,51 @@ public sealed class DisplayRuntimeTests
     }
 
     [Fact]
+    public void ResetPageSelection_AppliesChangedPageSetImmediately()
+    {
+        var scheduler = new PageScheduler();
+        scheduler.ReplacePages(new[]
+        {
+            new DisplayPage(
+                "one",
+                "One",
+                "PAGE ONE",
+                string.Empty,
+                TimeSpan.FromSeconds(30))
+        });
+
+        var runtime = new DisplayRuntime(
+            new TemplateRenderer(),
+            scheduler,
+            new EventQueue());
+
+        var now = DateTimeOffset.UtcNow;
+        var first = runtime.RenderNext(
+            new Dictionary<string, object?>(),
+            now);
+
+        scheduler.ReplacePages(new[]
+        {
+            new DisplayPage(
+                "two",
+                "Two",
+                "PAGE TWO",
+                string.Empty,
+                TimeSpan.FromSeconds(30))
+        });
+        runtime.ResetPageSelection();
+
+        var changed = runtime.RenderNext(
+            new Dictionary<string, object?>(),
+            now.AddMilliseconds(100));
+
+        Assert.NotNull(first);
+        Assert.NotNull(changed);
+        Assert.StartsWith("PAGE ONE", first.Line1);
+        Assert.StartsWith("PAGE TWO", changed.Line1);
+    }
+
+    [Fact]
     public void RenderNext_SkipsPageWhenVisibilityDoesNotMatch()
     {
         var scheduler = new PageScheduler();
