@@ -67,6 +67,82 @@ public sealed class DisplayRuntimeTests
     }
 
     [Fact]
+    public void RenderNext_LongLineScrollsWithoutAdvancingPage()
+    {
+        var scheduler = new PageScheduler();
+        scheduler.ReplacePages(new[]
+        {
+            new DisplayPage(
+                "long",
+                "Long",
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                "SECOND LINE",
+                TimeSpan.FromSeconds(10)),
+            new DisplayPage(
+                "next",
+                "Next",
+                "NEXT PAGE",
+                string.Empty,
+                TimeSpan.FromSeconds(10))
+        });
+
+        var runtime = new DisplayRuntime(
+            new TemplateRenderer(),
+            scheduler,
+            new EventQueue());
+
+        var now = DateTimeOffset.UtcNow;
+
+        var first = runtime.RenderNext(
+            new Dictionary<string, object?>(),
+            now);
+
+        var scrolled = runtime.RenderNext(
+            new Dictionary<string, object?>(),
+            now.AddMilliseconds(900));
+
+        Assert.NotNull(first);
+        Assert.NotNull(scrolled);
+        Assert.Equal("ABCDEFGHIJKLMNOPQRST", first.Line1);
+        Assert.Equal("BCDEFGHIJKLMNOPQRSTU", scrolled.Line1);
+        Assert.StartsWith("SECOND LINE", scrolled.Line2);
+        Assert.True(runtime.SuggestedDuration <= PingPongScroller.StepInterval);
+    }
+
+    [Fact]
+    public void RenderNext_SwitchesPageOnlyAfterPageDuration()
+    {
+        var scheduler = new PageScheduler();
+        scheduler.ReplacePages(new[]
+        {
+            new DisplayPage("one", "One", "PAGE ONE", string.Empty, TimeSpan.FromSeconds(2)),
+            new DisplayPage("two", "Two", "PAGE TWO", string.Empty, TimeSpan.FromSeconds(2))
+        });
+
+        var runtime = new DisplayRuntime(
+            new TemplateRenderer(),
+            scheduler,
+            new EventQueue());
+
+        var now = DateTimeOffset.UtcNow;
+
+        var first = runtime.RenderNext(new Dictionary<string, object?>(), now);
+        var stillFirst = runtime.RenderNext(
+            new Dictionary<string, object?>(),
+            now.AddSeconds(1));
+        var second = runtime.RenderNext(
+            new Dictionary<string, object?>(),
+            now.AddSeconds(2));
+
+        Assert.NotNull(first);
+        Assert.NotNull(stillFirst);
+        Assert.NotNull(second);
+        Assert.StartsWith("PAGE ONE", first.Line1);
+        Assert.StartsWith("PAGE ONE", stillFirst.Line1);
+        Assert.StartsWith("PAGE TWO", second.Line1);
+    }
+
+    [Fact]
     public void RenderNext_SkipsPageWhenVisibilityDoesNotMatch()
     {
         var scheduler = new PageScheduler();
