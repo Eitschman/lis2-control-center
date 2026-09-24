@@ -84,17 +84,22 @@ public sealed class WinampPipeServer : IAsyncDisposable
 
     private void TryHandleMessage(string json)
     {
+        var message = DeserializeMessage(json);
+        if (message is null)
+            return;
+
+        SnapshotReceived?.Invoke(this, ToSnapshot(message));
+    }
+
+    public static WinampMessage? DeserializeMessage(string json)
+    {
         try
         {
-            var message = JsonSerializer.Deserialize<WinampMessage>(json, JsonOptions);
-            if (message is null)
-                return;
-
-            SnapshotReceived?.Invoke(this, ToSnapshot(message));
+            return JsonSerializer.Deserialize<WinampMessage>(json, JsonOptions);
         }
         catch (JsonException)
         {
-            // Malformed plugin messages are ignored. The pipe stays alive.
+            return null;
         }
     }
 
