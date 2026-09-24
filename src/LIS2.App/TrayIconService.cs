@@ -1,11 +1,14 @@
 using System.Drawing;
-using System.Runtime.InteropServices;
+using System.IO;
 using Forms = System.Windows.Forms;
 
 namespace LIS2.App;
 
 public sealed class TrayIconService : IDisposable
 {
+    private const string Lis2IconBase64 =
+        "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";
+
     private readonly Forms.NotifyIcon _notifyIcon;
     private readonly Forms.ToolStripMenuItem _showItem;
     private readonly Forms.ToolStripMenuItem _exitItem;
@@ -26,7 +29,7 @@ public sealed class TrayIconService : IDisposable
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(_exitItem);
 
-        _icon = CreateLis2Icon();
+        _icon = LoadEmbeddedLis2Icon();
 
         _notifyIcon = new Forms.NotifyIcon
         {
@@ -77,46 +80,15 @@ public sealed class TrayIconService : IDisposable
             : text[..63];
     }
 
-    private static Icon CreateLis2Icon()
+    private static Icon LoadEmbeddedLis2Icon()
     {
-        using var bitmap = new Bitmap(32, 32);
-        using var graphics = Graphics.FromImage(bitmap);
+        var bytes = Convert.FromBase64String(Lis2IconBase64);
 
-        graphics.Clear(Color.Transparent);
-        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        using var stream = new MemoryStream(bytes, writable: false);
+        using var icon = new Icon(stream);
 
-        using var background = new SolidBrush(Color.FromArgb(23, 27, 32));
-        using var accent = new SolidBrush(Color.FromArgb(105, 238, 138));
-        using var border = new Pen(Color.FromArgb(70, 82, 92), 1.5f);
-        using var font = new Font("Segoe UI", 11f, FontStyle.Bold, GraphicsUnit.Pixel);
-
-        graphics.FillEllipse(background, 1, 1, 30, 30);
-        graphics.DrawEllipse(border, 1.5f, 1.5f, 29, 29);
-
-        var text = "L2";
-        var size = graphics.MeasureString(text, font);
-        graphics.DrawString(
-            text,
-            font,
-            accent,
-            (32 - size.Width) / 2f,
-            (32 - size.Height) / 2f - 0.5f);
-
-        var handle = bitmap.GetHicon();
-
-        try
-        {
-            using var temporary = Icon.FromHandle(handle);
-            return (Icon)temporary.Clone();
-        }
-        finally
-        {
-            DestroyIcon(handle);
-        }
+        return (Icon)icon.Clone();
     }
-
-    [DllImport("user32.dll")]
-    private static extern bool DestroyIcon(IntPtr handle);
 
     public void Dispose()
     {
