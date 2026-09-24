@@ -26,6 +26,9 @@ public partial class MainWindow : Window
     private readonly WinampDataSource _winampSource = new();
     private readonly FanController _fanController = new();
     private int[]? _lastAutomaticFanOutputs;
+    private readonly double?[] _lastAutomaticFanSensorValues = new double?[4];
+    private readonly double?[] _currentFanSensorValues = new double?[4];
+    private CustomCharacterManager? _customCharacterManager;
     private readonly TrayIconService _trayIcon = new();
     private readonly StartupService _startupService = new();
     private bool _allowClose;
@@ -310,6 +313,7 @@ public partial class MainWindow : Window
                 MinimumPercent = stored.MinimumPercent,
                 MaximumPercent = stored.MaximumPercent,
                 FailSafePercent = stored.FailSafePercent,
+                HysteresisDegrees = stored.HysteresisDegrees,
                 AllowStop = stored.AllowStop,
                 Curve = stored.Curve
                     .Select(point => new FanCurvePoint(
@@ -329,11 +333,15 @@ public partial class MainWindow : Window
                     TryConvertToDouble(rawValue, out sensorValue);
             }
 
+            _currentFanSensorValues[index] = sensorValid ? sensorValue : null;
+
             outputs[index] = _fanController.CalculateOutput(
                 configuration,
                 sensorValue,
                 externalPercent: null,
-                sensorValid);
+                sensorValid,
+                previousSensorValue: _lastAutomaticFanSensorValues[index],
+                previousOutputPercent: _lastAutomaticFanOutputs?[index]);
         }
 
         if (_lastAutomaticFanOutputs is not null &&
@@ -349,7 +357,11 @@ public partial class MainWindow : Window
             outputs[3]);
 
         _lastAutomaticFanOutputs = outputs;
+        for (var index = 0; index < _lastAutomaticFanSensorValues.Length; index++)
+            _lastAutomaticFanSensorValues[index] = _currentFanSensorValues[index];
+
         UpdateFanOutputFields(outputs);
+        RefreshFanLiveStatus();
         Log($"INFO automatic fan outputs: {string.Join("/", outputs)}%");
     }
 
@@ -419,8 +431,11 @@ public partial class MainWindow : Window
         FanMinimumTextBox.Text = channel.MinimumPercent.ToString(CultureInfo.InvariantCulture);
         FanMaximumTextBox.Text = channel.MaximumPercent.ToString(CultureInfo.InvariantCulture);
         FanFailSafeTextBox.Text = channel.FailSafePercent.ToString(CultureInfo.InvariantCulture);
+        FanHysteresisTextBox.Text = channel.HysteresisDegrees.ToString("0.##", CultureInfo.InvariantCulture);
         FanAllowStopCheckBox.IsChecked = channel.AllowStop;
         FanCurveTextBox.Text = FormatFanCurve(channel.Curve);
+        RefreshFanCurvePreview(channel.Curve);
+        RefreshFanLiveStatus();
     }
 
     private void SelectFanMode(string mode)
@@ -994,6 +1009,17 @@ public partial class MainWindow : Window
                 FanFailSafeTextBox.Text,
                 LocalizationService.Translate("Fail-safe output"));
 
+            if (!double.TryParse(
+                    FanHysteresisTextBox.Text,
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out var hysteresis) ||
+                hysteresis < 0 ||
+                hysteresis > 20)
+            {
+                throw new InvalidOperationException("Hysteresis must be between 0 and 20 degrees.");
+            }
+
             if (minimumPercent > maximumPercent)
                 throw new InvalidOperationException(
                     LocalizationService.Translate(
@@ -1028,8 +1054,10 @@ public partial class MainWindow : Window
             channel.MinimumPercent = minimumPercent;
             channel.MaximumPercent = maximumPercent;
             channel.FailSafePercent = failSafePercent;
+            channel.HysteresisDegrees = hysteresis;
             channel.AllowStop = FanAllowStopCheckBox.IsChecked == true;
             channel.Curve = curve;
+            RefreshFanCurvePreview(curve);
 
             await _settingsStore.SaveAsync(_settings);
 
@@ -1167,7 +1195,11 @@ public partial class MainWindow : Window
                         page.Line2Template,
                         TimeSpan.FromSeconds(Math.Max(1, page.DurationSeconds)),
                         page.Priority,
-                        page.VisibilityExpression)));
+                        page.VisibilityExpression,
+                        ParseOverflowMode(page.Line1OverflowMode),
+                        ParseOverflowMode(page.Line2OverflowMode),
+                        TimeSpan.FromMilliseconds(Math.Clamp(page.ScrollStepMilliseconds, 50, 5000)),
+                        TimeSpan.FromMilliseconds(Math.Clamp(page.ScrollEdgePauseMilliseconds, 0, 10000)))));
 
         _displayRuntime.ResetPageSelection();
     }
@@ -1210,6 +1242,11 @@ public partial class MainWindow : Window
         PageLine2TextBox.Text = page.Line2Template;
         PageDurationTextBox.Text = page.DurationSeconds.ToString(CultureInfo.InvariantCulture);
         PageVisibilityTextBox.Text = page.VisibilityExpression ?? string.Empty;
+        SelectComboBoxTag(PageLine1OverflowComboBox, page.Line1OverflowMode);
+        SelectComboBoxTag(PageLine2OverflowComboBox, page.Line2OverflowMode);
+        PageScrollSpeedTextBox.Text = page.ScrollStepMilliseconds.ToString(CultureInfo.InvariantCulture);
+        PageEdgePauseTextBox.Text = page.ScrollEdgePauseMilliseconds.ToString(CultureInfo.InvariantCulture);
+        RefreshPageEditorPreview();
     }
 
     private async void AddPage_Click(object sender, RoutedEventArgs e)
@@ -1262,6 +1299,19 @@ public partial class MainWindow : Window
             page.VisibilityExpression = string.IsNullOrWhiteSpace(PageVisibilityTextBox.Text)
                 ? null
                 : PageVisibilityTextBox.Text.Trim();
+            page.Line1OverflowMode = GetComboBoxTag(PageLine1OverflowComboBox, "PingPong");
+            page.Line2OverflowMode = GetComboBoxTag(PageLine2OverflowComboBox, "PingPong");
+
+            if (!int.TryParse(PageScrollSpeedTextBox.Text, out var scrollSpeed) ||
+                scrollSpeed is < 50 or > 5000)
+                throw new InvalidOperationException("Scroll step must be between 50 and 5000 ms.");
+
+            if (!int.TryParse(PageEdgePauseTextBox.Text, out var edgePause) ||
+                edgePause is < 0 or > 10000)
+                throw new InvalidOperationException("Edge pause must be between 0 and 10000 ms.");
+
+            page.ScrollStepMilliseconds = scrollSpeed;
+            page.ScrollEdgePauseMilliseconds = edgePause;
 
             await PersistPagesAsync();
             LoadPagesIntoRuntime();
@@ -1464,6 +1514,7 @@ public partial class MainWindow : Window
         _device = new Lis2Device(_transport);
         await _device.ConnectAsync();
         _frameWriter = new DisplayFrameWriter(_device);
+        _customCharacterManager = new CustomCharacterManager(_device);
 
         UpdateConnectionUiLocalization();
 
