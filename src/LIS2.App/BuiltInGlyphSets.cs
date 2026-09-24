@@ -15,6 +15,31 @@ public static class BuiltInGlyphSets
             Glyph("BarFull",     "11111","11111","11111","11111","11111","11111","11111","00000")
         };
 
+    public static IReadOnlyList<CustomGlyphSettings> CreateSpectrumSet() =>
+        Enumerable.Range(1, 8)
+            .Select(level => Glyph(
+                $"Spectrum{level}",
+                Enumerable.Range(0, 8)
+                    .Select(row => row >= 8 - level ? "11111" : "00000")
+                    .ToArray()))
+            .ToArray();
+
+    public static bool IsSpectrumSet(IReadOnlyList<CustomGlyphSettings> glyphs)
+    {
+        if (glyphs.Count != 8)
+            return false;
+
+        var expected = CreateSpectrumSet();
+
+        for (var index = 0; index < 8; index++)
+        {
+            if (!glyphs[index].Rows.SequenceEqual(expected[index].Rows))
+                return false;
+        }
+
+        return true;
+    }
+
     private static CustomGlyphSettings Glyph(string name, params string[] rows) =>
         new()
         {
