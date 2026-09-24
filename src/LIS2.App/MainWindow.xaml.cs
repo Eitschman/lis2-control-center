@@ -1,5 +1,8 @@
 using System.Globalization;
+using System.IO;
 using System.IO.Ports;
+using System.Text.Json;
+using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -37,6 +40,7 @@ public partial class MainWindow : Window
     private bool _allowClose;
     private bool _loadingStartupSetting;
     private bool _customGlyphUiInitialized;
+    private bool _loadingCustomGlyphSetting;
     private bool _fanUiInitialized;
     private bool _applyingAppearanceSettings;
 
@@ -1506,7 +1510,7 @@ public partial class MainWindow : Window
     private async Task RenderRuntimePageAsync()
     {
         var nextFrame = _displayRuntime.RenderNext(
-            _sources.Snapshot(),
+            CreateDisplayValues(),
             DateTimeOffset.Now);
 
         if (nextFrame is null)
@@ -1682,7 +1686,7 @@ public partial class MainWindow : Window
             return;
 
         var renderer = new TemplateRenderer();
-        var values = _sources.Snapshot();
+        var values = CreateDisplayValues();
         var now = DateTimeOffset.Now;
 
         var rawLine1 = renderer.Render(PageLine1TextBox.Text ?? string.Empty, values);
@@ -1699,10 +1703,10 @@ public partial class MainWindow : Window
             ? TimeSpan.FromMilliseconds(Math.Clamp(pauseMs, 0, 10000))
             : PingPongScroller.EdgePause;
 
-        PageEditorPreviewLine1.Text =
-            _pageEditorLine1Scroller.Render(rawLine1, now, mode1, step, pause);
-        PageEditorPreviewLine2.Text =
-            _pageEditorLine2Scroller.Render(rawLine2, now, mode2, step, pause);
+        PageEditorPreviewLine1.Text = FormatDisplayPreviewLine(
+            _pageEditorLine1Scroller.Render(rawLine1, now, mode1, step, pause));
+        PageEditorPreviewLine2.Text = FormatDisplayPreviewLine(
+            _pageEditorLine2Scroller.Render(rawLine2, now, mode2, step, pause));
     }
 
     private static DisplayOverflowMode ParseOverflowMode(string? value) =>
@@ -1831,6 +1835,10 @@ public partial class MainWindow : Window
 
     private void BindCustomGlyphs()
     {
+        _loadingCustomGlyphSetting = true;
+        ProgramCustomGlyphsOnConnectCheckBox.IsChecked = _settings.ProgramCustomGlyphsOnConnect;
+        _loadingCustomGlyphSetting = false;
+
         CustomGlyphSlotComboBox.ItemsSource = Enumerable.Range(1, 8).ToArray();
         if (CustomGlyphSlotComboBox.SelectedIndex < 0)
             CustomGlyphSlotComboBox.SelectedIndex = 0;
@@ -1860,6 +1868,7 @@ public partial class MainWindow : Window
 
         var glyph = _settings.CustomGlyphs[slot - 1];
         CustomGlyphNameTextBox.Text = glyph.Name;
+        RefreshCustomGlyphTemplateKey(slot, glyph.Name);
         CustomGlyphRowsTextBox.Text = string.Join(
             Environment.NewLine,
             glyph.Rows.Select(row => Convert.ToString(row, 2).PadLeft(5, '0')));
@@ -1902,6 +1911,7 @@ public partial class MainWindow : Window
             glyph.Rows = rows;
 
             await _settingsStore.SaveAsync(_settings);
+            RefreshCustomGlyphTemplateKey(slot, glyph.Name);
             RefreshGlyphPreview(rows);
             Log($"INFO saved custom glyph {slot} '{glyph.Name}'");
         }
@@ -1977,7 +1987,216 @@ public partial class MainWindow : Window
                     Enumerable.Range(0, 5)
                         .Select(column => (row & (1 << (4 - column))) != 0 ? '█' : '·')
                         .ToArray())));
+
+        if (CustomGlyphSlotComboBox.SelectedItem is int slot)
+        {
+            var name = CustomGlyphNameTextBox.Text?.Trim();
+            var label = string.IsNullOrWhiteSpace(name) ? $"Glyph {slot}" : name;
+            CustomGlyphLinePreview.Text =
+                $"▣ {label}".PadRight(DisplayFrame.Width)[..DisplayFrame.Width];
+        }
     }
+
+    private void CustomGlyphNameChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!IsLoaded || CustomGlyphSlotComboBox.SelectedItem is not int slot)
+            return;
+
+        RefreshCustomGlyphTemplateKey(slot, CustomGlyphNameTextBox.Text);
+        try
+        {
+            RefreshGlyphPreview(ReadGlyphEditor());
+        }
+        catch
+        {
+        }
+    }
+
+    private void RefreshCustomGlyphTemplateKey(int slot, string? name)
+    {
+        if (CustomGlyphTemplateKeyText is null)
+            return;
+
+        var normalized = NormalizeGlyphTemplateName(name);
+        CustomGlyphTemplateKeyText.Text =
+            string.IsNullOrWhiteSpace(normalized)
+                ? $"{{Glyph.{slot}}}"
+                : $"{{Glyph.{normalized}}}  ·  {{Glyph.{slot}}}";
+    }
+
+    private async void ProgramCustomGlyphsOnConnectChanged(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded || _loadingCustomGlyphSetting)
+            return;
+
+        _settings.ProgramCustomGlyphsOnConnect =
+            ProgramCustomGlyphsOnConnectCheckBox.IsChecked == true;
+        await _settingsStore.SaveAsync(_settings);
+
+        Log(_settings.ProgramCustomGlyphsOnConnect
+            ? "INFO custom glyph auto-sync on connect enabled"
+            : "INFO custom glyph auto-sync on connect disabled");
+    }
+
+    private async void SaveCustomGlyphSet_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var dialog = new SaveFileDialog
+            {
+                Title = LocalizationService.Translate("Save glyph set"),
+                Filter = "LIS2 glyph sets (*.lis2glyphs.json)|*.lis2glyphs.json|JSON (*.json)|*.json|All files (*.*)|*.*",
+                DefaultExt = ".lis2glyphs.json",
+                AddExtension = true,
+                FileName = "lis2-glyphs.lis2glyphs.json"
+            };
+
+            if (dialog.ShowDialog(this) != true)
+                return;
+
+            var set = new CustomGlyphSetFile
+            {
+                Name = Path.GetFileNameWithoutExtension(dialog.FileName),
+                Glyphs = CloneGlyphs(_settings.CustomGlyphs)
+            };
+
+            var json = JsonSerializer.Serialize(
+                set,
+                new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(dialog.FileName, json);
+
+            Log($"INFO saved custom glyph set '{dialog.FileName}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void LoadCustomGlyphSet_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var dialog = new OpenFileDialog
+            {
+                Title = LocalizationService.Translate("Load glyph set"),
+                Filter = "LIS2 glyph sets (*.lis2glyphs.json)|*.lis2glyphs.json|JSON (*.json)|*.json|All files (*.*)|*.*",
+                CheckFileExists = true
+            };
+
+            if (dialog.ShowDialog(this) != true)
+                return;
+
+            var json = await File.ReadAllTextAsync(dialog.FileName);
+            var set = JsonSerializer.Deserialize<CustomGlyphSetFile>(json)
+                ?? throw new InvalidOperationException(
+                    LocalizationService.Translate("The glyph-set file is empty or invalid."));
+
+            set.Validate();
+            await ApplyGlyphSetAsync(set.Glyphs);
+
+            Log($"INFO loaded custom glyph set '{dialog.FileName}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void LoadExampleGlyphSet_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await ApplyGlyphSetAsync(BuiltInGlyphSets.CreateExampleSet());
+            Log("INFO loaded built-in example glyph set");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async Task ApplyGlyphSetAsync(IReadOnlyList<CustomGlyphSettings> glyphs)
+    {
+        if (glyphs.Count != 8)
+            throw new InvalidOperationException(
+                LocalizationService.Translate("A glyph set must contain exactly eight glyphs."));
+
+        _settings.CustomGlyphs = CloneGlyphs(glyphs);
+        await _settingsStore.SaveAsync(_settings);
+
+        var selectedSlot = CustomGlyphSlotComboBox.SelectedItem is int slot ? slot : 1;
+        BindCustomGlyphs();
+        CustomGlyphSlotComboBox.SelectedItem = selectedSlot;
+        LoadSelectedGlyphIntoEditor();
+
+        if (_settings.ProgramCustomGlyphsOnConnect && _customCharacterManager is not null)
+        {
+            await _customCharacterManager.ProgramAllAsync(
+                _settings.CustomGlyphs.Select(glyph => glyph.Rows).ToArray(),
+                force: true);
+            Log("INFO synchronized loaded glyph set to LIS2");
+        }
+
+        RefreshPageEditorPreview();
+    }
+
+    private static List<CustomGlyphSettings> CloneGlyphs(
+        IEnumerable<CustomGlyphSettings> glyphs) =>
+        glyphs
+            .Select(glyph => new CustomGlyphSettings
+            {
+                Name = glyph.Name,
+                Rows = glyph.Rows.ToArray()
+            })
+            .ToList();
+
+    private IReadOnlyDictionary<string, object?> CreateDisplayValues()
+    {
+        var values = new Dictionary<string, object?>(
+            _sources.Snapshot(),
+            StringComparer.OrdinalIgnoreCase);
+
+        for (var index = 0; index < _settings.CustomGlyphs.Count && index < 8; index++)
+        {
+            var slot = index + 1;
+            var glyphValue = Lis2Protocol.CustomGlyph(slot).ToString();
+            values[$"Glyph.{slot}"] = glyphValue;
+
+            var name = NormalizeGlyphTemplateName(_settings.CustomGlyphs[index].Name);
+            if (!string.IsNullOrWhiteSpace(name))
+                values[$"Glyph.{name}"] = glyphValue;
+        }
+
+        return values;
+    }
+
+    private static string NormalizeGlyphTemplateName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return string.Empty;
+
+        var normalized = new string(
+            name.Trim()
+                .Select(character =>
+                    char.IsLetterOrDigit(character) || character is '_' or '-'
+                        ? character
+                        : '_')
+                .ToArray());
+
+        while (normalized.Contains("__", StringComparison.Ordinal))
+            normalized = normalized.Replace("__", "_", StringComparison.Ordinal);
+
+        return normalized.Trim('_');
+    }
+
+    private static string FormatDisplayPreviewLine(string value) =>
+        new(
+            value.Select(character =>
+                Lis2Protocol.TryGetCustomGlyphSlot(character, out var slot)
+                    ? "①②③④⑤⑥⑦⑧"[slot - 1]
+                    : character)
+                .ToArray());
 
     private void ApplySettingsToUi()
     {
@@ -2161,6 +2380,13 @@ public partial class MainWindow : Window
         await _device.ConnectAsync();
         _frameWriter = new DisplayFrameWriter(_device);
         _customCharacterManager = new CustomCharacterManager(_device);
+
+        if (_settings.ProgramCustomGlyphsOnConnect)
+        {
+            await _customCharacterManager.ProgramAllAsync(
+                _settings.CustomGlyphs.Select(glyph => glyph.Rows).ToArray());
+            Log("INFO synchronized saved custom glyphs after connect");
+        }
 
         UpdateConnectionUiLocalization();
 
@@ -2547,8 +2773,8 @@ public partial class MainWindow : Window
 
     private void RefreshPreview()
     {
-        PreviewLine1.Text = _frame.Line1;
-        PreviewLine2.Text = _frame.Line2;
+        PreviewLine1.Text = FormatDisplayPreviewLine(_frame.Line1);
+        PreviewLine2.Text = FormatDisplayPreviewLine(_frame.Line2);
     }
 
     private static int GetSliderPercent(Slider slider) =>
