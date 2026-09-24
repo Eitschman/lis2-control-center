@@ -1042,26 +1042,48 @@ public partial class MainWindow : Window
                 ? tag
                 : "All";
 
-        var rows = snapshot
+        var currentRows = snapshot
             .Where(pair =>
                 pair.Key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase) &&
                 !pair.Key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase) &&
                 IsNumericValue(pair.Value))
             .Select(pair => CreateHardwareSensorRow(pair.Key, pair.Value, snapshot))
+            .ToDictionary(row => row.Key, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var trackedKey in GetTrackedHardwareSensorKeys())
+        {
+            if (!currentRows.ContainsKey(trackedKey))
+                currentRows[trackedKey] = CreateUnavailableHardwareSensorRow(trackedKey);
+        }
+
+        var rows = currentRows.Values
             .Where(row =>
                 MatchesHardwareTypeFilter(row, typeFilter) &&
                 (string.IsNullOrWhiteSpace(search) ||
                  row.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                 row.HardwareName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                 row.SensorName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.Alias.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.Key.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.TypeKey.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                  row.Type.Contains(search, StringComparison.OrdinalIgnoreCase)))
-            .OrderByDescending(row => row.IsFavorite)
+            .OrderBy(row => row.HardwareName, StringComparer.OrdinalIgnoreCase)
+            .ThenByDescending(row => row.IsFavorite)
+            .ThenByDescending(row => row.IsAvailable)
             .ThenBy(row => row.Type, StringComparer.OrdinalIgnoreCase)
             .ThenBy(row => row.DisplayName, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
-        HardwareSensorsListBox.ItemsSource = rows;
+        var view = System.Windows.Data.CollectionViewSource.GetDefaultView(rows);
+        if (view.CanGroup)
+        {
+            view.GroupDescriptions.Clear();
+            view.GroupDescriptions.Add(
+                new System.Windows.Data.PropertyGroupDescription(
+                    nameof(HardwareSensorRow.HardwareName)));
+        }
+
+        HardwareSensorsListBox.ItemsSource = view;
 
         if (selectedKey is not null)
         {
@@ -1081,13 +1103,21 @@ public partial class MainWindow : Window
             pair.Key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase) &&
             !pair.Key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase));
 
+        var unavailableCount = rows.Count(row => !row.IsAvailable);
+
         HardwareSummaryText.Text =
             !string.IsNullOrWhiteSpace(hardwareError)
                 ? LocalizationService.Format("Hardware source error: {0}", hardwareError)
-                : LocalizationService.Format(
-                    "{0} visible sensor(s) / {1} total values",
-                    rows.Length,
-                    totalHardwareValues);
+                : unavailableCount > 0
+                    ? LocalizationService.Format(
+                        "{0} visible sensor(s) / {1} total values · {2} unavailable configured sensor(s)",
+                        rows.Length,
+                        totalHardwareValues,
+                        unavailableCount)
+                    : LocalizationService.Format(
+                        "{0} visible sensor(s) / {1} total values",
+                        rows.Length,
+                        totalHardwareValues);
     }
 
     private HardwareSensorRow CreateHardwareSensorRow(
@@ -1095,16 +1125,7 @@ public partial class MainWindow : Window
         object? rawValue,
         IReadOnlyDictionary<string, object?> snapshot)
     {
-        var parts = key.Split('.');
-        var hardwareName = parts.Length > 1
-            ? HumanizeSensorName(parts[1])
-            : "Hardware";
-        var type = parts.Length > 2
-            ? parts[2]
-            : "Other";
-        var sensorName = parts.Length > 3
-            ? HumanizeSensorName(string.Join(" ", parts.Skip(3)))
-            : key;
+        var (hardwareName, type, sensorName) = ParseHardwareSensorKey(key);
 
         var value = TryConvertToDouble(rawValue, out var number) && number is not null
             ? number.Value.ToString("0.##", CultureInfo.CurrentCulture)
@@ -1120,13 +1141,106 @@ public partial class MainWindow : Window
 
         return new HardwareSensorRow(
             key,
-            $"{hardwareName} — {sensorName}",
+            hardwareName,
+            sensorName,
             type,
             LocalizationService.Translate(type),
             value,
             unit,
             preference?.Alias ?? string.Empty,
-            preference?.IsFavorite == true);
+            preference?.IsFavorite == true,
+            true);
+    }
+
+    private HardwareSensorRow CreateUnavailableHardwareSensorRow(string key)
+    {
+        var (hardwareName, type, sensorName) = ParseHardwareSensorKey(key);
+        var preference = _settings.HardwareSensorPreferences
+            .FirstOrDefault(item =>
+                string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase));
+
+        return new HardwareSensorRow(
+            key,
+            hardwareName,
+            sensorName,
+            type,
+            LocalizationService.Translate(type),
+            "-",
+            string.Empty,
+            preference?.Alias ?? string.Empty,
+            preference?.IsFavorite == true,
+            false);
+    }
+
+    private static (string HardwareName, string Type, string SensorName)
+        ParseHardwareSensorKey(string key)
+    {
+        var parts = key.Split('.');
+        var hardwareName = parts.Length > 1
+            ? HumanizeSensorName(parts[1])
+            : "Hardware";
+        var type = parts.Length > 2
+            ? parts[2]
+            : "Other";
+        var sensorName = parts.Length > 3
+            ? HumanizeSensorName(string.Join(" ", parts.Skip(3)))
+            : key;
+
+        return (hardwareName, type, sensorName);
+    }
+
+    private IEnumerable<string> GetTrackedHardwareSensorKeys()
+    {
+        var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var preference in _settings.HardwareSensorPreferences)
+        {
+            if (!string.IsNullOrWhiteSpace(preference.Key))
+                keys.Add(preference.Key);
+        }
+
+        foreach (var channel in _settings.Fans.Channels)
+        {
+            if (!string.IsNullOrWhiteSpace(channel.SensorKey) &&
+                channel.SensorKey.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase))
+            {
+                keys.Add(channel.SensorKey);
+            }
+        }
+
+        foreach (var page in _settings.Pages)
+        {
+            foreach (var key in ExtractHardwareTemplateKeys(page.Line1Template))
+                keys.Add(key);
+            foreach (var key in ExtractHardwareTemplateKeys(page.Line2Template))
+                keys.Add(key);
+        }
+
+        return keys;
+    }
+
+    private static IEnumerable<string> ExtractHardwareTemplateKeys(string? template)
+    {
+        if (string.IsNullOrWhiteSpace(template))
+            yield break;
+
+        var index = 0;
+        while (index < template.Length)
+        {
+            var open = template.IndexOf('{', index);
+            if (open < 0)
+                yield break;
+
+            var close = template.IndexOf('}', open + 1);
+            if (close < 0)
+                yield break;
+
+            var key = template[(open + 1)..close].Trim();
+            if (key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase))
+                yield return key;
+
+            index = close + 1;
+        }
     }
 
     private static string HumanizeSensorName(string value) =>
@@ -1141,6 +1255,9 @@ public partial class MainWindow : Window
 
         if (string.Equals(filter, "Favorites", StringComparison.OrdinalIgnoreCase))
             return row.IsFavorite;
+
+        if (string.Equals(filter, "Unavailable", StringComparison.OrdinalIgnoreCase))
+            return !row.IsAvailable;
 
         var knownTypes = new HashSet<string>(
             new[]
@@ -1194,12 +1311,6 @@ public partial class MainWindow : Window
 
             await _settingsStore.SaveAsync(_settings);
             RefreshHardwareSensors();
-
-            HardwareSensorsListBox.SelectedItem =
-                HardwareSensorsListBox.Items
-                    .OfType<HardwareSensorRow>()
-                    .FirstOrDefault(row =>
-                        string.Equals(row.Key, sensor.Key, StringComparison.OrdinalIgnoreCase));
 
             Log($"INFO saved hardware sensor preference for '{sensor.Key}'");
         }
@@ -1354,6 +1465,10 @@ public partial class MainWindow : Window
             if (HardwareSensorsListBox.SelectedItem is not HardwareSensorRow sensor)
                 throw new InvalidOperationException(
                     LocalizationService.Translate("Select a hardware sensor first."));
+
+            if (!sensor.IsAvailable)
+                throw new InvalidOperationException(
+                    LocalizationService.Translate("The selected hardware sensor is currently unavailable."));
 
             if (sender is not System.Windows.Controls.Button { Tag: string tag } ||
                 !int.TryParse(tag, out var fanIndex) ||
