@@ -29,6 +29,14 @@ public partial class App : System.Windows.Application
         catch (Exception ex)
         {
             WriteStartupError("Application startup failed.", ex);
+
+            if (IsSmokeTestMode())
+            {
+                Environment.ExitCode = 1;
+                Shutdown(1);
+                return;
+            }
+
             ShowStartupError(ex);
             Shutdown(-1);
         }
@@ -131,6 +139,13 @@ public partial class App : System.Windows.Application
         System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
         WriteStartupError("Unhandled UI exception.", e.Exception);
+
+        if (IsSmokeTestMode())
+        {
+            e.Handled = true;
+            Environment.ExitCode = 1;
+            Shutdown(1);
+        }
     }
 
     private static void CurrentDomain_UnhandledException(
@@ -178,6 +193,13 @@ public partial class App : System.Windows.Application
         {
         }
     }
+
+    private static bool IsSmokeTestMode() =>
+        Environment.GetCommandLineArgs().Any(
+            arg => string.Equals(
+                arg,
+                "--smoke-test",
+                StringComparison.OrdinalIgnoreCase));
 
     private static string GetStartupErrorPath() =>
         Path.Combine(
