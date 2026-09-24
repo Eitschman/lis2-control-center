@@ -1758,36 +1758,30 @@ public partial class MainWindow : Window
     private async void Fans_Click(object sender, RoutedEventArgs e)
     {
         await ApplyManualFanValuesAsync(
-            Fan1TextBox.Text,
-            Fan2TextBox.Text,
-            Fan3TextBox.Text,
-            Fan4TextBox.Text);
+            GetSliderPercent(Fan1Slider),
+            GetSliderPercent(Fan2Slider),
+            GetSliderPercent(Fan3Slider),
+            GetSliderPercent(Fan4Slider));
     }
 
     private async void DashboardFans_Click(object sender, RoutedEventArgs e)
     {
         await ApplyManualFanValuesAsync(
-            DashboardFan1TextBox.Text,
-            DashboardFan2TextBox.Text,
-            DashboardFan3TextBox.Text,
-            DashboardFan4TextBox.Text);
+            GetSliderPercent(DashboardFan1Slider),
+            GetSliderPercent(DashboardFan2Slider),
+            GetSliderPercent(DashboardFan3Slider),
+            GetSliderPercent(DashboardFan4Slider));
     }
 
     private async Task ApplyManualFanValuesAsync(
-        string fan1,
-        string fan2,
-        string fan3,
-        string fan4)
+        int fan1,
+        int fan2,
+        int fan3,
+        int fan4)
     {
         try
         {
-            var requested = new[]
-            {
-                ParsePercent(fan1, LocalizationService.Translate("Fan 1")),
-                ParsePercent(fan2, LocalizationService.Translate("Fan 2")),
-                ParsePercent(fan3, LocalizationService.Translate("Fan 3")),
-                ParsePercent(fan4, LocalizationService.Translate("Fan 4"))
-            };
+            var requested = new[] { fan1, fan2, fan3, fan4 };
 
             var outputs = new int[4];
 
@@ -1831,15 +1825,15 @@ public partial class MainWindow : Window
         if (outputs.Count < 4)
             return;
 
-        Fan1TextBox.Text = outputs[0].ToString(CultureInfo.InvariantCulture);
-        Fan2TextBox.Text = outputs[1].ToString(CultureInfo.InvariantCulture);
-        Fan3TextBox.Text = outputs[2].ToString(CultureInfo.InvariantCulture);
-        Fan4TextBox.Text = outputs[3].ToString(CultureInfo.InvariantCulture);
+        Fan1Slider.Value = outputs[0];
+        Fan2Slider.Value = outputs[1];
+        Fan3Slider.Value = outputs[2];
+        Fan4Slider.Value = outputs[3];
 
-        DashboardFan1TextBox.Text = outputs[0].ToString(CultureInfo.InvariantCulture);
-        DashboardFan2TextBox.Text = outputs[1].ToString(CultureInfo.InvariantCulture);
-        DashboardFan3TextBox.Text = outputs[2].ToString(CultureInfo.InvariantCulture);
-        DashboardFan4TextBox.Text = outputs[3].ToString(CultureInfo.InvariantCulture);
+        DashboardFan1Slider.Value = outputs[0];
+        DashboardFan2Slider.Value = outputs[1];
+        DashboardFan3Slider.Value = outputs[2];
+        DashboardFan4Slider.Value = outputs[3];
     }
 
     private void Transport_Written(object? sender, VirtualLis2WriteEventArgs e)
@@ -1859,6 +1853,12 @@ public partial class MainWindow : Window
         PreviewLine1.Text = _frame.Line1;
         PreviewLine2.Text = _frame.Line2;
     }
+
+    private static int GetSliderPercent(Slider slider) =>
+        Math.Clamp(
+            (int)Math.Round(slider.Value, MidpointRounding.AwayFromZero),
+            0,
+            100);
 
     private static int ParsePercent(string value, string label)
     {

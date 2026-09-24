@@ -30,15 +30,96 @@
                            Margin="4,18,0,24"/>
 
                 <StackPanel x:Name="NavigationPanel" Grid.Row="1">
-                    <Button Content="⌂   Dashboard" Tag="0" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="▣   Display" Tag="1" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="▤   Pages" Tag="2" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="♫   Winamp" Tag="3" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="⚠   Events" Tag="4" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="▦   Hardware" Tag="5" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="✽   Fan Control" Tag="6" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="⚙   Settings" Tag="7" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="∿   Diagnostics" Tag="8" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Tag="0" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="⌂" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Dashboard" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                    <Button Tag="1" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="▣" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Display" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                    <Button Tag="2" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="▤" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Pages" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                    <Button Tag="3" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="♫" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Winamp" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                    <Button Tag="4" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="⚠" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Events" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                    <Button Tag="5" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="▦" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Hardware" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                    <Button Tag="6" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="✽" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Fan Control" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                    <Button Tag="7" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="⚙" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Settings" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                    <Button Tag="8" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="∿" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Diagnostics" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
 
                     <Separator Margin="4,18,4,16"/>
 
@@ -160,48 +241,112 @@
 
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                                 <StackPanel>
-                                    <TextBlock Text="Fan Outputs" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
+                                    <TextBlock Text="Fan Outputs" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12"/>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="34"/>
-                                            <ColumnDefinition Width="26"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="34"/>
-                                            <ColumnDefinition Width="26"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="34"/>
-                                            <ColumnDefinition Width="26"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="34"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="18"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="12"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="14"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
 
-                                        <TextBlock Grid.Column="0" Text="Fan 1" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                        <TextBox x:Name="DashboardFan1TextBox" Grid.Column="1" Text="100"/>
-                                        <TextBlock Grid.Column="2" Text="%" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                        <Grid Grid.Row="0" Grid.Column="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="70"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="55"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="Fan 1" VerticalAlignment="Center"/>
+                                            <Slider x:Name="DashboardFan1Slider"
+                                                Style="{StaticResource FanSliderStyle}"
+                                                    Grid.Column="1"
+                                                    Minimum="0" Maximum="100" Value="100"
+                                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                                    SmallChange="1" LargeChange="10"
+                                                    Margin="6,0,10,0"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding ElementName=DashboardFan1Slider, Path=Value, StringFormat={}{0:0} %}"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Center"
+                                                       FontFamily="Consolas"/>
+                                        </Grid>
 
-                                        <TextBlock Grid.Column="4" Text="Fan 2" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                        <TextBox x:Name="DashboardFan2TextBox" Grid.Column="5" Text="100"/>
-                                        <TextBlock Grid.Column="6" Text="%" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                        <Grid Grid.Row="0" Grid.Column="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="70"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="55"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="Fan 2" VerticalAlignment="Center"/>
+                                            <Slider x:Name="DashboardFan2Slider"
+                                                Style="{StaticResource FanSliderStyle}"
+                                                    Grid.Column="1"
+                                                    Minimum="0" Maximum="100" Value="100"
+                                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                                    SmallChange="1" LargeChange="10"
+                                                    Margin="6,0,10,0"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding ElementName=DashboardFan2Slider, Path=Value, StringFormat={}{0:0} %}"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Center"
+                                                       FontFamily="Consolas"/>
+                                        </Grid>
 
-                                        <TextBlock Grid.Column="8" Text="Fan 3" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                        <TextBox x:Name="DashboardFan3TextBox" Grid.Column="9" Text="100"/>
-                                        <TextBlock Grid.Column="10" Text="%" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                        <Grid Grid.Row="2" Grid.Column="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="70"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="55"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="Fan 3" VerticalAlignment="Center"/>
+                                            <Slider x:Name="DashboardFan3Slider"
+                                                Style="{StaticResource FanSliderStyle}"
+                                                    Grid.Column="1"
+                                                    Minimum="0" Maximum="100" Value="100"
+                                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                                    SmallChange="1" LargeChange="10"
+                                                    Margin="6,0,10,0"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding ElementName=DashboardFan3Slider, Path=Value, StringFormat={}{0:0} %}"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Center"
+                                                       FontFamily="Consolas"/>
+                                        </Grid>
 
-                                        <TextBlock Grid.Column="12" Text="Fan 4" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                        <TextBox x:Name="DashboardFan4TextBox" Grid.Column="13" Text="100"/>
-                                        <TextBlock Grid.Column="14" Text="%" VerticalAlignment="Center" Margin="6,0,12,0"/>
+                                        <Grid Grid.Row="2" Grid.Column="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="70"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="55"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="Fan 4" VerticalAlignment="Center"/>
+                                            <Slider x:Name="DashboardFan4Slider"
+                                                Style="{StaticResource FanSliderStyle}"
+                                                    Grid.Column="1"
+                                                    Minimum="0" Maximum="100" Value="100"
+                                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                                    SmallChange="1" LargeChange="10"
+                                                    Margin="6,0,10,0"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding ElementName=DashboardFan4Slider, Path=Value, StringFormat={}{0:0} %}"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Center"
+                                                       FontFamily="Consolas"/>
+                                        </Grid>
 
-                                        <Button Grid.Column="15"
+                                        <Button Grid.Row="4"
+                                                Grid.Column="0"
+                                                Grid.ColumnSpan="3"
                                                 Content="Apply"
                                                 Click="DashboardFans_Click"
                                                 HorizontalAlignment="Right"
-                                                MinWidth="100"/>
+                                                MinWidth="110"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -773,25 +918,85 @@
                                     </DockPanel>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="70"/>
                                             <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="65"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="1" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                        <TextBox x:Name="Fan1TextBox" Grid.Column="1" Text="100" Margin="0,0,12,0"/>
-                                        <TextBlock Grid.Column="2" Text="2" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                        <TextBox x:Name="Fan2TextBox" Grid.Column="3" Text="100" Margin="0,0,12,0"/>
-                                        <TextBlock Grid.Column="4" Text="3" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                        <TextBox x:Name="Fan3TextBox" Grid.Column="5" Text="100" Margin="0,0,12,0"/>
-                                        <TextBlock Grid.Column="6" Text="4" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                        <TextBox x:Name="Fan4TextBox" Grid.Column="7" Text="100" Margin="0,0,12,0"/>
-                                        <Button Grid.Column="8" Content="Apply" Click="Fans_Click" HorizontalAlignment="Left"/>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="14"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Fan 1" VerticalAlignment="Center"/>
+                                        <Slider x:Name="Fan1Slider"
+                                                Style="{StaticResource FanSliderStyle}"
+                                                Grid.Row="0" Grid.Column="1"
+                                                Minimum="0" Maximum="100" Value="100"
+                                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                                SmallChange="1" LargeChange="10"
+                                                Margin="6,0,12,0"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="2"
+                                                   Text="{Binding ElementName=Fan1Slider, Path=Value, StringFormat={}{0:0} %}"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   FontFamily="Consolas"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Fan 2" VerticalAlignment="Center"/>
+                                        <Slider x:Name="Fan2Slider"
+                                                Style="{StaticResource FanSliderStyle}"
+                                                Grid.Row="2" Grid.Column="1"
+                                                Minimum="0" Maximum="100" Value="100"
+                                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                                SmallChange="1" LargeChange="10"
+                                                Margin="6,0,12,0"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="2"
+                                                   Text="{Binding ElementName=Fan2Slider, Path=Value, StringFormat={}{0:0} %}"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   FontFamily="Consolas"/>
+
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Fan 3" VerticalAlignment="Center"/>
+                                        <Slider x:Name="Fan3Slider"
+                                                Style="{StaticResource FanSliderStyle}"
+                                                Grid.Row="4" Grid.Column="1"
+                                                Minimum="0" Maximum="100" Value="100"
+                                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                                SmallChange="1" LargeChange="10"
+                                                Margin="6,0,12,0"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="2"
+                                                   Text="{Binding ElementName=Fan3Slider, Path=Value, StringFormat={}{0:0} %}"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   FontFamily="Consolas"/>
+
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Fan 4" VerticalAlignment="Center"/>
+                                        <Slider x:Name="Fan4Slider"
+                                                Style="{StaticResource FanSliderStyle}"
+                                                Grid.Row="6" Grid.Column="1"
+                                                Minimum="0" Maximum="100" Value="100"
+                                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                                SmallChange="1" LargeChange="10"
+                                                Margin="6,0,12,0"/>
+                                        <TextBlock Grid.Row="6" Grid.Column="2"
+                                                   Text="{Binding ElementName=Fan4Slider, Path=Value, StringFormat={}{0:0} %}"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   FontFamily="Consolas"/>
+
+                                        <Button Grid.Row="8"
+                                                Grid.Column="1"
+                                                Grid.ColumnSpan="2"
+                                                Content="Apply"
+                                                Click="Fans_Click"
+                                                HorizontalAlignment="Right"
+                                                MinWidth="110"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
