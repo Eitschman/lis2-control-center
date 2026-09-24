@@ -152,7 +152,7 @@
                                         <StackPanel>
                                             <TextBlock Text="Quick Links" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
                                             <Button Content="Open Display Controls" Tag="1" Click="Navigation_Click" Margin="0,0,0,6"/>
-                                            <Button Content="Open Fan Control" Tag="5" Click="Navigation_Click"/>
+                                            <Button Content="Open Fan Control" Tag="6" Click="Navigation_Click"/>
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
