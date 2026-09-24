@@ -2042,7 +2042,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            var dialog = new SaveFileDialog
+            var dialog = new Microsoft.Win32.SaveFileDialog
             {
                 Title = LocalizationService.Translate("Save glyph set"),
                 Filter = "LIS2 glyph sets (*.lis2glyphs.json)|*.lis2glyphs.json|JSON (*.json)|*.json|All files (*.*)|*.*",
@@ -2077,7 +2077,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            var dialog = new OpenFileDialog
+            var dialog = new Microsoft.Win32.OpenFileDialog
             {
                 Title = LocalizationService.Translate("Load glyph set"),
                 Filter = "LIS2 glyph sets (*.lis2glyphs.json)|*.lis2glyphs.json|JSON (*.json)|*.json|All files (*.*)|*.*",
