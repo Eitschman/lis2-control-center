@@ -103,9 +103,9 @@ Do not infer electrical limits or safe fan-stop behavior solely from screenshots
 - [x] Page scheduler.
 - [x] Event queue/overlay infrastructure.
 - [x] Virtual display path.
-- [ ] Expose event overlays properly in the application UI.
-- [ ] Add test/demo event generation.
-- [ ] Add configurable event priority and lifetime.
+- [x] Expose event overlays properly in the application UI.
+- [x] Add test/demo event generation.
+- [x] Add configurable event priority and lifetime.
 - [ ] Add page transitions only where they make sense on a character VFD.
 - [ ] Add general formatting helpers for numeric values, temperatures and percentages.
 - [ ] Add fallback text for unavailable variables.

@@ -34,10 +34,11 @@
                     <Button Content="▣   Display" Tag="1" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
                     <Button Content="▤   Pages" Tag="2" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
                     <Button Content="♫   Winamp" Tag="3" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="▦   Hardware" Tag="4" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="✽   Fan Control" Tag="5" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="⚙   Settings" Tag="6" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="∿   Diagnostics" Tag="7" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="⚠   Events" Tag="4" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="▦   Hardware" Tag="5" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="✽   Fan Control" Tag="6" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="⚙   Settings" Tag="7" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="∿   Diagnostics" Tag="8" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}"/>
 
                     <Separator Margin="4,18,4,16"/>
 
@@ -53,7 +54,7 @@
                             <TextBlock Text="Connected" Foreground="{DynamicResource AccentBrush}"/>
                         </StackPanel>
                         <Button Content="Change..."
-                                Tag="6"
+                                Tag="7"
                                 Click="Navigation_Click"
                                 HorizontalAlignment="Left"
                                 MinWidth="110"/>
@@ -151,7 +152,7 @@
                                         <StackPanel>
                                             <TextBlock Text="Quick Links" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
                                             <Button Content="Open Display Controls" Tag="1" Click="Navigation_Click" Margin="0,0,0,6"/>
-                                            <Button Content="Open Fan Control" Tag="5" Click="Navigation_Click"/>
+                                            <Button Content="Open Fan Control" Tag="6" Click="Navigation_Click"/>
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
@@ -415,6 +416,159 @@
                             </Border>
                         </StackPanel>
                     </ScrollViewer>
+                </TabItem>
+
+                <!-- Events -->
+                <TabItem Header="Events">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="14"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                           Text="Line 1"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,9"/>
+                                <TextBox x:Name="EventLine1TextBox"
+                                         Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4"
+                                         MaxLength="20"
+                                         Text="BUILD FINISHED"
+                                         Margin="0,0,0,9"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0"
+                                           Text="Line 2"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,9"/>
+                                <TextBox x:Name="EventLine2TextBox"
+                                         Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4"
+                                         MaxLength="20"
+                                         Text="0 errors"
+                                         Margin="0,0,0,9"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0"
+                                           Text="Priority"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,9"/>
+                                <ComboBox x:Name="EventPriorityComboBox"
+                                          Grid.Row="2" Grid.Column="1"
+                                          Width="180"
+                                          HorizontalAlignment="Left"
+                                          Margin="0,0,0,9">
+                                    <ComboBoxItem Content="Info (10)" Tag="10"/>
+                                    <ComboBoxItem Content="Notice (50)" Tag="50" IsSelected="True"/>
+                                    <ComboBoxItem Content="Warning (100)" Tag="100"/>
+                                    <ComboBoxItem Content="Critical (200)" Tag="200"/>
+                                </ComboBox>
+
+                                <TextBlock Grid.Row="2" Grid.Column="3"
+                                           Text="Duration (s)"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,9"/>
+                                <TextBox x:Name="EventDurationTextBox"
+                                         Grid.Row="2" Grid.Column="4"
+                                         Text="5"
+                                         Margin="0,0,0,9"/>
+
+                                <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4"
+                                            Orientation="Horizontal">
+                                    <Button Content="Show event"
+                                            Click="AddEvent_Click"
+                                            Margin="0,0,7,0"/>
+                                    <Button Content="Test warning"
+                                            Click="TestWarningEvent_Click"
+                                            Margin="0,0,7,0"/>
+                                    <Button Content="Clear all"
+                                            Click="ClearEvents_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                                    <TextBlock Text="Active / queued events"
+                                               FontSize="17"
+                                               FontWeight="SemiBold"
+                                               DockPanel.Dock="Left"/>
+                                    <TextBlock x:Name="EventQueueSummaryText"
+                                               Text="0 events"
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               DockPanel.Dock="Right"/>
+                                </DockPanel>
+
+                                <ListBox x:Name="EventQueueListBox"
+                                         Grid.Row="1"
+                                         MinHeight="220"
+                                         SelectionChanged="EventQueueListBox_SelectionChanged">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="2,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1.8*"/>
+                                                    <ColumnDefinition Width="3*"/>
+                                                    <ColumnDefinition Width="1.1*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding PriorityName}"
+                                                           FontWeight="SemiBold"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding DisplayName}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding Remaining}"
+                                                           FontFamily="Consolas"
+                                                           HorizontalAlignment="Right"
+                                                           Foreground="{DynamicResource MutedBrush}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+
+                                <Grid Grid.Row="2" Margin="0,10,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="SelectedEventText"
+                                               Grid.Column="0"
+                                               Text="Select an event to inspect it."
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               VerticalAlignment="Center"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,14,0"/>
+                                    <Button Grid.Column="1"
+                                            Content="Cancel selected"
+                                            Click="CancelSelectedEvent_Click"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
                 </TabItem>
 
                 <!-- Hardware -->
