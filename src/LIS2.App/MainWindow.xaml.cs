@@ -1189,6 +1189,8 @@ public partial class MainWindow : Window
             return;
         }
 
+        PagesListBox.SelectedItem = page;
+
         await PersistPagesAsync();
         LoadPagesIntoRuntime();
         await RenderRuntimePageAsync();
