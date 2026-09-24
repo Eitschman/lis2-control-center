@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace LIS2.App;
@@ -619,7 +620,8 @@ public static class LocalizationService
 
         var originals = Originals.GetOrCreateValue(root);
 
-        if (root is TextBlock textBlock)
+        if (root is TextBlock textBlock &&
+            !BindingOperations.IsDataBound(textBlock, TextBlock.TextProperty))
         {
             if (!originals.TextCaptured)
             {
@@ -630,7 +632,9 @@ public static class LocalizationService
             textBlock.Text = TranslateKnown(originals.Text ?? string.Empty);
         }
 
-        if (root is ContentControl contentControl && contentControl.Content is string content)
+        if (root is ContentControl contentControl &&
+            !BindingOperations.IsDataBound(contentControl, ContentControl.ContentProperty) &&
+            contentControl.Content is string content)
         {
             if (!originals.ContentCaptured)
             {
@@ -641,7 +645,9 @@ public static class LocalizationService
             contentControl.Content = TranslateKnown(originals.Content ?? string.Empty);
         }
 
-        if (root is HeaderedContentControl headered && headered.Header is string header)
+        if (root is HeaderedContentControl headered &&
+            !BindingOperations.IsDataBound(headered, HeaderedContentControl.HeaderProperty) &&
+            headered.Header is string header)
         {
             if (!originals.HeaderCaptured)
             {
@@ -652,7 +658,9 @@ public static class LocalizationService
             headered.Header = TranslateKnown(originals.Header ?? string.Empty);
         }
 
-        if (root is FrameworkElement element && element.ToolTip is string tooltip)
+        if (root is FrameworkElement element &&
+            !BindingOperations.IsDataBound(element, FrameworkElement.ToolTipProperty) &&
+            element.ToolTip is string tooltip)
         {
             if (!originals.ToolTipCaptured)
             {
