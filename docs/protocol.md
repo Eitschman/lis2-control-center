@@ -174,6 +174,14 @@ AB 01 07 00
 
 A separate `AB 00 ...` form exists in MCC but its meaning is UNKNOWN and must not be used in production until understood.
 
+### Referencing programmed characters in display text
+
+**Confidence: EXPERIMENTAL**
+
+The application currently maps custom-character slots 1..8 to display-data bytes `01` through `08` when a page template uses `{Glyph.Name}` or `{Glyph.1}` .. `{Glyph.8}`.
+
+This mapping is intentionally treated as **EXPERIMENTAL** until verified on real LIS2 hardware. It is only emitted when the user explicitly places a glyph reference in a page template; it is not injected into ordinary display text automatically.
+
 ## Rejected / quarantined observations
 
 ### A9 A9 A9
