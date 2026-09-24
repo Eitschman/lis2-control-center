@@ -1092,10 +1092,10 @@
                                         <ColumnDefinition Width="2.8*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="1" Text="Sensor" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="2" Text="Type" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="3" Text="Value" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="1" Text="Sensor" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
+                                    <TextBlock Grid.Column="2" Text="Type" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
+                                    <TextBlock Grid.Column="3" Text="Value" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
+                                    <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
                                 </Grid>
 
                                 <ListBox x:Name="HardwareSensorsListBox"
@@ -1136,28 +1136,38 @@
                                                 </StackPanel>
                                                 <StackPanel Grid.Column="1" Margin="0,0,10,0">
                                                     <TextBlock Text="{Binding DisplayName}"
-                                                               TextTrimming="CharacterEllipsis"/>
+                                                               TextTrimming="CharacterEllipsis"
+                                                               HorizontalAlignment="Left"
+                                                               TextAlignment="Left"/>
                                                     <TextBlock Text="{Binding SensorName}"
                                                                Foreground="{DynamicResource MutedBrush}"
                                                                FontSize="11"
-                                                               TextTrimming="CharacterEllipsis"/>
+                                                               TextTrimming="CharacterEllipsis"
+                                                               HorizontalAlignment="Left"
+                                                               TextAlignment="Left"/>
                                                 </StackPanel>
                                                 <TextBlock Grid.Column="2"
                                                            Text="{Binding Type}"
                                                            Foreground="{DynamicResource MutedBrush}"
                                                            Margin="0,0,10,0"
-                                                           VerticalAlignment="Top"/>
+                                                           VerticalAlignment="Top"
+                                                           HorizontalAlignment="Left"
+                                                           TextAlignment="Left"/>
                                                 <TextBlock Grid.Column="3"
                                                            Text="{Binding DisplayValue}"
                                                            FontFamily="Consolas"
                                                            Margin="0,0,10,0"
-                                                           VerticalAlignment="Top"/>
+                                                           VerticalAlignment="Top"
+                                                           HorizontalAlignment="Left"
+                                                           TextAlignment="Left"/>
                                                 <TextBlock Grid.Column="4"
                                                            Text="{Binding Key}"
                                                            FontFamily="Consolas"
                                                            Foreground="{DynamicResource MutedBrush}"
                                                            TextTrimming="CharacterEllipsis"
-                                                           VerticalAlignment="Top"/>
+                                                           VerticalAlignment="Top"
+                                                           HorizontalAlignment="Left"
+                                                           TextAlignment="Left"/>
                                             </Grid>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
