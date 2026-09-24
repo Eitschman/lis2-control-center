@@ -56,6 +56,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Icon = TrayIconService.CreateWindowIcon();
         LocalizationService.ApplyTo(this);
 
         _displayRuntime = new DisplayRuntime(
@@ -572,8 +573,7 @@ public partial class MainWindow : Window
         var sampleRate = GetWinampValue(values, "SampleRateHz");
         var vuLeft = GetWinampInt(values, "VuLeft");
         var vuRight = GetWinampInt(values, "VuRight");
-        var spectrum = GetWinampValue(values, "Spectrum") ?? string.Empty;
-        var spectrumPeak = GetWinampInt(values, "SpectrumPeak");
+        var spectrum = FormatSpectrumUi(GetWinampSpectrum(values));
 
         var connected = _winampSource.IsRecentlyConnected;
 
@@ -610,9 +610,7 @@ public partial class MainWindow : Window
             ? (string.IsNullOrEmpty(spectrum) ? new string(' ', 20) : spectrum.PadRight(20)[..Math.Min(20, spectrum.PadRight(20).Length)])
             : new string(' ', 20);
         WinampTelemetryStatusText.Text = connected
-            ? LocalizationService.Format(
-                "Live visualization data · spectrum peak {0}",
-                spectrumPeak?.ToString(CultureInfo.InvariantCulture) ?? "-")
+            ? LocalizationService.Translate("Live visualization data")
             : LocalizationService.Translate("No visualization data");
 
         WinampStatusText.Text = connected
@@ -662,12 +660,78 @@ public partial class MainWindow : Window
         }
     }
 
+    private static IReadOnlyList<int>? GetWinampSpectrum(
+        IReadOnlyDictionary<string, object?> values)
+    {
+        if (!values.TryGetValue("SpectrumRaw", out var raw) || raw is null)
+            return null;
+
+        return raw switch
+        {
+            int[] array => array,
+            IReadOnlyList<int> list => list,
+            _ => null
+        };
+    }
+
+    private static string FormatSpectrumUi(IReadOnlyList<int>? spectrum)
+    {
+        if (spectrum is null || spectrum.Count == 0)
+            return new string(' ', 20);
+
+        const string levels = " ▁▂▃▄▅▆▇█";
+        var width = Math.Min(20, spectrum.Count);
+        var peak = spectrum.Take(width).Select(value => Math.Max(0, value)).DefaultIfEmpty().Max();
+        var scaleMaximum = peak <= 15 ? 15.0 : 255.0;
+        var result = new char[20];
+
+        for (var index = 0; index < result.Length; index++)
+        {
+            if (index >= width)
+            {
+                result[index] = ' ';
+                continue;
+            }
+
+            var value = Math.Clamp(spectrum[index], 0, (int)scaleMaximum);
+            var level = value <= 0
+                ? 0
+                : Math.Clamp(
+                    (int)Math.Ceiling(value / scaleMaximum * 8.0),
+                    1,
+                    8);
+
+            result[index] = levels[level];
+        }
+
+        return new string(result);
+    }
+
     private async void CreateWinampPreset_Click(object sender, RoutedEventArgs e)
     {
         try
         {
             if (sender is not System.Windows.Controls.Button { Tag: string preset })
                 return;
+
+            if (string.Equals(preset, "Spectrum", StringComparison.OrdinalIgnoreCase) &&
+                !BuiltInGlyphSets.IsSpectrumSet(_settings.CustomGlyphs))
+            {
+                var result = System.Windows.MessageBox.Show(
+                    this,
+                    LocalizationService.Translate(
+                        "The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"),
+                    "LIS2 Control Center",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result != MessageBoxResult.Yes)
+                    return;
+
+                await ApplyGlyphSetAsync(
+                    BuiltInGlyphSets.CreateSpectrumSet(),
+                    forceProgram: true);
+            }
 
             var page = preset switch
             {
@@ -702,7 +766,7 @@ public partial class MainWindow : Window
                     Id = Guid.NewGuid().ToString("N"),
                     Name = "Winamp Spectrum",
                     Line1Template = "{Winamp.Artist}",
-                    Line2Template = "{Winamp.Spectrum}",
+                    Line2Template = "{Winamp.SpectrumGlyphs}",
                     DurationSeconds = 7,
                     VisibilityExpression = "Winamp.State=Playing",
                     Line1OverflowMode = "PingPong",
@@ -2238,7 +2302,9 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task ApplyGlyphSetAsync(IReadOnlyList<CustomGlyphSettings> glyphs)
+    private async Task ApplyGlyphSetAsync(
+        IReadOnlyList<CustomGlyphSettings> glyphs,
+        bool forceProgram = false)
     {
         if (glyphs.Count != 8)
             throw new InvalidOperationException(
@@ -2252,7 +2318,8 @@ public partial class MainWindow : Window
         CustomGlyphSlotComboBox.SelectedItem = selectedSlot;
         LoadSelectedGlyphIntoEditor();
 
-        if (_settings.ProgramCustomGlyphsOnConnect && _customCharacterManager is not null)
+        if ((forceProgram || _settings.ProgramCustomGlyphsOnConnect) &&
+            _customCharacterManager is not null)
         {
             await _customCharacterManager.ProgramAllAsync(
                 _settings.CustomGlyphs.Select(glyph => glyph.Rows).ToArray(),
@@ -2290,7 +2357,58 @@ public partial class MainWindow : Window
                 values[$"Glyph.{name}"] = glyphValue;
         }
 
+        if (values.TryGetValue("Winamp.SpectrumRaw", out var rawSpectrum) &&
+            rawSpectrum is IReadOnlyList<int> spectrum)
+        {
+            values["Winamp.SpectrumGlyphs"] =
+                BuiltInGlyphSets.IsSpectrumSet(_settings.CustomGlyphs)
+                    ? CreateSpectrumGlyphLine(spectrum)
+                    : values.TryGetValue("Winamp.Spectrum", out var fallback)
+                        ? fallback
+                        : string.Empty;
+        }
+        else
+        {
+            values["Winamp.SpectrumGlyphs"] =
+                values.TryGetValue("Winamp.Spectrum", out var fallback)
+                    ? fallback
+                    : string.Empty;
+        }
+
         return values;
+    }
+
+    private static string CreateSpectrumGlyphLine(IReadOnlyList<int> spectrum)
+    {
+        var width = Math.Min(DisplayFrame.Width, spectrum.Count);
+        var peak = spectrum.Take(width).Select(value => Math.Max(0, value)).DefaultIfEmpty().Max();
+        var scaleMaximum = peak <= 15 ? 15.0 : 255.0;
+        var result = new char[DisplayFrame.Width];
+
+        for (var index = 0; index < result.Length; index++)
+        {
+            if (index >= width)
+            {
+                result[index] = ' ';
+                continue;
+            }
+
+            var value = Math.Clamp(spectrum[index], 0, (int)scaleMaximum);
+            if (value <= 0)
+            {
+                result[index] = ' ';
+                continue;
+            }
+
+            var level = Math.Clamp(
+                (int)Math.Ceiling(value / scaleMaximum * 8.0),
+                1,
+                8);
+
+            result[index] = Lis2Protocol.CustomGlyph(level);
+        }
+
+        return new string(result);
     }
 
     private static string NormalizeGlyphTemplateName(string? name)
@@ -2315,11 +2433,13 @@ public partial class MainWindow : Window
         return normalized.Trim('_');
     }
 
-    private static string FormatDisplayPreviewLine(string value) =>
+    private string FormatDisplayPreviewLine(string value) =>
         new(
             value.Select(character =>
                 Lis2Protocol.TryGetCustomGlyphSlot(character, out var slot)
-                    ? "①②③④⑤⑥⑦⑧"[slot - 1]
+                    ? BuiltInGlyphSets.IsSpectrumSet(_settings.CustomGlyphs)
+                        ? "▁▂▃▄▅▆▇█"[slot - 1]
+                        : "①②③④⑤⑥⑦⑧"[slot - 1]
                     : character)
                 .ToArray());
 
@@ -2471,6 +2591,16 @@ public partial class MainWindow : Window
             PortComboBox.SelectedIndex = 0;
     }
 
+    private bool RequiresSpectrumGlyphs() =>
+        _settings.Pages.Any(page =>
+            page.Enabled &&
+            ((page.Line1Template?.Contains(
+                  "{Winamp.SpectrumGlyphs}",
+                  StringComparison.OrdinalIgnoreCase) == true) ||
+             (page.Line2Template?.Contains(
+                  "{Winamp.SpectrumGlyphs}",
+                  StringComparison.OrdinalIgnoreCase) == true)));
+
     private async Task ReconnectAsync()
     {
         if (_device is not null)
@@ -2506,7 +2636,9 @@ public partial class MainWindow : Window
         _frameWriter = new DisplayFrameWriter(_device);
         _customCharacterManager = new CustomCharacterManager(_device);
 
-        if (_settings.ProgramCustomGlyphsOnConnect)
+        if (_settings.ProgramCustomGlyphsOnConnect ||
+            (RequiresSpectrumGlyphs() &&
+             BuiltInGlyphSets.IsSpectrumSet(_settings.CustomGlyphs)))
         {
             await _customCharacterManager.ProgramAllAsync(
                 _settings.CustomGlyphs.Select(glyph => glyph.Rows).ToArray());
