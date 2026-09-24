@@ -50,7 +50,17 @@ public static class LocalizationService
                 ["Language"]="Sprache", ["System default uses the Windows display language."]="Systemstandard verwendet die Windows-Anzeigesprache.",
                 ["Windows"]="Windows", ["Start LIS2 Control Center with Windows (minimized to tray)"]="LIS2 Control Center mit Windows starten (minimiert im Infobereich)",
                 ["Diagnostics Snapshot"]="Diagnoseübersicht", ["Protocol Log"]="Protokoll-Log", ["Open LIS2 Control Center"]="LIS2 Control Center öffnen", ["Exit"]="Beenden",
-                ["running in tray"]="läuft im Infobereich"
+                ["running in tray"]="läuft im Infobereich", ["No title"]="Kein Titel", ["Winamp connected"]="Winamp verbunden",
+                ["Playing"]="Wiedergabe", ["Paused"]="Pausiert", ["Stopped"]="Gestoppt", ["Info"]="Info", ["Notice"]="Hinweis", ["Warning"]="Warnung", ["Critical"]="Kritisch",
+                ["1 event"]="1 Ereignis", ["{0} events"]="{0} Ereignisse",
+                ["VFD output, brightness and direct display tests."]="VFD-Ausgabe, Helligkeit und direkte Anzeigetests.",
+                ["Create and edit the rotating 20x2 display pages."]="Rotierende 20x2-Anzeigeseiten erstellen und bearbeiten.",
+                ["Winamp integration, pipe transport and available media variables."]="Winamp-Integration, Pipe-Transport und verfügbare Medienvariablen.",
+                ["Priority notifications and temporary VFD overlays."]="Priorisierte Benachrichtigungen und temporäre VFD-Einblendungen.",
+                ["LibreHardwareMonitor data sources and sensor availability."]="LibreHardwareMonitor-Datenquellen und Sensorverfügbarkeit.",
+                ["Manual output, automatic control, curves and safety limits."]="Manuelle Ausgabe, automatische Steuerung, Kurven und Sicherheitsgrenzen.",
+                ["LIS2 transport, COM port and Windows startup behavior."]="LIS2-Transport, COM-Port und Windows-Startverhalten.",
+                ["Runtime state, data-source health and protocol traffic."]="Laufzeitstatus, Zustand der Datenquellen und Protokollverkehr."
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
@@ -81,7 +91,17 @@ public static class LocalizationService
                 ["Language"]="Langue", ["System default uses the Windows display language."]="La valeur système utilise la langue d'affichage de Windows.",
                 ["Windows"]="Windows", ["Start LIS2 Control Center with Windows (minimized to tray)"]="Démarrer LIS2 Control Center avec Windows (réduit dans la zone de notification)",
                 ["Diagnostics Snapshot"]="Aperçu des diagnostics", ["Protocol Log"]="Journal du protocole", ["Open LIS2 Control Center"]="Ouvrir LIS2 Control Center", ["Exit"]="Quitter",
-                ["running in tray"]="actif dans la zone de notification"
+                ["running in tray"]="actif dans la zone de notification", ["No title"]="Aucun titre", ["Winamp connected"]="Winamp connecté",
+                ["Playing"]="Lecture", ["Paused"]="En pause", ["Stopped"]="Arrêté", ["Info"]="Info", ["Notice"]="Notification", ["Warning"]="Avertissement", ["Critical"]="Critique",
+                ["1 event"]="1 événement", ["{0} events"]="{0} événements",
+                ["VFD output, brightness and direct display tests."]="Sortie VFD, luminosité et tests directs de l'affichage.",
+                ["Create and edit the rotating 20x2 display pages."]="Créer et modifier les pages d'affichage 20x2 en rotation.",
+                ["Winamp integration, pipe transport and available media variables."]="Intégration Winamp, transport par pipe et variables média disponibles.",
+                ["Priority notifications and temporary VFD overlays."]="Notifications prioritaires et affichages VFD temporaires.",
+                ["LibreHardwareMonitor data sources and sensor availability."]="Sources LibreHardwareMonitor et disponibilité des capteurs.",
+                ["Manual output, automatic control, curves and safety limits."]="Sortie manuelle, contrôle automatique, courbes et limites de sécurité.",
+                ["LIS2 transport, COM port and Windows startup behavior."]="Transport LIS2, port COM et démarrage Windows.",
+                ["Runtime state, data-source health and protocol traffic."]="État d'exécution, santé des sources et trafic du protocole."
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
@@ -103,7 +123,17 @@ public static class LocalizationService
                 ["Appearance"]="Görünüm", ["Theme"]="Tema", ["System default"]="Sistem varsayılanı", ["Light"]="Açık", ["Dark"]="Koyu",
                 ["Language"]="Dil", ["System default uses the Windows display language."]="Sistem varsayılanı Windows görüntüleme dilini kullanır.",
                 ["Windows"]="Windows", ["Diagnostics Snapshot"]="Tanılama Özeti", ["Protocol Log"]="Protokol Günlüğü",
-                ["Open LIS2 Control Center"]="LIS2 Control Center'ı aç", ["Exit"]="Çıkış", ["running in tray"]="sistem tepsisinde çalışıyor"
+                ["Open LIS2 Control Center"]="LIS2 Control Center'ı aç", ["Exit"]="Çıkış", ["running in tray"]="sistem tepsisinde çalışıyor",
+                ["No title"]="Başlık yok", ["Winamp connected"]="Winamp bağlı", ["Playing"]="Oynatılıyor", ["Paused"]="Duraklatıldı", ["Stopped"]="Durduruldu",
+                ["Info"]="Bilgi", ["Notice"]="Bildirim", ["Warning"]="Uyarı", ["Critical"]="Kritik", ["1 event"]="1 olay", ["{0} events"]="{0} olay",
+                ["VFD output, brightness and direct display tests."]="VFD çıkışı, parlaklık ve doğrudan ekran testleri.",
+                ["Create and edit the rotating 20x2 display pages."]="Dönen 20x2 ekran sayfalarını oluşturun ve düzenleyin.",
+                ["Winamp integration, pipe transport and available media variables."]="Winamp entegrasyonu, pipe aktarımı ve kullanılabilir medya değişkenleri.",
+                ["Priority notifications and temporary VFD overlays."]="Öncelikli bildirimler ve geçici VFD katmanları.",
+                ["LibreHardwareMonitor data sources and sensor availability."]="LibreHardwareMonitor veri kaynakları ve sensör kullanılabilirliği.",
+                ["Manual output, automatic control, curves and safety limits."]="Manuel çıkış, otomatik kontrol, eğriler ve güvenlik sınırları.",
+                ["LIS2 transport, COM port and Windows startup behavior."]="LIS2 aktarımı, COM portu ve Windows başlangıç davranışı.",
+                ["Runtime state, data-source health and protocol traffic."]="Çalışma durumu, veri kaynağı sağlığı ve protokol trafiği."
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
@@ -128,7 +158,17 @@ public static class LocalizationService
                 ["System default"]="Системная", ["Light"]="Светлая", ["Dark"]="Тёмная", ["Language"]="Язык",
                 ["System default uses the Windows display language."]="Системная настройка использует язык интерфейса Windows.",
                 ["Windows"]="Windows", ["Diagnostics Snapshot"]="Снимок диагностики", ["Protocol Log"]="Журнал протокола",
-                ["Open LIS2 Control Center"]="Открыть LIS2 Control Center", ["Exit"]="Выход", ["running in tray"]="работает в области уведомлений"
+                ["Open LIS2 Control Center"]="Открыть LIS2 Control Center", ["Exit"]="Выход", ["running in tray"]="работает в области уведомлений",
+                ["No title"]="Нет названия", ["Winamp connected"]="Winamp подключён", ["Playing"]="Воспроизведение", ["Paused"]="Пауза", ["Stopped"]="Остановлено",
+                ["Info"]="Информация", ["Notice"]="Уведомление", ["Warning"]="Предупреждение", ["Critical"]="Критическое", ["1 event"]="1 событие", ["{0} events"]="{0} событий",
+                ["VFD output, brightness and direct display tests."]="Вывод VFD, яркость и прямые тесты дисплея.",
+                ["Create and edit the rotating 20x2 display pages."]="Создание и редактирование чередующихся страниц 20x2.",
+                ["Winamp integration, pipe transport and available media variables."]="Интеграция Winamp, pipe-транспорт и доступные медиапеременные.",
+                ["Priority notifications and temporary VFD overlays."]="Приоритетные уведомления и временные VFD-оверлеи.",
+                ["LibreHardwareMonitor data sources and sensor availability."]="Источники LibreHardwareMonitor и доступность датчиков.",
+                ["Manual output, automatic control, curves and safety limits."]="Ручной вывод, автоматическое управление, кривые и пределы безопасности.",
+                ["LIS2 transport, COM port and Windows startup behavior."]="Транспорт LIS2, COM-порт и запуск с Windows.",
+                ["Runtime state, data-source health and protocol traffic."]="Состояние выполнения, источников данных и трафика протокола."
             }
         };
 
@@ -171,6 +211,12 @@ public static class LocalizationService
         if (root is FrameworkElement element && element.ToolTip is string tooltip)
             element.ToolTip = TranslateKnown(tooltip);
 
+        if (root is ItemsControl itemsControl)
+        {
+            foreach (var item in itemsControl.Items.OfType<DependencyObject>())
+                ApplyTo(item);
+        }
+
         var count = VisualTreeHelper.GetChildrenCount(root);
         for (var index = 0; index < count; index++)
             ApplyTo(VisualTreeHelper.GetChild(root, index));
@@ -179,7 +225,24 @@ public static class LocalizationService
     private static string TranslateKnown(string value)
     {
         var english = FindEnglishSource(value);
-        return Translate(english);
+
+        if (!string.Equals(english, value, StringComparison.Ordinal))
+            return Translate(english);
+
+        foreach (var language in Translations.Values)
+        {
+            foreach (var pair in language)
+            {
+                if (value.EndsWith(pair.Key, StringComparison.Ordinal))
+                {
+                    var prefix = value[..^pair.Key.Length];
+                    if (prefix.All(ch => !char.IsLetterOrDigit(ch)))
+                        return prefix + Translate(pair.Key);
+                }
+            }
+        }
+
+        return Translate(value);
     }
 
     private static string FindEnglishSource(string value)
