@@ -11,6 +11,7 @@ public sealed class SettingsStore
     };
 
     private readonly string _path;
+    private readonly SemaphoreSlim _saveLock = new(1, 1);
 
     public SettingsStore()
     {
@@ -46,7 +47,26 @@ public sealed class SettingsStore
     {
         ArgumentNullException.ThrowIfNull(settings);
 
-        await using var stream = File.Create(_path);
-        await JsonSerializer.SerializeAsync(stream, settings, JsonOptions);
+        await _saveLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            var tempPath = _path + ".tmp";
+
+            await using (var stream = new FileStream(
+                tempPath,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None))
+            {
+                await JsonSerializer.SerializeAsync(stream, settings, JsonOptions)
+                    .ConfigureAwait(false);
+            }
+
+            File.Move(tempPath, _path, overwrite: true);
+        }
+        finally
+        {
+            _saveLock.Release();
+        }
     }
 }
