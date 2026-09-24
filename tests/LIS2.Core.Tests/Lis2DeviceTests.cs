@@ -79,4 +79,34 @@ public sealed class Lis2DeviceTests
             new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
             transport.State.CustomCharacters[1]);
     }
+    [Fact]
+    public async Task CustomCharacterManager_SkipsUnchangedGlyph()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var device = new Lis2Device(transport);
+        await device.ConnectAsync();
+
+        var manager = new CustomCharacterManager(device);
+        var rows = new byte[] { 0, 4, 14, 31, 14, 4, 0, 0 };
+
+        await manager.ProgramSlotAsync(1, rows);
+        await manager.ProgramSlotAsync(1, rows);
+
+        Assert.Equal(8, transport.Writes.Count);
+    }
+
+    [Fact]
+    public async Task CustomCharacterManager_ReprogramsChangedGlyph()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var device = new Lis2Device(transport);
+        await device.ConnectAsync();
+
+        var manager = new CustomCharacterManager(device);
+
+        await manager.ProgramSlotAsync(1, new byte[] { 0, 4, 14, 31, 14, 4, 0, 0 });
+        await manager.ProgramSlotAsync(1, new byte[] { 0, 4, 14, 31, 4, 4, 0, 0 });
+
+        Assert.Equal(16, transport.Writes.Count);
+    }
 }
