@@ -127,12 +127,12 @@
                                                            Text="                    "
                                                            FontFamily="Consolas"
                                                            FontSize="31"
-                                                           Foreground="{DynamicResource AccentBrush}"/>
+                                                           Foreground="{DynamicResource VfdTextBrush}"/>
                                                 <TextBlock x:Name="PreviewLine2"
                                                            Text="                    "
                                                            FontFamily="Consolas"
                                                            FontSize="31"
-                                                           Foreground="{DynamicResource AccentBrush}"/>
+                                                           Foreground="{DynamicResource VfdTextBrush}"/>
                                             </StackPanel>
                                         </Border>
                                     </StackPanel>
