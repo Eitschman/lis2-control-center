@@ -14,7 +14,10 @@ public sealed class WinampMappingTests
             Title = "The Trooper",
             ElapsedSeconds = 65,
             DurationSeconds = 240,
-            BitrateKbps = 320
+            BitrateKbps = 320,
+            VuLeft = 180,
+            VuRight = 160,
+            Spectrum = Enumerable.Range(0, 20).Select(index => index * 10).ToArray()
         };
 
         var snapshot = WinampPipeServer.ToSnapshot(message);
@@ -25,6 +28,9 @@ public sealed class WinampMappingTests
         Assert.Equal(TimeSpan.FromSeconds(65), snapshot.Elapsed);
         Assert.Equal(TimeSpan.FromSeconds(240), snapshot.Duration);
         Assert.Equal(320, snapshot.BitrateKbps);
+        Assert.Equal(180, snapshot.VuLeft);
+        Assert.Equal(160, snapshot.VuRight);
+        Assert.Equal(20, snapshot.Spectrum?.Count);
     }
 
     [Fact]
@@ -32,7 +38,7 @@ public sealed class WinampMappingTests
     {
         const string json =
             """
-            {"type":"snapshot","state":"playing","artist":"Iron Maiden","title":"The Trooper","album":"Piece of Mind","playlistPosition":3,"playlistCount":12,"elapsedSeconds":65,"durationSeconds":245,"bitrateKbps":320,"sampleRateHz":44100}
+            {"type":"snapshot","state":"playing","artist":"Iron Maiden","title":"The Trooper","album":"Piece of Mind","playlistPosition":3,"playlistCount":12,"elapsedSeconds":65,"durationSeconds":245,"bitrateKbps":320,"sampleRateHz":44100,"vuLeft":200,"vuRight":180,"spectrum":[0,10,20,30]}
             """;
 
         var message = WinampPipeServer.DeserializeMessage(json);
@@ -48,6 +54,9 @@ public sealed class WinampMappingTests
         Assert.Equal(245, message.DurationSeconds);
         Assert.Equal(320, message.BitrateKbps);
         Assert.Equal(44100, message.SampleRateHz);
+        Assert.Equal(200, message.VuLeft);
+        Assert.Equal(180, message.VuRight);
+        Assert.Equal(new[] { 0, 10, 20, 30 }, message.Spectrum);
     }
 
     [Fact]
@@ -63,7 +72,10 @@ public sealed class WinampMappingTests
             TimeSpan.FromSeconds(65),
             TimeSpan.FromSeconds(245),
             320,
-            44100);
+            44100,
+            200,
+            180,
+            Enumerable.Repeat(128, 20).ToArray());
 
         var values = WinampValues.FromSnapshot(snapshot);
 
@@ -71,5 +83,17 @@ public sealed class WinampMappingTests
         Assert.Equal("Artist", values["Artist"]);
         Assert.Equal("01:05", values["Elapsed"]);
         Assert.Equal("04:05", values["Duration"]);
+        Assert.Equal(200, values["VuLeft"]);
+        Assert.Equal(180, values["VuRight"]);
+        Assert.Equal(20, Assert.IsType<string>(values["Spectrum"]).Length);
+    }
+
+    [Fact]
+    public void VuText_IsExactlyTwentyCharacters()
+    {
+        var text = WinampValues.FormatVu(255, 128);
+
+        Assert.Equal(20, text.Length);
+        Assert.StartsWith("L||||||||", text);
     }
 }
