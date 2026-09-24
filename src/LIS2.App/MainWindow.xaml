@@ -844,7 +844,7 @@
                                 <StackPanel>
                                     <TextBlock Text="Available page variables" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
                                     <TextBlock FontFamily="Consolas"
-                                               Text="{}{Winamp.State}   {Winamp.Artist}   {Winamp.Title}   {Winamp.Album}&#x0a;{Winamp.Elapsed}   {Winamp.Duration}   {Winamp.PlaylistPosition}   {Winamp.PlaylistCount}&#x0a;{Winamp.BitrateKbps}   {Winamp.SampleRateHz}&#x0a;{Winamp.Connected}   {Winamp.VuLeft}   {Winamp.VuRight}   {Winamp.Vu}&#x0a;{Winamp.Spectrum}"
+                                               Text="{}{Winamp.State}   {Winamp.Artist}   {Winamp.Title}   {Winamp.Album}&#x0a;{Winamp.Elapsed}   {Winamp.Duration}   {Winamp.PlaylistPosition}   {Winamp.PlaylistCount}&#x0a;{Winamp.BitrateKbps}   {Winamp.SampleRateHz}&#x0a;{Winamp.Connected}   {Winamp.VuLeft}   {Winamp.VuRight}   {Winamp.Vu}&#x0a;{Winamp.Spectrum}   {Winamp.SpectrumGlyphs}"
                                                Foreground="{DynamicResource LogTextBrush}"/>
                                 </StackPanel>
                             </Border>
