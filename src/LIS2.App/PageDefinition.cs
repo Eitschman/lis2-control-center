@@ -10,4 +10,8 @@ public sealed class PageDefinition
     public bool Enabled { get; set; } = true;
     public int Priority { get; set; }
     public string? VisibilityExpression { get; set; }
+    public string Line1OverflowMode { get; set; } = "PingPong";
+    public string Line2OverflowMode { get; set; } = "PingPong";
+    public int ScrollStepMilliseconds { get; set; } = 300;
+    public int ScrollEdgePauseMilliseconds { get; set; } = 900;
 }
