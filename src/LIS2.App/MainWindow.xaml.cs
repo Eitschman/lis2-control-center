@@ -1423,10 +1423,10 @@ public partial class MainWindow : Window
             ? mode
             : DisplayOverflowMode.PingPong;
 
-    private static string GetComboBoxTag(ComboBox comboBox, string fallback) =>
+    private static string GetComboBoxTag(System.Windows.Controls.ComboBox comboBox, string fallback) =>
         comboBox.SelectedItem is ComboBoxItem { Tag: string tag } ? tag : fallback;
 
-    private static void SelectComboBoxTag(ComboBox comboBox, string? value)
+    private static void SelectComboBoxTag(System.Windows.Controls.ComboBox comboBox, string? value)
     {
         foreach (var item in comboBox.Items.OfType<ComboBoxItem>())
         {
