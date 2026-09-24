@@ -9,7 +9,7 @@ public sealed record DisplayFrame(string Line1, string Line2)
 
     public static string Normalize(string? value)
     {
-        var text = LIS2.Core.Lis2Protocol.ToSafeAscii(value ?? string.Empty);
+        var text = LIS2.Core.Lis2Protocol.ToSafeDisplayText(value ?? string.Empty);
         if (text.Length > Width)
             text = text[..Width];
 
