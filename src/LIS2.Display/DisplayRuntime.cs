@@ -24,6 +24,12 @@ public sealed class DisplayRuntime
 
     public TimeSpan SuggestedDuration { get; private set; } = TimeSpan.FromSeconds(5);
 
+    public void ResetPageSelection()
+    {
+        _activePage = null;
+        _activePageUntil = DateTimeOffset.MinValue;
+    }
+
     public DisplayFrame? RenderNext(
         IReadOnlyDictionary<string, object?> values,
         DateTimeOffset now)
