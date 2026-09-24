@@ -137,6 +137,8 @@ Do not infer electrical limits or safe fan-stop behavior solely from screenshots
 - [x] Light theme.
 - [x] Follow Windows app theme.
 - [x] Theme-aware ComboBoxes and controls.
+- [x] Runtime localization: System default, English, German, French, Turkish and Russian with English fallback.
+- [x] Localized tray menu and custom LIS2 tray icon.
 - [x] Startup diagnostic log for fatal startup problems.
 - [ ] Theme the native Windows title bar consistently with the selected app theme.
 - [ ] Review all controls in both Light and Dark themes.
