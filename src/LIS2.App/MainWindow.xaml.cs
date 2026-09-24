@@ -348,25 +348,27 @@ public partial class MainWindow : Window
                 previousOutputPercent: _lastAutomaticFanOutputs?[index]);
         }
 
-        if (_lastAutomaticFanOutputs is not null &&
-            outputs.SequenceEqual(_lastAutomaticFanOutputs))
-        {
-            return;
-        }
+        var outputsChanged =
+            _lastAutomaticFanOutputs is null ||
+            !outputs.SequenceEqual(_lastAutomaticFanOutputs);
 
-        await RequireDevice().SetFansAsync(
-            outputs[0],
-            outputs[1],
-            outputs[2],
-            outputs[3]);
-
-        _lastAutomaticFanOutputs = outputs;
         for (var index = 0; index < _lastAutomaticFanSensorValues.Length; index++)
             _lastAutomaticFanSensorValues[index] = _currentFanSensorValues[index];
 
-        UpdateFanOutputFields(outputs);
+        if (outputsChanged)
+        {
+            await RequireDevice().SetFansAsync(
+                outputs[0],
+                outputs[1],
+                outputs[2],
+                outputs[3]);
+
+            _lastAutomaticFanOutputs = outputs;
+            UpdateFanOutputFields(outputs);
+            Log($"INFO automatic fan outputs: {string.Join("/", outputs)}%");
+        }
+
         RefreshFanLiveStatus();
-        Log($"INFO automatic fan outputs: {string.Join("/", outputs)}%");
     }
 
     private static bool TryConvertToDouble(object? value, out double? result)
