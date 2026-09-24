@@ -56,7 +56,11 @@ public sealed class WinampDataSource : IDataSource
             ["Elapsed"] = null,
             ["Duration"] = null,
             ["BitrateKbps"] = null,
-            ["SampleRateHz"] = null
+            ["SampleRateHz"] = null,
+            ["VuLeft"] = null,
+            ["VuRight"] = null,
+            ["Vu"] = string.Empty,
+            ["Spectrum"] = string.Empty
         };
 
     public async ValueTask DisposeAsync()
