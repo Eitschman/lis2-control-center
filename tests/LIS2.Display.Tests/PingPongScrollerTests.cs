@@ -74,4 +74,17 @@ public sealed class PingPongScrollerTests
         Assert.Equal("123456789012345678ae", frame);
         Assert.True(scroller.IsScrolling);
     }
+    [Fact]
+    public void CustomGlyphCell_IsPreservedWhileScrolling()
+    {
+        var scroller = new PingPongScroller();
+        var now = DateTimeOffset.UtcNow;
+        var glyph = LIS2.Core.Lis2Protocol.CustomGlyph(2);
+        var text = $"1234567890123456789{glyph}XYZ";
+
+        var frame = scroller.Render(text, now);
+
+        Assert.Equal(glyph, frame[19]);
+        Assert.True(scroller.IsScrolling);
+    }
 }
