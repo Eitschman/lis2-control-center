@@ -9,6 +9,7 @@ public sealed class AppSettings
     public string LanguageMode { get; set; } = nameof(AppLanguageMode.System);
     public List<PageDefinition> Pages { get; set; } = CreateDefaultPages();
     public List<CustomGlyphSettings> CustomGlyphs { get; set; } = CreateDefaultGlyphs();
+    public bool ProgramCustomGlyphsOnConnect { get; set; }
     public List<HardwareSensorPreferenceSettings> HardwareSensorPreferences { get; set; } = new();
     public FanSettings Fans { get; set; } = new();
 
