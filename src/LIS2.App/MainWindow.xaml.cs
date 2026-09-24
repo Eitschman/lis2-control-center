@@ -349,6 +349,7 @@ public partial class MainWindow : Window
             outputs[3]);
 
         _lastAutomaticFanOutputs = outputs;
+        UpdateFanOutputFields(outputs);
         Log($"INFO automatic fan outputs: {string.Join("/", outputs)}%");
     }
 
@@ -1156,25 +1157,45 @@ public partial class MainWindow : Window
     private void LoadPagesIntoRuntime()
     {
         _pageScheduler.ReplacePages(
-            _settings.Pages.Select(page =>
-                new DisplayPage(
-                    page.Id,
-                    page.Name,
-                    page.Line1Template,
-                    page.Line2Template,
-                    TimeSpan.FromSeconds(Math.Max(1, page.DurationSeconds)),
-                    page.Priority,
-                    page.VisibilityExpression)));
+            _settings.Pages
+                .Where(page => page.Enabled)
+                .Select(page =>
+                    new DisplayPage(
+                        page.Id,
+                        page.Name,
+                        page.Line1Template,
+                        page.Line2Template,
+                        TimeSpan.FromSeconds(Math.Max(1, page.DurationSeconds)),
+                        page.Priority,
+                        page.VisibilityExpression)));
+
+        _displayRuntime.ResetPageSelection();
     }
 
     private void BindPages()
     {
-        PagesListBox.DisplayMemberPath = nameof(PageDefinition.Name);
         PagesListBox.ItemsSource = null;
         PagesListBox.ItemsSource = _settings.Pages;
 
         if (_settings.Pages.Count > 0 && PagesListBox.SelectedIndex < 0)
             PagesListBox.SelectedIndex = 0;
+    }
+
+    private async void PageEnabledChanged(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded ||
+            sender is not CheckBox { DataContext: PageDefinition page })
+        {
+            return;
+        }
+
+        await PersistPagesAsync();
+        LoadPagesIntoRuntime();
+        await RenderRuntimePageAsync();
+
+        Log(
+            $"INFO page '{page.Name}' " +
+            (page.Enabled ? "enabled" : "disabled"));
     }
 
     private void PagesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1326,6 +1347,10 @@ public partial class MainWindow : Window
         RefreshLocalizedSectionHeader();
         UpdateNavigationSelection(MainTabs.SelectedIndex);
         UpdateTransportUi();
+        UpdateFanOutputFields(
+            _settings.Fans.Channels
+                .Select(channel => channel.FixedPercent)
+                .ToArray());
     }
 
     private async void ThemeModeChanged(object sender, SelectionChangedEventArgs e)
@@ -1730,22 +1755,36 @@ public partial class MainWindow : Window
 
     private async void Fans_Click(object sender, RoutedEventArgs e)
     {
+        await ApplyManualFanValuesAsync(
+            Fan1TextBox.Text,
+            Fan2TextBox.Text,
+            Fan3TextBox.Text,
+            Fan4TextBox.Text);
+    }
+
+    private async void DashboardFans_Click(object sender, RoutedEventArgs e)
+    {
+        await ApplyManualFanValuesAsync(
+            DashboardFan1TextBox.Text,
+            DashboardFan2TextBox.Text,
+            DashboardFan3TextBox.Text,
+            DashboardFan4TextBox.Text);
+    }
+
+    private async Task ApplyManualFanValuesAsync(
+        string fan1,
+        string fan2,
+        string fan3,
+        string fan4)
+    {
         try
         {
             var requested = new[]
             {
-                ParsePercent(
-                    Fan1TextBox.Text,
-                    LocalizationService.Translate("Fan 1")),
-                ParsePercent(
-                    Fan2TextBox.Text,
-                    LocalizationService.Translate("Fan 2")),
-                ParsePercent(
-                    Fan3TextBox.Text,
-                    LocalizationService.Translate("Fan 3")),
-                ParsePercent(
-                    Fan4TextBox.Text,
-                    LocalizationService.Translate("Fan 4"))
+                ParsePercent(fan1, LocalizationService.Translate("Fan 1")),
+                ParsePercent(fan2, LocalizationService.Translate("Fan 2")),
+                ParsePercent(fan3, LocalizationService.Translate("Fan 3")),
+                ParsePercent(fan4, LocalizationService.Translate("Fan 4"))
             };
 
             var outputs = new int[4];
@@ -1769,12 +1808,13 @@ public partial class MainWindow : Window
             }
 
             await _settingsStore.SaveAsync(_settings);
-            await RequireDevice().SetFansAsync(outputs[0], outputs[1], outputs[2], outputs[3]);
+            await RequireDevice().SetFansAsync(
+                outputs[0],
+                outputs[1],
+                outputs[2],
+                outputs[3]);
 
-            Fan1TextBox.Text = outputs[0].ToString(CultureInfo.InvariantCulture);
-            Fan2TextBox.Text = outputs[1].ToString(CultureInfo.InvariantCulture);
-            Fan3TextBox.Text = outputs[2].ToString(CultureInfo.InvariantCulture);
-            Fan4TextBox.Text = outputs[3].ToString(CultureInfo.InvariantCulture);
+            UpdateFanOutputFields(outputs);
 
             Log($"INFO fan outputs after safety limits: {string.Join("/", outputs)}%");
         }
@@ -1782,6 +1822,22 @@ public partial class MainWindow : Window
         {
             ShowError(ex);
         }
+    }
+
+    private void UpdateFanOutputFields(IReadOnlyList<int> outputs)
+    {
+        if (outputs.Count < 4)
+            return;
+
+        Fan1TextBox.Text = outputs[0].ToString(CultureInfo.InvariantCulture);
+        Fan2TextBox.Text = outputs[1].ToString(CultureInfo.InvariantCulture);
+        Fan3TextBox.Text = outputs[2].ToString(CultureInfo.InvariantCulture);
+        Fan4TextBox.Text = outputs[3].ToString(CultureInfo.InvariantCulture);
+
+        DashboardFan1TextBox.Text = outputs[0].ToString(CultureInfo.InvariantCulture);
+        DashboardFan2TextBox.Text = outputs[1].ToString(CultureInfo.InvariantCulture);
+        DashboardFan3TextBox.Text = outputs[2].ToString(CultureInfo.InvariantCulture);
+        DashboardFan4TextBox.Text = outputs[3].ToString(CultureInfo.InvariantCulture);
     }
 
     private void Transport_Written(object? sender, VirtualLis2WriteEventArgs e)
@@ -1826,7 +1882,5 @@ public partial class MainWindow : Window
         LogTextBox.AppendText(line);
         LogTextBox.ScrollToEnd();
 
-        DashboardLogMirror.AppendText(line);
-        DashboardLogMirror.ScrollToEnd();
     }
 }
