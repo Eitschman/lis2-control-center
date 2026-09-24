@@ -8,6 +8,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/Dark.xaml"/>
                 <ResourceDictionary Source="Themes/Common.xaml"/>
+                <ResourceDictionary Source="Localization/Strings.en.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
