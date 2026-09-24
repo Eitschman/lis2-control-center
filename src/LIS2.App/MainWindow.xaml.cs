@@ -22,6 +22,7 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _fanTimer;
     private readonly DispatcherTimer _hardwareTimer;
     private readonly DispatcherTimer _winampTimer;
+    private readonly DispatcherTimer _eventUiTimer;
     private readonly WinampDataSource _winampSource = new();
     private readonly FanController _fanController = new();
     private int[]? _lastAutomaticFanOutputs;
@@ -69,6 +70,13 @@ public partial class MainWindow : Window
         };
         _winampTimer.Tick += WinampTimer_Tick;
 
+        _eventUiTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        _eventUiTimer.Tick += EventUiTimer_Tick;
+
+        _eventQueue.Changed += EventQueue_Changed;
         _winampSource.Changed += WinampSource_Changed;
 
         _sources.Add(new ClockDataSource());
@@ -89,6 +97,7 @@ public partial class MainWindow : Window
         ("Display", "VFD output, brightness and direct display tests."),
         ("Pages", "Create and edit the rotating 20x2 display pages."),
         ("Winamp", "Winamp integration, pipe transport and available media variables."),
+        ("Events", "Priority notifications and temporary VFD overlays."),
         ("Hardware", "LibreHardwareMonitor data sources and sensor availability."),
         ("Fan Control", "Manual output, automatic control, curves and safety limits."),
         ("Settings", "LIS2 transport, COM port and Windows startup behavior."),
@@ -153,12 +162,15 @@ public partial class MainWindow : Window
             RefreshWinampView();
 
         if (index == 4)
-            RefreshHardwareSensors();
+            RefreshEventsView();
 
         if (index == 5)
+            RefreshHardwareSensors();
+
+        if (index == 6)
             RefreshFanSensorChoices();
 
-        if (index == 7)
+        if (index == 8)
             RefreshDiagnostics();
     }
 
@@ -193,7 +205,9 @@ public partial class MainWindow : Window
             _fanTimer.Start();
             _hardwareTimer.Start();
             _winampTimer.Start();
+            _eventUiTimer.Start();
 
+            RefreshEventsView();
             RefreshDiagnostics();
 
             if (Environment.GetCommandLineArgs().Any(
@@ -241,6 +255,8 @@ public partial class MainWindow : Window
         _fanTimer.Stop();
         _hardwareTimer.Stop();
         _winampTimer.Stop();
+        _eventUiTimer.Stop();
+        _eventQueue.Changed -= EventQueue_Changed;
         _winampSource.Changed -= WinampSource_Changed;
 
         await _sources.StopAllAsync();
