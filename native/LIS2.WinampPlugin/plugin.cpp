@@ -1,6 +1,8 @@
 #include "winamp_sdk_min.h"
 
 #include <algorithm>
+#include <array>
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -8,13 +10,26 @@
 namespace
 {
 constexpr wchar_t PipeName[] = L"\\\\.\\pipe\\LIS2ControlCenter.Winamp";
-constexpr DWORD PollIntervalMs = 1000;
+constexpr DWORD PollIntervalMs = 200;
+constexpr int SpectrumSourceBins = 75;
+constexpr int SpectrumOutputBins = 20;
+
+using SaGetFunc = const unsigned char* (__cdecl*)();
+using SaSetReqFunc = void (__cdecl*)(int);
+using VuGetFunc = int (__cdecl*)(int);
 
 HANDLE g_stopEvent = nullptr;
 HANDLE g_thread = nullptr;
 HANDLE g_pipe = INVALID_HANDLE_VALUE;
 
+SaGetFunc g_saGet = nullptr;
+SaSetReqFunc g_saSetReq = nullptr;
+VuGetFunc g_vuGet = nullptr;
+
 char g_description[] = "LIS2 Control Center (gen_lis2.dll)";
+
+bool IsValidFunctionPointer(LRESULT raw) =>
+    raw != 0 && raw != 1 && raw != -1;
 
 std::string JsonEscape(const std::string& value)
 {
@@ -185,6 +200,41 @@ void AppendJsonString(
          << "\"";
 }
 
+std::array<int, SpectrumOutputBins> ReadSpectrum()
+{
+    std::array<int, SpectrumOutputBins> result{};
+
+    if (g_saGet == nullptr)
+        return result;
+
+    const unsigned char* data = g_saGet();
+    if (data == nullptr)
+        return result;
+
+    for (int output = 0; output < SpectrumOutputBins; ++output)
+    {
+        const int begin = output * SpectrumSourceBins / SpectrumOutputBins;
+        const int end = (output + 1) * SpectrumSourceBins / SpectrumOutputBins;
+
+        int peak = 0;
+        for (int source = begin; source < end; ++source)
+            peak = std::max(peak, static_cast<int>(data[source]));
+
+        result[output] = std::clamp(peak, 0, 255);
+    }
+
+    return result;
+}
+
+int ReadVu(int channel)
+{
+    if (g_vuGet == nullptr)
+        return -1;
+
+    const int value = g_vuGet(channel);
+    return value < 0 ? -1 : std::clamp(value, 0, 255);
+}
+
 std::string BuildSnapshotJson(HWND hwndWinamp)
 {
     const int state = static_cast<int>(
@@ -244,6 +294,12 @@ std::string BuildSnapshotJson(HWND hwndWinamp)
     if (title.empty())
         title = AnsiToUtf8(playlistTitle);
 
+    const int vuLeft = state == 1 ? ReadVu(0) : 0;
+    const int vuRight = state == 1 ? ReadVu(1) : 0;
+    const auto spectrum = state == 1
+        ? ReadSpectrum()
+        : std::array<int, SpectrumOutputBins>{};
+
     std::ostringstream json;
     json << "{\"type\":\"snapshot\",\"state\":\""
          << PlaybackStateName(state)
@@ -271,7 +327,22 @@ std::string BuildSnapshotJson(HWND hwndWinamp)
     if (sampleRateHz > 0)
         json << ",\"sampleRateHz\":" << sampleRateHz;
 
-    json << "}";
+    if (vuLeft >= 0)
+        json << ",\"vuLeft\":" << vuLeft;
+
+    if (vuRight >= 0)
+        json << ",\"vuRight\":" << vuRight;
+
+    json << ",\"spectrum\":[";
+    for (int index = 0; index < SpectrumOutputBins; ++index)
+    {
+        if (index > 0)
+            json << ',';
+
+        json << spectrum[index];
+    }
+    json << "]}";
+
     return json.str();
 }
 
@@ -362,6 +433,36 @@ int PluginInit()
     if (g_stopEvent != nullptr || g_thread != nullptr)
         return 0;
 
+    const LRESULT saGet = SendMessage(
+        g_plugin.hwndParent,
+        WM_WA_IPC,
+        0,
+        IPC_GETSADATAFUNC);
+
+    const LRESULT saSetReq = SendMessage(
+        g_plugin.hwndParent,
+        WM_WA_IPC,
+        1,
+        IPC_GETSADATAFUNC);
+
+    const LRESULT vuGet = SendMessage(
+        g_plugin.hwndParent,
+        WM_WA_IPC,
+        0,
+        IPC_GETVUDATAFUNC);
+
+    if (IsValidFunctionPointer(saGet))
+        g_saGet = reinterpret_cast<SaGetFunc>(saGet);
+
+    if (IsValidFunctionPointer(saSetReq))
+        g_saSetReq = reinterpret_cast<SaSetReqFunc>(saSetReq);
+
+    if (IsValidFunctionPointer(vuGet))
+        g_vuGet = reinterpret_cast<VuGetFunc>(vuGet);
+
+    if (g_saSetReq != nullptr)
+        g_saSetReq(1);
+
     g_stopEvent = CreateEventW(
         nullptr,
         TRUE,
@@ -394,7 +495,8 @@ void PluginConfig()
     MessageBoxA(
         g_plugin.hwndParent,
         "LIS2 Control Center integration is active.\n\n"
-        "Data is sent to \\\\.\\pipe\\LIS2ControlCenter.Winamp.",
+        "Metadata, VU and spectrum data are sent to "
+        "\\\\.\\pipe\\LIS2ControlCenter.Winamp.",
         "LIS2 Control Center",
         MB_OK | MB_ICONINFORMATION);
 }
@@ -416,6 +518,13 @@ void PluginQuit()
         CloseHandle(g_stopEvent);
         g_stopEvent = nullptr;
     }
+
+    if (g_saSetReq != nullptr)
+        g_saSetReq(0);
+
+    g_saGet = nullptr;
+    g_saSetReq = nullptr;
+    g_vuGet = nullptr;
 
     ClosePipe();
 }
