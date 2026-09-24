@@ -24,6 +24,7 @@ public static class LocalizationService
         {
             ["de"] = new(StringComparer.Ordinal)
             {
+                ["The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"]="Das VFD-Spektrum verwendet alle acht Custom-Character-Slots. Soll das aktuelle Glyph-Set durch die acht Spektrum-Balkenstufen ersetzt werden?",
                 ["VU / Spectrum"]="VU / Spektrum",
                 ["No visualization data"]="Keine Visualisierungsdaten",
                 ["Live visualization data"]="Live-Visualisierungsdaten",
@@ -195,6 +196,7 @@ public static class LocalizationService
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
+                ["The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"]="Le spectre VFD utilise les huit emplacements de caractères personnalisés. Remplacer le jeu de glyphes actuel par les huit niveaux de barres du spectre ?",
                 ["VU / Spectrum"]="VU / Spectre",
                 ["No visualization data"]="Aucune donnée de visualisation",
                 ["Live visualization data"]="Données de visualisation en direct",
@@ -371,6 +373,7 @@ public static class LocalizationService
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
+                ["The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"]="VFD spektrumu sekiz özel karakter yuvasının tamamını kullanır. Geçerli glif seti sekiz spektrum çubuk seviyesiyle değiştirilsin mi?",
                 ["VU / Spectrum"]="VU / Spektrum",
                 ["No visualization data"]="Görselleştirme verisi yok",
                 ["Live visualization data"]="Canlı görselleştirme verisi",
@@ -555,6 +558,7 @@ public static class LocalizationService
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
+                ["The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"]="Спектр VFD использует все восемь слотов пользовательских символов. Заменить текущий набор глифов восемью уровнями спектральных столбиков?",
                 ["VU / Spectrum"]="VU / Спектр",
                 ["No visualization data"]="Нет данных визуализации",
                 ["Live visualization data"]="Данные визуализации в реальном времени",
