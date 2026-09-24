@@ -1,5 +1,7 @@
 using System.Drawing;
 using System.IO;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Forms = System.Windows.Forms;
 
 namespace LIS2.App;
@@ -78,6 +80,25 @@ public sealed class TrayIconService : IDisposable
         _notifyIcon.Text = text.Length <= 63
             ? text
             : text[..63];
+    }
+
+    public static ImageSource CreateWindowIcon()
+    {
+        var bytes = Convert.FromBase64String(Lis2IconBase64);
+
+        using var stream = new MemoryStream(bytes, writable: false);
+        var decoder = BitmapDecoder.Create(
+            stream,
+            BitmapCreateOptions.PreservePixelFormat,
+            BitmapCacheOption.OnLoad);
+
+        var frame = decoder.Frames
+            .OrderByDescending(item => item.PixelWidth)
+            .ThenByDescending(item => item.PixelHeight)
+            .First();
+
+        frame.Freeze();
+        return frame;
     }
 
     private static Icon LoadEmbeddedLis2Icon()
