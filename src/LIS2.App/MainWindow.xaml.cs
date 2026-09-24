@@ -1184,7 +1184,7 @@ public partial class MainWindow : Window
     private async void PageEnabledChanged(object sender, RoutedEventArgs e)
     {
         if (!IsLoaded ||
-            sender is not CheckBox { DataContext: PageDefinition page })
+            sender is not System.Windows.Controls.CheckBox { DataContext: PageDefinition page })
         {
             return;
         }
