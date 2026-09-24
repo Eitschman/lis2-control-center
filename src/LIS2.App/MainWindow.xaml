@@ -1083,25 +1083,42 @@
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
 
-                                <Grid Grid.Row="0" Margin="8,0,8,7">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="34"/>
-                                        <ColumnDefinition Width="2.1*"/>
-                                        <ColumnDefinition Width="1.1*"/>
-                                        <ColumnDefinition Width="1*"/>
-                                        <ColumnDefinition Width="2.8*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="1" Text="Sensor" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
-                                    <TextBlock Grid.Column="2" Text="Type" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
-                                    <TextBlock Grid.Column="3" Text="Value" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
-                                    <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
-                                </Grid>
-
                                 <ListBox x:Name="HardwareSensorsListBox"
-                                         Grid.Row="1"
+                                         Grid.Row="0"
+                                         Grid.RowSpan="2"
                                          SelectionChanged="HardwareSensorsListBox_SelectionChanged"
                                          HorizontalContentAlignment="Stretch">
+                                    <ListBox.Template>
+                                        <ControlTemplate TargetType="{x:Type ListBox}">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                                <DockPanel>
+                                                    <Grid DockPanel.Dock="Top" Margin="8,0,8,7">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="34"/>
+                                                            <ColumnDefinition Width="2.1*"/>
+                                                            <ColumnDefinition Width="1.1*"/>
+                                                            <ColumnDefinition Width="1*"/>
+                                                            <ColumnDefinition Width="2.8*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
+                                                        <TextBlock Grid.Column="1" Text="Sensor" FontWeight="SemiBold"/>
+                                                        <TextBlock Grid.Column="2" Text="Type" FontWeight="SemiBold"/>
+                                                        <TextBlock Grid.Column="3" Text="Value" FontWeight="SemiBold"/>
+                                                        <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold"/>
+                                                    </Grid>
+
+                                                    <ScrollViewer Focusable="False"
+                                                                  Padding="{TemplateBinding Padding}"
+                                                                  HorizontalScrollBarVisibility="Disabled"
+                                                                  VerticalScrollBarVisibility="Auto">
+                                                        <ItemsPresenter/>
+                                                    </ScrollViewer>
+                                                </DockPanel>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </ListBox.Template>
                                     <ListBox.GroupStyle>
                                         <GroupStyle>
                                             <GroupStyle.HeaderTemplate>
