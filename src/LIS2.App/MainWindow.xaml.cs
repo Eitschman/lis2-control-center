@@ -530,9 +530,203 @@ public partial class MainWindow : Window
             : $"{hz} Hz";
     }
 
-    private void HardwareTimer_Tick(object? sender, EventArgs e)
+    private void EventQueue_Changed(object? sender, EventArgs e)
+    {
+        Dispatcher.BeginInvoke(RefreshEventsView);
+    }
+
+    private void EventUiTimer_Tick(object? sender, EventArgs e)
     {
         if (MainTabs.SelectedIndex == 4)
+            RefreshEventsView();
+    }
+
+    private async void AddEvent_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var priority = GetSelectedEventPriority();
+
+            if (!int.TryParse(
+                    EventDurationTextBox.Text,
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out var durationSeconds) ||
+                durationSeconds is < 1 or > 3600)
+            {
+                throw new InvalidOperationException(
+                    "Event duration must be between 1 and 3600 seconds.");
+            }
+
+            var line1 = EventLine1TextBox.Text ?? string.Empty;
+            var line2 = EventLine2TextBox.Text ?? string.Empty;
+
+            await QueueDisplayEventAsync(
+                $"manual-{Guid.NewGuid():N}",
+                line1,
+                line2,
+                priority,
+                TimeSpan.FromSeconds(durationSeconds));
+
+            Log(
+                $"INFO display event queued: priority={priority}, " +
+                $"duration={durationSeconds}s");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void TestWarningEvent_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await QueueDisplayEventAsync(
+                $"warning-{Guid.NewGuid():N}",
+                "!! WARNING !!",
+                "Test notification",
+                priority: 100,
+                duration: TimeSpan.FromSeconds(8));
+
+            Log("INFO warning event queued for 8 seconds");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void ClearEvents_Click(object sender, RoutedEventArgs e)
+    {
+        _eventQueue.Clear();
+        await RenderRuntimePageAsync();
+        RefreshEventsView();
+        Log("INFO all display events cleared");
+    }
+
+    private async void CancelSelectedEvent_Click(object sender, RoutedEventArgs e)
+    {
+        if (EventQueueListBox.SelectedItem is not EventQueueRow row)
+            return;
+
+        if (_eventQueue.Remove(row.Id))
+        {
+            await RenderRuntimePageAsync();
+            RefreshEventsView();
+            Log($"INFO display event '{row.Id}' cancelled");
+        }
+    }
+
+    private void EventQueueListBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (EventQueueListBox.SelectedItem is EventQueueRow row)
+        {
+            SelectedEventText.Text =
+                $"ID: {row.Id}{Environment.NewLine}" +
+                $"Priority: {row.PriorityName} ({row.Priority}) • " +
+                $"Expires: {row.ExpiresAt.ToLocalTime():HH:mm:ss}";
+        }
+        else
+        {
+            SelectedEventText.Text = "Select an event to inspect it.";
+        }
+    }
+
+    private void RefreshEventsView()
+    {
+        var now = DateTimeOffset.Now;
+        var selectedId = (EventQueueListBox.SelectedItem as EventQueueRow)?.Id;
+
+        var rows = _eventQueue
+            .Snapshot(now)
+            .Select(displayEvent =>
+            {
+                var remaining = displayEvent.ExpiresAt - now;
+
+                return new EventQueueRow(
+                    displayEvent.Id,
+                    displayEvent.Frame.Line1,
+                    displayEvent.Frame.Line2,
+                    displayEvent.Priority,
+                    FormatEventPriority(displayEvent.Priority),
+                    displayEvent.ExpiresAt,
+                    remaining <= TimeSpan.Zero
+                        ? "expired"
+                        : $"{Math.Ceiling(remaining.TotalSeconds):0}s");
+            })
+            .ToArray();
+
+        EventQueueListBox.ItemsSource = rows;
+
+        if (selectedId is not null)
+        {
+            EventQueueListBox.SelectedItem =
+                rows.FirstOrDefault(row =>
+                    string.Equals(
+                        row.Id,
+                        selectedId,
+                        StringComparison.OrdinalIgnoreCase));
+        }
+
+        EventQueueSummaryText.Text =
+            rows.Length == 1
+                ? "1 event"
+                : $"{rows.Length} events";
+    }
+
+    private int GetSelectedEventPriority()
+    {
+        if (EventPriorityComboBox.SelectedItem is not ComboBoxItem { Tag: string tag } ||
+            !int.TryParse(
+                tag,
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out var priority))
+        {
+            throw new InvalidOperationException("Select a valid event priority.");
+        }
+
+        return priority;
+    }
+
+    private async Task QueueDisplayEventAsync(
+        string id,
+        string line1,
+        string line2,
+        int priority,
+        TimeSpan duration)
+    {
+        if (duration <= TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException(nameof(duration));
+
+        var now = DateTimeOffset.Now;
+
+        _eventQueue.Add(
+            new DisplayEvent(
+                id,
+                DisplayFrame.Create(line1, line2),
+                priority,
+                now.Add(duration)));
+
+        await RenderRuntimePageAsync();
+        RefreshEventsView();
+    }
+
+    private static string FormatEventPriority(int priority) =>
+        priority switch
+        {
+            >= 200 => "Critical",
+            >= 100 => "Warning",
+            >= 50 => "Notice",
+            _ => "Info"
+        };
+
+    private void HardwareTimer_Tick(object? sender, EventArgs e)
+    {
+        if (MainTabs.SelectedIndex == 5)
             RefreshHardwareSensors();
     }
 
@@ -1022,14 +1216,13 @@ public partial class MainWindow : Window
     {
         try
         {
-            var now = DateTimeOffset.Now;
-            _eventQueue.Add(new DisplayEvent(
-                "demo",
-                DisplayFrame.Create("** EVENT TEST **", "Overlay for 5 sec"),
-                100,
-                now.AddSeconds(5)));
+            await QueueDisplayEventAsync(
+                $"page-test-{Guid.NewGuid():N}",
+                "** EVENT TEST **",
+                "Overlay for 5 sec",
+                priority: 100,
+                duration: TimeSpan.FromSeconds(5));
 
-            await RenderRuntimePageAsync();
             Log("INFO event overlay queued for 5 seconds");
         }
         catch (Exception ex)
