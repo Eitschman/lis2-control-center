@@ -145,11 +145,11 @@ Do not infer electrical limits or safe fan-stop behavior solely from screenshots
 - [x] Startup diagnostic log for fatal startup problems.
 - [ ] Theme the native Windows title bar consistently with the selected app theme.
 - [ ] Review all controls in both Light and Dark themes.
-- [ ] Improve first-run experience.
-- [ ] Add explicit application/about/version information.
-- [ ] Add settings export/import.
+- [x] Improve first-run experience. — Not needed; intentionally omitted.
+- [x] Add explicit application/about/version information.
+- [x] Add settings export/import. — Not needed; intentionally omitted.
 - [ ] Consider profile support for different machines/use cases.
-- [ ] Add a safe "restore defaults" workflow.
+- [x] Add a safe "restore defaults" workflow. — Not needed; intentionally omitted.
 
 ## Virtual LIS2 / diagnostics
 
