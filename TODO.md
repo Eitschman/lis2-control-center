@@ -6,13 +6,13 @@ This document tracks feature work for LIS2 Control Center. It is intentionally s
 
 ### Display pages / "Auto User"
 
-- [ ] Turn the current page list into a richer sequence editor.
-- [ ] Reorder pages easily (buttons and/or drag & drop).
-- [ ] Configure duration per page.
-- [ ] Enable/disable individual pages without deleting them.
-- [ ] Make page duration drive the scheduler instead of relying on one global interval.
-- [ ] Add convenient duplicate-page action.
-- [ ] Improve page preview/editing workflow.
+- [x] Turn the current page list into a richer sequence editor.
+- [x] Reorder pages easily (buttons and/or drag & drop).
+- [x] Configure duration per page.
+- [x] Enable/disable individual pages without deleting them.
+- [x] Make page duration drive the scheduler instead of relying on one global interval.
+- [x] Add convenient duplicate-page action.
+- [x] Improve page preview/editing workflow.
 - [ ] Add optional conditional visibility based on source values.
 - [ ] Add reusable page/display presets.
 
@@ -26,17 +26,17 @@ The original MCC's "Auto User" concept is useful inspiration here, but the new i
 - [x] Avoid unnecessary serial writes when the visible frame has not changed.
 - [x] Support both lines scrolling independently.
 - [x] Use long Winamp titles/artists as a primary use case.
-- [ ] Add optional per-line overflow policy: ping-pong, truncate/static crop, or one-way marquee.
-- [ ] Make scroll speed and edge pause user-configurable.
+- [x] Add optional per-line overflow policy: ping-pong, truncate/static crop, or one-way marquee.
+- [x] Make scroll speed and edge pause user-configurable.
 
 Historical MCC material indicates that track information could scroll while ordinary long text was more limited. The new renderer should make scrolling a general feature.
 
 ### Custom characters / CG Builder
 
-- [ ] Add graphical editor for all eight programmable LIS2 character slots.
-- [ ] 5-pixel-wide row editing with the LIS2 character RAM constraints visible in the UI.
-- [ ] Live preview.
-- [ ] Send one slot or all slots to the device.
+- [x] Add graphical editor for all eight programmable LIS2 character slots.
+- [x] 5-pixel-wide row editing with the LIS2 character RAM constraints visible in the UI.
+- [x] Live preview.
+- [x] Send one slot or all slots to the device.
 - [ ] Save/load glyph sets as project-owned files.
 - [ ] Allow custom glyphs to be referenced conveniently from page templates.
 - [ ] Ship a small set of independently created example glyphs/icons.
@@ -52,7 +52,7 @@ The original MCC included a "CG Builder"; this is a confirmed useful product cap
 - [x] Show values, units and template keys.
 - [x] Assign a selected sensor directly to a fan channel.
 - [ ] Add friendly aliases/favorites for frequently used sensors.
-- [ ] Persist sensor favorites.
+- [x] Persist sensor favorites.
 - [ ] Add ready-made display presets such as CPU, GPU, memory, temperatures and fans.
 - [ ] Gracefully identify sensors that disappeared or changed after a hardware/driver update.
 - [ ] Consider grouping sensors by hardware device in the browser.
@@ -72,9 +72,9 @@ Historical MCC versions integrated MBM5/SpeedFan and offered predefined monitori
 - [ ] Add a clearer low-output safety warning/confirmation in the UI.
 - [ ] Document the historical LIS2 channel rating reported as 12 V / 10 W / approximately 0.83 A per output, while clearly marking the source/verification status.
 - [ ] Surface the original MCC's conservative low-speed behavior as historical guidance, not as an unverified electrical requirement.
-- [ ] Add fan-curve graph/editor.
-- [ ] Add live display of sensor input and resulting fan percentage per channel.
-- [ ] Add optional hysteresis/smoothing to avoid output hunting.
+- [x] Add fan-curve graph/editor.
+- [x] Add live display of sensor input and resulting fan percentage per channel.
+- [x] Add optional hysteresis/smoothing to avoid output hunting.
 - [ ] Add explicit emergency/fail-safe indication in the UI.
 - [ ] Validate safe minimum outputs with real connected fans before choosing stronger defaults.
 
