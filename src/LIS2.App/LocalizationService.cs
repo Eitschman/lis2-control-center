@@ -627,6 +627,15 @@ public static class LocalizationService
             element.ToolTip = TranslateKnown(originals.ToolTip ?? string.Empty);
         }
 
+        // WPF only materializes the visual content of the selected TabItem.
+        // Walk logical Content explicitly so controls on every page are localized,
+        // not only the currently visible page.
+        if (root is ContentControl { Content: DependencyObject contentObject })
+            ApplyTo(contentObject);
+
+        if (root is HeaderedContentControl { Header: DependencyObject headerObject })
+            ApplyTo(headerObject);
+
         if (root is ItemsControl itemsControl)
         {
             foreach (var item in itemsControl.Items.OfType<DependencyObject>())
