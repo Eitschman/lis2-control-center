@@ -398,6 +398,7 @@ public partial class MainWindow : Window
             AutomaticFanControlCheckBox.IsChecked == true;
 
         _lastAutomaticFanOutputs = null;
+        Array.Clear(_lastAutomaticFanSensorValues);
         await _settingsStore.SaveAsync(_settings);
 
         Log(_settings.Fans.AutomaticControlEnabled
@@ -1063,6 +1064,7 @@ public partial class MainWindow : Window
             await _settingsStore.SaveAsync(_settings);
 
             _lastAutomaticFanOutputs = null;
+            Array.Clear(_lastAutomaticFanSensorValues);
             FanChannelsListBox.Items.Refresh();
 
             Log($"INFO saved fan channel '{channel.Name}'");
