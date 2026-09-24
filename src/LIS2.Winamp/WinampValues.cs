@@ -22,6 +22,7 @@ public static class WinampValues
             ["VuRight"] = snapshot.VuRight,
             ["Vu"] = FormatVu(snapshot.VuLeft, snapshot.VuRight),
             ["Spectrum"] = FormatSpectrum(snapshot.Spectrum),
+            ["SpectrumRaw"] = snapshot.Spectrum?.ToArray(),
             ["SpectrumPeak"] = snapshot.Spectrum is { Count: > 0 }
                 ? snapshot.Spectrum.Max()
                 : null
