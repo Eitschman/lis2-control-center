@@ -14,7 +14,7 @@ constexpr DWORD PollIntervalMs = 200;
 constexpr int SpectrumSourceBins = 75;
 constexpr int SpectrumOutputBins = 20;
 
-using SaGetFunc = const unsigned char* (__cdecl*)();
+using SaGetFunc = char* (__cdecl*)(char*);
 using SaSetReqFunc = void (__cdecl*)(int);
 using VuGetFunc = int (__cdecl*)(int);
 
@@ -209,7 +209,8 @@ std::array<int, SpectrumOutputBins> ReadSpectrum()
     if (g_saGet == nullptr)
         return result;
 
-    const unsigned char* data = g_saGet();
+    std::array<char, SpectrumSourceBins * 2 + 8> buffer{};
+    const char* data = g_saGet(buffer.data());
     if (data == nullptr)
         return result;
 
@@ -220,7 +221,10 @@ std::array<int, SpectrumOutputBins> ReadSpectrum()
 
         int peak = 0;
         for (int source = begin; source < end; ++source)
-            peak = std::max(peak, static_cast<int>(data[source]));
+            peak = std::max(
+                peak,
+                static_cast<int>(
+                    static_cast<unsigned char>(data[source])));
 
         result[output] = std::clamp(peak, 0, 255);
     }
@@ -438,7 +442,7 @@ int PluginInit()
     const LRESULT saGet = SendMessage(
         g_plugin.hwndParent,
         WM_WA_IPC,
-        0,
+        2,
         IPC_GETSADATAFUNC);
 
     const LRESULT saSetReq = SendMessage(
