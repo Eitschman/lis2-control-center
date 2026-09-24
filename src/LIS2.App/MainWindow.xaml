@@ -1022,8 +1022,7 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="14"/>
                                             <RowDefinition Height="Auto"/>
-                                                                                <RowDefinition Height="Auto"/>
-</Grid.RowDefinitions>
+                                        </Grid.RowDefinitions>
 
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Fan 1" VerticalAlignment="Center"/>
                                         <Slider x:Name="Fan1Slider"
