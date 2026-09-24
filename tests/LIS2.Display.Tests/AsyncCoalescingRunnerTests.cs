@@ -8,9 +8,9 @@ public sealed class AsyncCoalescingRunnerTests
     public async Task ConcurrentRequests_NeverOverlap_AndBurstIsCoalesced()
     {
         var runner = new AsyncCoalescingRunner();
-        var entered = new TaskCompletionSource(
+        var entered = new TaskCompletionSource<bool>(
             TaskCreationOptions.RunContinuationsAsynchronously);
-        var release = new TaskCompletionSource(
+        var release = new TaskCompletionSource<bool>(
             TaskCreationOptions.RunContinuationsAsynchronously);
 
         var executions = 0;
@@ -27,7 +27,7 @@ public sealed class AsyncCoalescingRunnerTests
             {
                 if (execution == 1)
                 {
-                    entered.TrySetResult();
+                    entered.TrySetResult(true);
                     await release.Task;
                 }
             }
@@ -45,7 +45,7 @@ public sealed class AsyncCoalescingRunnerTests
             .ToArray();
 
         await Task.WhenAll(burst);
-        release.TrySetResult();
+        release.TrySetResult(true);
         await first;
 
         Assert.Equal(1, maxConcurrent);
