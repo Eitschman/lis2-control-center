@@ -1255,11 +1255,9 @@
                                         <ComboBox x:Name="ThemeModeComboBox"
                                                   Grid.Row="0" Grid.Column="1"
                                                   Margin="0,0,0,10"
-                                                  SelectionChanged="ThemeModeChanged">
-                                            <ComboBoxItem Content="System default" Tag="System"/>
-                                            <ComboBoxItem Content="Light" Tag="Light"/>
-                                            <ComboBoxItem Content="Dark" Tag="Dark"/>
-                                        </ComboBox>
+                                                  DisplayMemberPath="Label"
+                                                  SelectedValuePath="Value"
+                                                  SelectionChanged="ThemeModeChanged"/>
                                         <TextBlock Grid.Row="0" Grid.Column="2"
                                                    Margin="14,0,0,10"
                                                    VerticalAlignment="Center"
@@ -1273,14 +1271,9 @@
                                                    Margin="0,0,8,0"/>
                                         <ComboBox x:Name="LanguageModeComboBox"
                                                   Grid.Row="1" Grid.Column="1"
-                                                  SelectionChanged="LanguageModeChanged">
-                                            <ComboBoxItem Content="System default" Tag="System"/>
-                                            <ComboBoxItem Content="English" Tag="English"/>
-                                            <ComboBoxItem Content="Deutsch" Tag="German"/>
-                                            <ComboBoxItem Content="Français" Tag="French"/>
-                                            <ComboBoxItem Content="Türkçe" Tag="Turkish"/>
-                                            <ComboBoxItem Content="Русский" Tag="Russian"/>
-                                        </ComboBox>
+                                                  DisplayMemberPath="Label"
+                                                  SelectedValuePath="Value"
+                                                  SelectionChanged="LanguageModeChanged"/>
                                         <TextBlock Grid.Row="1" Grid.Column="2"
                                                    Margin="14,0,0,0"
                                                    VerticalAlignment="Center"
