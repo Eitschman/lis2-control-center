@@ -1095,7 +1095,15 @@ public partial class MainWindow : Window
             return;
         }
 
-        var sensor = _currentFanSensorValues[index];
+        var channel = _settings.Fans.Channels[index];
+        double? sensor = null;
+        var snapshot = _sources.Snapshot();
+        if (!string.IsNullOrWhiteSpace(channel.SensorKey) &&
+            snapshot.TryGetValue(channel.SensorKey, out var rawSensor))
+        {
+            TryConvertToDouble(rawSensor, out sensor);
+        }
+
         var output = _lastAutomaticFanOutputs?[index];
         FanLiveStatusText.Text =
             $"Sensor: {(sensor is null ? "-" : sensor.Value.ToString("0.##", CultureInfo.CurrentCulture))}  |  " +
