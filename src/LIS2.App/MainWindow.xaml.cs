@@ -35,6 +35,7 @@ public partial class MainWindow : Window
     private bool _loadingStartupSetting;
     private bool _customGlyphUiInitialized;
     private bool _fanUiInitialized;
+    private bool _applyingAppearanceSettings;
 
     private sealed record AppearanceChoice(string Value, string Label);
 
@@ -1722,6 +1723,7 @@ public partial class MainWindow : Window
 
     private void ApplySettingsToUi()
     {
+        _applyingAppearanceSettings = true;
         TransportModeComboBox.SelectedIndex =
             string.Equals(_settings.TransportMode, "Serial", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
 
@@ -1745,6 +1747,7 @@ public partial class MainWindow : Window
         ThemeService.Apply(themeMode);
         LocalizationService.Apply(languageMode);
         RefreshAppearanceChoices(themeMode, languageMode);
+        _applyingAppearanceSettings = false;
         LocalizationService.ApplyTo(this);
         RefreshLocalizedSectionHeader();
         UpdateNavigationSelection(MainTabs.SelectedIndex);
@@ -1782,6 +1785,7 @@ public partial class MainWindow : Window
     private async void ThemeModeChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded ||
+            _applyingAppearanceSettings ||
             ThemeModeComboBox.SelectedValue is not string value ||
             !Enum.TryParse<AppThemeMode>(value, ignoreCase: true, out var mode))
         {
@@ -1803,6 +1807,7 @@ public partial class MainWindow : Window
     private async void LanguageModeChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded ||
+            _applyingAppearanceSettings ||
             LanguageModeComboBox.SelectedValue is not string value ||
             !Enum.TryParse<AppLanguageMode>(value, ignoreCase: true, out var mode))
         {
