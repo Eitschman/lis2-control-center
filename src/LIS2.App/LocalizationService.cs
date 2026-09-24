@@ -667,10 +667,10 @@ public static class LocalizationService
         // Walk logical Content explicitly so controls on every page are localized,
         // not only the currently visible page.
         if (root is ContentControl { Content: DependencyObject contentObject })
-            ApplyTo(contentObject);
+            ApplyTo(contentObject, visited);
 
         if (root is HeaderedContentControl { Header: DependencyObject headerObject })
-            ApplyTo(headerObject);
+            ApplyTo(headerObject, visited);
 
         if (root is ItemsControl itemsControl)
         {
