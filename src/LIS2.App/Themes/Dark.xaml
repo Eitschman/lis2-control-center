@@ -25,8 +25,9 @@
     <SolidColorBrush x:Key="DangerBrush" Color="#FF7B72"/>
     <SolidColorBrush x:Key="LogBackgroundBrush" Color="#0C0F13"/>
     <SolidColorBrush x:Key="LogTextBrush" Color="#D8DEE4"/>
-    <SolidColorBrush x:Key="VfdBackgroundBrush" Color="#030A06"/>
-    <SolidColorBrush x:Key="VfdBorderBrush" Color="#324239"/>
+    <SolidColorBrush x:Key="VfdBackgroundBrush" Color="#123B8A"/>
+    <SolidColorBrush x:Key="VfdBorderBrush" Color="#5D8FE8"/>
+    <SolidColorBrush x:Key="VfdTextBrush" Color="#F7FBFF"/>
     <SolidColorBrush x:Key="StatusBadgeBrush" Color="#1D3325"/>
     <SolidColorBrush x:Key="StatusBadgeTextBrush" Color="#B9F7C8"/>
     <SolidColorBrush x:Key="TipBackgroundBrush" Color="#141A20"/>
