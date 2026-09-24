@@ -3,6 +3,26 @@ namespace LIS2.App;
 public sealed class FanChannelSettings
 {
     public string Name { get; set; } = "Fan";
+
+    public string DisplayName
+    {
+        get
+        {
+            for (var index = 1; index <= 4; index++)
+            {
+                if (string.Equals(
+                        Name,
+                        $"Fan {index}",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    return LocalizationService.Format("Fan {0}", index);
+                }
+            }
+
+            return Name;
+        }
+    }
+
     public string Mode { get; set; } = "Fixed";
     public string? SensorKey { get; set; }
     public int FixedPercent { get; set; } = 100;
