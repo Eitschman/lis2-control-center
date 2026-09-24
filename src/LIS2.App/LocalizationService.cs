@@ -140,7 +140,13 @@ public static class LocalizationService
                 ["Fan {0}: {1}, mode={2}, sensor={3}, fixed={4}%, min={5}%, max={6}%, fail-safe={7}%"]="Lüfter {0}: {1}, Modus={2}, Sensor={3}, fest={4}%, min={5}%, max={6}%, Notfall={7}%",
                 ["Unknown brightness."]="Unbekannte Helligkeit.",
                 ["Yes"]="Ja",
-                ["No"]="Nein"
+                ["No"]="Nein",
+                ["Fan {0}"]="Lüfter {0}",
+                ["LIS2 Control Center could not start."]="LIS2 Control Center konnte nicht gestartet werden.",
+                ["A diagnostic log was written to:"]="Ein Diagnoseprotokoll wurde geschrieben nach:",
+                ["Unable to open the current-user Windows startup registry key."]="Der Windows-Autostart-Registrierungsschlüssel des aktuellen Benutzers konnte nicht geöffnet werden.",
+                ["Unable to determine the application executable path."]="Der Pfad zur ausführbaren Anwendung konnte nicht ermittelt werden.",
+                ["Windows autostart is available only when running the published LIS2ControlCenter.exe."]="Windows-Autostart ist nur mit der veröffentlichten LIS2ControlCenter.exe verfügbar."
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
@@ -265,7 +271,13 @@ public static class LocalizationService
                 ["Fan {0}: {1}, mode={2}, sensor={3}, fixed={4}%, min={5}%, max={6}%, fail-safe={7}%"]="Ventilateur {0} : {1}, mode={2}, capteur={3}, fixe={4}%, min={5}%, max={6}%, sécurité={7}%",
                 ["Unknown brightness."]="Luminosité inconnue.",
                 ["Yes"]="Oui",
-                ["No"]="Non"
+                ["No"]="Non",
+                ["Fan {0}"]="Ventilateur {0}",
+                ["LIS2 Control Center could not start."]="LIS2 Control Center n'a pas pu démarrer.",
+                ["A diagnostic log was written to:"]="Un journal de diagnostic a été écrit dans :",
+                ["Unable to open the current-user Windows startup registry key."]="Impossible d'ouvrir la clé de registre de démarrage Windows de l'utilisateur actuel.",
+                ["Unable to determine the application executable path."]="Impossible de déterminer le chemin de l'exécutable de l'application.",
+                ["Windows autostart is available only when running the published LIS2ControlCenter.exe."]="Le démarrage automatique Windows n'est disponible qu'avec la version publiée de LIS2ControlCenter.exe."
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
@@ -398,7 +410,13 @@ public static class LocalizationService
                 ["Fan {0}: {1}, mode={2}, sensor={3}, fixed={4}%, min={5}%, max={6}%, fail-safe={7}%"]="Fan {0}: {1}, mod={2}, sensör={3}, sabit={4}%, min={5}%, maks={6}%, güvenli={7}%",
                 ["Unknown brightness."]="Bilinmeyen parlaklık.",
                 ["Yes"]="Evet",
-                ["No"]="Hayır"
+                ["No"]="Hayır",
+                ["Fan {0}"]="Fan {0}",
+                ["LIS2 Control Center could not start."]="LIS2 Control Center başlatılamadı.",
+                ["A diagnostic log was written to:"]="Tanılama günlüğü şu konuma yazıldı:",
+                ["Unable to open the current-user Windows startup registry key."]="Geçerli kullanıcı için Windows başlangıç kayıt anahtarı açılamadı.",
+                ["Unable to determine the application executable path."]="Uygulamanın çalıştırılabilir dosya yolu belirlenemedi.",
+                ["Windows autostart is available only when running the published LIS2ControlCenter.exe."]="Windows otomatik başlatma yalnızca yayımlanmış LIS2ControlCenter.exe çalıştırılırken kullanılabilir."
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
@@ -533,7 +551,13 @@ public static class LocalizationService
                 ["Fan {0}: {1}, mode={2}, sensor={3}, fixed={4}%, min={5}%, max={6}%, fail-safe={7}%"]="Вентилятор {0}: {1}, режим={2}, датчик={3}, фикс={4}%, мин={5}%, макс={6}%, аварийный={7}%",
                 ["Unknown brightness."]="Неизвестная яркость.",
                 ["Yes"]="Да",
-                ["No"]="Нет"
+                ["No"]="Нет",
+                ["Fan {0}"]="Вентилятор {0}",
+                ["LIS2 Control Center could not start."]="Не удалось запустить LIS2 Control Center.",
+                ["A diagnostic log was written to:"]="Диагностический журнал записан в:",
+                ["Unable to open the current-user Windows startup registry key."]="Не удалось открыть раздел реестра автозапуска Windows текущего пользователя.",
+                ["Unable to determine the application executable path."]="Не удалось определить путь к исполняемому файлу приложения.",
+                ["Windows autostart is available only when running the published LIS2ControlCenter.exe."]="Автозапуск Windows доступен только при запуске опубликованного LIS2ControlCenter.exe."
             }
         };
 
