@@ -1366,6 +1366,7 @@ public partial class MainWindow : Window
         RefreshEventsView();
         RefreshHardwareSensors();
         RefreshFanSensorChoices();
+        FanChannelsListBox.Items.Refresh();
         UpdateTransportUi();
         UpdateConnectionUiLocalization();
         RefreshDiagnostics();
@@ -1490,21 +1491,29 @@ public partial class MainWindow : Window
 
     private void UpdateConnectionUiLocalization()
     {
+        var connected = _device?.IsConnected == true;
+
         if (string.Equals(_settings.TransportMode, "Serial", StringComparison.OrdinalIgnoreCase))
         {
-            ConnectionText.Text = LocalizationService.Format(
-                "Connected: {0}",
-                _settings.PortName ?? "-");
+            ConnectionText.Text = connected
+                ? LocalizationService.Format(
+                    "Connected: {0}",
+                    _settings.PortName ?? "-")
+                : LocalizationService.Translate("Disconnected");
+
             TransportSummaryText.Text = LocalizationService.Format(
                 "Serial: {0}",
                 _settings.PortName ?? "-");
+
             VirtualStateText.Text = LocalizationService.Translate(
                 "Virtual state is unavailable while Serial transport is active.");
         }
         else
         {
-            ConnectionText.Text =
-                LocalizationService.Translate("Virtual LIS2 connected");
+            ConnectionText.Text = connected
+                ? LocalizationService.Translate("Virtual LIS2 connected")
+                : LocalizationService.Translate("Disconnected");
+
             TransportSummaryText.Text =
                 LocalizationService.Translate("Virtual LIS2 transport");
 
