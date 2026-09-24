@@ -13,7 +13,7 @@ public partial class App : System.Windows.Application
 
         try
         {
-            ApplySavedThemeBeforeWindowCreation();
+            ApplySavedPreferencesBeforeWindowCreation();
 
             try
             {
@@ -50,41 +50,57 @@ public partial class App : System.Windows.Application
         base.OnExit(e);
     }
 
-    private static void ApplySavedThemeBeforeWindowCreation()
+    private static void ApplySavedPreferencesBeforeWindowCreation()
     {
-        AppThemeMode mode;
+        AppSettings settings;
 
         try
         {
-            var settings = new SettingsStore().Load();
-
-            mode = Enum.TryParse<AppThemeMode>(
-                settings.ThemeMode,
-                ignoreCase: true,
-                out var parsed)
-                ? parsed
-                : AppThemeMode.System;
+            settings = new SettingsStore().Load();
         }
         catch (Exception ex)
         {
             WriteStartupError(
-                "Unable to load settings. Falling back to the built-in dark theme.",
+                "Unable to load settings. Falling back to built-in defaults.",
                 ex);
-            return;
+            settings = new AppSettings();
         }
+
+        var themeMode = Enum.TryParse<AppThemeMode>(
+            settings.ThemeMode,
+            ignoreCase: true,
+            out var parsedTheme)
+            ? parsedTheme
+            : AppThemeMode.System;
 
         try
         {
-            ThemeService.Apply(mode);
+            ThemeService.Apply(themeMode);
         }
         catch (Exception ex)
         {
-            // App.xaml already contains the built-in Dark palette.
-            // Do not retry theme loading here: a broken resource URI must
-            // never prevent the application from opening.
             WriteStartupError(
-                $"Unable to apply theme '{mode}'. Using the built-in dark theme.",
+                $"Unable to apply theme '{themeMode}'. Using the built-in dark theme.",
                 ex);
+        }
+
+        var languageMode = Enum.TryParse<AppLanguageMode>(
+            settings.LanguageMode,
+            ignoreCase: true,
+            out var parsedLanguage)
+            ? parsedLanguage
+            : AppLanguageMode.System;
+
+        try
+        {
+            LocalizationService.Apply(languageMode);
+        }
+        catch (Exception ex)
+        {
+            WriteStartupError(
+                $"Unable to apply language '{languageMode}'. Falling back to English.",
+                ex);
+            LocalizationService.Apply(AppLanguageMode.English);
         }
     }
 

@@ -40,6 +40,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        LocalizationService.ApplyTo(this);
 
         _displayRuntime = new DisplayRuntime(
             new TemplateRenderer(),
@@ -154,8 +155,8 @@ public partial class MainWindow : Window
         if (index < 0 || index >= Sections.Length)
             return;
 
-        SectionTitleText.Text = Sections[index].Title;
-        SectionSubtitleText.Text = Sections[index].Subtitle;
+        SectionTitleText.Text = LocalizationService.Translate(Sections[index].Title);
+        SectionSubtitleText.Text = LocalizationService.Translate(Sections[index].Subtitle);
         UpdateNavigationSelection(index);
 
         if (index == 3)
@@ -462,6 +463,7 @@ public partial class MainWindow : Window
         var values = _winampSource.Values;
 
         var state = GetWinampValue(values, "State") ?? "Unknown";
+        var localizedState = LocalizationService.Translate(state);
         var artist = GetWinampValue(values, "Artist");
         var title = GetWinampValue(values, "Title");
         var album = GetWinampValue(values, "Album");
@@ -478,18 +480,20 @@ public partial class MainWindow : Window
             !string.IsNullOrWhiteSpace(title)
                 ? title
                 : connected
-                    ? "No title"
-                    : "Nothing playing";
+                    ? LocalizationService.Translate("No title")
+                    : LocalizationService.Translate("Nothing playing");
 
         WinampArtistText.Text =
             !string.IsNullOrWhiteSpace(artist)
                 ? artist
                 : connected
-                    ? "Winamp connected"
-                    : "Waiting for Winamp...";
+                    ? LocalizationService.Translate("Winamp connected")
+                    : LocalizationService.Translate("Waiting for Winamp...");
 
         WinampAlbumText.Text = album ?? string.Empty;
-        WinampPlaybackText.Text = connected ? state : "Disconnected";
+        WinampPlaybackText.Text = connected
+            ? localizedState
+            : LocalizationService.Translate("Disconnected");
         WinampTimeText.Text = $"{elapsed} / {duration}";
         WinampPlaylistText.Text = $"{playlistPosition} / {playlistCount}";
         WinampAudioText.Text =
@@ -498,8 +502,8 @@ public partial class MainWindow : Window
                 : $"{bitrate ?? "-"} kbps / {FormatSampleRate(sampleRate)}";
 
         WinampStatusText.Text = connected
-            ? $"Connected • {state}"
-            : "Waiting for Winamp";
+            ? $"{LocalizationService.Translate("Connected")} • {localizedState}"
+            : LocalizationService.Translate("Waiting for Winamp");
 
         WinampConnectionDetailText.Text = connected
             ? @"Receiving snapshots on \\.\pipe\LIS2ControlCenter.Winamp" +
@@ -673,8 +677,11 @@ public partial class MainWindow : Window
 
         EventQueueSummaryText.Text =
             rows.Length == 1
-                ? "1 event"
-                : $"{rows.Length} events";
+                ? LocalizationService.Translate("1 event")
+                : string.Format(
+                    CultureInfo.CurrentCulture,
+                    LocalizationService.Translate("{0} events"),
+                    rows.Length);
     }
 
     private int GetSelectedEventPriority()
@@ -716,13 +723,14 @@ public partial class MainWindow : Window
     }
 
     private static string FormatEventPriority(int priority) =>
-        priority switch
-        {
-            >= 200 => "Critical",
-            >= 100 => "Warning",
-            >= 50 => "Notice",
-            _ => "Info"
-        };
+        LocalizationService.Translate(
+            priority switch
+            {
+                >= 200 => "Critical",
+                >= 100 => "Warning",
+                >= 50 => "Notice",
+                _ => "Info"
+            });
 
     private void HardwareTimer_Tick(object? sender, EventArgs e)
     {
@@ -753,7 +761,8 @@ public partial class MainWindow : Window
         }
         else
         {
-            SelectedHardwareSensorText.Text = "Select a sensor above.";
+            SelectedHardwareSensorText.Text =
+                LocalizationService.Translate("Select a sensor above.");
         }
     }
 
@@ -1257,6 +1266,27 @@ public partial class MainWindow : Window
         }
 
         ThemeService.Apply(themeMode);
+
+        var languageMode = Enum.TryParse<AppLanguageMode>(
+            _settings.LanguageMode,
+            ignoreCase: true,
+            out var parsedLanguage)
+            ? parsedLanguage
+            : AppLanguageMode.System;
+
+        foreach (var item in LanguageModeComboBox.Items.OfType<ComboBoxItem>())
+        {
+            if (item.Tag is string tag &&
+                string.Equals(tag, languageMode.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                LanguageModeComboBox.SelectedItem = item;
+                break;
+            }
+        }
+
+        LocalizationService.Apply(languageMode);
+        LocalizationService.ApplyTo(this);
+        RefreshLocalizedSectionHeader();
         UpdateNavigationSelection(MainTabs.SelectedIndex);
         UpdateTransportUi();
     }
@@ -1280,6 +1310,41 @@ public partial class MainWindow : Window
             mode == AppThemeMode.System
                 ? $"INFO theme set to System default ({(ThemeService.IsDarkEffective ? "Dark" : "Light")})"
                 : $"INFO theme set to {mode}");
+    }
+
+    private async void LanguageModeChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded ||
+            LanguageModeComboBox.SelectedItem is not ComboBoxItem { Tag: string tag } ||
+            !Enum.TryParse<AppLanguageMode>(tag, ignoreCase: true, out var mode))
+        {
+            return;
+        }
+
+        _settings.LanguageMode = mode.ToString();
+        LocalizationService.Apply(mode);
+        LocalizationService.ApplyTo(this);
+        RefreshLocalizedSectionHeader();
+        RefreshWinampView();
+        RefreshEventsView();
+        RefreshHardwareSensors();
+        _trayIcon.ApplyLocalization();
+
+        await _settingsStore.SaveAsync(_settings);
+
+        Log(
+            $"INFO language set to {mode} " +
+            $"({LocalizationService.LanguageCode})");
+    }
+
+    private void RefreshLocalizedSectionHeader()
+    {
+        var index = MainTabs.SelectedIndex;
+        if (index < 0 || index >= Sections.Length)
+            return;
+
+        SectionTitleText.Text = LocalizationService.Translate(Sections[index].Title);
+        SectionSubtitleText.Text = LocalizationService.Translate(Sections[index].Subtitle);
     }
 
     private void RefreshPorts()
