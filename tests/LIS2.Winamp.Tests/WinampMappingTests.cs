@@ -96,4 +96,14 @@ public sealed class WinampMappingTests
         Assert.Equal(20, text.Length);
         Assert.StartsWith("L||||||||", text);
     }
+    [Fact]
+    public void SpectrumFormatter_ScalesClassicZeroToFifteenRange()
+    {
+        var text = WinampValues.FormatSpectrum(
+            new[] { 0, 1, 2, 4, 6, 8, 10, 12, 15, 0, 1, 2, 4, 6, 8, 10, 12, 15, 8, 4 });
+
+        Assert.Equal(20, text.Length);
+        Assert.Contains('#', text);
+        Assert.NotEqual(new string(' ', 20), text);
+    }
 }
