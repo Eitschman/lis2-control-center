@@ -4,6 +4,8 @@ namespace LIS2.Core;
 
 public static class Lis2Protocol
 {
+    public const char CustomGlyphBase = '\uE000';
+
     public static ReadOnlyMemory<byte> Clear => new byte[] { 0xA0 };
 
     public static byte[] WriteLine(int line, int column, string text)
@@ -16,12 +18,12 @@ public static class Lis2Protocol
 
         ArgumentNullException.ThrowIfNull(text);
 
-        var safeText = ToSafeAscii(text);
+        var safeText = ToSafeDisplayText(text);
         var available = 20 - column;
         if (safeText.Length > available)
             safeText = safeText[..available];
 
-        var bytes = Encoding.ASCII.GetBytes(safeText);
+        var bytes = EncodeDisplayText(safeText);
         var command = new byte[3 + bytes.Length];
         command[0] = line == 1 ? (byte)0xA1 : (byte)0xA2;
         command[1] = (byte)column;
@@ -61,21 +63,61 @@ public static class Lis2Protocol
         return new byte[] { 0xAB, (byte)character, (byte)row, (byte)pixels };
     }
 
-    public static string ToSafeAscii(string value)
+    public static char CustomGlyph(int slot)
+    {
+        if (slot is < 1 or > 8)
+            throw new ArgumentOutOfRangeException(nameof(slot));
+
+        return (char)(CustomGlyphBase + slot - 1);
+    }
+
+    public static bool TryGetCustomGlyphSlot(char value, out int slot)
+    {
+        slot = value - CustomGlyphBase + 1;
+        return slot is >= 1 and <= 8;
+    }
+
+    public static string ToSafeDisplayText(string value)
     {
         ArgumentNullException.ThrowIfNull(value);
 
-        return value
+        var expanded = value
             .Replace("ä", "ae", StringComparison.Ordinal)
             .Replace("ö", "oe", StringComparison.Ordinal)
             .Replace("ü", "ue", StringComparison.Ordinal)
             .Replace("Ä", "Ae", StringComparison.Ordinal)
             .Replace("Ö", "Oe", StringComparison.Ordinal)
             .Replace("Ü", "Ue", StringComparison.Ordinal)
-            .Replace("ß", "ss", StringComparison.Ordinal)
-            .Select(c => c is >= ' ' and <= '~' ? c : '?')
+            .Replace("ß", "ss", StringComparison.Ordinal);
+
+        return expanded
+            .Select(c => TryGetCustomGlyphSlot(c, out _) || c is >= ' ' and <= '~' ? c : '?')
             .Aggregate(new StringBuilder(), (builder, c) => builder.Append(c))
             .ToString();
+    }
+
+    public static string ToSafeAscii(string value) =>
+        ToSafeDisplayText(value)
+            .Select(c => TryGetCustomGlyphSlot(c, out _) ? '?' : c)
+            .Aggregate(new StringBuilder(), (builder, c) => builder.Append(c))
+            .ToString();
+
+    public static byte[] EncodeDisplayText(string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        var safe = ToSafeDisplayText(value);
+        var bytes = new byte[safe.Length];
+
+        for (var index = 0; index < safe.Length; index++)
+        {
+            var character = safe[index];
+            bytes[index] = TryGetCustomGlyphSlot(character, out var slot)
+                ? (byte)slot
+                : (byte)character;
+        }
+
+        return bytes;
     }
 
     private static byte Percent(int value)
