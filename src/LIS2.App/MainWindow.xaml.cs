@@ -34,6 +34,8 @@ public partial class MainWindow : Window
     private bool _allowClose;
     private bool _loadingStartupSetting;
 
+    private sealed record AppearanceChoice(string Value, string Label);
+
     private AppSettings _settings = new();
     private ILis2Transport? _transport;
     private Lis2Device? _device;
@@ -1681,18 +1683,6 @@ public partial class MainWindow : Window
             ? parsedTheme
             : AppThemeMode.System;
 
-        foreach (var item in ThemeModeComboBox.Items.OfType<ComboBoxItem>())
-        {
-            if (item.Tag is string tag &&
-                string.Equals(tag, themeMode.ToString(), StringComparison.OrdinalIgnoreCase))
-            {
-                ThemeModeComboBox.SelectedItem = item;
-                break;
-            }
-        }
-
-        ThemeService.Apply(themeMode);
-
         var languageMode = Enum.TryParse<AppLanguageMode>(
             _settings.LanguageMode,
             ignoreCase: true,
@@ -1700,17 +1690,9 @@ public partial class MainWindow : Window
             ? parsedLanguage
             : AppLanguageMode.System;
 
-        foreach (var item in LanguageModeComboBox.Items.OfType<ComboBoxItem>())
-        {
-            if (item.Tag is string tag &&
-                string.Equals(tag, languageMode.ToString(), StringComparison.OrdinalIgnoreCase))
-            {
-                LanguageModeComboBox.SelectedItem = item;
-                break;
-            }
-        }
-
+        ThemeService.Apply(themeMode);
         LocalizationService.Apply(languageMode);
+        RefreshAppearanceChoices(themeMode, languageMode);
         LocalizationService.ApplyTo(this);
         RefreshLocalizedSectionHeader();
         UpdateNavigationSelection(MainTabs.SelectedIndex);
@@ -1721,11 +1703,35 @@ public partial class MainWindow : Window
                 .ToArray());
     }
 
+    private void RefreshAppearanceChoices(
+        AppThemeMode selectedTheme,
+        AppLanguageMode selectedLanguage)
+    {
+        ThemeModeComboBox.ItemsSource = new[]
+        {
+            new AppearanceChoice(nameof(AppThemeMode.System), LocalizationService.Translate("System default")),
+            new AppearanceChoice(nameof(AppThemeMode.Light), LocalizationService.Translate("Light")),
+            new AppearanceChoice(nameof(AppThemeMode.Dark), LocalizationService.Translate("Dark"))
+        };
+        ThemeModeComboBox.SelectedValue = selectedTheme.ToString();
+
+        LanguageModeComboBox.ItemsSource = new[]
+        {
+            new AppearanceChoice(nameof(AppLanguageMode.System), LocalizationService.Translate("System default")),
+            new AppearanceChoice(nameof(AppLanguageMode.English), "English"),
+            new AppearanceChoice(nameof(AppLanguageMode.German), "Deutsch"),
+            new AppearanceChoice(nameof(AppLanguageMode.French), "Français"),
+            new AppearanceChoice(nameof(AppLanguageMode.Turkish), "Türkçe"),
+            new AppearanceChoice(nameof(AppLanguageMode.Russian), "Русский")
+        };
+        LanguageModeComboBox.SelectedValue = selectedLanguage.ToString();
+    }
+
     private async void ThemeModeChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded ||
-            ThemeModeComboBox.SelectedItem is not ComboBoxItem { Tag: string tag } ||
-            !Enum.TryParse<AppThemeMode>(tag, ignoreCase: true, out var mode))
+            ThemeModeComboBox.SelectedValue is not string value ||
+            !Enum.TryParse<AppThemeMode>(value, ignoreCase: true, out var mode))
         {
             return;
         }
@@ -1745,14 +1751,23 @@ public partial class MainWindow : Window
     private async void LanguageModeChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded ||
-            LanguageModeComboBox.SelectedItem is not ComboBoxItem { Tag: string tag } ||
-            !Enum.TryParse<AppLanguageMode>(tag, ignoreCase: true, out var mode))
+            LanguageModeComboBox.SelectedValue is not string value ||
+            !Enum.TryParse<AppLanguageMode>(value, ignoreCase: true, out var mode))
         {
             return;
         }
 
         _settings.LanguageMode = mode.ToString();
         LocalizationService.Apply(mode);
+
+        var selectedTheme = Enum.TryParse<AppThemeMode>(
+            _settings.ThemeMode,
+            ignoreCase: true,
+            out var parsedTheme)
+            ? parsedTheme
+            : AppThemeMode.System;
+
+        RefreshAppearanceChoices(selectedTheme, mode);
         LocalizationService.ApplyTo(this);
         RefreshLocalizedSectionHeader();
         RefreshWinampView();
