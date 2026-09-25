@@ -73,6 +73,10 @@ internal static partial class HelpLocalization
             ["True while snapshots are fresh."] = "True, пока снимки состояния актуальны.",
             ["Age of the last snapshot."] = "Возраст последнего снимка.",
             ["Typical page"] = "Типичная страница",
+            ["Windows Media Player Legacy"] = "Windows Media Player Legacy",
+            ["Windows Media Player Legacy telemetry comes from the native background COM plug-in over the LIS2ControlCenter.WmpLegacy named pipe. The plug-in is telemetry-only and never accesses LIS2 hardware."] = "Телеметрия Windows Media Player Legacy поступает из нативного фонового COM-плагина через именованный канал LIS2ControlCenter.WmpLegacy. Плагин передаёт только телеметрию и никогда не обращается напрямую к оборудованию LIS2.",
+            ["Current media track number."] = "Текущий номер трека медиафайла.",
+            ["Typical WMP Legacy page"] = "Типичная страница WMP Legacy",
 
             ["Events are temporary priority overlays. While active they override normal page rotation; after expiry the scheduler returns to the normal page."] = "События — это временные приоритетные наложения. Пока они активны, обычная ротация страниц заменяется; после истечения времени планировщик возвращается к обычной странице.",
             ["Line 1 / Line 2: event text."] = "Строка 1 / Строка 2: текст события.",
