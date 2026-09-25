@@ -24,6 +24,14 @@ public static class LocalizationService
         {
             ["de"] = new(StringComparer.Ordinal)
             {
+                ["Copy key"]="Schlüssel kopieren",
+                ["Build"]="Erstellen",
+                ["Export report..."]="Bericht exportieren...",
+                ["Virtual LIS2 state"]="Virtueller LIS2-Status",
+                ["Decoded command history"]="Dekodierter Befehlsverlauf",
+                ["Virtual transport is not active."]="Virtueller Transport ist nicht aktiv.",
+                ["Decoded history is available for the virtual transport."]="Dekodierter Verlauf ist für den virtuellen Transport verfügbar.",
+                ["Export diagnostic report"]="Diagnosebericht exportieren",
                 ["Attributes"]="Attribute",
                 ["Create attribute page"]="Attribut-Seite erstellen",
                 ["Select a Home Assistant attribute first."]="Zuerst ein Home-Assistant-Attribut auswählen.",
@@ -246,6 +254,14 @@ public static class LocalizationService
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
+                ["Copy key"]="Copier la clé",
+                ["Build"]="Construire",
+                ["Export report..."]="Exporter le rapport...",
+                ["Virtual LIS2 state"]="État LIS2 virtuel",
+                ["Decoded command history"]="Historique des commandes décodées",
+                ["Virtual transport is not active."]="Le transport virtuel n’est pas actif.",
+                ["Decoded history is available for the virtual transport."]="L’historique décodé est disponible pour le transport virtuel.",
+                ["Export diagnostic report"]="Exporter le rapport de diagnostic",
                 ["Attributes"]="Attributs",
                 ["Create attribute page"]="Créer une page d’attribut",
                 ["Select a Home Assistant attribute first."]="Sélectionnez d’abord un attribut Home Assistant.",
@@ -473,6 +489,14 @@ public static class LocalizationService
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
+                ["Copy key"]="Anahtarı kopyala",
+                ["Build"]="Oluştur",
+                ["Export report..."]="Raporu dışa aktar...",
+                ["Virtual LIS2 state"]="Sanal LIS2 durumu",
+                ["Decoded command history"]="Çözümlenmiş komut geçmişi",
+                ["Virtual transport is not active."]="Sanal taşıma etkin değil.",
+                ["Decoded history is available for the virtual transport."]="Çözümlenmiş geçmiş sanal taşıma için kullanılabilir.",
+                ["Export diagnostic report"]="Tanılama raporunu dışa aktar",
                 ["Attributes"]="Öznitelikler",
                 ["Create attribute page"]="Öznitelik sayfası oluştur",
                 ["Select a Home Assistant attribute first."]="Önce bir Home Assistant özniteliği seçin.",
@@ -708,6 +732,14 @@ public static class LocalizationService
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
+                ["Copy key"]="Копировать ключ",
+                ["Build"]="Собрать",
+                ["Export report..."]="Экспортировать отчёт...",
+                ["Virtual LIS2 state"]="Состояние виртуального LIS2",
+                ["Decoded command history"]="Декодированная история команд",
+                ["Virtual transport is not active."]="Виртуальный транспорт не активен.",
+                ["Decoded history is available for the virtual transport."]="Декодированная история доступна для виртуального транспорта.",
+                ["Export diagnostic report"]="Экспортировать диагностический отчёт",
                 ["Attributes"]="Атрибуты",
                 ["Create attribute page"]="Создать страницу атрибута",
                 ["Select a Home Assistant attribute first."]="Сначала выберите атрибут Home Assistant.",
