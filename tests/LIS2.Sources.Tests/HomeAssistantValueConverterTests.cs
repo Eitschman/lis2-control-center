@@ -6,13 +6,21 @@ namespace LIS2.Sources.Tests;
 public sealed class HomeAssistantValueConverterTests
 {
     [Theory]
-    [InlineData(""hello"", "hello")]
     [InlineData("true", true)]
     [InlineData("false", false)]
-    public void Convert_PrimitivesPreserveUsefulTypes(string json, object expected)
+    public void Convert_BooleanPreservesType(string json, bool expected)
     {
         using var document = JsonDocument.Parse(json);
         Assert.Equal(expected, HomeAssistantValueConverter.Convert(document.RootElement));
+    }
+
+    [Fact]
+    public void Convert_StringPreservesValue()
+    {
+        var json = JsonSerializer.Serialize("hello");
+        using var document = JsonDocument.Parse(json);
+
+        Assert.Equal("hello", HomeAssistantValueConverter.Convert(document.RootElement));
     }
 
     [Fact]
@@ -29,13 +37,28 @@ public sealed class HomeAssistantValueConverterTests
         Assert.Equal(42.5, HomeAssistantValueConverter.Convert(document.RootElement));
     }
 
-    [Theory]
-    [InlineData("[1,2,3]", "[1,2,3]")]
-    [InlineData("{"temperature":21,"condition":"sunny"}", "{"temperature":21,"condition":"sunny"}")]
-    public void Convert_StructuredValuesUseCompactJson(string json, string expected)
+    [Fact]
+    public void Convert_ArrayUsesCompactJson()
     {
-        using var document = JsonDocument.Parse(json);
-        Assert.Equal(expected, HomeAssistantValueConverter.Convert(document.RootElement));
+        var payload = JsonSerializer.Serialize(new[] { 1, 2, 3 });
+        using var document = JsonDocument.Parse(payload);
+
+        Assert.Equal("[1,2,3]", HomeAssistantValueConverter.Convert(document.RootElement));
+    }
+
+    [Fact]
+    public void Convert_ObjectUsesCompactJson()
+    {
+        var payload = JsonSerializer.Serialize(new
+        {
+            temperature = 21,
+            condition = "sunny"
+        });
+        using var document = JsonDocument.Parse(payload);
+
+        Assert.Equal(
+            payload,
+            HomeAssistantValueConverter.Convert(document.RootElement));
     }
 
     [Fact]
