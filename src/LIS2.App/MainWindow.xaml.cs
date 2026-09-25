@@ -985,7 +985,7 @@ public partial class MainWindow : Window
                 Id = Guid.NewGuid().ToString("N"),
                 Name = entity.DisplayName,
                 Line1Template = entity.DisplayName,
-                Line2Template = $"{{{templateKey}}}{entity.Unit}",
+                Line2Template = $"{{{templateKey}|fallback:--}}{entity.Unit}",
                 DurationSeconds = 5,
                 Line1OverflowMode = "PingPong",
                 Line2OverflowMode = "Truncate"
@@ -1024,13 +1024,14 @@ public partial class MainWindow : Window
 
             var templateKey =
                 attribute.AliasTemplateKey ?? attribute.TemplateKey;
+            var templateExpression = templateKey.Trim('{', '}');
 
             var page = new PageDefinition
             {
                 Id = Guid.NewGuid().ToString("N"),
                 Name = $"{entity.DisplayName} · {attribute.Name}",
                 Line1Template = entity.DisplayName,
-                Line2Template = templateKey,
+                Line2Template = $"{{{templateExpression}|fallback:--}}",
                 DurationSeconds = 5,
                 Line1OverflowMode = "PingPong",
                 Line2OverflowMode = "PingPong"
