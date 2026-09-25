@@ -345,6 +345,9 @@ public partial class MainWindow : Window
         Hide();
 
         var originalTheme = ThemeService.Mode;
+        var originalLanguage = LocalizationService.Mode;
+
+        HelpLocalization.ValidateCoverage();
 
         foreach (var theme in new[] { AppThemeMode.Light, AppThemeMode.Dark, originalTheme })
         {
@@ -360,23 +363,42 @@ public partial class MainWindow : Window
             UpdateNavigationSelection(index);
             MainTabs.UpdateLayout();
             await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+        }
+
+        foreach (var language in new[]
+                 {
+                     AppLanguageMode.English,
+                     AppLanguageMode.German,
+                     AppLanguageMode.French,
+                     AppLanguageMode.Turkish,
+                     AppLanguageMode.Russian
+                 })
+        {
+            LocalizationService.Apply(language);
+            LocalizationService.ApplyTo(this);
+            RefreshLocalizedSectionHeader();
 
             var help = new HelpWindow(
-                index,
+                MainTabs.SelectedIndex,
                 CreateDisplayValues(),
                 _settings.CustomGlyphs.Select(glyph => glyph.Name).ToArray())
             {
                 Owner = this
             };
             help.Show();
+            help.RenderAllSectionsForSmokeTest();
             help.UpdateLayout();
             await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
             help.Close();
         }
 
+        LocalizationService.Apply(originalLanguage);
+        LocalizationService.ApplyTo(this);
+        RefreshLocalizedSectionHeader();
+
         await RenderRuntimePageAsync();
 
-        Log("INFO startup/theme/tab smoke test completed");
+        Log("INFO startup/theme/tab/help/localization smoke test completed");
         _allowClose = true;
         Environment.ExitCode = 0;
         Close();
@@ -3495,6 +3517,7 @@ public partial class MainWindow : Window
 
         SectionTitleText.Text = LocalizationService.Translate(Sections[index].Title);
         SectionSubtitleText.Text = LocalizationService.Translate(Sections[index].Subtitle);
+        SectionHelpButton.ToolTip = HelpLocalization.Translate("Help for this page");
     }
 
     private void RefreshPorts()
