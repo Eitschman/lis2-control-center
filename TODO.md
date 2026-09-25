@@ -103,13 +103,23 @@ Remaining:
 
 ## Windows Media Player
 
-- [ ] Research integration options for Windows Media Player Legacy and the current Windows 11 Media Player before implementation.
-- [ ] Determine whether Windows Media Player Legacy still supports a native/background plug-in or COM-based telemetry bridge suitable for LIS2 Control Center.
-- [ ] Determine available metadata, playback-state, position/duration, playlist and visualization/VU/spectrum access for Windows Media Player Legacy.
-- [ ] Determine integration options for the current Windows Media Player app on Windows 11 and whether it exposes a supported local API, COM surface, extension model or media-session telemetry.
-- [ ] Keep any Windows Media Player integration telemetry-only; it must not gain direct LIS2 hardware access.
-- [ ] Design a provider-neutral media-variable layer only if it can preserve existing `Winamp.*` compatibility without breaking current pages.
-- [ ] Add automated tests, Help documentation, localization and GitHub CI coverage for any implemented Windows Media Player provider.
+Research completed:
+
+- [x] Research integration options for Windows Media Player Legacy and the current Windows 11 Media Player before implementation.
+- [x] Windows Media Player Legacy still exposes the legacy COM plug-in model: background UI plug-ins can monitor player state/metadata, while visualization plug-ins receive timed waveform/frequency data and an `IWMPCore` pointer.
+- [x] Windows Media Player Legacy exposes current media metadata, playback state, position/duration and playlist information through the WMP COM SDK; visualization plug-ins can receive 1024-bin stereo frequency and waveform snapshots.
+- [x] The current Windows 11 Media Player can be observed through Windows Global System Media Transport Controls (GSMTC): media properties, playback state, timeline/position and source-app identity are available. No documented modern Media Player-specific plug-in API was found.
+- [x] Treat VU/spectrum as a Legacy-only capability unless a supported equivalent is discovered for the modern Media Player app.
+
+Implementation plan:
+
+- [ ] Add a Windows media-session source based on GSMTC for the current Windows 11 Media Player, filtered by source application and telemetry-only.
+- [ ] Add a native Windows Media Player Legacy COM bridge. Prefer a background plug-in for always-on metadata/state telemetry; add a visualization component only for optional VU/spectrum telemetry.
+- [ ] Build/register matching x86 and x64 Legacy plug-in variants because WMP plug-ins are in-process COM components.
+- [ ] Define `Media.*` provider-neutral variables for common metadata/state/timeline fields while preserving all existing `Winamp.*` variables for compatibility.
+- [ ] Keep player-specific extended variables under `WmpLegacy.*` / `WindowsMedia.*` where no common `Media.*` equivalent exists.
+- [ ] Keep every Windows Media Player integration telemetry-only; it must not gain direct LIS2 hardware access or playback-control commands.
+- [ ] Add automated tests, simulator/test fixtures, Help documentation, localization and GitHub CI coverage for implemented Windows Media Player providers.
 
 ## Winamp
 
