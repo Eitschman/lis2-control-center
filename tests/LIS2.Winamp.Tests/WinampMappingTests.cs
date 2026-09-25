@@ -31,7 +31,17 @@ public sealed class WinampMappingTests
         Assert.Equal(180, snapshot.VuLeft);
         Assert.Equal(160, snapshot.VuRight);
         Assert.Equal(20, snapshot.Spectrum?.Count);
+        private sealed class ManualTimeProvider : TimeProvider
+    {
+        private DateTimeOffset _utcNow;
+
+        public ManualTimeProvider(DateTimeOffset utcNow) => _utcNow = utcNow;
+
+        public override DateTimeOffset GetUtcNow() => _utcNow;
+
+        public void Advance(TimeSpan duration) => _utcNow += duration;
     }
+}
 
     [Fact]
     public void NativePluginCamelCaseJson_DeserializesAllFields()
@@ -96,6 +106,40 @@ public sealed class WinampMappingTests
         Assert.Equal(20, text.Length);
         Assert.StartsWith("L||||||||", text);
     }
+    [Fact]
+    public void DataSource_MarksSnapshotStaleAfterTimeout()
+    {
+        var time = new ManualTimeProvider(
+            new DateTimeOffset(2026, 9, 25, 10, 0, 0, TimeSpan.Zero));
+        var source = new WinampDataSource(time);
+
+        source.ApplySnapshot(new WinampSnapshot(
+            WinampPlaybackState.Playing,
+            "Artist",
+            "Title",
+            "Album",
+            1,
+            1,
+            TimeSpan.Zero,
+            TimeSpan.FromMinutes(4),
+            320,
+            44100,
+            100,
+            100,
+            Enumerable.Repeat(0, 20).ToArray()));
+
+        Assert.True(source.IsRecentlyConnected);
+        Assert.Equal(true, source.Values["Connected"]);
+        Assert.Equal("Playing", source.Values["State"]);
+
+        time.Advance(TimeSpan.FromSeconds(4));
+
+        Assert.False(source.IsRecentlyConnected);
+        Assert.Equal(false, source.Values["Connected"]);
+        Assert.Equal("Unknown", source.Values["State"]);
+        Assert.Equal("Title", source.Values["Title"]);
+    }
+
     [Fact]
     public void SpectrumFormatter_ScalesClassicZeroToFifteenRange()
     {
