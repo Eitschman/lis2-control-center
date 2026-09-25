@@ -4,18 +4,36 @@ using System.Text.Json;
 using LIS2.WmpLegacy;
 
 Console.WriteLine("LIS2 Windows Media Player Legacy Simulator");
-Console.WriteLine($"Connecting to pipe: {WmpLegacyPipeServer.PipeName}");
+Console.WriteLine($"Metadata pipe:      {WmpLegacyPipeServer.PipeName}");
+Console.WriteLine($"Visualization pipe: {WmpLegacyVisualizationPipeServer.PipeName}");
 
-using var pipe = new NamedPipeClientStream(
+using var metadataPipe = new NamedPipeClientStream(
     ".",
     WmpLegacyPipeServer.PipeName,
     PipeDirection.Out,
     PipeOptions.Asynchronous);
 
-await pipe.ConnectAsync(5000);
+using var visualizationPipe = new NamedPipeClientStream(
+    ".",
+    WmpLegacyVisualizationPipeServer.PipeName,
+    PipeDirection.Out,
+    PipeOptions.Asynchronous);
 
-await using var writer = new StreamWriter(
-    pipe,
+await Task.WhenAll(
+    metadataPipe.ConnectAsync(5000),
+    visualizationPipe.ConnectAsync(5000));
+
+await using var metadataWriter = new StreamWriter(
+    metadataPipe,
+    new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+    bufferSize: 4096,
+    leaveOpen: true)
+{
+    AutoFlush = true
+};
+
+await using var visualizationWriter = new StreamWriter(
+    visualizationPipe,
     new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
     bufferSize: 4096,
     leaveOpen: true)
@@ -34,9 +52,9 @@ for (var trackIndex = 0; trackIndex < tracks.Length; trackIndex++)
 {
     var track = tracks[trackIndex];
 
-    for (var elapsed = 0; elapsed <= 20; elapsed += 5)
+    for (var elapsed = 0; elapsed <= 20; elapsed++)
     {
-        var message = new WmpLegacyMessage
+        await metadataWriter.WriteLineAsync(JsonSerializer.Serialize(new WmpLegacyMessage
         {
             Type = "snapshot",
             State = "playing",
@@ -47,9 +65,35 @@ for (var trackIndex = 0; trackIndex < tracks.Length; trackIndex++)
             PlaylistCount = tracks.Length,
             ElapsedSeconds = elapsed,
             DurationSeconds = track.Duration
-        };
+        }));
 
-        await writer.WriteLineAsync(JsonSerializer.Serialize(message));
+        var phase = elapsed * 0.55;
+        var spectrum = Enumerable.Range(0, 20)
+            .Select(index =>
+            {
+                var wave = (Math.Sin(phase + index * 0.48) + 1.0) / 2.0;
+                var envelope = 1.0 - index / 28.0;
+                return Math.Clamp(
+                    (int)Math.Round(wave * envelope * 255),
+                    0,
+                    255);
+            })
+            .ToArray();
+
+        await visualizationWriter.WriteLineAsync(
+            JsonSerializer.Serialize(new WmpLegacyVisualizationMessage
+            {
+                Type = "visualization",
+                VuLeft = Math.Clamp(
+                    (int)Math.Round((Math.Sin(phase) + 1.0) * 110 + 30),
+                    0,
+                    255),
+                VuRight = Math.Clamp(
+                    (int)Math.Round((Math.Cos(phase * 0.87) + 1.0) * 105 + 35),
+                    0,
+                    255),
+                Spectrum = spectrum
+            }));
 
         Console.WriteLine(
             $"{trackIndex + 1}/{tracks.Length}: {track.Artist} - {track.Title} [{elapsed}s]");
@@ -57,7 +101,7 @@ for (var trackIndex = 0; trackIndex < tracks.Length; trackIndex++)
         await Task.Delay(TimeSpan.FromSeconds(1));
     }
 
-    await writer.WriteLineAsync(JsonSerializer.Serialize(new WmpLegacyMessage
+    await metadataWriter.WriteLineAsync(JsonSerializer.Serialize(new WmpLegacyMessage
     {
         Type = "snapshot",
         State = "paused",
@@ -70,10 +114,19 @@ for (var trackIndex = 0; trackIndex < tracks.Length; trackIndex++)
         DurationSeconds = track.Duration
     }));
 
+    await visualizationWriter.WriteLineAsync(
+        JsonSerializer.Serialize(new WmpLegacyVisualizationMessage
+        {
+            Type = "visualization",
+            VuLeft = 0,
+            VuRight = 0,
+            Spectrum = new int[20]
+        }));
+
     await Task.Delay(TimeSpan.FromMilliseconds(750));
 }
 
-await writer.WriteLineAsync(JsonSerializer.Serialize(new WmpLegacyMessage
+await metadataWriter.WriteLineAsync(JsonSerializer.Serialize(new WmpLegacyMessage
 {
     Type = "snapshot",
     State = "stopped"
