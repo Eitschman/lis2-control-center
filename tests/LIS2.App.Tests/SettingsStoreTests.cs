@@ -64,6 +64,82 @@ public sealed class SettingsStoreTests
     }
 
     [Fact]
+    public async Task Save_HomeAssistantToken_IsProtectedAtRestAndRoundTrips()
+    {
+        using var scope = new TempSettingsScope();
+        const string token = "super-secret-home-assistant-token";
+
+        var settings = new AppSettings();
+        settings.HomeAssistant.Enabled = true;
+        settings.HomeAssistant.Url = "https://ha.example.test";
+        settings.HomeAssistant.AccessToken = token;
+
+        await scope.Store.SaveAsync(settings);
+
+        var json = File.ReadAllText(scope.Path);
+        Assert.DoesNotContain(token, json, StringComparison.Ordinal);
+        Assert.Contains("\"AccessToken\": \"dpapi:v1:", json, StringComparison.Ordinal);
+
+        var loaded = await scope.Store.LoadAsync();
+        Assert.Equal(token, loaded.HomeAssistant.AccessToken);
+    }
+
+    [Fact]
+    public async Task LegacyPlaintextHomeAssistantToken_IsMigratedOnNextSave()
+    {
+        using var scope = new TempSettingsScope();
+        const string token = "legacy-plaintext-token";
+
+        File.WriteAllText(
+            scope.Path,
+            $"""
+            {
+              "HomeAssistant": {
+                "Enabled": true,
+                "Url": "https://ha.example.test",
+                "AccessToken": "{{token}}",
+                "EntityPreferences": []
+              }
+            }
+            """);
+
+        var loaded = scope.Store.Load();
+        Assert.Equal(token, loaded.HomeAssistant.AccessToken);
+
+        await scope.Store.SaveAsync(loaded);
+
+        var migratedJson = File.ReadAllText(scope.Path);
+        Assert.DoesNotContain(token, migratedJson, StringComparison.Ordinal);
+        Assert.Contains("\"AccessToken\": \"dpapi:v1:", migratedJson, StringComparison.Ordinal);
+
+        var reloaded = scope.Store.Load();
+        Assert.Equal(token, reloaded.HomeAssistant.AccessToken);
+    }
+
+    [Fact]
+    public async Task InvalidProtectedHomeAssistantToken_IsNeverUsedAsPlaintext()
+    {
+        using var scope = new TempSettingsScope();
+
+        File.WriteAllText(
+            scope.Path,
+            """
+            {
+              "HomeAssistant": {
+                "Enabled": true,
+                "Url": "https://ha.example.test",
+                "AccessToken": "dpapi:v1:not-valid-base64",
+                "EntityPreferences": []
+              }
+            }
+            """);
+
+        var loaded = await scope.Store.LoadAsync();
+
+        Assert.Equal(string.Empty, loaded.HomeAssistant.AccessToken);
+    }
+
+    [Fact]
     public async Task SaveAndLoadAsync_RoundTripsNormalizedSettings()
     {
         using var scope = new TempSettingsScope();
