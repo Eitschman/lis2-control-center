@@ -64,14 +64,14 @@ public sealed class PingPongScrollerTests
     }
 
     [Fact]
-    public void GermanCharacters_AreExpandedBeforeScrolling()
+    public void NativeGermanCharacters_UseOneCellWhileScrolling()
     {
         var scroller = new PingPongScroller();
         var now = DateTimeOffset.UtcNow;
 
         var frame = scroller.Render("123456789012345678äXYZ", now);
 
-        Assert.Equal("123456789012345678ae", frame);
+        Assert.Equal("123456789012345678äX", frame);
         Assert.True(scroller.IsScrolling);
     }
     [Fact]
