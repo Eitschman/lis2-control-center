@@ -93,4 +93,56 @@ public sealed class DataSourceRegistryTests
 
         public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
+    [Fact]
+    public async Task Snapshot_RemainsStableWhileSourcePublishesNewSnapshots()
+    {
+        var registry = new DataSourceRegistry();
+        var source = new SwappingSource("Live");
+        registry.Add(source);
+
+        var writer = Task.Run(() =>
+        {
+            for (var index = 0; index < 500; index++)
+                source.Publish(index);
+        });
+
+        for (var index = 0; index < 500; index++)
+        {
+            var snapshot = registry.Snapshot();
+            Assert.True(snapshot.ContainsKey("Live.Value"));
+        }
+
+        await writer;
+    }
+
+    private sealed class SwappingSource : IDataSource
+    {
+        private IReadOnlyDictionary<string, object?> _values =
+            new Dictionary<string, object?> { ["Value"] = 0 };
+
+        public SwappingSource(string id) => Id = id;
+
+        public string Id { get; }
+
+        public IReadOnlyDictionary<string, object?> Values =>
+            Volatile.Read(ref _values);
+
+        public event EventHandler? Changed;
+
+        public void Publish(int value)
+        {
+            Volatile.Write(
+                ref _values,
+                new Dictionary<string, object?> { ["Value"] = value });
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    }
 }
