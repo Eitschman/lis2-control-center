@@ -312,6 +312,12 @@ public partial class MainWindow : Window
             RefreshEventsView();
             RefreshDiagnostics();
 
+            if (IsUiTestMode())
+            {
+                await RunUiRegressionTestAsync();
+                return;
+            }
+
             if (IsSmokeTestMode())
             {
                 await RunStartupSmokeTestAsync();
@@ -327,9 +333,9 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            if (IsSmokeTestMode())
+            if (IsSmokeTestMode() || IsUiTestMode())
             {
-                Log($"ERR  startup smoke test: {ex}");
+                Log($"ERR  automated UI startup test: {ex}");
                 _allowClose = true;
                 Environment.ExitCode = 1;
                 System.Windows.Application.Current.Shutdown(1);
