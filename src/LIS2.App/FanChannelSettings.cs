@@ -38,4 +38,40 @@ public sealed class FanChannelSettings
             new FanCurvePointSettings { Temperature = 60, OutputPercent = 80 },
             new FanCurvePointSettings { Temperature = 75, OutputPercent = 100 }
         };
+
+    public void EnsureDefaults()
+    {
+        Name = string.IsNullOrWhiteSpace(Name) ? "Fan" : Name;
+
+        Mode = Mode?.Trim().ToLowerInvariant() switch
+        {
+            "curve" => "Curve",
+            "follow" => "Follow",
+            "external" => "External",
+            "off" => "Off",
+            _ => "Fixed"
+        };
+
+        MinimumPercent = Math.Clamp(MinimumPercent, 0, 100);
+        MaximumPercent = Math.Clamp(MaximumPercent, MinimumPercent, 100);
+        FixedPercent = Math.Clamp(FixedPercent, 0, 100);
+        FailSafePercent = Math.Clamp(FailSafePercent, MinimumPercent, MaximumPercent);
+
+        if (double.IsNaN(HysteresisDegrees) || double.IsInfinity(HysteresisDegrees))
+            HysteresisDegrees = 1.0;
+        HysteresisDegrees = Math.Clamp(HysteresisDegrees, 0, 50);
+
+        Curve ??= new List<FanCurvePointSettings>();
+        Curve = Curve
+            .Where(point => point is not null &&
+                            !double.IsNaN(point.Temperature) &&
+                            !double.IsInfinity(point.Temperature))
+            .Select(point =>
+            {
+                point.OutputPercent = Math.Clamp(point.OutputPercent, 0, 100);
+                return point;
+            })
+            .OrderBy(point => point.Temperature)
+            .ToList();
+    }
 }
