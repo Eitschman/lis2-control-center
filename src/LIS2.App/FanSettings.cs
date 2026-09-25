@@ -9,15 +9,20 @@ public sealed class FanSettings
 
     public void EnsureDefaults()
     {
-        if (Channels.Length == 4)
-            return;
+        Channels ??= Array.Empty<FanChannelSettings>();
 
         var defaults = CreateDefaultChannels();
 
         for (var index = 0; index < Math.Min(Channels.Length, defaults.Length); index++)
-            defaults[index] = Channels[index];
+        {
+            if (Channels[index] is not null)
+                defaults[index] = Channels[index];
+        }
 
         Channels = defaults;
+
+        foreach (var channel in Channels)
+            channel.EnsureDefaults();
     }
 
     private static FanChannelSettings[] CreateDefaultChannels() =>
