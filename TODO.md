@@ -38,7 +38,7 @@ The following larger feature areas are already implemented:
 - [x] Add general template formatting helpers: number, percent, bytes, prefix/suffix and case conversion.
 - [x] Add per-variable `fallback:` text for missing, `unknown` and `unavailable` values.
 - [ ] Consider page transitions only if they produce a useful effect on a 20x2 character VFD.
-- [ ] Review source snapshot/thread-safety semantics as more background/event-driven sources are added.
+- [x] Review source snapshot/thread-safety semantics; concurrent snapshot publication is covered by tests. Revisit only if a future dedicated background/event-driven source introduces new concurrency requirements.
 
 ## Home Assistant
 
