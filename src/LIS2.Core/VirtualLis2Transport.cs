@@ -3,10 +3,18 @@ namespace LIS2.Core;
 public sealed class VirtualLis2Transport : ILis2Transport
 {
     private readonly List<byte[]> _writes = new();
+    private readonly object _writesLock = new();
 
     public bool IsOpen { get; private set; }
 
-    public IReadOnlyList<byte[]> Writes => _writes;
+    public IReadOnlyList<byte[]> Writes
+    {
+        get
+        {
+            lock (_writesLock)
+                return _writes.Select(data => data.ToArray()).ToArray();
+        }
+    }
 
     public VirtualLis2State State { get; } = new();
 
@@ -35,7 +43,9 @@ public sealed class VirtualLis2Transport : ILis2Transport
             throw new InvalidOperationException("Virtual LIS2 transport is not connected.");
 
         var copy = data.ToArray();
-        _writes.Add(copy);
+
+        lock (_writesLock)
+            _writes.Add(copy);
 
         VirtualLis2ProtocolInterpreter.Apply(State, copy);
 
