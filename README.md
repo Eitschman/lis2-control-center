@@ -31,7 +31,9 @@ LIS2 Control Center is an independent replacement for the obsolete VL System Mul
 - two independent line templates with live editor preview
 - per-line overflow mode: **PingPong**, **Marquee** or **Truncate**
 - configurable scroll speed and edge pause
-- simple source-value visibility expressions such as `Winamp.State=Playing`
+- visibility expressions with string/numeric operators: `=`, `!=`, `>`, `>=`, `<`, `<=`
+- visibility builder in the page editor using live source values
+- template formatting pipeline with fallbacks, numeric/percent/byte formatting, prefix/suffix and case conversion
 - scheduler-driven rotation independent from scrolling animation
 - event/overlay queue with priority and lifetime plus UI/test generation
 - ready-made presets for Clock, Status, CPU, GPU, Memory, Temperatures, Fans, Winamp Now Playing, VU and Spectrum
@@ -94,6 +96,9 @@ See [docs/home-assistant-integration.md](docs/home-assistant-integration.md).
 - persistent JSON settings under the user's local application data
 - custom LIS2 application/tray/taskbar icon
 - diagnostics/logging
+- decoded virtual-LIS2 command history and full virtual state inspection
+- exportable diagnostic report
+- native Windows title bar follows the selected Light/Dark/System theme
 - coalesced asynchronous display rendering to prevent overlapping writes
 
 ## Architecture
@@ -151,6 +156,17 @@ Data sources are source-agnostic from the display engine's point of view. Typica
 ```
 
 Aliases provide shorter stable names for hardware/Home Assistant values where configured.
+
+Template values can be formatted inline:
+
+```text
+{HA.sensor.temperature|fallback:--|number:1|suffix:°C}
+{HA.sensor.disk_used|fallback:--|percent:0}
+{HA.sensor.disk_free_bytes|fallback:--|bytes:1}
+{Winamp.Title|fallback:Nothing playing|upper}
+```
+
+Supported operations are `fallback`, `number`, `percent`, `bytes`, `prefix`, `suffix`, `upper` and `lower`. Operations can be chained.
 
 ## Protocol status
 
