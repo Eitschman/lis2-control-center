@@ -1,207 +1,251 @@
 # TODO / Roadmap
 
-This document tracks feature work for LIS2 Control Center. It is intentionally separate from the protocol notes: unresolved protocol questions belong in `docs/protocol.md` or `docs/reverse-engineering.md`.
+This file tracks **remaining work** for LIS2 Control Center as implemented on `main`. Completed areas are summarized where useful, but old planning items that have already become normal product functionality are no longer presented as future work.
 
-## Next up
+Protocol uncertainties belong in `docs/protocol.md` / `docs/reverse-engineering.md`.
 
-### Display pages / "Auto User"
+## Current implementation baseline
 
-- [x] Turn the current page list into a richer sequence editor.
-- [x] Reorder pages easily (buttons and/or drag & drop).
-- [x] Configure duration per page.
-- [x] Enable/disable individual pages without deleting them.
-- [x] Make page duration drive the scheduler instead of relying on one global interval.
-- [x] Add convenient duplicate-page action.
-- [x] Improve page preview/editing workflow.
-- [ ] Add optional conditional visibility based on source values.
-- [x] Add reusable page/display presets.
+The following larger feature areas are already implemented:
 
-The original MCC's "Auto User" concept is useful inspiration here, but the new implementation should remain source-agnostic and more flexible.
+- [x] Serial and virtual LIS2 transports.
+- [x] 20x2 display runtime, page scheduler and differential display writes.
+- [x] Page editor with reorder, duplicate, enable/disable, duration and live preview.
+- [x] Ping-pong, marquee and truncate overflow modes with configurable timing.
+- [x] Simple source-value conditional visibility.
+- [x] Page presets: Clock, Status, CPU, GPU, Memory, Temperatures, Fans, Winamp Now Playing, VU and Spectrum.
+- [x] Event/overlay queue with priority/lifetime and application UI.
+- [x] Eight-slot custom-character manager and graphical CG Builder.
+- [x] Save/load custom glyph sets and named template references.
+- [x] Native uPD16314 character mapping including umlauts and common symbols.
+- [x] Character-ROM/raw-byte testing UI.
+- [x] LibreHardwareMonitor browser with grouping, search/filter, aliases, favorites and missing-sensor handling.
+- [x] Four-channel fan control with Fixed, Curve, Follow, External and Off modes.
+- [x] Fan curves, live values, min/max/fail-safe and hysteresis.
+- [x] Native Winamp x86 plug-in, simulator, metadata, VU and spectrum telemetry.
+- [x] Eight-level custom-glyph Winamp spectrum.
+- [x] Home Assistant WebSocket source with entity browser, aliases/favorites and page creation.
+- [x] Home Assistant entity attributes exposed as template values and browsable in the UI.
+- [x] Tray/autostart, themes, localization and About/version UI.
+- [x] Windows CI, unit tests, self-contained artifacts and WPF startup/tab smoke test.
+- [x] Coalesced asynchronous display rendering.
 
-### Scrolling / marquee
+## Display pages / runtime
 
-- [x] Automatically ping-pong scroll display lines longer than 20 characters.
-- [x] Pause briefly at both scroll edges.
-- [x] Keep page rotation timing independent from scrolling cadence.
-- [x] Avoid unnecessary serial writes when the visible frame has not changed.
-- [x] Support both lines scrolling independently.
-- [x] Use long Winamp titles/artists as a primary use case.
-- [x] Add optional per-line overflow policy: ping-pong, truncate/static crop, or one-way marquee.
-- [x] Make scroll speed and edge pause user-configurable.
+- [ ] Improve the **conditional visibility editor UX**. The runtime already supports `key=value`; the remaining work is making conditions easier to build without typing raw expressions.
+- [ ] Add general formatting helpers for numeric values, temperatures and percentages.
+- [ ] Add configurable fallback text for missing/unavailable variables.
+- [ ] Consider page transitions only if they produce a useful effect on a 20x2 character VFD.
+- [ ] Review source snapshot/thread-safety semantics as more background/event-driven sources are added.
 
-Historical MCC material indicates that track information could scroll while ordinary long text was more limited. The new renderer should make scrolling a general feature.
+## Home Assistant
 
-### Custom characters / CG Builder
+Implemented today:
 
-- [x] Add graphical editor for all eight programmable LIS2 character slots.
-- [x] 5-pixel-wide row editing with the LIS2 character RAM constraints visible in the UI.
-- [x] Live preview.
-- [x] Send one slot or all slots to the device.
-- [x] Save/load glyph sets as project-owned files.
-- [x] Allow custom glyphs to be referenced conveniently from page templates.
-- [x] Ship a small set of independently created example glyphs/icons.
-- [ ] Validate every custom-character operation on real LIS2 hardware before treating it as stable.
+- [x] WebSocket authentication and automatic reconnect.
+- [x] Initial `get_states` snapshot and live `state_changed` events.
+- [x] Search and domain filtering.
+- [x] Entity aliases and favorites.
+- [x] Entity state/unit/friendly-name variables.
+- [x] All entity attributes exposed as `{HA.<entity>.attribute.<name>}`.
+- [x] Alias-based attribute variables.
+- [x] Attribute browser.
+- [x] Direct display-page creation from entities and attributes.
+- [x] Read-only integration by design.
 
-The original MCC included a "CG Builder"; this is a confirmed useful product capability, not a reason to copy proprietary artwork.
+Remaining:
+
+- [ ] Validate behavior with a wider range of real HA integrations, especially entities with large/structured attributes.
+- [ ] Consider friendlier formatting for JSON array/object attributes if real integrations make that useful.
+- [ ] Consider secure OS-backed token storage instead of keeping the long-lived token in the application settings JSON.
+- [ ] Keep service calls/control out of scope unless there is a concrete LIS2 use case.
 
 ## Hardware monitoring
 
-- [x] LibreHardwareMonitor data source.
-- [x] Live sensor browser.
-- [x] Search/filter sensors.
-- [x] Show values, units and template keys.
-- [x] Assign a selected sensor directly to a fan channel.
-- [x] Add friendly aliases/favorites for frequently used sensors.
-- [x] Persist sensor favorites.
-- [x] Add ready-made display presets such as CPU, GPU, memory, temperatures and fans.
-- [x] Gracefully identify sensors that disappeared or changed after a hardware/driver update.
-- [x] Group sensors by hardware device in the browser.
+Implemented:
 
-Historical MCC versions integrated MBM5/SpeedFan and offered predefined monitoring choices. LIS2 Control Center should provide similar convenience without coupling the display engine to a particular monitoring backend.
+- [x] LibreHardwareMonitor source and live sensor browser.
+- [x] Search/filter and grouping by hardware.
+- [x] Values, units and template keys.
+- [x] Aliases and favorites with persistence.
+- [x] Configured-but-disappeared sensors remain visible as unavailable.
+- [x] Direct fan-channel assignment.
+- [x] CPU/GPU/Memory/Temperatures/Fans display presets.
 
-## Fan control
+Remaining:
 
-- [x] Four fan channels.
-- [x] Fixed output mode.
-- [x] Curve mode.
-- [x] Follow mode.
-- [x] Minimum/maximum output.
-- [x] Fail-safe output.
+- [ ] Continue validating sensor identity stability across LibreHardwareMonitor/driver updates.
+- [ ] Improve formatting/fallback helpers at the display layer rather than adding backend-specific formatting.
+
+## Fan control / safety
+
+Implemented:
+
+- [x] Four channels.
+- [x] Fixed, Curve, Follow, External and Off modes.
+- [x] Minimum/maximum/fail-safe outputs.
 - [x] Missing/invalid sensor handling.
 - [x] Hardware sensor selection.
-- [ ] Add a clearer low-output safety warning/confirmation in the UI.
-- [ ] Document the historical LIS2 channel rating reported as 12 V / 10 W / approximately 0.83 A per output, while clearly marking the source/verification status.
-- [ ] Surface the original MCC's conservative low-speed behavior as historical guidance, not as an unverified electrical requirement.
-- [x] Add fan-curve graph/editor.
-- [x] Add live display of sensor input and resulting fan percentage per channel.
-- [x] Add optional hysteresis/smoothing to avoid output hunting.
-- [ ] Add explicit emergency/fail-safe indication in the UI.
-- [ ] Validate safe minimum outputs with real connected fans before choosing stronger defaults.
+- [x] Fan-curve editor/preview.
+- [x] Live input/output values.
+- [x] Optional hysteresis.
 
-Do not infer electrical limits or safe fan-stop behavior solely from screenshots/reviews. Real-hardware verification remains authoritative.
+Remaining:
+
+- [ ] Add a clearer low-output safety warning/confirmation in the UI.
+- [ ] Add explicit emergency/fail-safe indication in the UI.
+- [ ] Document the historical reported channel rating of 12 V / 10 W / approximately 0.83 A while clearly identifying the source and verification status.
+- [ ] Preserve original MCC low-speed behavior only as historical guidance, not as an electrical requirement.
+- [ ] Validate safe minimum outputs and stop behavior on real connected fans before choosing stronger defaults.
 
 ## Winamp
 
-- [x] Native 32-bit `gen_lis2.dll`.
+Implemented:
+
+- [x] Native x86 `gen_lis2.dll`.
 - [x] Named-pipe transport.
-- [x] Artist/title/album metadata.
-- [x] Playback state.
-- [x] Elapsed/duration.
-- [x] Playlist position/count.
-- [x] Bitrate/sample rate.
+- [x] Playback state and metadata.
+- [x] Elapsed/duration, playlist position/count, bitrate/sample rate.
 - [x] Winamp simulator.
-- [x] Live Now Playing/status page in the Windows application.
-- [x] Improve stale/disconnect/reconnect diagnostics.
-- [x] Add optional display-page presets for Now Playing.
-- [x] Add configurable title/artist scrolling.
-- [x] Investigate a lightweight VU/level visualization.
-- [x] Investigate an optional small spectrum display using custom characters.
-- [ ] Keep spectrum/VU optional: a 20x2 character VFD and serial update rate make high-resolution visualization a poor fit.
-- [ ] Do not make the Winamp plugin responsible for LIS2 hardware access; it remains metadata/events only.
+- [x] Stale/disconnect/reconnect handling.
+- [x] Now Playing preset and scrolling.
+- [x] VU telemetry/display.
+- [x] 20-band analyzer/spectrum telemetry.
+- [x] Eight-level custom-glyph VFD spectrum preset.
 
-## Display runtime
+Remaining:
 
-- [x] 20x2 display frames.
-- [x] Template renderer.
-- [x] Page scheduler.
-- [x] Event queue/overlay infrastructure.
-- [x] Virtual display path.
-- [x] Expose event overlays properly in the application UI.
-- [x] Add test/demo event generation.
-- [x] Add configurable event priority and lifetime.
-- [ ] Add page transitions only where they make sense on a character VFD.
-- [ ] Add general formatting helpers for numeric values, temperatures and percentages.
-- [ ] Add fallback text for unavailable variables.
-- [ ] Review thread safety of data-source snapshots while background sources update.
+- [ ] Keep VU/spectrum deliberately modest in update rate; the LIS2 is a character VFD, not a high-frame-rate visualizer.
+- [ ] Keep the Winamp plug-in metadata/telemetry-only. It must not gain direct LIS2 hardware access.
+
+## Custom characters / character ROM
+
+Implemented:
+
+- [x] Graphical editor for all eight 5x8 slots.
+- [x] Live preview and one/all-slot programming.
+- [x] Glyph-set save/load.
+- [x] Template references.
+- [x] Built-in independently created glyph sets.
+- [x] Spectrum bar glyph set.
+- [x] Native uPD16314 ROM-code-002 mapping for Latin-1 and selected useful Unicode symbols.
+- [x] Raw 40-byte ROM range tester.
+
+Remaining:
+
+- [ ] Validate all eight custom-character slots on physical LIS2 hardware.
+- [ ] Validate the newly mapped extended character ROM against the physical display and record any deviations.
+- [ ] Record confirmed physical-ROM findings in `docs/protocol.md`.
 
 ## LIS2 protocol / hardware validation
 
-- [x] Serial transport at 19200 baud, 8N1.
-- [x] Virtual transport.
-- [x] Clear/reset command support.
-- [x] Line 1/line 2 display commands.
-- [x] Known brightness commands.
-- [x] Four-channel fan command generation.
-- [x] Known custom-character command generation.
-- [ ] Validate the complete command set on physical LIS2 hardware.
-- [ ] Resolve full-line trailing `00` behavior.
+Implemented in production code:
+
+- [x] Serial 19200 baud, 8N1.
+- [x] Virtual transport/interpreter.
+- [x] `A0` clear/reset.
+- [x] `A1/A2 <column> A7 ...` line writes.
+- [x] Brightness commands for 100/75/50/25%.
+- [x] `AE F0 ...` four-channel fan writes.
+- [x] `AB <slot> <row> <bitmap>` custom-character programming.
+- [x] Native display-character encoding.
+- [x] Raw display-byte writes for explicit testing.
+
+Still unresolved / requiring real hardware:
+
+- [ ] Validate the complete supported command set on physical LIS2 hardware.
+- [ ] Resolve MCC full-line trailing `00` behavior.
 - [ ] Resolve display-off/brightness-off behavior.
-- [ ] Validate all eight custom-character slots.
-- [ ] Investigate safe device detection without sending speculative commands.
+- [ ] Validate all custom-character operations.
+- [ ] Investigate safe device detection without speculative writes.
+- [ ] Determine whether the device returns useful identification/version information.
 - [ ] Keep MPlay-specific commands out of automatic LIS2 initialization.
-- [ ] Record every newly confirmed command with confidence level and test evidence.
+- [ ] Record each newly confirmed command with confidence level and test evidence.
 
 ## Application / UX
 
-- [x] Windows WPF application.
-- [x] Tray operation.
+Implemented:
+
+- [x] WPF application and tray operation.
 - [x] Windows autostart.
-- [x] Dark theme.
-- [x] Light theme.
-- [x] Follow Windows app theme.
-- [x] Theme-aware ComboBoxes and controls.
-- [x] Runtime localization: System default, English, German, French, Turkish and Russian with English fallback.
-- [x] Localized tray menu and custom LIS2 tray icon.
-- [x] Startup diagnostic log for fatal startup problems.
-- [ ] Theme the native Windows title bar consistently with the selected app theme.
-- [ ] Review all controls in both Light and Dark themes.
-- [x] Improve first-run experience. — Not needed; intentionally omitted.
-- [x] Add explicit application/about/version information.
-- [x] Add settings export/import. — Not needed; intentionally omitted.
-- [ ] Consider profile support for different machines/use cases.
-- [x] Add a safe "restore defaults" workflow. — Not needed; intentionally omitted.
+- [x] Light, Dark and System themes.
+- [x] Runtime localization: System, English, German, French, Turkish and Russian with English fallback.
+- [x] Localized tray menu and LIS2 app/tray/taskbar icon.
+- [x] Startup diagnostics.
+- [x] About/version information.
+- [x] Hardware and Home Assistant browser/table layout cleanup.
+
+Remaining:
+
+- [ ] Theme the native Windows title bar consistently with the selected application theme.
+- [ ] Continue reviewing every control in both Light and Dark themes.
+- [ ] Continue UI polish where real-world data exposes layout problems.
+- [ ] Consider profile support only if multiple machine/use-case configurations actually need it.
+
+Deliberately omitted:
+
+- [x] First-run wizard — **not needed**.
+- [x] Settings import/export — **not needed**.
+- [x] Restore-defaults workflow — **not needed**.
 
 ## Virtual LIS2 / diagnostics
 
-- [x] Virtual transport.
-- [x] Virtual protocol interpreter/state.
+Implemented:
+
+- [x] Virtual transport and protocol interpreter/state.
 - [x] Protocol tester.
 - [x] Runtime diagnostics/logging.
-- [ ] Expand virtual-device state display so fan, brightness, glyph and display state can be inspected together.
-- [ ] Add command history with decoded protocol meaning.
-- [ ] Add exportable diagnostic report.
-- [ ] Add optional raw serial capture for hardware reverse-engineering sessions.
+- [x] Virtual decoding of native international display characters.
+
+Remaining:
+
+- [ ] Expand the virtual-device diagnostics so display, fan, brightness and glyph state can be inspected together.
+- [ ] Add decoded command history.
+- [ ] Add an exportable diagnostic report.
+- [ ] Add optional raw serial capture for reverse-engineering sessions.
 - [ ] Never send unknown/experimental commands automatically.
 
-## Future data sources
+## Additional data sources
 
-These are deliberately lower priority than making the core LIS2 experience complete.
+Home Assistant changes the priority here: values already available in HA do **not** need a second dedicated LIS2 integration merely to display them.
 
-- [x] Home Assistant — WebSocket state source, entity browser, aliases/favorites and page creation.
-- [ ] Plex.
-- [ ] OctoPrint.
+Possible future sources should therefore be added only when they provide a concrete advantage over HA or local sources:
+
+- [ ] Plex — only if direct integration adds useful data/behavior.
+- [ ] OctoPrint — only if direct integration adds useful data/behavior.
 - [ ] Generic HTTP/JSON source.
-- [ ] Server/Docker monitoring source.
-- [ ] Possibly additional media-player integrations behind the same source abstraction.
+- [ ] Additional media-player integrations behind the existing source abstraction.
+
+A separate generic Docker/server-monitoring source is **not currently planned** just to duplicate values that can already arrive through Home Assistant.
 
 ## Engineering / quality
 
+Implemented:
+
 - [x] Windows CI.
-- [x] Unit tests for Core, Display, Sources, Fans and Winamp mapping.
-- [x] Self-contained Windows build artifact.
-- [x] Native Winamp x86 build artifact.
-- [x] Add an application startup smoke test so WPF resource/startup regressions are caught by CI.
-- [ ] Add tests around theme resource loading.
+- [x] Core, Display, Sources, Fans and Winamp tests.
+- [x] Self-contained Windows x64 application artifact.
+- [x] Self-contained protocol-tester artifact.
+- [x] Native Winamp x86 artifact.
+- [x] WPF startup/tab smoke test.
+- [x] Serialized/coalesced display rendering.
+
+Remaining:
+
+- [ ] Add targeted tests for theme resource loading.
 - [ ] Add tests for settings migration/defaulting.
 - [ ] Add more fan safety edge-case tests.
-- [x] Review async/UI-thread boundaries for display rendering; serialize/coalesce overlapping render requests.
-- [ ] Review data-source concurrency and snapshot semantics.
-- [ ] Add release/versioning workflow when the application reaches an alpha milestone.
+- [ ] Review data-source concurrency/snapshot semantics.
+- [ ] Add a release/versioning workflow when the project reaches an explicit release milestone.
 
-## Research references to preserve
+## Research / guardrails
 
-Useful historical material should be linked/documented rather than copied into the repository.
-
-- TechPowerUp VLSystem LIS2 review, especially the installation/software screenshots:
-  `https://www.techpowerup.com/review/vlsystem-lis2/2.html`
-- Original MCC executable/binaries used for interoperability research must remain outside the repository.
-- Findings derived from reverse engineering should be written down in `docs/reverse-engineering.md` with an appropriate confidence level.
-
-## Non-goals / guardrails
-
-- Do not redistribute proprietary VL System software or artwork.
+- Do not redistribute proprietary VL System software, installers or artwork.
 - Do not blindly clone MCC's UI.
-- Do not send unknown commands merely because they appear in an old binary.
-- Do not merge LIS2 and MPlay protocol assumptions without hardware evidence.
-- Do not sacrifice fan safety for visual convenience.
-- Keep Winamp/media integrations separated from direct hardware access.
+- Do not send unknown protocol commands because they appear in an old binary.
+- Keep LIS2 and MPlay assumptions separate.
+- Keep fan safety independent from display/media/network integrations.
+- Keep the Winamp plug-in separated from hardware access.
+- Treat physical LIS2 validation as authoritative for protocol behavior.
+
+Historical references and reverse-engineering evidence belong in `docs/reverse-engineering.md`.
