@@ -657,9 +657,6 @@ public partial class MainWindow : Window
                 if (MainTabs.SelectedIndex == 9)
                     RefreshHomeAssistantView();
 
-                if (MainTabs.SelectedIndex == 2)
-                    RefreshTemplateVariableChoices();
-
                 await RenderRuntimePageAsync();
             }
             catch (Exception ex)
