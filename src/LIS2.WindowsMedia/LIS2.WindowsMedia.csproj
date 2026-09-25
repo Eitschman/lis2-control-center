@@ -4,7 +4,6 @@
     <RootNamespace>LIS2.WindowsMedia</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.SDK.NET.Ref" Version="10.0.26100.86" />
     <ProjectReference Include="..\LIS2.Sources\LIS2.Sources.csproj" />
   </ItemGroup>
 </Project>
