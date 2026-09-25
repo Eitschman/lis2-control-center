@@ -36,12 +36,36 @@ public partial class HelpWindow : Window
         _displayValues = displayValues;
         _glyphNames = glyphNames;
 
+        ApplyLocalization();
+        LocalizationService.LanguageChanged += LocalizationService_LanguageChanged;
+        Closed += (_, _) =>
+            LocalizationService.LanguageChanged -= LocalizationService_LanguageChanged;
+
+        SectionsListBox.SelectedIndex =
+            Math.Clamp(initialSection, 0, SectionNames.Length - 1);
+    }
+
+    private void LocalizationService_LanguageChanged(object? sender, EventArgs e) =>
+        ApplyLocalization();
+
+    private void ApplyLocalization()
+    {
+        Title = HelpLocalization.Translate("LIS2 Control Center Help");
+        HelpTitleText.Text = HelpLocalization.Translate("Help & reference");
+        HelpSubtitleText.Text = HelpLocalization.Translate(
+            "Instructions, configuration reference and display-variable examples.");
+        CloseButton.Content = LocalizationService.Translate("Close");
+
+        var selectedIndex = SectionsListBox.SelectedIndex;
         SectionsListBox.ItemsSource = SectionNames
             .Select(LocalizationService.Translate)
             .ToArray();
 
-        SectionsListBox.SelectedIndex =
-            Math.Clamp(initialSection, 0, SectionNames.Length - 1);
+        if (selectedIndex >= 0)
+            SectionsListBox.SelectedIndex = selectedIndex;
+
+        if (SectionsListBox.SelectedIndex >= 0)
+            RenderSection(SectionsListBox.SelectedIndex);
     }
 
     private void SectionsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -320,7 +344,7 @@ public partial class HelpWindow : Window
         });
 
     private void AddHeading(string text) =>
-        HelpDocument.Blocks.Add(new Paragraph(new Run(text))
+        HelpDocument.Blocks.Add(new Paragraph(new Run(HelpLocalization.Translate(text)))
         {
             FontSize = 18,
             FontWeight = FontWeights.SemiBold,
@@ -328,7 +352,7 @@ public partial class HelpWindow : Window
         });
 
     private void AddParagraph(string text) =>
-        HelpDocument.Blocks.Add(new Paragraph(new Run(text))
+        HelpDocument.Blocks.Add(new Paragraph(new Run(HelpLocalization.Translate(text)))
         {
             Margin = new Thickness(0, 0, 0, 8),
             LineHeight = 21
@@ -347,7 +371,7 @@ public partial class HelpWindow : Window
     {
         var paragraph = new Paragraph { Margin = new Thickness(0, 2, 0, 5) };
         paragraph.Inlines.Add(new Run($"{{{key}}}") { FontFamily = new System.Windows.Media.FontFamily("Consolas"), FontWeight = FontWeights.SemiBold });
-        paragraph.Inlines.Add(new Run($" — {description}"));
+        paragraph.Inlines.Add(new Run($" — {HelpLocalization.Translate(description)}"));
         HelpDocument.Blocks.Add(paragraph);
     }
 
@@ -377,7 +401,11 @@ public partial class HelpWindow : Window
             Margin = new Thickness(20, 2, 0, 8)
         };
         foreach (var item in items)
-            list.ListItems.Add(new ListItem(new Paragraph(new Run(item)) { Margin = new Thickness(0, 1, 0, 3) }));
+            list.ListItems.Add(new ListItem(
+                new Paragraph(new Run(HelpLocalization.Translate(item)))
+                {
+                    Margin = new Thickness(0, 1, 0, 3)
+                }));
         HelpDocument.Blocks.Add(list);
     }
 
