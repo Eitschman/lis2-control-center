@@ -12,6 +12,7 @@ using LIS2.Display;
 using LIS2.Fans;
 using LIS2.Sources;
 using LIS2.Winamp;
+using LIS2.WmpLegacy;
 
 namespace LIS2.App;
 
@@ -32,6 +33,7 @@ public partial class MainWindow : Window
     private readonly PingPongScroller _pageEditorLine1Scroller = new();
     private readonly PingPongScroller _pageEditorLine2Scroller = new();
     private readonly WinampDataSource _winampSource = new();
+    private readonly WmpLegacyDataSource _wmpLegacySource = new();
     private readonly HomeAssistantDataSource _homeAssistantSource = new();
     private readonly FanController _fanController = new();
     private int[]? _lastAutomaticFanOutputs;
@@ -46,6 +48,7 @@ public partial class MainWindow : Window
     private bool _loadingCustomGlyphSetting;
     private bool _fanUiInitialized;
     private bool _lastWinampConnected;
+    private bool _lastWmpLegacyConnected;
     private bool _applyingAppearanceSettings;
     private bool _refreshingHomeAssistantUi;
 
@@ -108,10 +111,12 @@ public partial class MainWindow : Window
 
         _eventQueue.Changed += EventQueue_Changed;
         _winampSource.Changed += WinampSource_Changed;
+        _wmpLegacySource.Changed += WmpLegacySource_Changed;
         _homeAssistantSource.Changed += HomeAssistantSource_Changed;
 
         _sources.Add(new ClockDataSource());
         _sources.Add(_winampSource);
+        _sources.Add(_wmpLegacySource);
         _sources.Add(new LibreHardwareMonitorDataSource());
         _sources.Add(_homeAssistantSource);
 
@@ -134,7 +139,8 @@ public partial class MainWindow : Window
         ("Fans", "Fans", "Hardware"),
         ("WinampNowPlaying", "Winamp Now Playing", "Winamp"),
         ("WinampVU", "Winamp VU", "Winamp"),
-        ("WinampSpectrum", "Winamp Spectrum", "Winamp")
+        ("WinampSpectrum", "Winamp Spectrum", "Winamp"),
+        ("WmpLegacyNowPlaying", "WMP Legacy Now Playing", "Media")
     ];
 
     private static readonly (string Title, string Subtitle)[] Sections =
@@ -296,6 +302,7 @@ public partial class MainWindow : Window
             LogSourceHealth();
             RefreshWinampView();
             _lastWinampConnected = _winampSource.IsRecentlyConnected;
+            _lastWmpLegacyConnected = _wmpLegacySource.IsRecentlyConnected;
             RefreshHardwareSensors();
             RefreshFanSensorChoices();
             RefreshHomeAssistantView();
@@ -454,6 +461,7 @@ public partial class MainWindow : Window
         _pageEditorPreviewTimer.Stop();
         _eventQueue.Changed -= EventQueue_Changed;
         _winampSource.Changed -= WinampSource_Changed;
+        _wmpLegacySource.Changed -= WmpLegacySource_Changed;
         _homeAssistantSource.Changed -= HomeAssistantSource_Changed;
 
         await _sources.StopAllAsync();
@@ -704,6 +712,21 @@ public partial class MainWindow : Window
             catch (Exception ex)
             {
                 Log($"ERR  Winamp-triggered page render: {ex.Message}");
+            }
+        });
+    }
+
+    private void WmpLegacySource_Changed(object? sender, EventArgs e)
+    {
+        Dispatcher.BeginInvoke(async () =>
+        {
+            try
+            {
+                await RenderRuntimePageAsync();
+            }
+            catch (Exception ex)
+            {
+                Log($"ERR  WMP Legacy-triggered page render: {ex.Message}");
             }
         });
     }
@@ -1146,17 +1169,23 @@ public partial class MainWindow : Window
         if (MainTabs.SelectedIndex == 3)
             RefreshWinampView();
 
-        if (connected != _lastWinampConnected)
-        {
-            _lastWinampConnected = connected;
+        var wmpLegacyConnected = _wmpLegacySource.IsRecentlyConnected;
+        var connectionChanged =
+            connected != _lastWinampConnected ||
+            wmpLegacyConnected != _lastWmpLegacyConnected;
 
+        _lastWinampConnected = connected;
+        _lastWmpLegacyConnected = wmpLegacyConnected;
+
+        if (connectionChanged)
+        {
             try
             {
                 await RenderRuntimePageAsync();
             }
             catch (Exception ex)
             {
-                Log($"ERR  Winamp connection-state page render: {ex.Message}");
+                Log($"ERR  media connection-state page render: {ex.Message}");
             }
         }
     }
@@ -2543,6 +2572,19 @@ public partial class MainWindow : Window
                 VisibilityExpression = "Winamp.State=Playing",
                 Line1OverflowMode = "PingPong",
                 Line2OverflowMode = "Truncate",
+                ScrollStepMilliseconds = 250,
+                ScrollEdgePauseMilliseconds = 800
+            },
+            "WmpLegacyNowPlaying" => new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = "WMP Legacy Now Playing",
+                Line1Template = "{WmpLegacy.Artist|fallback:--}",
+                Line2Template = "{WmpLegacy.Title|fallback:--}",
+                DurationSeconds = 7,
+                VisibilityExpression = "WmpLegacy.State=Playing",
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "PingPong",
                 ScrollStepMilliseconds = 250,
                 ScrollEdgePauseMilliseconds = 800
             },
