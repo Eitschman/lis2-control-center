@@ -82,6 +82,31 @@ public partial class HelpWindow : Window
             RenderSection(index);
     }
 
+    internal void ValidateLayoutForUiTest(UiRegressionReport report)
+    {
+        UiTestSupport.AssertPositiveSize(
+            report,
+            HelpViewer,
+            "Help: document viewer");
+
+        UiTestSupport.AssertFullyInside(
+            report,
+            CloseButton,
+            this,
+            "Help: close button");
+
+        if (HelpDocument.PagePadding.Right < 16)
+        {
+            report.Fail(
+                $"Help: right document padding is {HelpDocument.PagePadding.Right:0.0}px; expected at least 16px to keep text clear of the scrollbar.");
+        }
+        else
+        {
+            report.Pass(
+                $"Help: right document padding is {HelpDocument.PagePadding.Right:0.0}px.");
+        }
+    }
+
     private void RenderSection(int index)
     {
         HelpDocument.Blocks.Clear();
