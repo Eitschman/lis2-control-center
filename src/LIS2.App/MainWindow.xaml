@@ -67,7 +67,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="♫" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="Winamp" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Media" VerticalAlignment="Center"/>
                         </Grid>
                     </Button>
                     <Button Tag="4" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
@@ -824,8 +824,8 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- Winamp -->
-                <TabItem Header="Winamp">
+                <!-- Media -->
+                <TabItem Header="Media">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
@@ -1143,6 +1143,82 @@
                                                Margin="0,5,0,8"/>
                                     <TextBlock FontFamily="Consolas"
                                                Text="{}{WmpLegacy.State}   {WmpLegacy.Artist}   {WmpLegacy.Title}   {WmpLegacy.Album}&#x0a;{WmpLegacy.Elapsed}   {WmpLegacy.Duration}   {WmpLegacy.TrackNumber}   {WmpLegacy.PlaylistCount}&#x0a;{WmpLegacy.Connected}   {WmpLegacy.VisualizationConnected}   {WmpLegacy.Vu}&#x0a;{WmpLegacy.Spectrum}   {WmpLegacy.SpectrumGlyphs}"
+                                               Foreground="{DynamicResource LogTextBrush}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="Windows Media Player"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="18"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,20,0"/>
+                                        <Border Grid.Column="1"
+                                                Background="{DynamicResource StatusBadgeBrush}"
+                                                CornerRadius="12"
+                                                Padding="12,8">
+                                            <TextBlock x:Name="WindowsMediaStatusText"
+                                                       Text="Disconnected"
+                                                       Foreground="{DynamicResource StatusBadgeTextBrush}"
+                                                       FontWeight="SemiBold"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <TextBlock x:Name="WindowsMediaTitleText"
+                                               Text="Nothing playing"
+                                               FontSize="22"
+                                               FontWeight="SemiBold"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock x:Name="WindowsMediaArtistText"
+                                               Text="Waiting for Windows Media Player..."
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               Margin="0,4,0,0"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock x:Name="WindowsMediaAlbumText"
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               Margin="0,3,0,10"
+                                               TextTrimming="CharacterEllipsis"/>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="14"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Playback" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="WindowsMediaPlaybackText"
+                                                       Text="Unknown"
+                                                       FontSize="18"
+                                                       FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="WindowsMediaTimeText"
+                                                       Text="--:-- / --:--"
+                                                       FontFamily="Consolas"
+                                                       Foreground="{DynamicResource MutedBrush}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Windows media session" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="WindowsMediaSourceText"
+                                                       Text="Microsoft.ZuneMusic"
+                                                       Foreground="{DynamicResource MutedBrush}"
+                                                       TextWrapping="Wrap"/>
+                                            <TextBlock Text="No plug-in is required; telemetry comes directly from Windows GSMTC."
+                                                       Foreground="{DynamicResource MutedBrush}"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <TextBlock FontFamily="Consolas"
+                                               Margin="0,12,0,0"
+                                               Text="{}{WindowsMedia.State}   {WindowsMedia.Artist}   {WindowsMedia.Title}&#x0a;{WindowsMedia.Album}   {WindowsMedia.AlbumArtist}&#x0a;{WindowsMedia.Elapsed}   {WindowsMedia.Duration}&#x0a;{WindowsMedia.TrackNumber}   {WindowsMedia.AlbumTrackCount}   {WindowsMedia.Connected}"
                                                Foreground="{DynamicResource LogTextBrush}"/>
                                 </StackPanel>
                             </Border>
