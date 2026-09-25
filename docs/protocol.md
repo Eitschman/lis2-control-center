@@ -82,7 +82,34 @@ A2 00 A7 <20 characters> 00
 
 Whether the trailing `00` is required, ignored, or merely an MCC implementation artifact is UNKNOWN.
 
-Initial text handling uses a conservative display-safe character set. The native degree sign is supported explicitly: Unicode `°` is preserved in display frames/previews and encoded as display byte `DF` on the wire. LCDproc exposes VLSystem LIS2 as an HD44780-compatible connection type, whose classic character ROM maps the degree sign to `0xDF`. The remainder of the LIS2 character ROM/code page is still to be mapped and validated on physical hardware.
+Display text now uses the documented NEC uPD16314 ROM-code-002 mapping used by LCDproc for the VLSystem LIS VFD family. Unicode is retained inside the application and converted to native display bytes only at the protocol boundary.
+
+Important native mappings include:
+
+| Unicode | Display byte |
+| --- | ---: |
+| `Ä` | `80` |
+| `Ö` | `86` |
+| `Ü` | `8A` |
+| `ä` | `E1` |
+| `ö` | `87` |
+| `ü` | `8B` |
+| `ß` | `E2` |
+| `°` | `DF` |
+| `µ` / `μ` | `E4` |
+| `±` | `B1` |
+| `£` | `92` |
+| `÷` | `FD` |
+| `←` / `→` | `7F` / `7E` |
+| `Ω` | `F4` |
+| `π` | `F7` |
+| `Σ` | `F6` |
+| `√` | `E8` |
+| `∞` | `F3` |
+
+The full ISO-8859-1 range `U+00A0..U+00FF` is translated through LCDproc's uPD16314 table. Characters outside the known mapping remain `?` rather than sending speculative byte values.
+
+The Display page also contains an explicit character-ROM tester. It can send a mapped special-character sample or a user-selected 40-byte raw ROM range. Raw ROM testing is only performed after a deliberate button press and is never part of automatic initialization.
 
 ## Brightness
 
