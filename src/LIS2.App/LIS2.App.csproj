@@ -7,6 +7,9 @@
     <RootNamespace>LIS2.App</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\LIS2.Core\LIS2.Core.csproj" />
     <ProjectReference Include="..\LIS2.Display\LIS2.Display.csproj" />
     <ProjectReference Include="..\LIS2.Sources\LIS2.Sources.csproj" />
