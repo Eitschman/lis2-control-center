@@ -179,33 +179,50 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <DockPanel Grid.Row="0" Margin="0,0,0,18">
-                <StackPanel DockPanel.Dock="Left">
-                    <TextBlock x:Name="SectionTitleText" Text="Dashboard" FontSize="30" FontWeight="SemiBold"/>
+            <Grid Grid.Row="0" Margin="0,0,0,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="SectionTitleText"
+                                   Text="Dashboard"
+                                   FontSize="30"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                        <Button x:Name="SectionHelpButton"
+                                Content="?"
+                                Width="32"
+                                Height="32"
+                                Margin="12,1,0,0"
+                                Padding="0"
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                VerticalAlignment="Center"
+                                ToolTip="Help for this page"
+                                Click="Help_Click"/>
+                    </StackPanel>
                     <TextBlock x:Name="SectionSubtitleText"
                                Text="Overview and quick access to the most important functions."
                                Foreground="{DynamicResource MutedBrush}"
                                Margin="0,5,0,0"/>
                 </StackPanel>
-                <Button DockPanel.Dock="Right"
-                        Content="?"
-                        Width="36"
-                        Height="36"
-                        Margin="0,0,10,0"
-                        Padding="0"
-                        FontSize="18"
-                        FontWeight="SemiBold"
-                        ToolTip="Help for this page"
-                        Click="Help_Click"/>
+
                 <Border x:Name="ConnectionBadge"
-                        DockPanel.Dock="Right"
+                        Grid.Column="1"
                         Background="{DynamicResource StatusBadgeBrush}"
                         CornerRadius="14"
                         Padding="14,9"
-                        HorizontalAlignment="Right">
-                    <TextBlock x:Name="ConnectionText" Text="Disconnected" Foreground="{DynamicResource StatusBadgeTextBrush}" FontWeight="SemiBold"/>
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top">
+                    <TextBlock x:Name="ConnectionText"
+                               Text="Disconnected"
+                               Foreground="{DynamicResource StatusBadgeTextBrush}"
+                               FontWeight="SemiBold"/>
                 </Border>
-            </DockPanel>
+            </Grid>
 
             <TabControl x:Name="MainTabs"
                         Grid.Row="1"
