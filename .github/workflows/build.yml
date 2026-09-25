@@ -48,6 +48,25 @@ jobs:
           --
           --smoke-test
 
+      - name: WPF UI regression test
+        run: >
+          dotnet run
+          --project .\src\LIS2.App\LIS2.App.csproj
+          --configuration Release
+          --no-build
+          --
+          --ui-test
+          --ui-test-output
+          .\artifacts\ui-tests
+
+      - name: Upload UI regression evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: LIS2-UI-Regression
+          path: artifacts/ui-tests/
+          if-no-files-found: warn
+
       - name: Publish LIS2 Control Center
         if: github.event_name != 'pull_request'
         run: >
