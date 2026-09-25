@@ -12,6 +12,7 @@ using LIS2.Display;
 using LIS2.Fans;
 using LIS2.Sources;
 using LIS2.Winamp;
+using LIS2.WindowsMedia;
 using LIS2.WmpLegacy;
 
 namespace LIS2.App;
@@ -33,6 +34,7 @@ public partial class MainWindow : Window
     private readonly PingPongScroller _pageEditorLine1Scroller = new();
     private readonly PingPongScroller _pageEditorLine2Scroller = new();
     private readonly WinampDataSource _winampSource = new();
+    private readonly WindowsMediaDataSource _windowsMediaSource = new();
     private readonly WmpLegacyDataSource _wmpLegacySource = new();
     private readonly HomeAssistantDataSource _homeAssistantSource = new();
     private readonly FanController _fanController = new();
@@ -112,12 +114,14 @@ public partial class MainWindow : Window
 
         _eventQueue.Changed += EventQueue_Changed;
         _winampSource.Changed += WinampSource_Changed;
+        _windowsMediaSource.Changed += WindowsMediaSource_Changed;
         // WMP integration is intentionally disabled for now.
         // _wmpLegacySource.Changed += WmpLegacySource_Changed;
         _homeAssistantSource.Changed += HomeAssistantSource_Changed;
 
         _sources.Add(new ClockDataSource());
         _sources.Add(_winampSource);
+        _sources.Add(_windowsMediaSource);
         // WMP integration is intentionally disabled for now.
         // _sources.Add(_wmpLegacySource);
         _sources.Add(new LibreHardwareMonitorDataSource());
@@ -154,7 +158,7 @@ public partial class MainWindow : Window
         ("Dashboard", "Overview and quick access to the most important functions."),
         ("Display", "VFD output, brightness and direct display tests."),
         ("Pages", "Create and edit the rotating 20x2 display pages."),
-        ("Winamp", "Winamp integration, pipe transport and available media variables."),
+        ("Media", "Winamp and Windows 11 Media Player telemetry and available media variables."),
         ("Events", "Priority notifications and temporary VFD overlays."),
         ("Hardware", "LibreHardwareMonitor data sources and sensor availability."),
         ("Fan Control", "Manual output, automatic control, curves and safety limits."),
@@ -265,6 +269,7 @@ public partial class MainWindow : Window
         if (index == 3)
         {
             RefreshWinampView();
+            RefreshWindowsMediaView();
             // WMP integration is intentionally disabled for now.
             // RefreshWmpLegacyView();
         }
@@ -474,6 +479,7 @@ public partial class MainWindow : Window
         _pageEditorPreviewTimer.Stop();
         _eventQueue.Changed -= EventQueue_Changed;
         _winampSource.Changed -= WinampSource_Changed;
+        _windowsMediaSource.Changed -= WindowsMediaSource_Changed;
         // WMP integration is intentionally disabled for now.
         // _wmpLegacySource.Changed -= WmpLegacySource_Changed;
         _homeAssistantSource.Changed -= HomeAssistantSource_Changed;
@@ -726,6 +732,24 @@ public partial class MainWindow : Window
             catch (Exception ex)
             {
                 Log($"ERR  Winamp-triggered page render: {ex.Message}");
+            }
+        });
+    }
+
+    private void WindowsMediaSource_Changed(object? sender, EventArgs e)
+    {
+        Dispatcher.BeginInvoke(async () =>
+        {
+            try
+            {
+                if (MainTabs.SelectedIndex == 3)
+                    RefreshWindowsMediaView();
+
+                await RenderRuntimePageAsync();
+            }
+            catch (Exception ex)
+            {
+                Log($"ERR  Windows Media-triggered page render: {ex.Message}");
             }
         });
     }
@@ -1281,6 +1305,51 @@ public partial class MainWindow : Window
                 "Listening on {0} — no recent plugin/simulator data.",
                 winampPipe);
     }
+
+    private void RefreshWindowsMediaView()
+    {
+        var values = _windowsMediaSource.Values;
+
+        string? Get(string key) =>
+            values.TryGetValue(key, out var value)
+                ? Convert.ToString(value, CultureInfo.CurrentCulture)
+                : null;
+
+        var connected =
+            values.TryGetValue("Connected", out var connectedValue) &&
+            connectedValue is true;
+
+        var state = Get("State") ?? "Unknown";
+        var title = Get("Title");
+        var artist = Get("Artist");
+        var album = Get("Album");
+        var elapsed = Get("Elapsed") ?? "--:--";
+        var duration = Get("Duration") ?? "--:--";
+
+        WindowsMediaStatusText.Text = connected
+            ? $"{LocalizationService.Translate("Connected")} • {LocalizationService.Translate(state)}"
+            : LocalizationService.Translate("Disconnected");
+
+        WindowsMediaTitleText.Text =
+            !string.IsNullOrWhiteSpace(title)
+                ? title
+                : LocalizationService.Translate("Nothing playing");
+
+        WindowsMediaArtistText.Text =
+            !string.IsNullOrWhiteSpace(artist)
+                ? artist
+                : connected
+                    ? LocalizationService.Translate("No artist")
+                    : LocalizationService.Translate("Waiting for Windows Media Player...");
+
+        WindowsMediaAlbumText.Text = album ?? string.Empty;
+        WindowsMediaPlaybackText.Text = LocalizationService.Translate(state);
+        WindowsMediaTimeText.Text = $"{elapsed} / {duration}";
+        WindowsMediaSourceText.Text =
+            Get("SourceAppUserModelId") ??
+            "Microsoft.ZuneMusic";
+    }
+
 
     private void RefreshWmpLegacyView()
     {
