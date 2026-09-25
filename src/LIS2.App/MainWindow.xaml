@@ -696,7 +696,7 @@
                                                      Grid.Column="4"
                                                      ToolTip="Comparison value"/>
                                             <Button Grid.Column="6"
-                                                    Content="Build"
+                                                    Content="Apply condition"
                                                     Click="BuildVisibilityExpression_Click"/>
                                         </Grid>
                                         <TextBox x:Name="PageVisibilityTextBox"
