@@ -207,16 +207,25 @@ Remaining:
 
 ## Additional data sources
 
-Home Assistant changes the priority here: values already available in HA do **not** need a second dedicated LIS2 integration merely to display them.
+Home Assistant is the preferred **universal integration layer** for values that already exist in HA. A dedicated LIS2 source must provide a concrete capability beyond simply exposing the same values again.
 
-Possible future sources should therefore be added only when they provide a concrete advantage over HA or local sources:
+Examples that should normally come through Home Assistant include:
 
-- [ ] Plex — only if direct integration adds useful data/behavior.
-- [ ] OctoPrint — only if direct integration adds useful data/behavior.
-- [ ] Generic HTTP/JSON source.
-- [ ] Additional media-player integrations behind the existing source abstraction.
+- OctoPrint printer/job/temperature values
+- Beszel, Docker and server monitoring
+- DWD/weather data
+- network/device integrations
+- Zigbee and other smart-home sensors
 
-A separate generic Docker/server-monitoring source is **not currently planned** just to duplicate values that can already arrive through Home Assistant.
+Consequently:
+
+- [x] OctoPrint dedicated source — **not needed; use Home Assistant**.
+- [x] Generic Docker/server-monitoring source — **not needed; use Home Assistant**.
+- [ ] Plex — consider a direct source only if it adds media-specific functionality that is materially better than the HA representation.
+- [ ] Generic HTTP/JSON source — only if there is a real data source that cannot reasonably be exposed through HA.
+- [ ] Additional media-player integrations — only for capabilities that justify a dedicated source.
+
+Do not add one-off integrations merely because a system has an API. Prefer the existing HA source whenever HA already exposes the required state and attributes.
 
 ## Engineering / quality
 
