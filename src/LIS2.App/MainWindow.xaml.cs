@@ -150,7 +150,7 @@ public partial class MainWindow : Window
         ("Dashboard", "Overview and quick access to the most important functions."),
         ("Display", "VFD output, brightness and direct display tests."),
         ("Pages", "Create and edit the rotating 20x2 display pages."),
-        ("Winamp", "Winamp integration, pipe transport and available media variables."),
+        ("Media", "Winamp and Windows Media Player Legacy integrations, telemetry and page variables."),
         ("Events", "Priority notifications and temporary VFD overlays."),
         ("Hardware", "LibreHardwareMonitor data sources and sensor availability."),
         ("Fan Control", "Manual output, automatic control, curves and safety limits."),
@@ -259,7 +259,10 @@ public partial class MainWindow : Window
             RefreshTemplateVariableChoices();
 
         if (index == 3)
+        {
             RefreshWinampView();
+            RefreshWmpLegacyView();
+        }
 
         if (index == 4)
             RefreshEventsView();
@@ -303,6 +306,7 @@ public partial class MainWindow : Window
             await _sources.StartAllAsync();
             LogSourceHealth();
             RefreshWinampView();
+            RefreshWmpLegacyView();
             _lastWinampConnected = _winampSource.IsRecentlyConnected;
             _lastWmpLegacyConnected = _wmpLegacySource.IsRecentlyConnected;
             RefreshHardwareSensors();
@@ -1169,7 +1173,10 @@ public partial class MainWindow : Window
         var connected = _winampSource.IsRecentlyConnected;
 
         if (MainTabs.SelectedIndex == 3)
+        {
             RefreshWinampView();
+            RefreshWmpLegacyView();
+        }
 
         var wmpLegacyConnected = _wmpLegacySource.IsRecentlyConnected;
         var connectionChanged =
@@ -1265,6 +1272,105 @@ public partial class MainWindow : Window
             : LocalizationService.Format(
                 "Listening on {0} — no recent plugin/simulator data.",
                 winampPipe);
+    }
+
+    private void RefreshWmpLegacyView()
+    {
+        var values = _wmpLegacySource.Values;
+
+        var state = GetWinampValue(values, "State") ?? "Unknown";
+        var localizedState = LocalizationService.Translate(state);
+        var artist = GetWinampValue(values, "Artist");
+        var title = GetWinampValue(values, "Title");
+        var album = GetWinampValue(values, "Album");
+        var elapsed = GetWinampValue(values, "Elapsed") ?? "--:--";
+        var duration = GetWinampValue(values, "Duration") ?? "--:--";
+        var trackNumber = GetWinampValue(values, "TrackNumber") ?? "-";
+        var playlistCount = GetWinampValue(values, "PlaylistCount") ?? "-";
+        var vuLeft = GetWinampInt(values, "VuLeft");
+        var vuRight = GetWinampInt(values, "VuRight");
+        var spectrum = FormatSpectrumUi(GetWinampSpectrum(values));
+
+        var connected = _wmpLegacySource.IsRecentlyConnected;
+        var visualizationConnected = _wmpLegacySource.IsVisualizationRecentlyConnected;
+
+        WmpLegacyTitleText.Text =
+            !string.IsNullOrWhiteSpace(title)
+                ? title
+                : connected
+                    ? LocalizationService.Translate("No title")
+                    : LocalizationService.Translate("Nothing playing");
+
+        WmpLegacyArtistText.Text =
+            !string.IsNullOrWhiteSpace(artist)
+                ? artist
+                : connected
+                    ? LocalizationService.Translate("WMP Legacy connected")
+                    : LocalizationService.Translate("Waiting for Windows Media Player Legacy...");
+
+        WmpLegacyAlbumText.Text = album ?? string.Empty;
+        WmpLegacyPlaybackText.Text = connected
+            ? localizedState
+            : LocalizationService.Translate("Disconnected");
+        WmpLegacyTimeText.Text = $"{elapsed} / {duration}";
+        WmpLegacyPlaylistText.Text = $"{trackNumber} / {playlistCount}";
+
+        WmpLegacyVuLeftBar.Value =
+            visualizationConnected ? Math.Clamp(vuLeft ?? 0, 0, 255) : 0;
+        WmpLegacyVuRightBar.Value =
+            visualizationConnected ? Math.Clamp(vuRight ?? 0, 0, 255) : 0;
+        WmpLegacyVuLeftText.Text = visualizationConnected
+            ? (vuLeft ?? 0).ToString(CultureInfo.InvariantCulture)
+            : "-";
+        WmpLegacyVuRightText.Text = visualizationConnected
+            ? (vuRight ?? 0).ToString(CultureInfo.InvariantCulture)
+            : "-";
+        WmpLegacySpectrumText.Text = visualizationConnected
+            ? spectrum
+            : new string(' ', 20);
+
+        WmpLegacyVisualizationStatusText.Text = visualizationConnected
+            ? LocalizationService.Translate("Live visualization data")
+            : LocalizationService.Translate("No visualization data");
+
+        WmpLegacyStatusText.Text = connected
+            ? $"{LocalizationService.Translate("Connected")} • {localizedState}"
+            : LocalizationService.Translate("Waiting for WMP Legacy");
+
+        const string metadataPipe =
+            @"\\.\pipe\LIS2ControlCenter.WmpLegacy";
+        const string visualizationPipe =
+            @"\\.\pipe\LIS2ControlCenter.WmpLegacy.Visualization";
+
+        WmpLegacyConnectionDetailText.Text = connected
+            ? LocalizationService.Format(
+                  "Receiving snapshots on {0}",
+                  metadataPipe) +
+              " • " +
+              LocalizationService.Format(
+                  "Visualization pipe: {0}",
+                  visualizationPipe)
+            : LocalizationService.Format(
+                "Listening on {0} — no recent plugin/simulator data.",
+                metadataPipe);
+    }
+
+    private async void CreateWmpLegacyPreset_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button { Tag: string preset })
+            return;
+
+        var presetId = preset switch
+        {
+            "NowPlaying" => "WmpLegacyNowPlaying",
+            "VU" => "WmpLegacyVU",
+            "Spectrum" => "WmpLegacySpectrum",
+            _ => preset
+        };
+
+        await CreatePageFromPresetAsync(presetId);
     }
 
     private static string? GetWinampValue(
