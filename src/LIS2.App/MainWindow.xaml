@@ -67,7 +67,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="♫" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="Winamp" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Media" VerticalAlignment="Center"/>
                         </Grid>
                     </Button>
                     <Button Tag="4" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
@@ -824,8 +824,8 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- Winamp -->
-                <TabItem Header="Winamp">
+                <!-- Media -->
+                <TabItem Header="Media">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
@@ -1016,6 +1016,133 @@
                                                TextWrapping="Wrap"
                                                Foreground="{DynamicResource MutedBrush}"
                                                Margin="0,6,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="Windows Media Player Legacy"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="18"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,20,0"/>
+                                        <Border Grid.Column="1"
+                                                Background="{DynamicResource StatusBadgeBrush}"
+                                                CornerRadius="12"
+                                                Padding="12,8">
+                                            <TextBlock x:Name="WmpLegacyStatusText"
+                                                       Text="Waiting for WMP Legacy"
+                                                       Foreground="{DynamicResource StatusBadgeTextBrush}"
+                                                       FontWeight="SemiBold"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <TextBlock x:Name="WmpLegacyTitleText"
+                                               Text="Nothing playing"
+                                               FontSize="22"
+                                               FontWeight="SemiBold"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock x:Name="WmpLegacyArtistText"
+                                               Text="Waiting for Windows Media Player Legacy..."
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               Margin="0,4,0,0"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock x:Name="WmpLegacyAlbumText"
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               Margin="0,3,0,10"
+                                               TextTrimming="CharacterEllipsis"/>
+
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="14"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="14"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Playback" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="WmpLegacyPlaybackText" Text="Unknown" FontSize="18" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="WmpLegacyTimeText" Text="--:-- / --:--"
+                                                       FontFamily="Consolas" Foreground="{DynamicResource MutedBrush}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Playlist" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="WmpLegacyPlaylistText" Text="- / -" FontSize="18" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Track number / total tracks" Foreground="{DynamicResource MutedBrush}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="4">
+                                            <TextBlock Text="Visualization" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="WmpLegacyVisualizationStatusText"
+                                                       Text="No visualization data"
+                                                       FontSize="18"
+                                                       FontWeight="SemiBold"/>
+                                            <TextBlock Text="Select the LIS2 visualization in WMP Legacy for VU/spectrum."
+                                                       Foreground="{DynamicResource MutedBrush}"
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="55"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="7"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Left" VerticalAlignment="Center"/>
+                                        <ProgressBar x:Name="WmpLegacyVuLeftBar" Grid.Row="0" Grid.Column="1"
+                                                     Minimum="0" Maximum="255" Height="18"/>
+                                        <TextBlock x:Name="WmpLegacyVuLeftText" Grid.Row="0" Grid.Column="2"
+                                                   Text="0" FontFamily="Consolas" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Right" VerticalAlignment="Center"/>
+                                        <ProgressBar x:Name="WmpLegacyVuRightBar" Grid.Row="2" Grid.Column="1"
+                                                     Minimum="0" Maximum="255" Height="18"/>
+                                        <TextBlock x:Name="WmpLegacyVuRightText" Grid.Row="2" Grid.Column="2"
+                                                   Text="0" FontFamily="Consolas" HorizontalAlignment="Right"/>
+                                        <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
+                                                Background="{DynamicResource VfdBackgroundBrush}"
+                                                BorderBrush="{DynamicResource VfdBorderBrush}"
+                                                BorderThickness="1" CornerRadius="5" Padding="12,8">
+                                            <TextBlock x:Name="WmpLegacySpectrumText"
+                                                       Text="                    "
+                                                       FontFamily="Consolas" FontSize="22"
+                                                       Foreground="{DynamicResource VfdTextBrush}"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <WrapPanel Margin="0,2,0,10">
+                                        <Button Content="Create Now Playing page" Tag="NowPlaying"
+                                                Click="CreateWmpLegacyPreset_Click" Margin="0,0,7,6"/>
+                                        <Button Content="Create VU page" Tag="VU"
+                                                Click="CreateWmpLegacyPreset_Click" Margin="0,0,7,6"/>
+                                        <Button Content="Create Spectrum page" Tag="Spectrum"
+                                                Click="CreateWmpLegacyPreset_Click" Margin="0,0,0,6"/>
+                                    </WrapPanel>
+
+                                    <TextBlock x:Name="WmpLegacyConnectionDetailText"
+                                               Text="Listening on \\.\pipe\LIS2ControlCenter.WmpLegacy"
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               TextWrapping="Wrap"/>
+                                    <TextBlock Text="Register the matching x86/x64 WMP Legacy background and visualization DLLs with regsvr32."
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,5,0,8"/>
+                                    <TextBlock FontFamily="Consolas"
+                                               Text="{}{WmpLegacy.State}   {WmpLegacy.Artist}   {WmpLegacy.Title}   {WmpLegacy.Album}&#x0a;{WmpLegacy.Elapsed}   {WmpLegacy.Duration}   {WmpLegacy.TrackNumber}   {WmpLegacy.PlaylistCount}&#x0a;{WmpLegacy.Connected}   {WmpLegacy.VisualizationConnected}   {WmpLegacy.Vu}&#x0a;{WmpLegacy.Spectrum}   {WmpLegacy.SpectrumGlyphs}"
+                                               Foreground="{DynamicResource LogTextBrush}"/>
                                 </StackPanel>
                             </Border>
 
