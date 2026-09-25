@@ -141,12 +141,14 @@ public static class Lis2Protocol
 
         if (character is >= ' ' and <= '}')
         {
-            value = (byte)character;
+            // ROM-code 002 moves backslash out of the normal ASCII cell.
+            value = character == '\\'
+                ? (byte)0x8C
+                : (byte)character;
             return true;
         }
 
-        // The ROM uses 0x7E/0x7F for arrows, so Unicode arrows are preferred
-        // over ASCII '~' for those two cells.
+        // ROM-code 002 moves tilde as well; 0x7E/0x7F are right/left arrows.
         if (character == '~')
         {
             value = 0x8E;
@@ -244,6 +246,8 @@ public static class Lis2Protocol
         // Prefer human-readable Unicode forms for the cells we explicitly use.
         result[0x7E] = '→';
         result[0x7F] = '←';
+        result[0x8C] = '\\';
+        result[0x8E] = '~';
         result[0x80] = 'Ä';
         result[0x86] = 'Ö';
         result[0x87] = 'ö';
