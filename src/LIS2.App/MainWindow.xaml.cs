@@ -32,6 +32,7 @@ public partial class MainWindow : Window
     private readonly PingPongScroller _pageEditorLine1Scroller = new();
     private readonly PingPongScroller _pageEditorLine2Scroller = new();
     private readonly WinampDataSource _winampSource = new();
+    private readonly HomeAssistantDataSource _homeAssistantSource = new();
     private readonly FanController _fanController = new();
     private int[]? _lastAutomaticFanOutputs;
     private readonly double?[] _lastAutomaticFanSensorValues = new double?[4];
@@ -105,10 +106,12 @@ public partial class MainWindow : Window
 
         _eventQueue.Changed += EventQueue_Changed;
         _winampSource.Changed += WinampSource_Changed;
+        _homeAssistantSource.Changed += HomeAssistantSource_Changed;
 
         _sources.Add(new ClockDataSource());
         _sources.Add(_winampSource);
         _sources.Add(new LibreHardwareMonitorDataSource());
+        _sources.Add(_homeAssistantSource);
 
         _trayIcon.ShowRequested += TrayIcon_ShowRequested;
         _trayIcon.ExitRequested += TrayIcon_ExitRequested;
@@ -142,7 +145,8 @@ public partial class MainWindow : Window
         ("Hardware", "LibreHardwareMonitor data sources and sensor availability."),
         ("Fan Control", "Manual output, automatic control, curves and safety limits."),
         ("Settings", "LIS2 transport, COM port and Windows startup behavior."),
-        ("Diagnostics", "Runtime state, data-source health and protocol traffic.")
+        ("Diagnostics", "Runtime state, data-source health and protocol traffic."),
+        ("Home Assistant", "Live Home Assistant entities over the WebSocket API.")
     ];
 
     private void GitHub_MouseLeftButtonUp(
@@ -245,6 +249,9 @@ public partial class MainWindow : Window
 
         if (index == 8)
             RefreshDiagnostics();
+
+        if (index == 9)
+            RefreshHomeAssistantView();
     }
 
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -256,6 +263,7 @@ public partial class MainWindow : Window
 
             RefreshPorts();
             ApplySettingsToUi();
+            ConfigureHomeAssistantSource();
             AutomaticFanControlCheckBox.IsChecked = _settings.Fans.AutomaticControlEnabled;
 
             _loadingStartupSetting = true;
@@ -272,6 +280,7 @@ public partial class MainWindow : Window
             _lastWinampConnected = _winampSource.IsRecentlyConnected;
             RefreshHardwareSensors();
             RefreshFanSensorChoices();
+            RefreshHomeAssistantView();
             RefreshPageEditorPreview();
             await RenderRuntimePageAsync();
 
@@ -377,6 +386,7 @@ public partial class MainWindow : Window
         _pageEditorPreviewTimer.Stop();
         _eventQueue.Changed -= EventQueue_Changed;
         _winampSource.Changed -= WinampSource_Changed;
+        _homeAssistantSource.Changed -= HomeAssistantSource_Changed;
 
         await _sources.StopAllAsync();
         await _sources.DisposeAsync();
@@ -2639,7 +2649,40 @@ public partial class MainWindow : Window
                     : string.Empty;
         }
 
+        foreach (var preference in _settings.HomeAssistant.EntityPreferences)
+        {
+            if (string.IsNullOrWhiteSpace(preference.Alias))
+                continue;
+
+            var sourceKey = $"HA.{preference.EntityId}";
+            if (!values.TryGetValue(sourceKey, out var value))
+                continue;
+
+            var alias = NormalizeHomeAssistantAlias(preference.Alias);
+            if (!string.IsNullOrWhiteSpace(alias))
+                values[$"HA.{alias}"] = value;
+        }
+
         return values;
+    }
+
+    private static string NormalizeHomeAssistantAlias(string? alias)
+    {
+        if (string.IsNullOrWhiteSpace(alias))
+            return string.Empty;
+
+        var chars = alias.Trim()
+            .Select(character =>
+                char.IsLetterOrDigit(character) || character is '_' or '-'
+                    ? character
+                    : '_')
+            .ToArray();
+
+        var normalized = new string(chars);
+        while (normalized.Contains("__", StringComparison.Ordinal))
+            normalized = normalized.Replace("__", "_", StringComparison.Ordinal);
+
+        return normalized.Trim('_');
     }
 
     private static string CreateSpectrumGlyphLine(IReadOnlyList<int> spectrum)
@@ -2742,6 +2785,10 @@ public partial class MainWindow : Window
             _settings.Fans.Channels
                 .Select(channel => channel.FixedPercent)
                 .ToArray());
+
+        HomeAssistantEnabledCheckBox.IsChecked = _settings.HomeAssistant.Enabled;
+        HomeAssistantUrlTextBox.Text = _settings.HomeAssistant.Url;
+        HomeAssistantTokenPasswordBox.Password = _settings.HomeAssistant.AccessToken;
     }
 
     private void RefreshAppearanceChoices(
