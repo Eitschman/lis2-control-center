@@ -67,7 +67,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="♫" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="Media" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Winamp" VerticalAlignment="Center"/>
                         </Grid>
                     </Button>
                     <Button Tag="4" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
@@ -824,8 +824,8 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- Media -->
-                <TabItem Header="Media">
+                <!-- Winamp -->
+                <TabItem Header="Winamp">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
@@ -1019,7 +1019,8 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14" Visibility="Collapsed">
+                                <!-- WMP integration intentionally disabled for now; implementation retained for later reactivation. -->
                                 <StackPanel>
                                     <Grid Margin="0,0,0,10">
                                         <Grid.ColumnDefinitions>
