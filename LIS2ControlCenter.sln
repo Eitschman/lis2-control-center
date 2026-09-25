@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Fans", "src\LIS2.Fans\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.WmpLegacy", "src\LIS2.WmpLegacy\LIS2.WmpLegacy.csproj", "{C2A4A13B-32A4-4E55-9B04-5DA4E5B22105}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.WindowsMedia", "src\LIS2.WindowsMedia\LIS2.WindowsMedia.csproj", "{F74F6D8E-3D33-44B5-9C61-2D66A2D22107}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Winamp", "src\LIS2.Winamp\LIS2.Winamp.csproj", "{781F21A8-6E62-4E5E-A8E1-A21855221003}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.App", "src\LIS2.App\LIS2.App.csproj", "{3C41882A-72D5-43D6-A8C1-D358B5503103}"
@@ -33,6 +35,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Winamp.Tests", "tests\LIS2.Winamp.Tests\LIS2.Winamp.Tests.csproj", "{14EEC12B-98E5-417C-BDFC-921EA2202014}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.WmpLegacy.Tests", "tests\LIS2.WmpLegacy.Tests\LIS2.WmpLegacy.Tests.csproj", "{A5C33C72-8A65-4D9F-A8F0-8D33D7202016}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.WindowsMedia.Tests", "tests\LIS2.WindowsMedia.Tests\LIS2.WindowsMedia.Tests.csproj", "{7F455B6C-E9F4-4FC9-8AA1-9F62D9202017}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.App.Tests", "tests\LIS2.App.Tests\LIS2.App.Tests.csproj", "{B65C9A01-53C9-4D50-A784-2F861E3E7C15}"
 EndProject
@@ -110,5 +114,13 @@ Global
 		{68C445E2-FDD6-4656-8B7A-D525AE221006}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68C445E2-FDD6-4656-8B7A-D525AE221006}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68C445E2-FDD6-4656-8B7A-D525AE221006}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F74F6D8E-3D33-44B5-9C61-2D66A2D22107}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F74F6D8E-3D33-44B5-9C61-2D66A2D22107}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F74F6D8E-3D33-44B5-9C61-2D66A2D22107}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F74F6D8E-3D33-44B5-9C61-2D66A2D22107}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F455B6C-E9F4-4FC9-8AA1-9F62D9202017}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F455B6C-E9F4-4FC9-8AA1-9F62D9202017}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F455B6C-E9F4-4FC9-8AA1-9F62D9202017}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F455B6C-E9F4-4FC9-8AA1-9F62D9202017}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
