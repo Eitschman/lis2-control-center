@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>LIS2.WmpLegacySimulator</AssemblyName>
+    <RootNamespace>LIS2.WmpLegacySimulator</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\LIS2.WmpLegacy\LIS2.WmpLegacy.csproj" />
+  </ItemGroup>
+</Project>
