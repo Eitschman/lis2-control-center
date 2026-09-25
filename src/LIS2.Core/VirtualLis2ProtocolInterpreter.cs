@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace LIS2.Core;
 
 internal static class VirtualLis2ProtocolInterpreter
@@ -60,10 +58,10 @@ internal static class VirtualLis2ProtocolInterpreter
             return;
 
         var current = (data[0] == 0xA1 ? state.Line1 : state.Line2).ToCharArray();
-        var text = Encoding.ASCII.GetString(data[3..]);
+        var displayBytes = data[3..];
 
-        for (var i = 0; i < text.Length && column + i < 20; i++)
-            current[column + i] = text[i];
+        for (var i = 0; i < displayBytes.Length && column + i < 20; i++)
+            current[column + i] = Lis2Protocol.DecodeDisplayByte(displayBytes[i]);
 
         var updated = new string(current);
 
