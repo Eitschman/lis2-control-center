@@ -24,6 +24,14 @@ public static class LocalizationService
         {
             ["de"] = new(StringComparer.Ordinal)
             {
+                ["Character ROM / Special Characters"]="Zeichen-ROM / Sonderzeichen",
+                ["Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display."]="Native LIS2-Zeichen verwenden das uPD16314-ROM. Teste die Unicode-Zuordnung oder prüfe rohe ROM-Bytes direkt auf dem echten Display.",
+                ["Send special-character test"]="Sonderzeichen-Test senden",
+                ["ROM start byte"]="ROM-Startbyte",
+                ["Previous"]="Zurück",
+                ["Send 40 bytes"]="40 Bytes senden",
+                ["Next"]="Weiter",
+                ["ROM start byte must be hexadecimal 20 through D8."]="Das ROM-Startbyte muss hexadezimal zwischen 20 und D8 liegen.",
                 ["Live Home Assistant entities over the WebSocket API."]="Live-Home-Assistant-Entitäten über die WebSocket-API.",
                 ["Enable Home Assistant"]="Home Assistant aktivieren",
                 ["Token"]="Token",
@@ -234,6 +242,14 @@ public static class LocalizationService
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
+                ["Character ROM / Special Characters"]="ROM de caractères / caractères spéciaux",
+                ["Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display."]="Les caractères natifs LIS2 utilisent la ROM uPD16314. Testez le mappage Unicode ou inspectez les octets ROM bruts sur l’afficheur réel.",
+                ["Send special-character test"]="Envoyer le test de caractères spéciaux",
+                ["ROM start byte"]="Octet de début ROM",
+                ["Previous"]="Précédent",
+                ["Send 40 bytes"]="Envoyer 40 octets",
+                ["Next"]="Suivant",
+                ["ROM start byte must be hexadecimal 20 through D8."]="L’octet de début ROM doit être hexadécimal entre 20 et D8.",
                 ["Live Home Assistant entities over the WebSocket API."]="Entités Home Assistant en direct via l’API WebSocket.",
                 ["Enable Home Assistant"]="Activer Home Assistant",
                 ["Token"]="Jeton",
@@ -449,6 +465,14 @@ public static class LocalizationService
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
+                ["Character ROM / Special Characters"]="Karakter ROM / Özel karakterler",
+                ["Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display."]="Yerel LIS2 karakterleri uPD16314 ROM kullanır. Unicode eşlemesini test edin veya ham ROM baytlarını gerçek ekranda inceleyin.",
+                ["Send special-character test"]="Özel karakter testini gönder",
+                ["ROM start byte"]="ROM başlangıç baytı",
+                ["Previous"]="Önceki",
+                ["Send 40 bytes"]="40 bayt gönder",
+                ["Next"]="Sonraki",
+                ["ROM start byte must be hexadecimal 20 through D8."]="ROM başlangıç baytı onaltılık 20 ile D8 arasında olmalıdır.",
                 ["Live Home Assistant entities over the WebSocket API."]="WebSocket API üzerinden canlı Home Assistant varlıkları.",
                 ["Enable Home Assistant"]="Home Assistant'ı etkinleştir",
                 ["Token"]="Token",
@@ -672,6 +696,14 @@ public static class LocalizationService
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
+                ["Character ROM / Special Characters"]="ПЗУ символов / специальные символы",
+                ["Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display."]="Встроенные символы LIS2 используют ПЗУ uPD16314. Проверьте сопоставление Unicode или сырые байты ПЗУ на реальном дисплее.",
+                ["Send special-character test"]="Отправить тест специальных символов",
+                ["ROM start byte"]="Начальный байт ПЗУ",
+                ["Previous"]="Назад",
+                ["Send 40 bytes"]="Отправить 40 байт",
+                ["Next"]="Далее",
+                ["ROM start byte must be hexadecimal 20 through D8."]="Начальный байт ПЗУ должен быть шестнадцатеричным от 20 до D8.",
                 ["Live Home Assistant entities over the WebSocket API."]="Живые сущности Home Assistant через WebSocket API.",
                 ["Enable Home Assistant"]="Включить Home Assistant",
                 ["Token"]="Токен",
