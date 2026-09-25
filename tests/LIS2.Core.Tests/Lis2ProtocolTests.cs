@@ -155,4 +155,23 @@ public sealed class Lis2ProtocolTests
             new byte[] { 0xA2, 0x00, 0xA7, 0x80, 0x86, 0x8A, 0xDF, 0xF4 },
             actual);
     }
+    [Theory]
+    [InlineData(new byte[] { 0xA0 }, "Clear/reset display")]
+    [InlineData(new byte[] { 0xA5, 0x3A }, "Brightness 50%")]
+    [InlineData(new byte[] { 0xAE, 0xF0, 25, 50, 75, 100 }, "Fans 25/50/75/100%")]
+    [InlineData(new byte[] { 0xAB, 0x02, 0x03, 0x1F }, "Custom glyph slot 2, row 3, pixels 0x1F")]
+    public void DescribeCommand_ReturnsSemanticMeaning(byte[] data, string expected)
+    {
+        Assert.Equal(expected, Lis2Protocol.DescribeCommand(data));
+    }
+
+    [Fact]
+    public void DescribeCommand_DecodesDisplayText()
+    {
+        var data = Lis2Protocol.WriteLine(1, 4, "Dümmer");
+
+        Assert.Equal(
+            "Display line 1, column 4: \"Dümmer\"",
+            Lis2Protocol.DescribeCommand(data));
+    }
 }
