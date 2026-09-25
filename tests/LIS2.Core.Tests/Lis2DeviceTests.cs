@@ -109,4 +109,32 @@ public sealed class Lis2DeviceTests
 
         Assert.Equal(16, transport.Writes.Count);
     }
+    [Fact]
+    public async Task VirtualTransport_DecodesNativeInternationalCharacters()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var device = new Lis2Device(transport);
+
+        await device.ConnectAsync();
+        await device.WriteLineAsync(1, "ÄÖÜ äöü ß °");
+        await device.WriteLineAsync(2, "← → Ω π Σ √ ∞");
+
+        Assert.StartsWith("ÄÖÜ äöü ß °", transport.State.Line1);
+        Assert.StartsWith("← → Ω π Σ √ ∞", transport.State.Line2);
+    }
+
+    [Fact]
+    public async Task RawDisplayWrite_IsVisibleInVirtualTransport()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var device = new Lis2Device(transport);
+
+        await device.ConnectAsync();
+        await device.WriteRawDisplayBytesAsync(
+            1,
+            0,
+            new byte[] { 0x80, 0x86, 0x8A, 0xDF, 0xF4 });
+
+        Assert.StartsWith("ÄÖÜ°Ω", transport.State.Line1);
+    }
 }
