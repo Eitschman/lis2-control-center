@@ -178,8 +178,8 @@ Implemented:
 Remaining:
 
 - [x] Theme the native Windows title bar consistently with the selected application theme.
-- [ ] Continue reviewing every control in both Light and Dark themes.
-- [ ] Continue UI polish where real-world data exposes layout problems.
+- [x] Complete a full Light/Dark control review, including input, selection, focus, disabled and resizable-pane states.
+- [ ] Continue UI polish only when real-world data exposes a concrete layout problem.
 - [ ] Consider profile support only if multiple machine/use-case configurations actually need it.
 
 Deliberately omitted:
