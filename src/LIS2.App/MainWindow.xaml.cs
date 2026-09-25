@@ -47,6 +47,7 @@ public partial class MainWindow : Window
     private bool _fanUiInitialized;
     private bool _lastWinampConnected;
     private bool _applyingAppearanceSettings;
+    private bool _refreshingHomeAssistantUi;
 
     private sealed record AppearanceChoice(string Value, string Label);
 
@@ -631,6 +632,302 @@ public partial class MainWindow : Window
                 Log($"ERR  Winamp-triggered page render: {ex.Message}");
             }
         });
+    }
+
+    private void HomeAssistantSource_Changed(object? sender, EventArgs e)
+    {
+        Dispatcher.BeginInvoke(async () =>
+        {
+            try
+            {
+                if (MainTabs.SelectedIndex == 9)
+                    RefreshHomeAssistantView();
+
+                await RenderRuntimePageAsync();
+            }
+            catch (Exception ex)
+            {
+                Log($"ERR  Home Assistant-triggered page render: {ex.Message}");
+            }
+        });
+    }
+
+    private void ConfigureHomeAssistantSource()
+    {
+        var settings = _settings.HomeAssistant;
+
+        _homeAssistantSource.Configure(
+            settings.Enabled ? settings.Url : string.Empty,
+            settings.Enabled ? settings.AccessToken : string.Empty);
+    }
+
+    private async void TestHomeAssistant_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await using var testSource = new HomeAssistantDataSource();
+            testSource.Configure(
+                HomeAssistantUrlTextBox.Text,
+                HomeAssistantTokenPasswordBox.Password);
+
+            await testSource.TestConnectionAsync();
+
+            System.Windows.MessageBox.Show(
+                this,
+                LocalizationService.Translate("Home Assistant connection successful."),
+                "LIS2 Control Center",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void SaveHomeAssistant_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            _settings.HomeAssistant.Enabled =
+                HomeAssistantEnabledCheckBox.IsChecked == true;
+            _settings.HomeAssistant.Url =
+                HomeAssistantUrlTextBox.Text?.Trim() ?? string.Empty;
+            _settings.HomeAssistant.AccessToken =
+                HomeAssistantTokenPasswordBox.Password?.Trim() ?? string.Empty;
+
+            await _settingsStore.SaveAsync(_settings);
+
+            ConfigureHomeAssistantSource();
+            await _homeAssistantSource.RestartAsync();
+
+            RefreshHomeAssistantView();
+            Log(_settings.HomeAssistant.Enabled
+                ? "INFO Home Assistant WebSocket source enabled/reconnected"
+                : "INFO Home Assistant WebSocket source disabled");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private void HomeAssistantFilterChanged(object sender, EventArgs e)
+    {
+        if (!IsLoaded || _refreshingHomeAssistantUi)
+            return;
+
+        RefreshHomeAssistantView();
+    }
+
+    private void RefreshHomeAssistantView()
+    {
+        if (HomeAssistantEntitiesListBox is null)
+            return;
+
+        _refreshingHomeAssistantUi = true;
+        try
+        {
+            var selectedEntityId =
+                (HomeAssistantEntitiesListBox.SelectedItem as HomeAssistantEntityRow)?.EntityId;
+            var selectedFilter = HomeAssistantDomainComboBox.SelectedItem as string ?? "All";
+            var search = HomeAssistantSearchTextBox.Text?.Trim() ?? string.Empty;
+
+            var entities = _homeAssistantSource.Entities;
+            var domains = entities
+                .Select(entity => entity.Domain)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(domain => domain, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            var filters = new[] { "All", "Favorites" }
+                .Concat(domains)
+                .ToArray();
+
+            HomeAssistantDomainComboBox.ItemsSource = filters;
+            HomeAssistantDomainComboBox.SelectedItem =
+                filters.Contains(selectedFilter, StringComparer.OrdinalIgnoreCase)
+                    ? filters.First(item => string.Equals(
+                        item,
+                        selectedFilter,
+                        StringComparison.OrdinalIgnoreCase))
+                    : "All";
+
+            var effectiveFilter =
+                HomeAssistantDomainComboBox.SelectedItem as string ?? "All";
+
+            var rows = entities
+                .Select(entity =>
+                {
+                    var preference = _settings.HomeAssistant.EntityPreferences
+                        .FirstOrDefault(item =>
+                            string.Equals(
+                                item.EntityId,
+                                entity.EntityId,
+                                StringComparison.OrdinalIgnoreCase));
+
+                    return new HomeAssistantEntityRow(
+                        entity.EntityId,
+                        entity.Domain,
+                        entity.FriendlyName,
+                        entity.State,
+                        entity.Unit,
+                        preference?.Alias ?? string.Empty,
+                        preference?.IsFavorite == true,
+                        entity.IsAvailable);
+                })
+                .Where(row =>
+                    (string.Equals(effectiveFilter, "All", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(effectiveFilter, "Favorites", StringComparison.OrdinalIgnoreCase) && row.IsFavorite ||
+                     string.Equals(row.Domain, effectiveFilter, StringComparison.OrdinalIgnoreCase)) &&
+                    (string.IsNullOrWhiteSpace(search) ||
+                     row.EntityId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                     row.FriendlyName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                     row.Alias.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                     row.Domain.Contains(search, StringComparison.OrdinalIgnoreCase)))
+                .OrderByDescending(row => row.IsFavorite)
+                .ThenBy(row => row.Domain, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(row => row.DisplayName, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            HomeAssistantEntitiesListBox.ItemsSource = rows;
+
+            if (selectedEntityId is not null)
+            {
+                HomeAssistantEntitiesListBox.SelectedItem =
+                    rows.FirstOrDefault(row =>
+                        string.Equals(
+                            row.EntityId,
+                            selectedEntityId,
+                            StringComparison.OrdinalIgnoreCase));
+            }
+
+            HomeAssistantStatusText.Text =
+                !_settings.HomeAssistant.Enabled
+                    ? LocalizationService.Translate("Disabled")
+                    : _homeAssistantSource.IsConnected
+                        ? LocalizationService.Format(
+                            "Connected to Home Assistant {0} · {1} entities",
+                            _homeAssistantSource.HomeAssistantVersion ?? "?",
+                            entities.Count)
+                        : !string.IsNullOrWhiteSpace(_homeAssistantSource.LastError)
+                            ? LocalizationService.Format(
+                                "Connection error: {0}",
+                                _homeAssistantSource.LastError)
+                            : LocalizationService.Translate("Connecting...");
+        }
+        finally
+        {
+            _refreshingHomeAssistantUi = false;
+        }
+    }
+
+    private void HomeAssistantEntitiesListBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (HomeAssistantEntitiesListBox.SelectedItem is HomeAssistantEntityRow entity)
+        {
+            SelectedHomeAssistantEntityText.Text =
+                $"{entity.FriendlyName} — {entity.DisplayState}{Environment.NewLine}" +
+                $"{entity.EntityId}{Environment.NewLine}{entity.TemplateKey}";
+
+            HomeAssistantAliasTextBox.Text = entity.Alias;
+            HomeAssistantFavoriteCheckBox.IsChecked = entity.IsFavorite;
+        }
+        else
+        {
+            SelectedHomeAssistantEntityText.Text =
+                LocalizationService.Translate("Select an entity above.");
+            HomeAssistantAliasTextBox.Text = string.Empty;
+            HomeAssistantFavoriteCheckBox.IsChecked = false;
+        }
+    }
+
+    private async void SaveHomeAssistantEntity_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (HomeAssistantEntitiesListBox.SelectedItem is not HomeAssistantEntityRow entity)
+                throw new InvalidOperationException(
+                    LocalizationService.Translate("Select a Home Assistant entity first."));
+
+            var preference = _settings.HomeAssistant.EntityPreferences
+                .FirstOrDefault(item =>
+                    string.Equals(
+                        item.EntityId,
+                        entity.EntityId,
+                        StringComparison.OrdinalIgnoreCase));
+
+            var alias = HomeAssistantAliasTextBox.Text?.Trim() ?? string.Empty;
+            var favorite = HomeAssistantFavoriteCheckBox.IsChecked == true;
+
+            if (preference is null)
+            {
+                preference = new HomeAssistantEntityPreferenceSettings
+                {
+                    EntityId = entity.EntityId
+                };
+                _settings.HomeAssistant.EntityPreferences.Add(preference);
+            }
+
+            preference.Alias = alias;
+            preference.IsFavorite = favorite;
+
+            if (string.IsNullOrWhiteSpace(alias) && !favorite)
+                _settings.HomeAssistant.EntityPreferences.Remove(preference);
+
+            await _settingsStore.SaveAsync(_settings);
+            RefreshHomeAssistantView();
+            RefreshPageEditorPreview();
+
+            Log($"INFO saved Home Assistant entity preference for '{entity.EntityId}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void CreateHomeAssistantPage_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (HomeAssistantEntitiesListBox.SelectedItem is not HomeAssistantEntityRow entity)
+                throw new InvalidOperationException(
+                    LocalizationService.Translate("Select a Home Assistant entity first."));
+
+            var normalizedAlias = NormalizeHomeAssistantAlias(entity.Alias);
+            var templateKey = string.IsNullOrWhiteSpace(normalizedAlias)
+                ? $"HA.{entity.EntityId}"
+                : $"HA.{normalizedAlias}";
+
+            var page = new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = entity.DisplayName,
+                Line1Template = entity.DisplayName,
+                Line2Template = $"{{{templateKey}}}{entity.Unit}",
+                DurationSeconds = 5,
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "Truncate"
+            };
+
+            _settings.Pages.Add(page);
+            await PersistPagesAsync();
+            LoadPagesIntoRuntime();
+            BindPages();
+
+            MainTabs.SelectedIndex = 2;
+            UpdateNavigationSelection(2);
+            PagesListBox.SelectedItem = page;
+
+            Log($"INFO created Home Assistant display page for '{entity.EntityId}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
     }
 
     private async void WinampTimer_Tick(object? sender, EventArgs e)
