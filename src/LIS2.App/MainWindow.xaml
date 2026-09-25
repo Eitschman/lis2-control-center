@@ -605,7 +605,8 @@
                                             Margin="0,0,0,12"/>
 
                                     <ListBox x:Name="PagesListBox"
-                                             Height="250"
+                                             MinHeight="250"
+                                             MaxHeight="420"
                                              SelectionChanged="PagesListBox_SelectionChanged">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
@@ -1502,7 +1503,7 @@
 
                                     <StackPanel Grid.Column="0">
                                         <TextBlock Text="Channels" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
-                                        <ListBox x:Name="FanChannelsListBox" Height="290" SelectionChanged="FanChannelsListBox_SelectionChanged"/>
+                                        <ListBox x:Name="FanChannelsListBox" MinHeight="240" MaxHeight="420" SelectionChanged="FanChannelsListBox_SelectionChanged"/>
                                         <Button Content="Refresh sensors"
                                                 Click="RefreshFanSensors_Click"
                                                 Margin="0,8,0,0"
@@ -1582,7 +1583,7 @@
                                                        FontFamily="Consolas"
                                                        Margin="0,0,0,6"/>
                                             <Border BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="4">
-                                                <Canvas x:Name="FanCurvePreviewCanvas" Width="360" Height="120"/>
+                                                <Canvas x:Name="FanCurvePreviewCanvas" MinWidth="280" Height="120" HorizontalAlignment="Stretch"/>
                                             </Border>
                                         </StackPanel>
 
