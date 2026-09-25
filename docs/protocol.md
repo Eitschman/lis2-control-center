@@ -82,7 +82,7 @@ A2 00 A7 <20 characters> 00
 
 Whether the trailing `00` is required, ignored, or merely an MCC implementation artifact is UNKNOWN.
 
-Initial text handling should use safe ASCII. The actual VFD character ROM/code page remains to be determined.
+Initial text handling uses a conservative display-safe character set. The native degree sign is supported explicitly: Unicode `°` is preserved in display frames/previews and encoded as display byte `DF` on the wire. LCDproc exposes VLSystem LIS2 as an HD44780-compatible connection type, whose classic character ROM maps the degree sign to `0xDF`. The remainder of the LIS2 character ROM/code page is still to be mapped and validated on physical hardware.
 
 ## Brightness
 
