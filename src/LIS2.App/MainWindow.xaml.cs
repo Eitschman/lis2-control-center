@@ -360,6 +360,18 @@ public partial class MainWindow : Window
             UpdateNavigationSelection(index);
             MainTabs.UpdateLayout();
             await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+
+            var help = new HelpWindow(
+                index,
+                CreateDisplayValues(),
+                _settings.CustomGlyphs.Select(glyph => glyph.Name).ToArray())
+            {
+                Owner = this
+            };
+            help.Show();
+            help.UpdateLayout();
+            await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+            help.Close();
         }
 
         await RenderRuntimePageAsync();
