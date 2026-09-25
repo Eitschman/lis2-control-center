@@ -272,7 +272,7 @@ Do not initially test 0% fan output on cooling-critical channels.
 - What is `AB 00 ...`?
 - Does the device return any response?
 - Is there a safe identification handshake?
-- What is the exact character ROM/code page?
 - What happens for columns above 19?
 - Can firmware version information be read?
 - Do low fan values have special semantics?
+- Does the physical LIS2 exactly match the documented uPD16314 ROM-code-002 extended-character mapping, including the newly supported umlauts/symbols?
