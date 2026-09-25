@@ -79,7 +79,9 @@ Examples:
 {HA.DockerDisk.attribute.total}
 ```
 
-This makes existing Home Assistant integrations — for example server/Docker monitoring fed into HA — immediately usable without adding another monitoring protocol to LIS2 Control Center.
+This makes Home Assistant the **universal integration layer** for data that is already available there. Weather/DWD, OctoPrint, Beszel/server and Docker monitoring, network devices, Zigbee sensors and other HA integrations can be displayed without implementing dedicated LIS2 data sources for each system.
+
+Dedicated LIS2 integrations are therefore only useful when they provide a concrete capability that Home Assistant cannot provide adequately. In particular, a separate OctoPrint or generic Docker/server-monitoring source is not planned while those values are already available through HA.
 
 See [docs/home-assistant-integration.md](docs/home-assistant-integration.md).
 
@@ -216,6 +218,8 @@ Several ideas have deliberately **not** been added:
 - no first-run wizard
 - no direct LIS2 hardware access from the Winamp plug-in
 - Home Assistant is currently read-only
+- no dedicated OctoPrint source: OctoPrint values already available in Home Assistant are consumed through the HA source
+- no duplicate Docker/server-monitoring source solely for values already available through Home Assistant
 - unknown/experimental protocol commands are never sent automatically
 
 The application is not intended to clone MCC pixel-for-pixel. Historical MCC behavior is used where it helps interoperability or preserves a useful capability; the application architecture and UI are otherwise independent.
