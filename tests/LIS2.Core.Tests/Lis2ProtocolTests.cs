@@ -44,10 +44,18 @@ public sealed class Lis2ProtocolTests
             Lis2Protocol.ProgramCharacterRow(1, 3, 0x1F));
 
     [Fact]
-    public void WriteLine_TransliteratesGermanCharacters()
+    public void WriteLine_EncodesGermanCharactersNatively()
     {
-        var actual = Lis2Protocol.WriteLine(1, 0, "äöüß");
-        Assert.Equal("aeoeuess", Encoding.ASCII.GetString(actual[3..]));
+        var actual = Lis2Protocol.WriteLine(1, 0, "ÄÖÜ äöü ß");
+
+        Assert.Equal(
+            new byte[]
+            {
+                0xA1, 0x00, 0xA7,
+                0x80, 0x86, 0x8A, 0x20,
+                0xE1, 0x87, 0x8B, 0x20, 0xE2
+            },
+            actual);
     }
 
     [Fact]
@@ -74,12 +82,12 @@ public sealed class Lis2ProtocolTests
     }
 
     [Fact]
-    public void SafeDisplayText_PreservesCustomGlyphSentinels()
+    public void SafeDisplayText_PreservesNativeUnicodeAndCustomGlyphSentinels()
     {
         var glyph = Lis2Protocol.CustomGlyph(8);
-        var actual = Lis2Protocol.ToSafeDisplayText($"ä{glyph}!");
+        var actual = Lis2Protocol.ToSafeDisplayText($"ä°Ω←→{glyph}!");
 
-        Assert.Equal($"ae{glyph}!", actual);
+        Assert.Equal($"ä°Ω←→{glyph}!", actual);
     }
     [Fact]
     public void WriteLine_EncodesDegreeSignAsNativeDisplayCharacter()
@@ -101,5 +109,50 @@ public sealed class Lis2ProtocolTests
         var actual = Lis2Protocol.ToSafeDisplayText("23.5 °C");
 
         Assert.Equal("23.5 °C", actual);
+    }
+    [Theory]
+    [InlineData('Ä', 0x80)]
+    [InlineData('Ö', 0x86)]
+    [InlineData('Ü', 0x8A)]
+    [InlineData('ä', 0xE1)]
+    [InlineData('ö', 0x87)]
+    [InlineData('ü', 0x8B)]
+    [InlineData('ß', 0xE2)]
+    [InlineData('°', 0xDF)]
+    [InlineData('µ', 0xE4)]
+    [InlineData('±', 0xB1)]
+    [InlineData('£', 0x92)]
+    [InlineData('×', 0x78)]
+    [InlineData('÷', 0xFD)]
+    [InlineData('←', 0x7F)]
+    [InlineData('→', 0x7E)]
+    [InlineData('Ω', 0xF4)]
+    [InlineData('π', 0xF7)]
+    [InlineData('Σ', 0xF6)]
+    [InlineData('√', 0xE8)]
+    [InlineData('∞', 0xF3)]
+    public void UnicodeCharacter_EncodesToNativeDisplayByte(char character, int expected)
+    {
+        Assert.True(Lis2Protocol.TryEncodeDisplayCharacter(character, out var actual));
+        Assert.Equal((byte)expected, actual);
+    }
+
+    [Fact]
+    public void SafeAscii_StillTransliteratesGermanCharactersForIdentifiers()
+    {
+        Assert.Equal("AeOeUe aeoeue ss", Lis2Protocol.ToSafeAscii("ÄÖÜ äöü ß"));
+    }
+
+    [Fact]
+    public void RawLine_WritesPayloadWithoutCharacterTranslation()
+    {
+        var actual = Lis2Protocol.WriteRawLine(
+            2,
+            0,
+            new byte[] { 0x80, 0x86, 0x8A, 0xDF, 0xF4 });
+
+        Assert.Equal(
+            new byte[] { 0xA2, 0x00, 0xA7, 0x80, 0x86, 0x8A, 0xDF, 0xF4 },
+            actual);
     }
 }
