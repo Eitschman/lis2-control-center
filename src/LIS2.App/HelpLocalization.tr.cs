@@ -73,6 +73,10 @@ internal static partial class HelpLocalization
             ["True while snapshots are fresh."] = "Anlık görüntüler güncel olduğu sürece True.",
             ["Age of the last snapshot."] = "Son anlık görüntünün yaşı.",
             ["Typical page"] = "Tipik sayfa",
+            ["Windows Media Player Legacy"] = "Windows Media Player Legacy",
+            ["Windows Media Player Legacy telemetry comes from the native background COM plug-in over the LIS2ControlCenter.WmpLegacy named pipe. The plug-in is telemetry-only and never accesses LIS2 hardware."] = "Windows Media Player Legacy telemetrisi yerel arka plan COM eklentisinden LIS2ControlCenter.WmpLegacy adlı kanal üzerinden gelir. Eklenti yalnızca telemetri sağlar ve LIS2 donanımına hiçbir zaman doğrudan erişmez.",
+            ["Current media track number."] = "Geçerli medyanın parça numarası.",
+            ["Typical WMP Legacy page"] = "Tipik WMP Legacy sayfası",
 
             ["Events are temporary priority overlays. While active they override normal page rotation; after expiry the scheduler returns to the normal page."] = "Olaylar geçici öncelikli kaplamalardır. Etkin olduklarında normal sayfa döngüsünü geçersiz kılar; süresi dolunca zamanlayıcı normal sayfaya döner.",
             ["Line 1 / Line 2: event text."] = "Satır 1 / Satır 2: olay metni.",
