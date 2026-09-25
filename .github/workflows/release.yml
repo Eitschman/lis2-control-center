@@ -1,0 +1,114 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Resolve version
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          if ($version -notmatch '^\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?$') {
+            throw "Tag '${{ github.ref_name }}' is not a supported semantic version."
+          }
+          "LIS2_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Restore
+        run: dotnet restore .\LIS2ControlCenter.sln
+
+      - name: Build
+        run: dotnet build .\LIS2ControlCenter.sln --configuration Release --no-restore -p:Version=$env:LIS2_VERSION
+
+      - name: Test
+        run: dotnet test .\LIS2ControlCenter.sln --configuration Release --no-build --verbosity normal
+
+      - name: WPF startup smoke test
+        run: >
+          dotnet run
+          --project .\src\LIS2.App\LIS2.App.csproj
+          --configuration Release
+          --no-build
+          --
+          --smoke-test
+
+      - name: Publish portable application
+        run: >
+          dotnet publish .\src\LIS2.App\LIS2.App.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          --no-build
+          -p:Version=$env:LIS2_VERSION
+          -p:DebugType=None
+          -p:DebugSymbols=false
+          --output .\release\LIS2-Control-Center
+
+      - name: Publish protocol tester
+        run: >
+          dotnet publish .\tools\LIS2.ProtocolTester\LIS2.ProtocolTester.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          --no-build
+          -p:Version=$env:LIS2_VERSION
+          -p:DebugType=None
+          -p:DebugSymbols=false
+          --output .\release\LIS2-ProtocolTester
+
+      - name: Build Winamp x86 plugin
+        run: |
+          cmake -S .\native\LIS2.WinampPlugin -B .\native\LIS2.WinampPlugin\build -A Win32
+          cmake --build .\native\LIS2.WinampPlugin\build --config Release
+
+      - name: Package portable release
+        shell: pwsh
+        run: |
+          Copy-Item README.md .\release\LIS2-Control-Center\README.md
+          Copy-Item LICENSE .\release\LIS2-Control-Center\LICENSE
+          Copy-Item .\native\LIS2.WinampPlugin\build\Release\gen_lis2.dll .\release\gen_lis2.dll
+
+          Compress-Archive -Path .\release\LIS2-Control-Center\* -DestinationPath ".\release\LIS2-Control-Center-$env:LIS2_VERSION-win-x64.zip"
+          Compress-Archive -Path .\release\LIS2-ProtocolTester\* -DestinationPath ".\release\LIS2-ProtocolTester-$env:LIS2_VERSION-win-x64.zip"
+
+          $files = @(
+            ".\release\LIS2-Control-Center-$env:LIS2_VERSION-win-x64.zip",
+            ".\release\LIS2-ProtocolTester-$env:LIS2_VERSION-win-x64.zip",
+            ".\release\gen_lis2.dll"
+          )
+
+          $lines = foreach ($file in $files) {
+            $hash = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLowerInvariant()
+            "$hash  $(Split-Path $file -Leaf)"
+          }
+          $lines | Set-Content .\release\SHA256SUMS.txt
+
+      - name: Create GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" `
+            --title "LIS2 Control Center ${{ github.ref_name }}" `
+            --generate-notes `
+            ".\release\LIS2-Control-Center-$env:LIS2_VERSION-win-x64.zip" `
+            ".\release\LIS2-ProtocolTester-$env:LIS2_VERSION-win-x64.zip" `
+            ".\release\gen_lis2.dll" `
+            ".\release\SHA256SUMS.txt"
