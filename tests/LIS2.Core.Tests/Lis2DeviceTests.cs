@@ -132,7 +132,8 @@ public sealed class Lis2DeviceTests
         await transport.WriteAsync(new byte[] { 0xFF, 0x01, 0x02 });
 
         Assert.Equal(1, transport.State.RejectedCommandCount);
-        Assert.Contains("Unknown LIS2 command", transport.State.LastProtocolError);
+        Assert.NotNull(transport.State.LastProtocolError);
+        Assert.Contains("Unknown LIS2 command", transport.State.LastProtocolError!);
         Assert.Equal(new string(' ', 20), transport.State.Line1);
         Assert.Equal(new string(' ', 20), transport.State.Line2);
     }
@@ -146,7 +147,8 @@ public sealed class Lis2DeviceTests
         await transport.WriteAsync(new byte[] { 0xA1, 0x00, 0x00 });
 
         Assert.Equal(1, transport.State.RejectedCommandCount);
-        Assert.Contains("Malformed LIS2 display-write", transport.State.LastProtocolError);
+        Assert.NotNull(transport.State.LastProtocolError);
+        Assert.Contains("Malformed LIS2 display-write", transport.State.LastProtocolError!);
     }
 
     [Fact]
