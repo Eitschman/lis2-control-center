@@ -3763,6 +3763,8 @@ public partial class MainWindow : Window
             $"Line 2: [{FormatDisplayPreviewLine(state.Line2)}]",
             $"Brightness: {state.Brightness}",
             $"Fans: {state.Fan1}% / {state.Fan2}% / {state.Fan3}% / {state.Fan4}%",
+            $"Rejected commands: {state.RejectedCommandCount}",
+            $"Last protocol error: {state.LastProtocolError ?? "-"}",
             ""
         };
 
