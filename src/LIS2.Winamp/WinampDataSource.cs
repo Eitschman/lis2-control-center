@@ -6,6 +6,7 @@ public sealed class WinampDataSource : IDataSource
 {
     private static readonly TimeSpan ConnectedTimeout = TimeSpan.FromSeconds(3);
     private readonly WinampPipeServer _server = new();
+    private readonly TimeProvider _timeProvider;
 
     private IReadOnlyDictionary<string, object?> _values =
         CreateInitialValues();
@@ -25,7 +26,7 @@ public sealed class WinampDataSource : IDataSource
             result["Connected"] = connected;
             result["SnapshotAgeSeconds"] = LastSnapshotAt is null
                 ? null
-                : Math.Max(0, (DateTimeOffset.UtcNow - LastSnapshotAt.Value).TotalSeconds);
+                : Math.Max(0, (_timeProvider.GetUtcNow() - LastSnapshotAt.Value).TotalSeconds);
 
             if (!connected)
                 result["State"] = WinampPlaybackState.Unknown.ToString();
@@ -38,12 +39,13 @@ public sealed class WinampDataSource : IDataSource
 
     public bool IsRecentlyConnected =>
         LastSnapshotAt is not null &&
-        DateTimeOffset.UtcNow - LastSnapshotAt.Value < ConnectedTimeout;
+        _timeProvider.GetUtcNow() - LastSnapshotAt.Value < ConnectedTimeout;
 
     public event EventHandler? Changed;
 
-    public WinampDataSource()
+    public WinampDataSource(TimeProvider? timeProvider = null)
     {
+        _timeProvider = timeProvider ?? TimeProvider.System;
         _server.SnapshotReceived += Server_SnapshotReceived;
     }
 
@@ -53,9 +55,12 @@ public sealed class WinampDataSource : IDataSource
     public Task StopAsync(CancellationToken cancellationToken = default) =>
         _server.StopAsync();
 
-    private void Server_SnapshotReceived(object? sender, WinampSnapshot snapshot)
+    private void Server_SnapshotReceived(object? sender, WinampSnapshot snapshot) =>
+        ApplySnapshot(snapshot);
+
+    internal void ApplySnapshot(WinampSnapshot snapshot)
     {
-        LastSnapshotAt = DateTimeOffset.UtcNow;
+        LastSnapshotAt = _timeProvider.GetUtcNow();
 
         Volatile.Write(
             ref _values,
