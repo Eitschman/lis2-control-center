@@ -5,6 +5,7 @@ namespace LIS2.Core;
 public static class Lis2Protocol
 {
     public const char CustomGlyphBase = '\uE000';
+    public const byte DegreeSymbolByte = 0xDF;
 
     public static ReadOnlyMemory<byte> Clear => new byte[] { 0xA0 };
 
@@ -91,7 +92,12 @@ public static class Lis2Protocol
             .Replace("ß", "ss", StringComparison.Ordinal);
 
         return expanded
-            .Select(c => TryGetCustomGlyphSlot(c, out _) || c is >= ' ' and <= '~' ? c : '?')
+            .Select(c =>
+                TryGetCustomGlyphSlot(c, out _) ||
+                c == '°' ||
+                c is >= ' ' and <= '~'
+                    ? c
+                    : '?')
             .Aggregate(new StringBuilder(), (builder, c) => builder.Append(c))
             .ToString();
     }
@@ -114,7 +120,9 @@ public static class Lis2Protocol
             var character = safe[index];
             bytes[index] = TryGetCustomGlyphSlot(character, out var slot)
                 ? (byte)slot
-                : (byte)character;
+                : character == '°'
+                    ? DegreeSymbolByte
+                    : (byte)character;
         }
 
         return bytes;
