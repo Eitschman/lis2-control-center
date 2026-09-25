@@ -233,12 +233,24 @@ public partial class HelpWindow : Window
         AddVariable("WmpLegacy.PlaylistCount", "Number of playlist entries.");
         AddVariable("WmpLegacy.Elapsed", "Elapsed time as mm:ss.");
         AddVariable("WmpLegacy.Duration", "Track duration as mm:ss.");
+        AddVariable("WmpLegacy.VuLeft", "Left VU level from the active WMP Legacy visualization.");
+        AddVariable("WmpLegacy.VuRight", "Right VU level from the active WMP Legacy visualization.");
+        AddVariable("WmpLegacy.Vu", "Preformatted 20-character stereo VU line from the active visualization.");
+        AddVariable("WmpLegacy.Spectrum", "20-band ASCII spectrum from the active visualization.");
+        AddVariable("WmpLegacy.SpectrumRaw", "Raw 20-band spectrum array from the active visualization.");
+        AddVariable("WmpLegacy.SpectrumPeak", "Peak value of the current 20-band spectrum.");
+        AddVariable("WmpLegacy.SpectrumGlyphs", "20-band spectrum using the eight custom VFD glyph levels.");
         AddVariable("WmpLegacy.Connected", "True while snapshots are fresh.");
         AddVariable("WmpLegacy.SnapshotAgeSeconds", "Age of the last snapshot.");
+        AddVariable("WmpLegacy.VisualizationConnected", "True while the LIS2 WMP Legacy visualization is active and sending audio snapshots.");
+        AddVariable("WmpLegacy.VisualizationAgeSeconds", "Age of the last WMP Legacy visualization snapshot.");
+        AddParagraph("VU and spectrum require the LIS2 Control Center visualization to be selected in Windows Media Player Legacy. Metadata and playback state continue to work through the background plug-in even when another visualization is selected.");
         AddHeading("Typical WMP Legacy page");
         AddCode("{WmpLegacy.Artist|fallback:Nothing playing}");
         AddCode("{WmpLegacy.Title|fallback:--}");
         AddCode("Visible when: WmpLegacy.State=Playing");
+        AddCode("{WmpLegacy.Vu}");
+        AddCode("{WmpLegacy.SpectrumGlyphs}");
     }
 
     private void RenderEvents()
