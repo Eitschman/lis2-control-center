@@ -20,12 +20,13 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <StackPanel>
-                <TextBlock Text="Help &amp; reference" FontSize="28" FontWeight="SemiBold"/>
-                <TextBlock Text="Instructions, configuration reference and display-variable examples."
+                <TextBlock x:Name="HelpTitleText" Text="Help &amp; reference" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock x:Name="HelpSubtitleText" Text="Instructions, configuration reference and display-variable examples."
                            Foreground="{DynamicResource MutedBrush}"
                            Margin="0,4,0,0"/>
             </StackPanel>
-            <Button Grid.Column="1"
+            <Button x:Name="CloseButton"
+                    Grid.Column="1"
                     Content="Close"
                     Padding="18,8"
                     VerticalAlignment="Center"
