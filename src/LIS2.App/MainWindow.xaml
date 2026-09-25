@@ -838,7 +838,7 @@
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
                                             <TextBlock Text="Windows Media Player" FontWeight="SemiBold" FontSize="18"/>
-                                            <TextBlock Text="Windows 11 media session"
+                                            <TextBlock Text="Integrated directly with Windows"
                                                        Foreground="{DynamicResource MutedBrush}"
                                                        Margin="0,3,20,0"/>
                                         </StackPanel>
