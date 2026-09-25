@@ -233,6 +233,9 @@ public partial class MainWindow : Window
         SectionSubtitleText.Text = LocalizationService.Translate(Sections[index].Subtitle);
         UpdateNavigationSelection(index);
 
+        if (index == 2)
+            RefreshTemplateVariableChoices();
+
         if (index == 3)
             RefreshWinampView();
 
@@ -2237,6 +2240,7 @@ public partial class MainWindow : Window
     private void BindPages()
     {
         RefreshPagePresetChoices();
+        RefreshTemplateVariableChoices();
 
         PagesListBox.ItemsSource = null;
         PagesListBox.ItemsSource = _settings.Pages;
@@ -2417,11 +2421,97 @@ public partial class MainWindow : Window
         PageLine2TextBox.Text = page.Line2Template;
         PageDurationTextBox.Text = page.DurationSeconds.ToString(CultureInfo.InvariantCulture);
         PageVisibilityTextBox.Text = page.VisibilityExpression ?? string.Empty;
+        ApplyVisibilityExpressionToBuilder(page.VisibilityExpression);
         SelectComboBoxTag(PageLine1OverflowComboBox, page.Line1OverflowMode);
         SelectComboBoxTag(PageLine2OverflowComboBox, page.Line2OverflowMode);
         PageScrollSpeedTextBox.Text = page.ScrollStepMilliseconds.ToString(CultureInfo.InvariantCulture);
         PageEdgePauseTextBox.Text = page.ScrollEdgePauseMilliseconds.ToString(CultureInfo.InvariantCulture);
         RefreshPageEditorPreview();
+    }
+
+    private void RefreshTemplateVariableChoices()
+    {
+        if (PageVisibilityKeyComboBox is null)
+            return;
+
+        var selectedKey =
+            PageVisibilityKeyComboBox.SelectedValue as string ??
+            PageVisibilityKeyComboBox.Text?.Trim();
+
+        var choices = CreateDisplayValues()
+            .OrderBy(item => item.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(item =>
+            {
+                var value = Convert.ToString(
+                    item.Value,
+                    CultureInfo.CurrentCulture) ?? string.Empty;
+
+                if (value.Length > 48)
+                    value = value[..45] + "...";
+
+                return new TemplateVariableChoice(
+                    item.Key,
+                    string.IsNullOrWhiteSpace(value)
+                        ? item.Key
+                        : $"{item.Key}  =  {value}");
+            })
+            .ToArray();
+
+        PageVisibilityKeyComboBox.ItemsSource = choices;
+
+        if (!string.IsNullOrWhiteSpace(selectedKey))
+        {
+            var matching = choices.FirstOrDefault(item =>
+                string.Equals(
+                    item.Key,
+                    selectedKey,
+                    StringComparison.OrdinalIgnoreCase));
+
+            if (matching is not null)
+                PageVisibilityKeyComboBox.SelectedValue = matching.Key;
+            else
+                PageVisibilityKeyComboBox.Text = selectedKey;
+        }
+    }
+
+    private void ApplyVisibilityExpressionToBuilder(string? expression)
+    {
+        if (!VisibilityEvaluator.TryParse(
+                expression,
+                out var key,
+                out var op,
+                out var expected))
+        {
+            PageVisibilityKeyComboBox.Text = string.Empty;
+            SelectComboBoxTag(PageVisibilityOperatorComboBox, "=");
+            PageVisibilityValueTextBox.Text = string.Empty;
+            return;
+        }
+
+        PageVisibilityKeyComboBox.SelectedValue = key;
+        if (PageVisibilityKeyComboBox.SelectedValue is null)
+            PageVisibilityKeyComboBox.Text = key;
+
+        SelectComboBoxTag(PageVisibilityOperatorComboBox, op);
+        PageVisibilityValueTextBox.Text = expected;
+    }
+
+    private void BuildVisibilityExpression_Click(object sender, RoutedEventArgs e)
+    {
+        var key =
+            PageVisibilityKeyComboBox.SelectedValue as string ??
+            PageVisibilityKeyComboBox.Text?.Trim() ??
+            string.Empty;
+        var op = GetComboBoxTag(PageVisibilityOperatorComboBox, "=");
+        var value = PageVisibilityValueTextBox.Text?.Trim() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+        {
+            PageVisibilityTextBox.Text = string.Empty;
+            return;
+        }
+
+        PageVisibilityTextBox.Text = $"{key}{op}{value}";
     }
 
     private async void AddPage_Click(object sender, RoutedEventArgs e)
