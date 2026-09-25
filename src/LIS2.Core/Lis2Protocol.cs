@@ -257,6 +257,9 @@ public static class Lis2Protocol
         result[0xE1] = 'ä';
         result[0xE2] = 'ß';
         result[0xE4] = 'µ';
+        result[0xE8] = '√';
+        result[0xB1] = '±';
+        result[0x92] = '£';
         result[0xF3] = '∞';
         result[0xF4] = 'Ω';
         result[0xF6] = 'Σ';
