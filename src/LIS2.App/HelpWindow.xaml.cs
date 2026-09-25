@@ -15,7 +15,7 @@ public partial class HelpWindow : Window
         "Dashboard",
         "Display",
         "Pages",
-        "Media",
+        "Winamp",
         "Events",
         "Hardware",
         "Fan Control",
@@ -223,6 +223,8 @@ public partial class HelpWindow : Window
         AddCode("{Winamp.Title|fallback:--}");
         AddCode("Visible when: Winamp.State=Playing");
 
+#if WMP_EXPERIMENTAL
+        // Deferred WMP help retained for later reactivation.
         AddHeading("Windows Media Player Legacy");
         AddParagraph("Windows Media Player Legacy telemetry comes from the native background COM plug-in over the LIS2ControlCenter.WmpLegacy named pipe. The plug-in is telemetry-only and never accesses LIS2 hardware.");
         AddVariable("WmpLegacy.State", "Unknown, Stopped, Paused or Playing.");
@@ -251,6 +253,7 @@ public partial class HelpWindow : Window
         AddCode("Visible when: WmpLegacy.State=Playing");
         AddCode("{WmpLegacy.Vu}");
         AddCode("{WmpLegacy.SpectrumGlyphs}");
+#endif
     }
 
     private void RenderEvents()
