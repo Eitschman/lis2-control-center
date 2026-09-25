@@ -11,6 +11,7 @@ public sealed class AppSettings
     public List<CustomGlyphSettings> CustomGlyphs { get; set; } = CreateDefaultGlyphs();
     public bool ProgramCustomGlyphsOnConnect { get; set; }
     public List<HardwareSensorPreferenceSettings> HardwareSensorPreferences { get; set; } = new();
+    public HomeAssistantSettings HomeAssistant { get; set; } = new();
     public FanSettings Fans { get; set; } = new();
 
     public void EnsureDefaults()
@@ -30,6 +31,9 @@ public sealed class AppSettings
             .GroupBy(preference => preference.Key, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.Last())
             .ToList();
+
+        HomeAssistant ??= new HomeAssistantSettings();
+        HomeAssistant.EnsureDefaults();
 
         Fans ??= new FanSettings();
         Fans.EnsureDefaults();
