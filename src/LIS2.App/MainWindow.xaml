@@ -1843,7 +1843,8 @@
                                          Grid.Row="0"
                                          Grid.RowSpan="2"
                                          HorizontalContentAlignment="Stretch"
-                                         SelectionChanged="HomeAssistantEntitiesListBox_SelectionChanged">
+                                         SelectionChanged="HomeAssistantEntitiesListBox_SelectionChanged"
+                                         MouseDoubleClick="HomeAssistantEntitiesListBox_MouseDoubleClick">
                                     <ListBox.Template>
                                         <ControlTemplate TargetType="{x:Type ListBox}">
                                             <Border Background="{TemplateBinding Background}"
@@ -1985,6 +1986,9 @@
                                                 Orientation="Horizontal"
                                                 HorizontalAlignment="Right"
                                                 Margin="0,10,0,0">
+                                        <Button Content="Copy key"
+                                                Click="CopyHomeAssistantEntityKey_Click"
+                                                Margin="0,0,7,0"/>
                                         <Button Content="Save entity"
                                                 Click="SaveHomeAssistantEntity_Click"
                                                 Margin="0,0,7,0"/>
@@ -2009,16 +2013,21 @@
                                                    FontWeight="SemiBold"
                                                    FontSize="16"
                                                    VerticalAlignment="Center"/>
-                                        <Button Grid.Column="1"
-                                                Content="Create attribute page"
-                                                Click="CreateHomeAssistantAttributePage_Click"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <Button Content="Copy key"
+                                                    Click="CopyHomeAssistantAttributeKey_Click"
+                                                    Margin="0,0,7,0"/>
+                                            <Button Content="Create attribute page"
+                                                    Click="CreateHomeAssistantAttributePage_Click"/>
+                                        </StackPanel>
                                     </Grid>
 
                                     <ListBox x:Name="HomeAssistantAttributesListBox"
                                              Grid.Row="1"
                                              MinHeight="90"
                                              MaxHeight="150"
-                                             HorizontalContentAlignment="Stretch">
+                                             HorizontalContentAlignment="Stretch"
+                                             MouseDoubleClick="HomeAssistantAttributesListBox_MouseDoubleClick">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="2,1">
@@ -2034,7 +2043,8 @@
                                                                HorizontalAlignment="Left"
                                                                TextAlignment="Left"/>
                                                     <TextBlock Grid.Column="1"
-                                                               Text="{Binding Value}"
+                                                               Text="{Binding DisplayValue}"
+                                                               ToolTip="{Binding Value}"
                                                                FontFamily="Consolas"
                                                                Margin="0,0,10,0"
                                                                TextTrimming="CharacterEllipsis"
