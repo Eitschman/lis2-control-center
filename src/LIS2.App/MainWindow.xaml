@@ -1800,7 +1800,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*" MinHeight="240"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
@@ -1995,60 +1995,72 @@
                             </Grid>
                         </Border>
 
-                        <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}">
+                        <Border Grid.Row="3"
+                                Style="{StaticResource CardBorderStyle}"
+                                MaxHeight="220">
                             <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.05*"/>
+                                    <ColumnDefinition Width="18"/>
+                                    <ColumnDefinition Width="1.45*"/>
+                                </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0"
-                                           Text="Selected entity"
-                                           FontWeight="SemiBold"
-                                           FontSize="16"/>
-
-                                <TextBlock x:Name="SelectedHomeAssistantEntityText"
-                                           Grid.Row="1"
-                                           Text="Select an entity above."
-                                           Foreground="{DynamicResource MutedBrush}"
-                                           Margin="0,5,0,10"
-                                           TextWrapping="Wrap"/>
-
-                                <Grid Grid.Row="2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="14"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="14"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="14"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Grid.Column="0"
-                                               Text="Alias"
-                                               VerticalAlignment="Center"/>
-                                    <TextBox x:Name="HomeAssistantAliasTextBox"
-                                             Grid.Column="1"/>
-                                    <CheckBox x:Name="HomeAssistantFavoriteCheckBox"
-                                              Grid.Column="3"
-                                              Content="Favorite"
-                                              VerticalAlignment="Center"/>
-                                    <Button Grid.Column="5"
-                                            Content="Save entity"
-                                            Click="SaveHomeAssistantEntity_Click"/>
-                                    <Button Grid.Column="7"
-                                            Content="Create display page"
-                                            Click="CreateHomeAssistantPage_Click"/>
-                                </Grid>
-
-                                <Grid Grid.Row="3" Margin="0,14,0,0">
+                                <Grid Grid.Column="0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0"
+                                               Text="Selected entity"
+                                               FontWeight="SemiBold"
+                                               FontSize="16"/>
+
+                                    <TextBlock x:Name="SelectedHomeAssistantEntityText"
+                                               Grid.Row="1"
+                                               Text="Select an entity above."
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               Margin="0,5,0,10"
+                                               TextWrapping="Wrap"
+                                               MaxHeight="58"
+                                               TextTrimming="CharacterEllipsis"/>
+
+                                    <Grid Grid.Row="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="14"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="Alias"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBox x:Name="HomeAssistantAliasTextBox"
+                                                 Grid.Column="1"/>
+                                        <CheckBox x:Name="HomeAssistantFavoriteCheckBox"
+                                                  Grid.Column="3"
+                                                  Content="Favorite"
+                                                  VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <StackPanel Grid.Row="3"
+                                                Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                Margin="0,10,0,0">
+                                        <Button Content="Save entity"
+                                                Click="SaveHomeAssistantEntity_Click"
+                                                Margin="0,0,7,0"/>
+                                        <Button Content="Create display page"
+                                                Click="CreateHomeAssistantPage_Click"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid Grid.Column="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
 
                                     <Grid Grid.Row="0" Margin="0,0,0,6">
@@ -2059,6 +2071,7 @@
                                         <TextBlock Grid.Column="0"
                                                    Text="Attributes"
                                                    FontWeight="SemiBold"
+                                                   FontSize="16"
                                                    VerticalAlignment="Center"/>
                                         <Button Grid.Column="1"
                                                 Content="Create attribute page"
@@ -2067,30 +2080,37 @@
 
                                     <ListBox x:Name="HomeAssistantAttributesListBox"
                                              Grid.Row="1"
+                                             MinHeight="90"
                                              MaxHeight="150"
                                              HorizontalContentAlignment="Stretch">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="2,1">
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="1.2*"/>
-                                                        <ColumnDefinition Width="1*"/>
-                                                        <ColumnDefinition Width="2.2*"/>
+                                                        <ColumnDefinition Width="1.15*"/>
+                                                        <ColumnDefinition Width="0.9*"/>
+                                                        <ColumnDefinition Width="2.15*"/>
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Grid.Column="0"
                                                                Text="{Binding Name}"
                                                                Margin="0,0,10,0"
-                                                               TextTrimming="CharacterEllipsis"/>
+                                                               TextTrimming="CharacterEllipsis"
+                                                               HorizontalAlignment="Left"
+                                                               TextAlignment="Left"/>
                                                     <TextBlock Grid.Column="1"
                                                                Text="{Binding Value}"
                                                                FontFamily="Consolas"
                                                                Margin="0,0,10,0"
-                                                               TextTrimming="CharacterEllipsis"/>
+                                                               TextTrimming="CharacterEllipsis"
+                                                               HorizontalAlignment="Left"
+                                                               TextAlignment="Left"/>
                                                     <TextBlock Grid.Column="2"
                                                                Text="{Binding TemplateKey}"
                                                                FontFamily="Consolas"
                                                                Foreground="{DynamicResource MutedBrush}"
-                                                               TextTrimming="CharacterEllipsis"/>
+                                                               TextTrimming="CharacterEllipsis"
+                                                               HorizontalAlignment="Left"
+                                                               TextAlignment="Left"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
