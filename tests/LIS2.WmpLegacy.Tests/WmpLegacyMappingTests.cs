@@ -78,6 +78,63 @@ public sealed class WmpLegacyMappingTests
     }
 
     [Fact]
+    public void VisualizationMessage_DeserializesAndFormatsTelemetry()
+    {
+        const string json =
+            """
+            {"type":"visualization","vuLeft":192,"vuRight":128,"spectrum":[0,32,64,96,128,160,192,224,255]}
+            """;
+
+        var message = WmpLegacyVisualizationPipeServer.DeserializeMessage(json);
+
+        Assert.NotNull(message);
+        Assert.Equal(192, message.VuLeft);
+        Assert.Equal(128, message.VuRight);
+        Assert.Equal(9, message.Spectrum?.Length);
+        Assert.Equal(20, WmpLegacyValues.FormatVu(255, 128).Length);
+        Assert.NotEqual(string.Empty, WmpLegacyValues.FormatSpectrum(message.Spectrum));
+    }
+
+    [Fact]
+    public async Task DataSource_MergesVisualizationWithoutLosingMetadata()
+    {
+        var time = new ManualTimeProvider(
+            new DateTimeOffset(2026, 9, 25, 10, 0, 0, TimeSpan.Zero));
+        await using var source = new WmpLegacyDataSource(time);
+
+        source.ApplySnapshot(new WmpLegacySnapshot(
+            WmpLegacyPlaybackState.Playing,
+            "Artist",
+            "Title",
+            "Album",
+            1,
+            5,
+            TimeSpan.FromSeconds(30),
+            TimeSpan.FromMinutes(4)));
+
+        source.ApplyVisualization(new WmpLegacyVisualizationMessage
+        {
+            VuLeft = 200,
+            VuRight = 150,
+            Spectrum = Enumerable.Repeat(128, 20).ToArray()
+        });
+
+        Assert.Equal("Artist", source.Values["Artist"]);
+        Assert.Equal("Title", source.Values["Title"]);
+        Assert.Equal(200, source.Values["VuLeft"]);
+        Assert.Equal(150, source.Values["VuRight"]);
+        Assert.True(source.IsVisualizationRecentlyConnected);
+        Assert.Equal(20, Assert.IsType<string>(source.Values["Spectrum"]).Length);
+
+        time.Advance(TimeSpan.FromSeconds(3));
+
+        Assert.False(source.IsVisualizationRecentlyConnected);
+        Assert.Null(source.Values["VuLeft"]);
+        Assert.Equal(string.Empty, source.Values["Spectrum"]);
+        Assert.Equal("Title", source.Values["Title"]);
+    }
+
+    [Fact]
     public async Task DataSource_MarksSnapshotStaleAfterTimeout()
     {
         var time = new ManualTimeProvider(
