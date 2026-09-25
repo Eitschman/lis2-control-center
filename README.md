@@ -2,7 +2,7 @@
 
 Modern Windows control software for the **VL System L.I.S. 2** 20x2 VFD display and four-channel fan controller.
 
-> **Status:** Active development — the main application is already broadly usable  
+> **Status:** Software feature freeze / release-candidate hardening — physical LIS2 validation remains  
 > **Target:** Windows 11 x64  
 > **Implementation:** C# / .NET 8, WPF, native Win32 Winamp plug-in  
 > **License:** MIT
@@ -203,17 +203,20 @@ dotnet test .\LIS2ControlCenter.sln -c Release --no-build
 GitHub Actions currently:
 
 1. restores and builds the complete .NET solution on Windows;
-2. runs the Core, Display, Sources, Fans and Winamp tests;
+2. runs the Core, Display, Sources, Fans, Winamp and application reliability tests;
 3. runs a WPF startup/tab smoke test;
 4. publishes a self-contained Windows x64 LIS2 Control Center;
 5. publishes the self-contained x64 protocol tester;
-6. builds and uploads the native Winamp x86 plug-in.
+6. builds and uploads the native Winamp x86 plug-in;
+7. creates tagged portable GitHub releases for `v*` tags, including SHA-256 checksums.
 
-Artifacts:
+Development artifacts:
 
 - `LIS2-Control-Center-win-x64`
 - `LIS2-ProtocolTester-win-x64`
 - `gen_lis2-win32`
+
+Tagged releases additionally contain portable ZIP packages and `SHA256SUMS.txt`. See [Release process](docs/release.md).
 
 ## Documentation
 
@@ -223,6 +226,7 @@ Artifacts:
 - [Reverse-engineering notes](docs/reverse-engineering.md)
 - [Winamp integration](docs/winamp-integration.md)
 - [Home Assistant integration](docs/home-assistant-integration.md)
+- [Release process](docs/release.md)
 - [Roadmap / TODO](TODO.md)
 
 ## Scope decisions
