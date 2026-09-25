@@ -1817,8 +1817,9 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*" MinHeight="240"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="3*" MinHeight="240"/>
+                            <RowDefinition Height="6"/>
+                            <RowDefinition Height="2*" MinHeight="180"/>
                         </Grid.RowDefinitions>
 
                         <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
@@ -2013,9 +2014,18 @@
                             </Grid>
                         </Border>
 
-                        <Border Grid.Row="3"
-                                Style="{StaticResource CardBorderStyle}"
-                                MaxHeight="220">
+                        <GridSplitter Grid.Row="3"
+                                      Height="6"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Center"
+                                      ResizeDirection="Rows"
+                                      ResizeBehavior="PreviousAndNext"
+                                      Background="{DynamicResource PanelBorderBrush}"
+                                      Cursor="SizeNS"
+                                      Margin="8,0"/>
+
+                        <Border Grid.Row="4"
+                                Style="{StaticResource CardBorderStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="1.05*"/>
@@ -2105,8 +2115,7 @@
 
                                     <ListBox x:Name="HomeAssistantAttributesListBox"
                                              Grid.Row="1"
-                                             MinHeight="90"
-                                             MaxHeight="150"
+                                             MinHeight="120"
                                              HorizontalContentAlignment="Stretch"
                                              MouseDoubleClick="HomeAssistantAttributesListBox_MouseDoubleClick">
                                         <ListBox.ItemTemplate>
