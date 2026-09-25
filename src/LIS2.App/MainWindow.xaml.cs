@@ -3723,7 +3723,7 @@ public partial class MainWindow : Window
         {
             RefreshDiagnostics();
 
-            var dialog = new SaveFileDialog
+            var dialog = new Microsoft.Win32.SaveFileDialog
             {
                 Title = LocalizationService.Translate("Export diagnostic report"),
                 Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
