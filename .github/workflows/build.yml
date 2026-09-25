@@ -125,3 +125,43 @@ jobs:
           name: gen_lis2-win32
           path: native/LIS2.WinampPlugin/build/Release/gen_lis2.dll
           if-no-files-found: error
+
+
+  wmp-legacy-plugin:
+    name: WMP Legacy plugin ${{ matrix.arch }}
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86
+            generator: Win32
+            artifact: LIS2-WMP-Legacy-win32
+          - arch: x64
+            generator: x64
+            artifact: LIS2-WMP-Legacy-win64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Configure WMP Legacy plugin
+        run: >
+          cmake
+          -S .\native\LIS2.WmpLegacyPlugin
+          -B .\native\LIS2.WmpLegacyPlugin\build-${{ matrix.arch }}
+          -A ${{ matrix.generator }}
+
+      - name: Build WMP Legacy plugin
+        run: >
+          cmake
+          --build .\native\LIS2.WmpLegacyPlugin\build-${{ matrix.arch }}
+          --config Release
+
+      - name: Upload WMP Legacy plugin
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact }}
+          path: native/LIS2.WmpLegacyPlugin/build-${{ matrix.arch }}/Release/lis2_wmp_legacy.dll
+          if-no-files-found: error
