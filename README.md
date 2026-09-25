@@ -79,7 +79,7 @@ Examples:
 {HA.DockerDisk.attribute.total}
 ```
 
-This makes Home Assistant the **universal integration layer** for data that is already available there. Weather/DWD, OctoPrint, Beszel/server and Docker monitoring, network devices, Zigbee sensors and other HA integrations can be displayed without implementing dedicated LIS2 data sources for each system.
+This makes Home Assistant the **universal integration layer** for data that is already available there. Weather/DWD, OctoPrint, Plex, Beszel/server and Docker monitoring, network devices, Zigbee sensors and other HA integrations can be displayed without implementing dedicated LIS2 data sources for each system.
 
 Dedicated LIS2 integrations are therefore only useful when they provide a concrete capability that Home Assistant cannot provide adequately. In particular, a separate OctoPrint or generic Docker/server-monitoring source is not planned while those values are already available through HA.
 
@@ -219,6 +219,7 @@ Several ideas have deliberately **not** been added:
 - no direct LIS2 hardware access from the Winamp plug-in
 - Home Assistant is currently read-only
 - no dedicated OctoPrint source: OctoPrint values already available in Home Assistant are consumed through the HA source
+- no dedicated Plex source: Plex values already available in Home Assistant are consumed through the HA source
 - no duplicate Docker/server-monitoring source solely for values already available through Home Assistant
 - unknown/experimental protocol commands are never sent automatically
 
