@@ -1,10 +1,21 @@
+using System.Text.Json.Serialization;
+
 namespace LIS2.App;
 
 public sealed class HomeAssistantSettings
 {
     public bool Enabled { get; set; }
     public string Url { get; set; } = string.Empty;
+    [JsonIgnore]
     public string AccessToken { get; set; } = string.Empty;
+
+    [JsonPropertyName("AccessToken")]
+    public string ProtectedAccessToken
+    {
+        get => HomeAssistantTokenProtector.Protect(AccessToken);
+        set => AccessToken =
+            HomeAssistantTokenProtector.UnprotectOrMigrateLegacy(value);
+    }
     public List<HomeAssistantEntityPreferenceSettings> EntityPreferences { get; set; } = new();
 
     public void EnsureDefaults()
