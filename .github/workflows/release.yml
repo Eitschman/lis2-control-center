@@ -55,7 +55,6 @@ jobs:
           --configuration Release
           --runtime win-x64
           --self-contained true
-          --no-build
           -p:Version=$env:LIS2_VERSION
           -p:DebugType=None
           -p:DebugSymbols=false
@@ -67,7 +66,6 @@ jobs:
           --configuration Release
           --runtime win-x64
           --self-contained true
-          --no-build
           -p:Version=$env:LIS2_VERSION
           -p:DebugType=None
           -p:DebugSymbols=false
