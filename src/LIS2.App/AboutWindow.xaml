@@ -56,7 +56,7 @@
             </Grid>
 
             <Border Grid.Row="2"
-                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderBrush="{DynamicResource PanelBorderBrush}"
                     BorderThickness="1"
                     CornerRadius="4"
                     Padding="12"
