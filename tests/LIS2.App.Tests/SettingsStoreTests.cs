@@ -92,16 +92,17 @@ public sealed class SettingsStoreTests
 
         File.WriteAllText(
             scope.Path,
-            $"""
-            {
-              "HomeAssistant": {
-                "Enabled": true,
-                "Url": "https://ha.example.test",
-                "AccessToken": "{{token}}",
-                "EntityPreferences": []
-              }
-            }
-            """);
+            JsonSerializer.Serialize(
+                new
+                {
+                    HomeAssistant = new
+                    {
+                        Enabled = true,
+                        Url = "https://ha.example.test",
+                        AccessToken = token,
+                        EntityPreferences = Array.Empty<object>()
+                    }
+                }));
 
         var loaded = scope.Store.Load();
         Assert.Equal(token, loaded.HomeAssistant.AccessToken);
