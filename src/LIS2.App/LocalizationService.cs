@@ -24,6 +24,9 @@ public static class LocalizationService
         {
             ["de"] = new(StringComparer.Ordinal)
             {
+                ["Attributes"]="Attribute",
+                ["Create attribute page"]="Attribut-Seite erstellen",
+                ["Select a Home Assistant attribute first."]="Zuerst ein Home-Assistant-Attribut auswählen.",
                 ["Connection"]="Verbindung",
                 ["Character ROM / Special Characters"]="Zeichen-ROM / Sonderzeichen",
                 ["Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display."]="Native LIS2-Zeichen verwenden das uPD16314-ROM. Teste die Unicode-Zuordnung oder prüfe rohe ROM-Bytes direkt auf dem echten Display.",
@@ -243,6 +246,9 @@ public static class LocalizationService
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
+                ["Attributes"]="Attributs",
+                ["Create attribute page"]="Créer une page d’attribut",
+                ["Select a Home Assistant attribute first."]="Sélectionnez d’abord un attribut Home Assistant.",
                 ["Connection"]="Connexion",
                 ["Character ROM / Special Characters"]="ROM de caractères / caractères spéciaux",
                 ["Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display."]="Les caractères natifs LIS2 utilisent la ROM uPD16314. Testez le mappage Unicode ou inspectez les octets ROM bruts sur l’afficheur réel.",
@@ -467,6 +473,9 @@ public static class LocalizationService
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
+                ["Attributes"]="Öznitelikler",
+                ["Create attribute page"]="Öznitelik sayfası oluştur",
+                ["Select a Home Assistant attribute first."]="Önce bir Home Assistant özniteliği seçin.",
                 ["Connection"]="Bağlantı",
                 ["Character ROM / Special Characters"]="Karakter ROM / Özel karakterler",
                 ["Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display."]="Yerel LIS2 karakterleri uPD16314 ROM kullanır. Unicode eşlemesini test edin veya ham ROM baytlarını gerçek ekranda inceleyin.",
@@ -699,6 +708,9 @@ public static class LocalizationService
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
+                ["Attributes"]="Атрибуты",
+                ["Create attribute page"]="Создать страницу атрибута",
+                ["Select a Home Assistant attribute first."]="Сначала выберите атрибут Home Assistant.",
                 ["Connection"]="Подключение",
                 ["Character ROM / Special Characters"]="ПЗУ символов / специальные символы",
                 ["Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display."]="Встроенные символы LIS2 используют ПЗУ uPD16314. Проверьте сопоставление Unicode или сырые байты ПЗУ на реальном дисплее.",
