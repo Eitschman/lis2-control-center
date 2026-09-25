@@ -147,6 +147,7 @@ public partial class MainWindow : Window
         ("WinampNowPlaying", "Winamp Now Playing", "Winamp"),
         ("WinampVU", "Winamp VU", "Winamp"),
         ("WinampSpectrum", "Winamp Spectrum", "Winamp"),
+        ("WindowsMediaNowPlaying", "Windows Media Now Playing", "Media"),
         // WMP integration is intentionally disabled for now.
         // ("WmpLegacyNowPlaying", "WMP Legacy Now Playing", "Media"),
         // ("WmpLegacyVU", "WMP Legacy VU", "Media"),
@@ -1430,6 +1431,13 @@ public partial class MainWindow : Window
             : LocalizationService.Format(
                 "Listening on {0} — no recent plugin/simulator data.",
                 metadataPipe);
+    }
+
+    private async void CreateWindowsMediaPreset_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        await CreatePageFromPresetAsync("WindowsMediaNowPlaying");
     }
 
     private async void CreateWmpLegacyPreset_Click(
@@ -2757,6 +2765,19 @@ public partial class MainWindow : Window
                 VisibilityExpression = "Winamp.State=Playing",
                 Line1OverflowMode = "PingPong",
                 Line2OverflowMode = "Truncate",
+                ScrollStepMilliseconds = 250,
+                ScrollEdgePauseMilliseconds = 800
+            },
+            "WindowsMediaNowPlaying" => new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = "Windows Media Now Playing",
+                Line1Template = "{WindowsMedia.Artist|fallback:--}",
+                Line2Template = "{WindowsMedia.Title|fallback:--}",
+                DurationSeconds = 7,
+                VisibilityExpression = "WindowsMedia.State=Playing",
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "PingPong",
                 ScrollStepMilliseconds = 250,
                 ScrollEdgePauseMilliseconds = 800
             },
