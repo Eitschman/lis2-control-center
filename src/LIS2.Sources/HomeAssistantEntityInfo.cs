@@ -6,4 +6,5 @@ public sealed record HomeAssistantEntityInfo(
     string FriendlyName,
     string State,
     string Unit,
-    bool IsAvailable);
+    bool IsAvailable,
+    IReadOnlyDictionary<string, object?> Attributes);
