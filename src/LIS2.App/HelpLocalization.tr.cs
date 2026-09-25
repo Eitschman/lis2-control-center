@@ -7,6 +7,7 @@ internal static partial class HelpLocalization
         {
             ["LIS2 Control Center Help"] = "LIS2 Control Center Yardım",
             ["Help & reference"] = "Yardım ve başvuru",
+            ["Help for this page"] = "Bu sayfa için yardım",
             ["Instructions, configuration reference and display-variable examples."] = "Talimatlar, yapılandırma başvurusu ve ekran değişkeni örnekleri.",
 
             ["The Dashboard is the operational overview. It shows the current 20x2 VFD frame, connection state, virtual-device state, recent log messages and direct fan-output controls."] = "Genel Bakış çalışma durumunun özetidir. Geçerli 20x2 VFD çerçevesini, bağlantı durumunu, sanal aygıt durumunu, son günlük iletilerini ve doğrudan fan çıkışı denetimlerini gösterir.",
