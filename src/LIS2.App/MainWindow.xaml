@@ -429,6 +429,69 @@
 
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                                 <StackPanel>
+                                    <TextBlock Text="Character ROM / Special Characters"
+                                               FontWeight="SemiBold"
+                                               FontSize="16"
+                                               Margin="0,0,0,8"/>
+                                    <TextBlock Text="Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display."
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,0,12"/>
+
+                                    <WrapPanel Margin="0,0,0,12">
+                                        <Button Content="Send special-character test"
+                                                Click="SendSpecialCharacterTest_Click"
+                                                Margin="0,0,8,0"/>
+                                        <TextBlock Text="Ä Ö Ü  ä ö ü  ß  °  µ  ±  £  ×  ÷  ← →  Ω π Σ √ ∞"
+                                                   FontFamily="Consolas"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource MutedBrush}"/>
+                                    </WrapPanel>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                                                   Text="ROM start byte"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0"/>
+                                        <TextBox x:Name="CharacterRomStartTextBox"
+                                                 Grid.Column="1"
+                                                 Text="80"
+                                                 FontFamily="Consolas"
+                                                 MaxLength="2"
+                                                 Margin="0,0,8,0"/>
+                                        <Button Grid.Column="2"
+                                                Content="Previous"
+                                                Click="CharacterRomPrevious_Click"
+                                                Margin="0,0,7,0"/>
+                                        <Button Grid.Column="3"
+                                                Content="Send 40 bytes"
+                                                Click="SendCharacterRomRange_Click"
+                                                Margin="0,0,7,0"/>
+                                        <Button Grid.Column="4"
+                                                Content="Next"
+                                                Click="CharacterRomNext_Click"/>
+                                        <TextBlock x:Name="CharacterRomRangeText"
+                                                   Grid.Column="5"
+                                                   Text="80-A7"
+                                                   FontFamily="Consolas"
+                                                   Foreground="{DynamicResource MutedBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="12,0,0,0"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                                <StackPanel>
                                     <DockPanel Margin="0,0,0,12">
                                         <TextBlock Text="Custom Characters / CG Builder"
                                                    FontWeight="SemiBold"
