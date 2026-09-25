@@ -60,7 +60,7 @@ Remaining:
 - [x] Cover primitive, null, large array and object attributes with automated conversion tests.
 - [ ] Validate behavior with a wider range of real HA integrations on the actual installation.
 - [ ] Consider friendlier formatting for JSON array/object attributes only if real integrations make that useful.
-- [ ] Consider secure OS-backed token storage instead of keeping the long-lived token in the application settings JSON.
+- [x] Protect the Home Assistant long-lived token at rest with Windows DPAPI (CurrentUser), including transparent migration from legacy plaintext settings.
 - [ ] Keep service calls/control out of scope unless there is a concrete LIS2 use case.
 
 ## Hardware monitoring
