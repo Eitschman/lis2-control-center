@@ -1916,12 +1916,49 @@
                                                 Content="Save entity"
                                                 Click="SaveHomeAssistantEntity_Click"/>
                                     </Grid>
+
+                                    <TextBlock Text="Attributes"
+                                               FontWeight="SemiBold"
+                                               Margin="0,14,0,6"/>
+                                    <ListBox x:Name="HomeAssistantAttributesListBox"
+                                             MaxHeight="150"
+                                             HorizontalContentAlignment="Stretch">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="2,1">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="1.2*"/>
+                                                        <ColumnDefinition Width="1*"/>
+                                                        <ColumnDefinition Width="2.2*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0"
+                                                               Text="{Binding Name}"
+                                                               Margin="0,0,10,0"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{Binding Value}"
+                                                               FontFamily="Consolas"
+                                                               Margin="0,0,10,0"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding TemplateKey}"
+                                                               FontFamily="Consolas"
+                                                               Foreground="{DynamicResource MutedBrush}"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
                                 </StackPanel>
 
-                                <Button Grid.Column="2"
-                                        Content="Create display page"
-                                        Click="CreateHomeAssistantPage_Click"
-                                        VerticalAlignment="Center"/>
+                                <StackPanel Grid.Column="2"
+                                            VerticalAlignment="Center">
+                                    <Button Content="Create display page"
+                                            Click="CreateHomeAssistantPage_Click"
+                                            Margin="0,0,0,7"/>
+                                    <Button Content="Create attribute page"
+                                            Click="CreateHomeAssistantAttributePage_Click"/>
+                                </StackPanel>
                             </Grid>
                         </Border>
                     </Grid>
