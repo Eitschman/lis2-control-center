@@ -88,7 +88,7 @@ This validates the host integration, data source and display templates before th
 
 ## Native plugin
 
-The planned `gen_lis2.dll` will be a thin Winamp general-purpose plugin.
+The native x86 `gen_lis2.dll` is implemented as a thin Winamp general-purpose plug-in and is built by CI.
 
 Responsibilities:
 
@@ -135,7 +135,10 @@ The application exposes these as:
 - `{Winamp.VuRight}`
 - `{Winamp.Vu}` — a preformatted 20-character stereo VU line
 - `{Winamp.Spectrum}` — a preformatted 20-character spectrum line
+- `{Winamp.SpectrumGlyphs}` — 20-cell spectrum rendered with eight programmable VFD glyph levels
 
 Visualization data is optional. Older plug-ins / simulators that omit these fields remain compatible.
+
+The application provides ready-made **Now Playing**, **VU** and **Spectrum** page presets. The Spectrum preset can install a project-owned eight-glyph bar set into all custom-character slots after explicit user confirmation.
 
 The application treats Winamp as disconnected after snapshots become stale. This deliberately forces `Winamp.State` back to `Unknown` for page visibility evaluation so a `Winamp.State=Playing` page cannot remain stuck after Winamp or the plug-in exits.
