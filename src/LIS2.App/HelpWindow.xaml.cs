@@ -71,7 +71,6 @@ public partial class HelpWindow : Window
             case 9: RenderHomeAssistant(); break;
         }
 
-        HelpViewer.ScrollToHome();
     }
 
     private void RenderDashboard()
@@ -338,8 +337,8 @@ public partial class HelpWindow : Window
     private void AddCode(string text) =>
         HelpDocument.Blocks.Add(new Paragraph(new Run(text))
         {
-            FontFamily = new FontFamily("Consolas"),
-            Background = (Brush)FindResource("InputBrush"),
+            FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+            Background = (System.Windows.Media.Brush)FindResource("InputBrush"),
             Padding = new Thickness(8, 5, 8, 5),
             Margin = new Thickness(0, 3, 0, 5)
         });
@@ -347,7 +346,7 @@ public partial class HelpWindow : Window
     private void AddVariable(string key, string description)
     {
         var paragraph = new Paragraph { Margin = new Thickness(0, 2, 0, 5) };
-        paragraph.Inlines.Add(new Run($"{{{key}}}") { FontFamily = new FontFamily("Consolas"), FontWeight = FontWeights.SemiBold });
+        paragraph.Inlines.Add(new Run($"{{{key}}}") { FontFamily = new System.Windows.Media.FontFamily("Consolas"), FontWeight = FontWeights.SemiBold });
         paragraph.Inlines.Add(new Run($" — {description}"));
         HelpDocument.Blocks.Add(paragraph);
     }
