@@ -11,6 +11,7 @@ public partial class AboutWindow : Window
     {
         InitializeComponent();
         Icon = TrayIconService.CreateWindowIcon();
+        SourceInitialized += (_, _) => ThemeService.ApplyWindowChrome(this);
 
         VersionText.Text = LocalizationService.Format("Version {0}", AppInfo.Version);
         BuildText.Text = AppInfo.BuildConfiguration;
