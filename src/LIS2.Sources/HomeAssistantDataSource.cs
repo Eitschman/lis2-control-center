@@ -260,8 +260,8 @@ public sealed class HomeAssistantDataSource : IDataSource
             var states = new Dictionary<string, EntityState>(StringComparer.OrdinalIgnoreCase);
             foreach (var state in result.EnumerateArray())
             {
-                if (TryReadState(state, out var parsed))
-                    states[parsed.EntityId] = parsed;
+                if (TryReadState(state, out var parsedState))
+                    states[parsedState.EntityId] = parsedState;
             }
 
             Publish(states.Values);
