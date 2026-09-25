@@ -11,4 +11,7 @@ public sealed class VirtualLis2State
     public int Fan4 { get; internal set; } = 100;
     public byte[][] CustomCharacters { get; } =
         Enumerable.Range(0, 8).Select(_ => new byte[8]).ToArray();
+
+    public int RejectedCommandCount { get; internal set; }
+    public string? LastProtocolError { get; internal set; }
 }
