@@ -56,9 +56,11 @@ internal static class UiTestSupport
 
         try
         {
-            var topLeft = child.TranslatePoint(new Point(0, 0), ancestor);
-            var childRect = new Rect(topLeft, child.RenderSize);
-            var ancestorRect = new Rect(new Point(0, 0), ancestor.RenderSize);
+            var topLeft = child.TranslatePoint(new System.Windows.Point(0, 0), ancestor);
+            var childRect = new System.Windows.Rect(topLeft, child.RenderSize);
+            var ancestorRect = new System.Windows.Rect(
+                new System.Windows.Point(0, 0),
+                ancestor.RenderSize);
 
             var inside =
                 childRect.Left >= ancestorRect.Left - tolerance &&
