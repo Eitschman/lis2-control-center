@@ -167,7 +167,7 @@ Do not infer electrical limits or safe fan-stop behavior solely from screenshots
 
 These are deliberately lower priority than making the core LIS2 experience complete.
 
-- [ ] Home Assistant.
+- [x] Home Assistant — WebSocket state source, entity browser, aliases/favorites and page creation.
 - [ ] Plex.
 - [ ] OctoPrint.
 - [ ] Generic HTTP/JSON source.
