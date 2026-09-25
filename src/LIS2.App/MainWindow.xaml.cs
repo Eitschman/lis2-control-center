@@ -519,6 +519,13 @@ public partial class MainWindow : Window
             result = Convert.ToDouble(
                 value,
                 CultureInfo.InvariantCulture);
+
+            if (result is null || !double.IsFinite(result.Value))
+            {
+                result = null;
+                return false;
+            }
+
             return true;
         }
         catch (Exception ex) when (
@@ -703,12 +710,31 @@ public partial class MainWindow : Window
     {
         try
         {
-            _settings.HomeAssistant.Enabled =
-                HomeAssistantEnabledCheckBox.IsChecked == true;
-            _settings.HomeAssistant.Url =
-                HomeAssistantUrlTextBox.Text?.Trim() ?? string.Empty;
-            _settings.HomeAssistant.AccessToken =
-                HomeAssistantTokenPasswordBox.Password?.Trim() ?? string.Empty;
+            var enabled = HomeAssistantEnabledCheckBox.IsChecked == true;
+            var url = HomeAssistantUrlTextBox.Text?.Trim() ?? string.Empty;
+            var token = HomeAssistantTokenPasswordBox.Password?.Trim() ?? string.Empty;
+
+            if (enabled)
+            {
+                if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+                    uri.Scheme is not ("http" or "https"))
+                {
+                    throw new InvalidOperationException(
+                        LocalizationService.Translate(
+                            "Home Assistant URL must be an absolute HTTP or HTTPS URL."));
+                }
+
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    throw new InvalidOperationException(
+                        LocalizationService.Translate(
+                            "Home Assistant access token is required when the integration is enabled."));
+                }
+            }
+
+            _settings.HomeAssistant.Enabled = enabled;
+            _settings.HomeAssistant.Url = url;
+            _settings.HomeAssistant.AccessToken = token;
 
             await _settingsStore.SaveAsync(_settings);
 
@@ -2038,6 +2064,26 @@ public partial class MainWindow : Window
                     LocalizationService.Translate(
                         "Minimum fan output must not be greater than maximum output."));
 
+            if (failSafePercent < minimumPercent || failSafePercent > maximumPercent)
+                throw new InvalidOperationException(
+                    LocalizationService.Translate(
+                        "Fail-safe fan output must be between minimum and maximum output."));
+
+            var allowStop = FanAllowStopCheckBox.IsChecked == true;
+            if (allowStop && !channel.AllowStop)
+            {
+                var confirmation = System.Windows.MessageBox.Show(
+                    this,
+                    LocalizationService.Translate(
+                        "Allowing 0% can stop the fan completely. Enable this only after validating safe stop and restart behavior on the real fan hardware."),
+                    "LIS2 Control Center",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (confirmation != MessageBoxResult.Yes)
+                    return;
+            }
+
             var mode = GetSelectedFanMode();
 
             if (!Enum.TryParse<FanMode>(mode, ignoreCase: true, out _))
@@ -2068,7 +2114,7 @@ public partial class MainWindow : Window
             channel.MaximumPercent = maximumPercent;
             channel.FailSafePercent = failSafePercent;
             channel.HysteresisDegrees = hysteresis;
-            channel.AllowStop = FanAllowStopCheckBox.IsChecked == true;
+            channel.AllowStop = allowStop;
             channel.Curve = curve;
             RefreshFanCurvePreview(curve);
 
@@ -2730,15 +2776,29 @@ public partial class MainWindow : Window
                 throw new InvalidOperationException(
                     LocalizationService.Translate("Page duration must be at least 1 second."));
 
+            var visibilityExpression = string.IsNullOrWhiteSpace(PageVisibilityTextBox.Text)
+                ? null
+                : PageVisibilityTextBox.Text.Trim();
+
+            if (visibilityExpression is not null &&
+                !VisibilityEvaluator.TryParse(
+                    visibilityExpression,
+                    out _,
+                    out _,
+                    out _))
+            {
+                throw new InvalidOperationException(
+                    LocalizationService.Translate(
+                        "Visibility expression is invalid. Use a source key, an operator (=, !=, >, >=, <, <=) and a comparison value."));
+            }
+
             page.Name = string.IsNullOrWhiteSpace(PageNameTextBox.Text)
                 ? LocalizationService.Translate("Page")
                 : PageNameTextBox.Text.Trim();
             page.Line1Template = PageLine1TextBox.Text;
             page.Line2Template = PageLine2TextBox.Text;
             page.DurationSeconds = duration;
-            page.VisibilityExpression = string.IsNullOrWhiteSpace(PageVisibilityTextBox.Text)
-                ? null
-                : PageVisibilityTextBox.Text.Trim();
+            page.VisibilityExpression = visibilityExpression;
             page.Line1OverflowMode = GetComboBoxTag(PageLine1OverflowComboBox, "PingPong");
             page.Line2OverflowMode = GetComboBoxTag(PageLine2OverflowComboBox, "PingPong");
 
@@ -3581,8 +3641,19 @@ public partial class MainWindow : Window
     {
         try
         {
-            _settings.TransportMode = TransportModeComboBox.SelectedIndex == 1 ? "Serial" : "Virtual";
-            _settings.PortName = PortComboBox.SelectedItem as string;
+            var transportMode = TransportModeComboBox.SelectedIndex == 1 ? "Serial" : "Virtual";
+            var portName = PortComboBox.SelectedItem as string;
+
+            if (string.Equals(transportMode, "Serial", StringComparison.OrdinalIgnoreCase) &&
+                string.IsNullOrWhiteSpace(portName))
+            {
+                throw new InvalidOperationException(
+                    LocalizationService.Translate(
+                        "Select a COM port before enabling the serial LIS2 transport."));
+            }
+
+            _settings.TransportMode = transportMode;
+            _settings.PortName = portName;
             await _settingsStore.SaveAsync(_settings);
             await ReconnectAsync();
             await WriteFrameAsync(_frame);
