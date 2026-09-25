@@ -15,7 +15,7 @@ public partial class HelpWindow : Window
         "Dashboard",
         "Display",
         "Pages",
-        "Winamp",
+        "Media",
         "Events",
         "Hardware",
         "Fan Control",
@@ -222,6 +222,27 @@ public partial class HelpWindow : Window
         AddCode("{Winamp.Artist|fallback:Nothing playing}");
         AddCode("{Winamp.Title|fallback:--}");
         AddCode("Visible when: Winamp.State=Playing");
+
+        AddHeading("Windows Media Player");
+        AddParagraph("Windows Media Player on Windows 11 is read directly from the Windows global media session (GSMTC). No player plug-in is required.");
+        AddHeading("All Windows Media variables");
+        AddVariable("WindowsMedia.State", "Unknown, Closed, Opened, Changing, Stopped, Paused or Playing.");
+        AddVariable("WindowsMedia.Artist", "Current artist.");
+        AddVariable("WindowsMedia.Title", "Current title.");
+        AddVariable("WindowsMedia.Album", "Current album.");
+        AddVariable("WindowsMedia.AlbumArtist", "Current album artist.");
+        AddVariable("WindowsMedia.TrackNumber", "Current media track number.");
+        AddVariable("WindowsMedia.AlbumTrackCount", "Total tracks reported for the current album.");
+        AddVariable("WindowsMedia.Elapsed", "Elapsed time as mm:ss.");
+        AddVariable("WindowsMedia.Duration", "Track duration as mm:ss.");
+        AddVariable("WindowsMedia.PlaybackRate", "Playback rate reported by Windows.");
+        AddVariable("WindowsMedia.SourceAppUserModelId", "Source application user model ID.");
+        AddVariable("WindowsMedia.Connected", "True while the Windows Media Player session is available.");
+        AddVariable("WindowsMedia.SnapshotAgeSeconds", "Age of the last snapshot.");
+        AddHeading("Typical Windows Media page");
+        AddCode("{WindowsMedia.Artist|fallback:Nothing playing}");
+        AddCode("{WindowsMedia.Title|fallback:--}");
+        AddCode("Visible when: WindowsMedia.State=Playing");
 
 #if WMP_EXPERIMENTAL
         // Deferred WMP help retained for later reactivation.
