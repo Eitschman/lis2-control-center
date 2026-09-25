@@ -1704,48 +1704,54 @@
                         </Grid.RowDefinitions>
 
                         <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="14"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Connection"
+                                           FontWeight="SemiBold"
+                                           FontSize="18"
+                                           Margin="0,0,0,10"/>
 
                                 <CheckBox x:Name="HomeAssistantEnabledCheckBox"
-                                          Grid.Row="0" Grid.Column="0"
-                                          Grid.ColumnSpan="2"
                                           Content="Enable Home Assistant"
-                                          Margin="0,0,0,10"/>
+                                          Margin="0,0,0,12"/>
 
-                                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
-                                    <TextBlock Text="URL" Width="55" VerticalAlignment="Center"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0"
+                                               Text="URL"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,10,10"/>
                                     <TextBox x:Name="HomeAssistantUrlTextBox"
-                                             Width="320"
+                                             Grid.Row="0" Grid.Column="1"
+                                             Margin="0,0,0,10"
                                              ToolTip="Example: http://homeassistant.local:8123"/>
-                                </StackPanel>
 
-                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="14,0,0,0">
-                                    <TextBlock Text="Token" Width="55" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0"
+                                               Text="Token"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,10,0"/>
                                     <PasswordBox x:Name="HomeAssistantTokenPasswordBox"
-                                                 Width="300"
+                                                 Grid.Row="1" Grid.Column="1"
                                                  ToolTip="Home Assistant long-lived access token"/>
-                                </StackPanel>
+                                </Grid>
 
-                                <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="3"
-                                            Orientation="Horizontal"
-                                            VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal"
+                                            HorizontalAlignment="Right"
+                                            Margin="0,12,0,0">
                                     <Button Content="Test connection"
                                             Click="TestHomeAssistant_Click"
                                             Margin="0,0,7,0"/>
                                     <Button Content="Save / reconnect"
                                             Click="SaveHomeAssistant_Click"/>
                                 </StackPanel>
-                            </Grid>
+                            </StackPanel>
                         </Border>
 
                         <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
@@ -1782,25 +1788,43 @@
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
 
-                                <Grid Grid.Row="0" Margin="8,0,8,7">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="34"/>
-                                        <ColumnDefinition Width="2.2*"/>
-                                        <ColumnDefinition Width="1.1*"/>
-                                        <ColumnDefinition Width="1.1*"/>
-                                        <ColumnDefinition Width="2.6*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="1" Text="Entity" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="2" Text="Domain" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="3" Text="State" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold"/>
-                                </Grid>
-
                                 <ListBox x:Name="HomeAssistantEntitiesListBox"
-                                         Grid.Row="1"
+                                         Grid.Row="0"
+                                         Grid.RowSpan="2"
                                          HorizontalContentAlignment="Stretch"
                                          SelectionChanged="HomeAssistantEntitiesListBox_SelectionChanged">
+                                    <ListBox.Template>
+                                        <ControlTemplate TargetType="{x:Type ListBox}">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                                <DockPanel>
+                                                    <Grid DockPanel.Dock="Top" Margin="8,0,8,7">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="34"/>
+                                                            <ColumnDefinition Width="2.2*"/>
+                                                            <ColumnDefinition Width="1.1*"/>
+                                                            <ColumnDefinition Width="1.1*"/>
+                                                            <ColumnDefinition Width="2.6*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
+                                                        <TextBlock Grid.Column="1" Text="Entity" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
+                                                        <TextBlock Grid.Column="2" Text="Domain" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
+                                                        <TextBlock Grid.Column="3" Text="State" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
+                                                        <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold" HorizontalAlignment="Left" TextAlignment="Left"/>
+                                                    </Grid>
+
+                                                    <ScrollViewer Focusable="False"
+                                                                  Padding="{TemplateBinding Padding}"
+                                                                  HorizontalScrollBarVisibility="Disabled"
+                                                                  VerticalScrollBarVisibility="Auto">
+                                                        <ItemsPresenter/>
+                                                    </ScrollViewer>
+                                                </DockPanel>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </ListBox.Template>
+
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <Grid Margin="2,1">
@@ -1813,28 +1837,42 @@
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0"
                                                            Text="{Binding FavoriteMarker}"
-                                                           Foreground="{DynamicResource AccentBrush}"/>
+                                                           Foreground="{DynamicResource AccentBrush}"
+                                                           VerticalAlignment="Top"/>
                                                 <StackPanel Grid.Column="1" Margin="0,0,10,0">
                                                     <TextBlock Text="{Binding DisplayName}"
-                                                               TextTrimming="CharacterEllipsis"/>
+                                                               TextTrimming="CharacterEllipsis"
+                                                               HorizontalAlignment="Left"
+                                                               TextAlignment="Left"/>
                                                     <TextBlock Text="{Binding EntityId}"
                                                                Foreground="{DynamicResource MutedBrush}"
                                                                FontSize="11"
-                                                               TextTrimming="CharacterEllipsis"/>
+                                                               TextTrimming="CharacterEllipsis"
+                                                               HorizontalAlignment="Left"
+                                                               TextAlignment="Left"/>
                                                 </StackPanel>
                                                 <TextBlock Grid.Column="2"
                                                            Text="{Binding Domain}"
                                                            Foreground="{DynamicResource MutedBrush}"
-                                                           Margin="0,0,10,0"/>
+                                                           Margin="0,0,10,0"
+                                                           VerticalAlignment="Top"
+                                                           HorizontalAlignment="Left"
+                                                           TextAlignment="Left"/>
                                                 <TextBlock Grid.Column="3"
                                                            Text="{Binding DisplayState}"
                                                            FontFamily="Consolas"
-                                                           Margin="0,0,10,0"/>
+                                                           Margin="0,0,10,0"
+                                                           VerticalAlignment="Top"
+                                                           HorizontalAlignment="Left"
+                                                           TextAlignment="Left"/>
                                                 <TextBlock Grid.Column="4"
                                                            Text="{Binding TemplateKey}"
                                                            FontFamily="Consolas"
                                                            Foreground="{DynamicResource MutedBrush}"
-                                                           TextTrimming="CharacterEllipsis"/>
+                                                           TextTrimming="CharacterEllipsis"
+                                                           VerticalAlignment="Top"
+                                                           HorizontalAlignment="Left"
+                                                           TextAlignment="Left"/>
                                             </Grid>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
