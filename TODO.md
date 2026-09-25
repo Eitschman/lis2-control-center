@@ -250,6 +250,16 @@ Remaining:
 - [x] Review data-source snapshot semantics and add concurrent snapshot publication coverage.
 - [x] Add tagged release/versioning workflow with portable ZIP packages and SHA-256 checksums.
 
+## In-app help
+
+- [x] Add a context-sensitive Help entry to every main application page.
+- [x] Document page configuration, overflow modes, formatting pipeline and visibility operators.
+- [x] Document all static Clock, Winamp and Glyph variables.
+- [x] Show current dynamic Hardware variables without hard-coding machine-specific sensors.
+- [x] Explain Home Assistant variable patterns with concrete state, Unit, FriendlyName, alias, attribute, formatting, visibility and structured-attribute examples.
+- [x] Keep the HA help example-based instead of dumping every entity from large installations.
+- [x] Include every Help section in the WPF startup/theme smoke test.
+
 ## Software feature freeze
 
 The software-only implementation is considered feature-complete for the first physical-hardware validation cycle.
