@@ -114,12 +114,14 @@ Research completed:
 Implementation plan:
 
 - [ ] Add a Windows media-session source based on GSMTC for the current Windows 11 Media Player, filtered by source application and telemetry-only.
-- [ ] Add a native Windows Media Player Legacy COM bridge. Prefer a background plug-in for always-on metadata/state telemetry; add a visualization component only for optional VU/spectrum telemetry.
-- [ ] Build/register matching x86 and x64 Legacy plug-in variants because WMP plug-ins are in-process COM components.
+- [x] Add a native Windows Media Player Legacy background COM bridge for metadata/state plus a separate optional visualization component for VU/spectrum telemetry.
+- [x] Build matching x86 and x64 Legacy background/visualization plug-in variants in GitHub Actions and package them for releases.
 - [ ] Define `Media.*` provider-neutral variables for common metadata/state/timeline fields while preserving all existing `Winamp.*` variables for compatibility.
-- [ ] Keep player-specific extended variables under `WmpLegacy.*` / `WindowsMedia.*` where no common `Media.*` equivalent exists.
-- [ ] Keep every Windows Media Player integration telemetry-only; it must not gain direct LIS2 hardware access or playback-control commands.
-- [ ] Add automated tests, simulator/test fixtures, Help documentation, localization and GitHub CI coverage for implemented Windows Media Player providers.
+- [x] Keep Legacy-specific variables under `WmpLegacy.*`; reserve `WindowsMedia.*` for the modern Windows Media Player provider.
+- [x] Keep the Windows Media Player Legacy integrations telemetry-only; neither native component has direct LIS2 hardware access or playback-control commands.
+- [x] Add automated tests, dual-pipe simulator, Help/localization and GitHub CI coverage for the WMP Legacy provider.
+- [ ] Validate WMP Legacy background plug-in registration, metadata telemetry, active visualization VU/spectrum and x86/x64 selection on a real Windows Media Player Legacy installation.
+- [ ] Add automated tests, Help/localization and GitHub CI coverage for the modern Windows Media Player provider.
 
 ## Winamp
 
