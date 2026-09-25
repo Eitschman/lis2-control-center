@@ -44,17 +44,23 @@ public sealed class FanController
         FanChannelConfiguration configuration,
         double? sensorValue)
     {
-        if (!IsFinite(sensorValue) || configuration.Curve.Count == 0)
+        if (sensorValue is null ||
+            !double.IsFinite(sensorValue.Value) ||
+            configuration.Curve.Count == 0)
+        {
             return configuration.FailSafePercent;
+        }
+
+        var value = sensorValue.Value;
 
         var points = configuration.Curve
             .OrderBy(point => point.Temperature)
             .ToArray();
 
-        if (sensorValue <= points[0].Temperature)
+        if (value <= points[0].Temperature)
             return points[0].OutputPercent;
 
-        if (sensorValue >= points[^1].Temperature)
+        if (value >= points[^1].Temperature)
             return points[^1].OutputPercent;
 
         for (var index = 0; index < points.Length - 1; index++)
@@ -62,14 +68,14 @@ public sealed class FanController
             var lower = points[index];
             var upper = points[index + 1];
 
-            if (sensorValue < lower.Temperature || sensorValue > upper.Temperature)
+            if (value < lower.Temperature || value > upper.Temperature)
                 continue;
 
             var range = upper.Temperature - lower.Temperature;
             if (range <= 0)
                 return upper.OutputPercent;
 
-            var ratio = (sensorValue.Value - lower.Temperature) / range;
+            var ratio = (value - lower.Temperature) / range;
             var interpolated =
                 lower.OutputPercent +
                 ((upper.OutputPercent - lower.OutputPercent) * ratio);
