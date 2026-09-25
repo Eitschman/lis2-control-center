@@ -76,6 +76,12 @@ public partial class HelpWindow : Window
 
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
 
+    internal void RenderAllSectionsForSmokeTest()
+    {
+        for (var index = 0; index < SectionNames.Length; index++)
+            RenderSection(index);
+    }
+
     private void RenderSection(int index)
     {
         HelpDocument.Blocks.Clear();
