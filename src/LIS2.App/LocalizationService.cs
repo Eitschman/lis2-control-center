@@ -24,8 +24,8 @@ public static class LocalizationService
         {
             ["de"] = new(StringComparer.Ordinal)
             {
+                ["Apply condition"]="Bedingung übernehmen",
                 ["Copy key"]="Schlüssel kopieren",
-                ["Build"]="Erstellen",
                 ["Export report..."]="Bericht exportieren...",
                 ["Virtual LIS2 state"]="Virtueller LIS2-Status",
                 ["Decoded command history"]="Dekodierter Befehlsverlauf",
@@ -254,8 +254,8 @@ public static class LocalizationService
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
+                ["Apply condition"]="Appliquer la condition",
                 ["Copy key"]="Copier la clé",
-                ["Build"]="Construire",
                 ["Export report..."]="Exporter le rapport...",
                 ["Virtual LIS2 state"]="État LIS2 virtuel",
                 ["Decoded command history"]="Historique des commandes décodées",
@@ -489,8 +489,8 @@ public static class LocalizationService
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
+                ["Apply condition"]="Koşulu uygula",
                 ["Copy key"]="Anahtarı kopyala",
-                ["Build"]="Oluştur",
                 ["Export report..."]="Raporu dışa aktar...",
                 ["Virtual LIS2 state"]="Sanal LIS2 durumu",
                 ["Decoded command history"]="Çözümlenmiş komut geçmişi",
@@ -732,8 +732,8 @@ public static class LocalizationService
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
+                ["Apply condition"]="Применить условие",
                 ["Copy key"]="Копировать ключ",
-                ["Build"]="Собрать",
                 ["Export report..."]="Экспортировать отчёт...",
                 ["Virtual LIS2 state"]="Состояние виртуального LIS2",
                 ["Decoded command history"]="Декодированная история команд",
