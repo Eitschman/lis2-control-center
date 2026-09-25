@@ -1264,7 +1264,7 @@ public partial class MainWindow : Window
             !string.IsNullOrWhiteSpace(artist)
                 ? artist
                 : connected
-                    ? LocalizationService.Translate("Winamp connected")
+                    ? string.Empty
                     : LocalizationService.Translate("Waiting for Winamp...");
 
         WinampAlbumText.Text = album ?? string.Empty;
