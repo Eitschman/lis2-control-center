@@ -212,6 +212,7 @@ Home Assistant is the preferred **universal integration layer** for values that 
 Examples that should normally come through Home Assistant include:
 
 - OctoPrint printer/job/temperature values
+- Plex media/player values
 - Beszel, Docker and server monitoring
 - DWD/weather data
 - network/device integrations
@@ -221,7 +222,7 @@ Consequently:
 
 - [x] OctoPrint dedicated source — **not needed; use Home Assistant**.
 - [x] Generic Docker/server-monitoring source — **not needed; use Home Assistant**.
-- [ ] Plex — consider a direct source only if it adds media-specific functionality that is materially better than the HA representation.
+- [x] Plex dedicated source — **not needed; use Home Assistant**.
 - [ ] Generic HTTP/JSON source — only if there is a real data source that cannot reasonably be exposed through HA.
 - [ ] Additional media-player integrations — only for capabilities that justify a dedicated source.
 
