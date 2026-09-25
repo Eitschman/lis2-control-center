@@ -1,0 +1,6 @@
+LIBRARY lis2_wmp_legacy
+EXPORTS
+    DllCanUnloadNow PRIVATE
+    DllGetClassObject PRIVATE
+    DllRegisterServer PRIVATE
+    DllUnregisterServer PRIVATE
