@@ -48,7 +48,8 @@ public partial class MainWindow : Window
     private bool _loadingCustomGlyphSetting;
     private bool _fanUiInitialized;
     private bool _lastWinampConnected;
-    private bool _lastWmpLegacyConnected;
+    // WMP Legacy integration is deferred; keep the implementation but not runtime state.
+    // private bool _lastWmpLegacyConnected;
     private bool _applyingAppearanceSettings;
     private bool _refreshingHomeAssistantUi;
 
