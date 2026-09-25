@@ -646,6 +646,9 @@ public partial class MainWindow : Window
                 if (MainTabs.SelectedIndex == 9)
                     RefreshHomeAssistantView();
 
+                if (MainTabs.SelectedIndex == 2)
+                    RefreshTemplateVariableChoices();
+
                 await RenderRuntimePageAsync();
             }
             catch (Exception ex)
@@ -866,6 +869,46 @@ public partial class MainWindow : Window
             HomeAssistantAttributesListBox.ItemsSource =
                 Array.Empty<HomeAssistantAttributeRow>();
         }
+    }
+
+    private void HomeAssistantEntitiesListBox_MouseDoubleClick(
+        object sender,
+        System.Windows.Input.MouseButtonEventArgs e) =>
+        CopySelectedHomeAssistantEntityKey();
+
+    private void HomeAssistantAttributesListBox_MouseDoubleClick(
+        object sender,
+        System.Windows.Input.MouseButtonEventArgs e) =>
+        CopySelectedHomeAssistantAttributeKey();
+
+    private void CopyHomeAssistantEntityKey_Click(
+        object sender,
+        RoutedEventArgs e) =>
+        CopySelectedHomeAssistantEntityKey();
+
+    private void CopyHomeAssistantAttributeKey_Click(
+        object sender,
+        RoutedEventArgs e) =>
+        CopySelectedHomeAssistantAttributeKey();
+
+    private void CopySelectedHomeAssistantEntityKey()
+    {
+        if (HomeAssistantEntitiesListBox.SelectedItem is not HomeAssistantEntityRow entity)
+            return;
+
+        var key = entity.AliasTemplateKey ?? entity.TemplateKey;
+        System.Windows.Clipboard.SetText(key);
+        Log($"INFO copied Home Assistant template key '{key}'");
+    }
+
+    private void CopySelectedHomeAssistantAttributeKey()
+    {
+        if (HomeAssistantAttributesListBox.SelectedItem is not HomeAssistantAttributeRow attribute)
+            return;
+
+        var key = attribute.AliasTemplateKey ?? attribute.TemplateKey;
+        System.Windows.Clipboard.SetText(key);
+        Log($"INFO copied Home Assistant attribute template key '{key}'");
     }
 
     private async void SaveHomeAssistantEntity_Click(object sender, RoutedEventArgs e)
