@@ -1695,15 +1695,35 @@
                 <TabItem Header="Diagnostics">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="14"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*" MinHeight="180"/>
+                            <RowDefinition Height="6"/>
+                            <RowDefinition Height="*" MinHeight="180"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.15*"/>
-                            <ColumnDefinition Width="14"/>
-                            <ColumnDefinition Width="0.85*"/>
+                            <ColumnDefinition Width="1.15*" MinWidth="300"/>
+                            <ColumnDefinition Width="6"/>
+                            <ColumnDefinition Width="0.85*" MinWidth="260"/>
                         </Grid.ColumnDefinitions>
+
+                        <GridSplitter Grid.Row="1"
+                                      Grid.Column="0"
+                                      Grid.ColumnSpan="3"
+                                      Height="6"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Center"
+                                      ResizeDirection="Rows"
+                                      ResizeBehavior="PreviousAndNext"
+                                      Cursor="SizeNS"/>
+
+                        <GridSplitter Grid.Row="0"
+                                      Grid.RowSpan="3"
+                                      Grid.Column="1"
+                                      Width="6"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Stretch"
+                                      ResizeDirection="Columns"
+                                      ResizeBehavior="PreviousAndNext"
+                                      Cursor="SizeWE"/>
 
                         <Border Grid.Row="0" Grid.Column="0"
                                 Style="{StaticResource CardBorderStyle}">
