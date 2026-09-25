@@ -55,8 +55,9 @@ Implemented today:
 
 Remaining:
 
-- [ ] Validate behavior with a wider range of real HA integrations, especially entities with large/structured attributes.
-- [ ] Consider friendlier formatting for JSON array/object attributes if real integrations make that useful.
+- [x] Cover primitive, null, large array and object attributes with automated conversion tests.
+- [ ] Validate behavior with a wider range of real HA integrations on the actual installation.
+- [ ] Consider friendlier formatting for JSON array/object attributes only if real integrations make that useful.
 - [ ] Consider secure OS-backed token storage instead of keeping the long-lived token in the application settings JSON.
 - [ ] Keep service calls/control out of scope unless there is a concrete LIS2 use case.
 
@@ -243,10 +244,26 @@ Implemented:
 Remaining:
 
 - [x] Exercise Light and Dark theme resource loading in the WPF startup/tab smoke test.
-- [ ] Add tests for settings migration/defaulting.
-- [ ] Add more fan safety edge-case tests.
+- [x] Add tests for settings migration/defaulting, corrupt-file recovery and save/load round trips.
+- [x] Add more fan safety edge-case tests, including non-finite sensor values and fail-safe clamping.
+- [x] Add virtual-device end-to-end tests from display runtime through transport/state.
 - [x] Review data-source snapshot semantics and add concurrent snapshot publication coverage.
-- [ ] Add a release/versioning workflow when the project reaches an explicit release milestone.
+- [x] Add tagged release/versioning workflow with portable ZIP packages and SHA-256 checksums.
+
+## Software feature freeze
+
+The software-only implementation is considered feature-complete for the first physical-hardware validation cycle.
+
+Until real LIS2 hardware testing produces evidence for a required change:
+
+- do not add speculative protocol commands;
+- do not add one-off data sources already covered by Home Assistant;
+- do not expand the Winamp plug-in beyond metadata/telemetry;
+- prefer regression tests and fixes over new features;
+- treat new UI work as bug fixing for concrete real-world layout failures;
+- keep portable ZIP distribution as the primary release format.
+
+The next major milestone is physical LIS2 validation followed by release-candidate fixes.
 
 ## Research / guardrails
 
