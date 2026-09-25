@@ -23,6 +23,7 @@ The following larger feature areas are already implemented:
 - [x] Four-channel fan control with Fixed, Curve, Follow, External and Off modes.
 - [x] Fan curves, live values, min/max/fail-safe and hysteresis.
 - [x] Native Winamp x86 plug-in, simulator, metadata, VU and spectrum telemetry.
+- [x] Windows 11 Media Player telemetry via GSMTC without a player plug-in, including media-page UI, display variables and Now Playing page preset.
 - [x] Eight-level custom-glyph Winamp spectrum.
 - [x] Home Assistant WebSocket source with entity browser, aliases/favorites and page creation.
 - [x] Home Assistant entity attributes exposed as template values and browsable in the UI.
@@ -103,7 +104,7 @@ Remaining:
 
 ## Windows Media Player
 
-Status: **deferred / disabled**. The implementation work is intentionally retained in the repository, but WMP UI/runtime integration and native plug-in CI artifacts are disabled until the integration approach is revisited.
+Status: **modern Windows 11 integration active; Windows Media Player Legacy deferred / disabled**. The modern player is integrated directly through Windows GSMTC without a player plug-in. Legacy COM/background/visualization implementation work is intentionally retained in the repository, but its UI/runtime integration and native plug-in CI artifacts remain disabled until the Legacy approach is revisited.
 
 Research completed:
 
@@ -124,7 +125,8 @@ Implementation plan:
 - [x] Add automated tests, dual-pipe simulator, Help/localization and GitHub CI coverage for the WMP Legacy provider.
 - [ ] Validate WMP Legacy background plug-in registration, metadata telemetry, active visualization VU/spectrum and x86/x64 selection on a real Windows Media Player Legacy installation.
 - [x] Add automated tests, Help/localization and GitHub CI coverage for the modern Windows Media Player provider.
-- [ ] Validate the GSMTC provider against the real Windows 11 Media Player on a user machine, including metadata changes, pause/resume, seek/timeline updates and session start/stop.
+- [x] Validate the GSMTC provider against the real Windows 11 Media Player on a user machine; live metadata, playback state and timeline telemetry have been confirmed in the application UI.
+- [ ] Revisit additional GSMTC edge cases only if real-world use exposes a concrete problem (for example unusual session lifecycle or metadata behavior).
 
 ## Winamp
 
@@ -203,7 +205,8 @@ Implemented:
 - [x] About/version information.
 - [x] Hardware and Home Assistant browser/table layout cleanup.
 - [x] Page-list selection and enabled/disabled state use separate interactions; only the checkbox toggles page activation.
-- [x] Card-header actions/status are visually separated from headings in Fan Control, Diagnostics and Winamp.
+- [x] Card-header actions/status are visually separated from headings in Fan Control, Diagnostics and media integrations.
+- [x] Reorganize the Media page around provider-specific cards: modern Windows Media Player first, Winamp with its playback/VU/spectrum/plugin details grouped together, and provider-separated page variables.
 - [x] Help-button placement, help scrollbar spacing and Home Assistant minimum-window layout have been corrected from real-world UI review.
 - [x] Theme the native Windows title bar consistently with the selected application theme.
 - [x] Complete a full Light/Dark control review, including input, selection, focus, disabled and resizable-pane states.
