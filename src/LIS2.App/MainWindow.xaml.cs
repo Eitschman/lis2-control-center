@@ -3704,12 +3704,15 @@ public partial class MainWindow : Window
         VirtualLis2StateTextBox.Text =
             string.Join(Environment.NewLine, stateLines);
 
+        var history = virtualTransport.Writes;
+        var firstHistoryNumber = Math.Max(1, history.Count - 199);
+
         CommandHistoryTextBox.Text = string.Join(
             Environment.NewLine,
-            virtualTransport.Writes
+            history
                 .TakeLast(200)
                 .Select((data, index) =>
-                    $"{Math.Max(1, virtualTransport.Writes.Count - 199) + index,4}: " +
+                    $"{firstHistoryNumber + index,4}: " +
                     $"{string.Join(" ", data.Select(value => value.ToString("X2", CultureInfo.InvariantCulture)))}" +
                     $"{Environment.NewLine}      {Lis2Protocol.DescribeCommand(data)}"));
     }
