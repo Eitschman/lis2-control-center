@@ -3460,6 +3460,110 @@ public partial class MainWindow : Window
     }
 
 
+    private async void SendSpecialCharacterTest_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            _frame = DisplayFrame.Create(
+                "ÄÖÜ äöü ß ° µ ± £",
+                "← → Ω π Σ √ ∞ × ÷");
+
+            await WriteFrameAsync(_frame);
+            RefreshPreview();
+
+            Log("INFO sent native LIS2 special-character test");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void SendCharacterRomRange_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var start = ParseCharacterRomStart();
+
+            var firstLine = Enumerable.Range(start, 20)
+                .Select(value => (byte)value)
+                .ToArray();
+            var secondLine = Enumerable.Range(start + 20, 20)
+                .Select(value => (byte)value)
+                .ToArray();
+
+            var device = RequireDevice();
+            await device.WriteRawDisplayBytesAsync(1, 0, firstLine);
+            await device.WriteRawDisplayBytesAsync(2, 0, secondLine);
+
+            CharacterRomRangeText.Text =
+                $"{start:X2}-{start + 39:X2}";
+
+            Log(
+                $"INFO sent raw LIS2 character ROM range " +
+                $"{start:X2}-{start + 39:X2}");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private void CharacterRomPrevious_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var start = ParseCharacterRomStart();
+            SetCharacterRomStart(Math.Max(0x20, start - 0x28));
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private void CharacterRomNext_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var start = ParseCharacterRomStart();
+            SetCharacterRomStart(Math.Min(0xD8, start + 0x28));
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private int ParseCharacterRomStart()
+    {
+        var text = CharacterRomStartTextBox.Text?.Trim();
+
+        if (!int.TryParse(
+                text,
+                NumberStyles.HexNumber,
+                CultureInfo.InvariantCulture,
+                out var start) ||
+            start is < 0x20 or > 0xD8)
+        {
+            throw new InvalidOperationException(
+                LocalizationService.Translate(
+                    "ROM start byte must be hexadecimal 20 through D8."));
+        }
+
+        SetCharacterRomStart(start);
+        return start;
+    }
+
+    private void SetCharacterRomStart(int start)
+    {
+        start = Math.Clamp(start, 0x20, 0xD8);
+        CharacterRomStartTextBox.Text =
+            start.ToString("X2", CultureInfo.InvariantCulture);
+        CharacterRomRangeText.Text =
+            $"{start:X2}-{start + 39:X2}";
+    }
+
     private async void SendLine1_Click(object sender, RoutedEventArgs e)
     {
         try
