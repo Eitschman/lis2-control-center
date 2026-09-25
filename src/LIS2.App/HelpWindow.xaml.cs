@@ -372,7 +372,11 @@ public partial class HelpWindow : Window
 
     private void AddBullets(params string[] items)
     {
-        var list = new List { MarkerStyle = TextMarkerStyle.Disc, Margin = new Thickness(20, 2, 0, 8) };
+        var list = new System.Windows.Documents.List
+        {
+            MarkerStyle = TextMarkerStyle.Disc,
+            Margin = new Thickness(20, 2, 0, 8)
+        };
         foreach (var item in items)
             list.ListItems.Add(new ListItem(new Paragraph(new Run(item)) { Margin = new Thickness(0, 1, 0, 3) }));
         HelpDocument.Blocks.Add(list);
