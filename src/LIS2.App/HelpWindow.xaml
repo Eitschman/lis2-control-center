@@ -62,7 +62,7 @@
                                           IsSelectionEnabled="True"
                                           Padding="18">
                     <FlowDocument x:Name="HelpDocument"
-                                  PagePadding="0"
+                                  PagePadding="0,0,20,0"
                                   FontFamily="Segoe UI"
                                   FontSize="14"
                                   Foreground="{DynamicResource TextBrush}"/>
