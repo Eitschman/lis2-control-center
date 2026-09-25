@@ -7,7 +7,7 @@ Modern Windows control software for the **VL System L.I.S. 2** 20x2 VFD display 
 > **Implementation:** C# / .NET 8, WPF, native Win32 Winamp plug-in  
 > **License:** MIT
 
-LIS2 Control Center is an independent replacement for the obsolete VL System Multimedia Control Center (MCC). It combines direct LIS2 hardware control with programmable display pages, PC hardware monitoring, Winamp telemetry, Home Assistant data and fan control.
+LIS2 Control Center is an independent replacement for the obsolete VL System Multimedia Control Center (MCC). It combines direct LIS2 hardware control with programmable display pages, PC hardware monitoring, Winamp and Windows 11 Media Player telemetry, Home Assistant data and fan control.
 
 > **Preserve the hardware. Replace the limitations of its software.**
 
@@ -36,7 +36,7 @@ LIS2 Control Center is an independent replacement for the obsolete VL System Mul
 - template formatting pipeline with fallbacks, numeric/percent/byte formatting, prefix/suffix and case conversion
 - scheduler-driven rotation independent from scrolling animation
 - event/overlay queue with priority and lifetime plus UI/test generation
-- ready-made presets for Clock, Status, CPU, GPU, Memory, Temperatures, Fans, Winamp Now Playing, VU and Spectrum
+- ready-made presets for Clock, Status, CPU, GPU, Memory, Temperatures, Fans, Winamp Now Playing/VU/Spectrum and Windows Media Player Now Playing
 
 ### PC hardware and fan control
 
@@ -59,6 +59,21 @@ LIS2 Control Center is an independent replacement for the obsolete VL System Mul
 - 20-band spectrum telemetry and eight-level custom-glyph VFD spectrum
 - stale/disconnect handling
 - Winamp simulator for development without Winamp
+
+### Windows Media Player
+
+The modern Windows 11 Media Player is integrated directly through **Global System Media Transport Controls (GSMTC)**. No player plug-in or additional DLL installation is required.
+
+- automatic detection of the Windows Media Player session
+- title, artist, album and album artist
+- playback state and timeline/position
+- track number/count and playback rate when supplied by Windows
+- live session start/change notifications
+- `WindowsMedia.*` display variables
+- ready-made Now Playing page preset
+- dedicated Media-page card alongside Winamp
+
+Windows Media Player Legacy support has been researched and prototyped separately, but its COM/background/visualization plug-ins and UI/runtime integration are currently **disabled and deferred**. The implementation remains in the repository for possible later work.
 
 ### Home Assistant
 
@@ -105,7 +120,7 @@ See [docs/home-assistant-integration.md](docs/home-assistant-integration.md).
 ## Architecture
 
 ```text
-Clock / Hardware / Winamp / Home Assistant
+Clock / Hardware / Winamp / Windows Media / Home Assistant
                   |
                   v
           DataSourceRegistry
@@ -130,6 +145,7 @@ The projects are deliberately separated:
 - `src/LIS2.Sources` — clock, LibreHardwareMonitor and Home Assistant sources plus source registry
 - `src/LIS2.Fans` — fan-control modes, curves, hysteresis and fail-safe logic
 - `src/LIS2.Winamp` — named-pipe host, Winamp snapshots and display-value formatting
+- `src/LIS2.WindowsMedia` — Windows 11 GSMTC session source and Windows Media display values
 - `src/LIS2.App` — WPF UI, settings, pages, presets, tray, themes and localization
 - `tools/LIS2.ProtocolTester` — low-level protocol testing
 - `tools/LIS2.WinampSimulator` — Winamp testing without Winamp
@@ -150,6 +166,12 @@ Data sources are source-agnostic from the display engine's point of view. Typica
 {Winamp.State}
 {Winamp.Vu}
 {Winamp.SpectrumGlyphs}
+
+{WindowsMedia.Artist}
+{WindowsMedia.Title}
+{WindowsMedia.State}
+{WindowsMedia.Elapsed}
+{WindowsMedia.Duration}
 
 {HA.sensor.example}
 {HA.sensor.example.Unit}
@@ -204,7 +226,7 @@ dotnet test .\LIS2ControlCenter.sln -c Release --no-build
 GitHub Actions currently:
 
 1. restores and builds the complete .NET solution on Windows;
-2. runs the Core, Display, Sources, Fans, Winamp and application reliability tests;
+2. runs the Core, Display, Sources, Fans, Winamp, Windows Media and application reliability tests;
 3. runs a WPF startup/tab smoke test;
 4. publishes a self-contained Windows x64 LIS2 Control Center;
 5. publishes the self-contained x64 protocol tester;
