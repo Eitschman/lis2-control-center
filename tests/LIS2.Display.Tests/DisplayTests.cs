@@ -23,10 +23,10 @@ public sealed class DisplayTests
     }
 
     [Fact]
-    public void Frame_TransliteratesGermanCharacters()
+    public void Frame_PreservesNativeGermanCharacters()
     {
         var frame = DisplayFrame.Create("Dümmer", string.Empty);
-        Assert.StartsWith("Duemmer", frame.Line1);
+        Assert.StartsWith("Dümmer", frame.Line1);
     }
 
     [Fact]
