@@ -15,7 +15,7 @@ public partial class HelpWindow : Window
         "Dashboard",
         "Display",
         "Pages",
-        "Winamp",
+        "Media",
         "Events",
         "Hardware",
         "Fan Control",
