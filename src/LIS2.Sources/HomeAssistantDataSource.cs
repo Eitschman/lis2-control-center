@@ -383,7 +383,7 @@ public sealed class HomeAssistantDataSource : IDataSource
             attributes.ValueKind == JsonValueKind.Object)
         {
             foreach (var attribute in attributes.EnumerateObject())
-                parsedAttributes[attribute.Name] = ReadAttributeValue(attribute.Value);
+                parsedAttributes[attribute.Name] = HomeAssistantValueConverter.Convert(attribute.Value);
 
             if (attributes.TryGetProperty("friendly_name", out var rawFriendlyName))
                 friendlyName = rawFriendlyName.GetString() ?? entityId;
@@ -400,18 +400,6 @@ public sealed class HomeAssistantDataSource : IDataSource
             parsedAttributes);
         return true;
     }
-
-    private static object? ReadAttributeValue(JsonElement value) =>
-        value.ValueKind switch
-        {
-            JsonValueKind.String => value.GetString(),
-            JsonValueKind.Number when value.TryGetInt64(out var integer) => integer,
-            JsonValueKind.Number when value.TryGetDouble(out var number) => number,
-            JsonValueKind.True => true,
-            JsonValueKind.False => false,
-            JsonValueKind.Null or JsonValueKind.Undefined => null,
-            _ => value.GetRawText()
-        };
 
     private Uri CreateWebSocketUri()
     {
