@@ -165,3 +165,43 @@ jobs:
           name: ${{ matrix.artifact }}
           path: native/LIS2.WmpLegacyPlugin/build-${{ matrix.arch }}/Release/lis2_wmp_legacy.dll
           if-no-files-found: error
+
+
+  wmp-legacy-visualization:
+    name: WMP Legacy visualization ${{ matrix.arch }}
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86
+            generator: Win32
+            artifact: LIS2-WMP-Legacy-Visualization-win32
+          - arch: x64
+            generator: x64
+            artifact: LIS2-WMP-Legacy-Visualization-win64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Configure WMP Legacy visualization
+        run: >
+          cmake
+          -S .\native\LIS2.WmpLegacyVisualization
+          -B .\native\LIS2.WmpLegacyVisualization\build-${{ matrix.arch }}
+          -A ${{ matrix.generator }}
+
+      - name: Build WMP Legacy visualization
+        run: >
+          cmake
+          --build .\native\LIS2.WmpLegacyVisualization\build-${{ matrix.arch }}
+          --config Release
+
+      - name: Upload WMP Legacy visualization
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact }}
+          path: native/LIS2.WmpLegacyVisualization/build-${{ matrix.arch }}/Release/lis2_wmp_legacy_visualization.dll
+          if-no-files-found: error
