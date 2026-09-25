@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>LIS2.WmpLegacy</AssemblyName>
+    <RootNamespace>LIS2.WmpLegacy</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LIS2.Sources\LIS2.Sources.csproj" />
+  </ItemGroup>
+</Project>
