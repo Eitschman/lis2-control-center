@@ -120,6 +120,16 @@
                             <TextBlock Grid.Column="1" Text="Diagnostics" VerticalAlignment="Center"/>
                         </Grid>
                     </Button>
+                    <Button Tag="9" Click="Navigation_Click" Style="{StaticResource NavButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="⌂" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Home Assistant" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
 
                     <Separator Margin="4,18,4,16"/>
 
@@ -1618,6 +1628,202 @@
                             </Border>
                         </StackPanel>
                     </ScrollViewer>
+                </TabItem>
+
+                <!-- Home Assistant -->
+                <TabItem Header="Home Assistant">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <CheckBox x:Name="HomeAssistantEnabledCheckBox"
+                                          Grid.Row="0" Grid.Column="0"
+                                          Grid.ColumnSpan="2"
+                                          Content="Enable Home Assistant"
+                                          Margin="0,0,0,10"/>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                                    <TextBlock Text="URL" Width="55" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="HomeAssistantUrlTextBox"
+                                             Width="320"
+                                             ToolTip="Example: http://homeassistant.local:8123"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="14,0,0,0">
+                                    <TextBlock Text="Token" Width="55" VerticalAlignment="Center"/>
+                                    <PasswordBox x:Name="HomeAssistantTokenPasswordBox"
+                                                 Width="300"
+                                                 ToolTip="Home Assistant long-lived access token"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="3"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <Button Content="Test connection"
+                                            Click="TestHomeAssistant_Click"
+                                            Margin="0,0,7,0"/>
+                                    <Button Content="Save / reconnect"
+                                            Click="SaveHomeAssistant_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                            <DockPanel>
+                                <StackPanel DockPanel.Dock="Left">
+                                    <TextBlock Text="Home Assistant entities"
+                                               FontWeight="SemiBold"
+                                               FontSize="18"/>
+                                    <TextBlock x:Name="HomeAssistantStatusText"
+                                               Text="Not configured"
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               Margin="0,5,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel DockPanel.Dock="Right"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBox x:Name="HomeAssistantSearchTextBox"
+                                             Width="240"
+                                             ToolTip="Search entity ID, friendly name or alias"
+                                             TextChanged="HomeAssistantFilterChanged"
+                                             Margin="0,0,8,0"/>
+                                    <ComboBox x:Name="HomeAssistantDomainComboBox"
+                                              Width="170"
+                                              SelectionChanged="HomeAssistantFilterChanged"/>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+
+                        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0" Margin="8,0,8,7">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="34"/>
+                                        <ColumnDefinition Width="2.2*"/>
+                                        <ColumnDefinition Width="1.1*"/>
+                                        <ColumnDefinition Width="1.1*"/>
+                                        <ColumnDefinition Width="2.6*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="1" Text="Entity" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="2" Text="Domain" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="3" Text="State" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold"/>
+                                </Grid>
+
+                                <ListBox x:Name="HomeAssistantEntitiesListBox"
+                                         Grid.Row="1"
+                                         HorizontalContentAlignment="Stretch"
+                                         SelectionChanged="HomeAssistantEntitiesListBox_SelectionChanged">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="2,1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="34"/>
+                                                    <ColumnDefinition Width="2.2*"/>
+                                                    <ColumnDefinition Width="1.1*"/>
+                                                    <ColumnDefinition Width="1.1*"/>
+                                                    <ColumnDefinition Width="2.6*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding FavoriteMarker}"
+                                                           Foreground="{DynamicResource AccentBrush}"/>
+                                                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                                    <TextBlock Text="{Binding DisplayName}"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding EntityId}"
+                                                               Foreground="{DynamicResource MutedBrush}"
+                                                               FontSize="11"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding Domain}"
+                                                           Foreground="{DynamicResource MutedBrush}"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="{Binding DisplayState}"
+                                                           FontFamily="Consolas"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Grid.Column="4"
+                                                           Text="{Binding TemplateKey}"
+                                                           FontFamily="Consolas"
+                                                           Foreground="{DynamicResource MutedBrush}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Selected entity"
+                                               FontWeight="SemiBold"
+                                               FontSize="16"/>
+                                    <TextBlock x:Name="SelectedHomeAssistantEntityText"
+                                               Text="Select an entity above."
+                                               Foreground="{DynamicResource MutedBrush}"
+                                               Margin="0,5,0,10"
+                                               TextWrapping="Wrap"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="220"/>
+                                            <ColumnDefinition Width="14"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="14"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Alias" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="HomeAssistantAliasTextBox" Grid.Column="1"/>
+                                        <CheckBox x:Name="HomeAssistantFavoriteCheckBox"
+                                                  Grid.Column="3"
+                                                  Content="Favorite"
+                                                  VerticalAlignment="Center"/>
+                                        <Button Grid.Column="5"
+                                                Content="Save entity"
+                                                Click="SaveHomeAssistantEntity_Click"/>
+                                    </Grid>
+                                </StackPanel>
+
+                                <Button Grid.Column="2"
+                                        Content="Create display page"
+                                        Click="CreateHomeAssistantPage_Click"
+                                        VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
                 </TabItem>
             </TabControl>
         </Grid>
