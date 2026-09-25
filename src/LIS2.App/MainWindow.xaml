@@ -1865,9 +1865,9 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="3*" MinHeight="240"/>
+                            <RowDefinition Height="*" MinHeight="120"/>
                             <RowDefinition Height="6"/>
-                            <RowDefinition Height="2*" MinHeight="180"/>
+                            <RowDefinition Height="Auto" MinHeight="205"/>
                         </Grid.RowDefinitions>
 
                         <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
