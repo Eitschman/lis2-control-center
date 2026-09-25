@@ -115,15 +115,16 @@ Research completed:
 
 Implementation plan:
 
-- [ ] Add a Windows media-session source based on GSMTC for the current Windows 11 Media Player, filtered by source application and telemetry-only.
+- [x] Add a Windows media-session source based on GSMTC for the current Windows 11 Media Player, filtered to the Microsoft.ZuneMusic session and telemetry-only.
 - [x] Add a native Windows Media Player Legacy background COM bridge for metadata/state plus a separate optional visualization component for VU/spectrum telemetry.
 - [x] Build matching x86 and x64 Legacy background/visualization plug-in variants in GitHub Actions and package them for releases.
-- [ ] Define `Media.*` provider-neutral variables for common metadata/state/timeline fields while preserving all existing `Winamp.*` variables for compatibility.
+- [ ] Define `Media.*` provider-neutral variables only if multiple modern providers make it worthwhile; existing `Winamp.*` and new `WindowsMedia.*` variables remain explicit and compatible.
 - [x] Keep Legacy-specific variables under `WmpLegacy.*`; reserve `WindowsMedia.*` for the modern Windows Media Player provider.
 - [x] Keep the Windows Media Player Legacy integrations telemetry-only; neither native component has direct LIS2 hardware access or playback-control commands.
 - [x] Add automated tests, dual-pipe simulator, Help/localization and GitHub CI coverage for the WMP Legacy provider.
 - [ ] Validate WMP Legacy background plug-in registration, metadata telemetry, active visualization VU/spectrum and x86/x64 selection on a real Windows Media Player Legacy installation.
-- [ ] Add automated tests, Help/localization and GitHub CI coverage for the modern Windows Media Player provider.
+- [x] Add automated tests, Help/localization and GitHub CI coverage for the modern Windows Media Player provider.
+- [ ] Validate the GSMTC provider against the real Windows 11 Media Player on a user machine, including metadata changes, pause/resume, seek/timeline updates and session start/stop.
 
 ## Winamp
 
