@@ -76,6 +76,59 @@ public sealed class FanControllerTests
 
         Assert.Equal(0, _controller.CalculateOutput(configuration));
     }
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    [InlineData(double.NegativeInfinity)]
+    public void NonFiniteSensorValue_UsesFailSafe(double value)
+    {
+        var configuration = new FanChannelConfiguration
+        {
+            Mode = FanMode.Curve,
+            MinimumPercent = 30,
+            MaximumPercent = 100,
+            FailSafePercent = 85,
+            Curve =
+            {
+                new FanCurvePoint(40, 40),
+                new FanCurvePoint(60, 80)
+            }
+        };
+
+        Assert.Equal(85, _controller.CalculateOutput(configuration, value));
+    }
+
+    [Fact]
+    public void ExternalMode_IsClampedToConfiguredRange()
+    {
+        var configuration = new FanChannelConfiguration
+        {
+            Mode = FanMode.External,
+            MinimumPercent = 30,
+            MaximumPercent = 80
+        };
+
+        Assert.Equal(80, _controller.CalculateOutput(configuration, externalPercent: 500));
+        Assert.Equal(30, _controller.CalculateOutput(configuration, externalPercent: -10));
+    }
+
+    [Fact]
+    public void FailSafe_IsClampedAndNeverStopsFan()
+    {
+        var configuration = new FanChannelConfiguration
+        {
+            Mode = FanMode.Curve,
+            MinimumPercent = 30,
+            MaximumPercent = 80,
+            FailSafePercent = 0,
+            AllowStop = true
+        };
+
+        Assert.Equal(
+            30,
+            _controller.CalculateOutput(configuration, sensorValue: null, sensorValid: false));
+    }
+
     [Fact]
     public void CurveMode_HysteresisKeepsPreviousOutputForSmallSensorChange()
     {
