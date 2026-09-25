@@ -921,16 +921,23 @@
 
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                                 <StackPanel>
-                                    <DockPanel Margin="0,0,0,10">
-                                        <TextBlock Text="VU / Spectrum"
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="VU / Spectrum"
                                                    FontWeight="SemiBold"
                                                    FontSize="16"
-                                                   DockPanel.Dock="Left"/>
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,20,0"/>
                                         <TextBlock x:Name="WinampTelemetryStatusText"
+                                                   Grid.Column="1"
                                                    Text="No visualization data"
                                                    Foreground="{DynamicResource MutedBrush}"
-                                                   DockPanel.Dock="Right"/>
-                                    </DockPanel>
+                                                   VerticalAlignment="Center"/>
+                                    </Grid>
 
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -1432,14 +1439,19 @@
                         <StackPanel>
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
                                 <StackPanel>
-                                    <DockPanel Margin="0,0,0,12">
-                                        <TextBlock Text="Fan Outputs" FontWeight="SemiBold" FontSize="18" DockPanel.Dock="Left"/>
-                                        <CheckBox x:Name="AutomaticFanControlCheckBox"
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Fan Outputs" FontWeight="SemiBold" FontSize="18"
+                                                   VerticalAlignment="Center" Margin="0,0,20,0"/>
+                                        <CheckBox x:Name="AutomaticFanControlCheckBox" Grid.Column="1"
                                                   Content="Automatic control"
                                                   Checked="AutomaticFanControlChanged"
                                                   Unchecked="AutomaticFanControlChanged"
-                                                  DockPanel.Dock="Right"/>
-                                    </DockPanel>
+                                                  VerticalAlignment="Center"/>
+                                    </Grid>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="70"/>
@@ -1772,12 +1784,18 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <DockPanel Grid.Row="0" Margin="0,0,0,10">
-                                    <TextBlock Text="Diagnostics Snapshot"
+                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="Diagnostics Snapshot"
                                                FontWeight="SemiBold"
                                                FontSize="18"
-                                               DockPanel.Dock="Left"/>
-                                    <StackPanel DockPanel.Dock="Right"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,20,0"/>
+                                    <StackPanel Grid.Column="1"
                                                 Orientation="Horizontal">
                                         <Button Content="Export report..."
                                                 Click="ExportDiagnostics_Click"
@@ -1785,7 +1803,7 @@
                                         <Button Content="Refresh"
                                                 Click="RefreshDiagnostics_Click"/>
                                     </StackPanel>
-                                </DockPanel>
+                                </Grid>
                                 <TextBox x:Name="DiagnosticsTextBox"
                                          Grid.Row="1"
                                          IsReadOnly="True"
