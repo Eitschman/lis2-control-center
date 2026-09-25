@@ -48,7 +48,10 @@ public partial class MainWindow
             var languages = new[]
             {
                 AppLanguageMode.English,
-                AppLanguageMode.German
+                AppLanguageMode.German,
+                AppLanguageMode.French,
+                AppLanguageMode.Turkish,
+                AppLanguageMode.Russian
             };
 
             foreach (var theme in themes)
@@ -127,7 +130,11 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            report.Fail($"Unhandled UI regression exception: {ex}");
+            if (report.FailureCount == 0)
+                report.Fail($"Unhandled UI regression exception: {ex}");
+            else
+                report.Info($"UI regression stopped after detected layout failures: {ex.Message}");
+
             report.Write(reportPath);
             Log($"ERR  GitHub UI regression test: {ex}");
             Environment.ExitCode = 1;
