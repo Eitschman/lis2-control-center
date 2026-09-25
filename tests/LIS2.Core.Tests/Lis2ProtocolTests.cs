@@ -81,4 +81,25 @@ public sealed class Lis2ProtocolTests
 
         Assert.Equal($"ae{glyph}!", actual);
     }
+    [Fact]
+    public void WriteLine_EncodesDegreeSignAsNativeDisplayCharacter()
+    {
+        var actual = Lis2Protocol.WriteLine(1, 0, "23.5 °C");
+
+        Assert.Equal(
+            new byte[]
+            {
+                0xA1, 0x00, 0xA7,
+                0x32, 0x33, 0x2E, 0x35, 0x20, 0xDF, 0x43
+            },
+            actual);
+    }
+
+    [Fact]
+    public void SafeDisplayText_PreservesDegreeSignForPreview()
+    {
+        var actual = Lis2Protocol.ToSafeDisplayText("23.5 °C");
+
+        Assert.Equal("23.5 °C", actual);
+    }
 }
