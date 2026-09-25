@@ -151,6 +151,19 @@ public partial class MainWindow : Window
         ("Home Assistant", "Live Home Assistant entities over the WebSocket API.")
     ];
 
+    private void Help_Click(object sender, RoutedEventArgs e)
+    {
+        var help = new HelpWindow(
+            MainTabs.SelectedIndex,
+            CreateDisplayValues(),
+            _settings.CustomGlyphs.Select(glyph => glyph.Name).ToArray())
+        {
+            Owner = this
+        };
+
+        help.ShowDialog();
+    }
+
     private void GitHub_MouseLeftButtonUp(
         object sender,
         System.Windows.Input.MouseButtonEventArgs e)
