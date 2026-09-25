@@ -236,6 +236,46 @@ public static class Lis2Protocol
         return bytes;
     }
 
+    public static string DescribeCommand(ReadOnlySpan<byte> data)
+    {
+        if (data.Length == 0)
+            return "Empty";
+
+        return data[0] switch
+        {
+            0xA0 => "Clear/reset display",
+            0xA1 or 0xA2 when data.Length >= 3 && data[2] == 0xA7 =>
+                DescribeDisplayWrite(data),
+            0xA5 when data.Length >= 2 =>
+                $"Brightness {data[1] switch
+                {
+                    0x38 => "100%",
+                    0x39 => "75%",
+                    0x3A => "50%",
+                    0x3B => "25%",
+                    _ => $"unknown 0x{data[1]:X2}"
+                }}",
+            0xAE when data.Length >= 6 && data[1] == 0xF0 =>
+                $"Fans {data[2]}/{data[3]}/{data[4]}/{data[5]}%",
+            0xAB when data.Length >= 4 =>
+                $"Custom glyph slot {data[1]}, row {data[2]}, pixels 0x{data[3]:X2}",
+            _ => $"Unknown command 0x{data[0]:X2}"
+        };
+    }
+
+    private static string DescribeDisplayWrite(ReadOnlySpan<byte> data)
+    {
+        var line = data[0] == 0xA1 ? 1 : 2;
+        var column = data[1];
+        var text = new string(
+            data[3..]
+                .ToArray()
+                .Select(DecodeDisplayByte)
+                .ToArray());
+
+        return $"Display line {line}, column {column}: \"{text}\"";
+    }
+
     private static Dictionary<byte, char> BuildPreferredDisplayToUnicode()
     {
         var result = new Dictionary<byte, char>();
