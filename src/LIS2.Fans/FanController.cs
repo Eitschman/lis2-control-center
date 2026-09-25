@@ -12,7 +12,7 @@ public sealed class FanController
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        if (!sensorValid)
+        if (!sensorValid || !IsFinite(sensorValue))
             return Clamp(configuration.FailSafePercent, configuration, allowZero: false);
 
         if (configuration.Mode == FanMode.Curve &&
@@ -44,7 +44,7 @@ public sealed class FanController
         FanChannelConfiguration configuration,
         double? sensorValue)
     {
-        if (sensorValue is null || configuration.Curve.Count == 0)
+        if (!IsFinite(sensorValue) || configuration.Curve.Count == 0)
             return configuration.FailSafePercent;
 
         var points = configuration.Curve
@@ -79,6 +79,9 @@ public sealed class FanController
 
         return configuration.FailSafePercent;
     }
+
+    private static bool IsFinite(double? value) =>
+        value is null || (!double.IsNaN(value.Value) && !double.IsInfinity(value.Value));
 
     private static int Clamp(
         int value,
