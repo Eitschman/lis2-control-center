@@ -28,6 +28,8 @@ The following larger feature areas are already implemented:
 - [x] Home Assistant entity attributes exposed as template values and browsable in the UI.
 - [x] Tray/autostart, themes, localization and About/version UI.
 - [x] Windows CI, unit tests, self-contained artifacts and WPF startup/tab smoke test.
+- [x] Automated WPF UI-regression run in GitHub Actions with layout assertions and screenshot artifacts across Light/Dark and all supported languages.
+- [x] Context-sensitive, fully localized in-app help for every main page.
 - [x] Coalesced asynchronous display rendering.
 
 ## Display pages / runtime
@@ -175,11 +177,14 @@ Implemented:
 - [x] Startup diagnostics.
 - [x] About/version information.
 - [x] Hardware and Home Assistant browser/table layout cleanup.
+- [x] Page-list selection and enabled/disabled state use separate interactions; only the checkbox toggles page activation.
+- [x] Card-header actions/status are visually separated from headings in Fan Control, Diagnostics and Winamp.
+- [x] Help-button placement, help scrollbar spacing and Home Assistant minimum-window layout have been corrected from real-world UI review.
+- [x] Theme the native Windows title bar consistently with the selected application theme.
+- [x] Complete a full Light/Dark control review, including input, selection, focus, disabled and resizable-pane states.
 
 Remaining:
 
-- [x] Theme the native Windows title bar consistently with the selected application theme.
-- [x] Complete a full Light/Dark control review, including input, selection, focus, disabled and resizable-pane states.
 - [ ] Continue UI polish only when real-world data exposes a concrete layout problem.
 - [ ] Consider profile support only if multiple machine/use-case configurations actually need it.
 
@@ -239,6 +244,9 @@ Implemented:
 - [x] Self-contained protocol-tester artifact.
 - [x] Native Winamp x86 artifact.
 - [x] WPF startup/tab smoke test.
+- [x] GitHub Actions WPF UI-regression test covering all 10 main pages and their Help views in Light/Dark and English/German/French/Turkish/Russian.
+- [x] UI-regression screenshot/report artifact is uploaded even when layout assertions fail.
+- [x] Critical layout assertions cover page-header controls, Home Assistant detail/action regions and Help layout/scrollbar spacing.
 - [x] Serialized/coalesced display rendering.
 
 Remaining:
@@ -258,7 +266,9 @@ Remaining:
 - [x] Show current dynamic Hardware variables without hard-coding machine-specific sensors.
 - [x] Explain Home Assistant variable patterns with concrete state, Unit, FriendlyName, alias, attribute, formatting, visibility and structured-attribute examples.
 - [x] Keep the HA help example-based instead of dumping every entity from large installations.
+- [x] Fully localize Help content in English, German, French, Turkish and Russian and validate translation-key coverage automatically.
 - [x] Include every Help section in the WPF startup/theme smoke test.
+- [x] Include Help windows in the GitHub UI-regression screenshots/layout checks.
 
 ## Software feature freeze
 
