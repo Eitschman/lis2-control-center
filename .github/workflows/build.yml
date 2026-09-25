@@ -159,11 +159,22 @@ jobs:
           --build .\native\LIS2.WmpLegacyPlugin\build-${{ matrix.arch }}
           --config Release
 
+      - name: Encode WMP Legacy plugin for safe download
+        shell: pwsh
+        run: |
+          $dll = ".\native\LIS2.WmpLegacyPlugin\build-${{ matrix.arch }}\Release\lis2_wmp_legacy.dll"
+          $out = ".\artifacts\wmp-legacy-${{ matrix.arch }}"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          [Convert]::ToBase64String([IO.File]::ReadAllBytes($dll)) |
+            Set-Content -NoNewline -Encoding ascii "$out\lis2_wmp_legacy.dll.b64"
+          (Get-FileHash $dll -Algorithm SHA256).Hash |
+            Set-Content -Encoding ascii "$out\lis2_wmp_legacy.dll.sha256.txt"
+
       - name: Upload WMP Legacy plugin
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
-          path: native/LIS2.WmpLegacyPlugin/build-${{ matrix.arch }}/Release/lis2_wmp_legacy.dll
+          path: artifacts/wmp-legacy-${{ matrix.arch }}/
           if-no-files-found: error
 
 
@@ -199,9 +210,20 @@ jobs:
           --build .\native\LIS2.WmpLegacyVisualization\build-${{ matrix.arch }}
           --config Release
 
+      - name: Encode WMP Legacy visualization for safe download
+        shell: pwsh
+        run: |
+          $dll = ".\native\LIS2.WmpLegacyVisualization\build-${{ matrix.arch }}\Release\lis2_wmp_legacy_visualization.dll"
+          $out = ".\artifacts\wmp-legacy-visualization-${{ matrix.arch }}"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          [Convert]::ToBase64String([IO.File]::ReadAllBytes($dll)) |
+            Set-Content -NoNewline -Encoding ascii "$out\lis2_wmp_legacy_visualization.dll.b64"
+          (Get-FileHash $dll -Algorithm SHA256).Hash |
+            Set-Content -Encoding ascii "$out\lis2_wmp_legacy_visualization.dll.sha256.txt"
+
       - name: Upload WMP Legacy visualization
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
-          path: native/LIS2.WmpLegacyVisualization/build-${{ matrix.arch }}/Release/lis2_wmp_legacy_visualization.dll
+          path: artifacts/wmp-legacy-visualization-${{ matrix.arch }}/
           if-no-files-found: error
