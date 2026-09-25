@@ -101,6 +101,16 @@ Remaining:
 - [ ] Preserve original MCC low-speed behavior only as historical guidance, not as an electrical requirement.
 - [ ] Validate safe minimum outputs and stop behavior on real connected fans before choosing stronger defaults.
 
+## Windows Media Player
+
+- [ ] Research integration options for Windows Media Player Legacy and the current Windows 11 Media Player before implementation.
+- [ ] Determine whether Windows Media Player Legacy still supports a native/background plug-in or COM-based telemetry bridge suitable for LIS2 Control Center.
+- [ ] Determine available metadata, playback-state, position/duration, playlist and visualization/VU/spectrum access for Windows Media Player Legacy.
+- [ ] Determine integration options for the current Windows Media Player app on Windows 11 and whether it exposes a supported local API, COM surface, extension model or media-session telemetry.
+- [ ] Keep any Windows Media Player integration telemetry-only; it must not gain direct LIS2 hardware access.
+- [ ] Design a provider-neutral media-variable layer only if it can preserve existing `Winamp.*` compatibility without breaking current pages.
+- [ ] Add automated tests, Help documentation, localization and GitHub CI coverage for any implemented Windows Media Player provider.
+
 ## Winamp
 
 Implemented:
