@@ -637,10 +637,24 @@
                                              SelectionChanged="PagesListBox_SelectionChanged">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
-                                                <CheckBox Content="{Binding Name}"
-                                                          IsChecked="{Binding Enabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                          Click="PageEnabledChanged"
-                                                          Padding="2"/>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <CheckBox Grid.Column="0"
+                                                              IsChecked="{Binding Enabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              Click="PageEnabledChanged"
+                                                              VerticalAlignment="Center"
+                                                              Margin="2,0,8,0"
+                                                              ToolTip="Enable or disable this page"/>
+
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{Binding Name}"
+                                                               VerticalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
