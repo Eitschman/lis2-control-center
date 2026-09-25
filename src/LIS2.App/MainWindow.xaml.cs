@@ -3591,12 +3591,21 @@ public partial class MainWindow : Window
 
     private void RefreshDiagnostics()
     {
+        DiagnosticsTextBox.Text = BuildDiagnosticsSnapshot();
+        RefreshVirtualDiagnostics();
+    }
+
+    private string BuildDiagnosticsSnapshot()
+    {
         var snapshot = _sources.Snapshot();
         var lines = new List<string>
         {
             LocalizationService.Format(
                 "Time: {0}",
                 DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture)),
+            LocalizationService.Format(
+                "Version: {0}",
+                AppInfo.Version),
             LocalizationService.Format(
                 "Transport: {0}",
                 LocalizeTransportMode(_settings.TransportMode)),
@@ -3646,7 +3655,95 @@ public partial class MainWindow : Window
                     channel.FailSafePercent));
         }
 
-        DiagnosticsTextBox.Text = string.Join(Environment.NewLine, lines);
+        return string.Join(Environment.NewLine, lines);
+    }
+
+    private void RefreshVirtualDiagnostics()
+    {
+        if (_transport is not VirtualLis2Transport virtualTransport)
+        {
+            VirtualLis2StateTextBox.Text =
+                LocalizationService.Translate("Virtual transport is not active.");
+            CommandHistoryTextBox.Text =
+                LocalizationService.Translate("Decoded history is available for the virtual transport.");
+            return;
+        }
+
+        var state = virtualTransport.State;
+        var stateLines = new List<string>
+        {
+            $"Line 1: [{FormatDisplayPreviewLine(state.Line1)}]",
+            $"Line 2: [{FormatDisplayPreviewLine(state.Line2)}]",
+            $"Brightness: {state.Brightness}",
+            $"Fans: {state.Fan1}% / {state.Fan2}% / {state.Fan3}% / {state.Fan4}%",
+            ""
+        };
+
+        for (var slot = 0; slot < state.CustomCharacters.Length; slot++)
+        {
+            stateLines.Add(
+                $"Glyph {slot + 1}: " +
+                string.Join(
+                    " ",
+                    state.CustomCharacters[slot]
+                        .Select(value => value.ToString("X2", CultureInfo.InvariantCulture))));
+        }
+
+        VirtualLis2StateTextBox.Text =
+            string.Join(Environment.NewLine, stateLines);
+
+        CommandHistoryTextBox.Text = string.Join(
+            Environment.NewLine,
+            virtualTransport.Writes
+                .TakeLast(200)
+                .Select((data, index) =>
+                    $"{Math.Max(1, virtualTransport.Writes.Count - 199) + index,4}: " +
+                    $"{string.Join(" ", data.Select(value => value.ToString("X2", CultureInfo.InvariantCulture)))}" +
+                    $"{Environment.NewLine}      {Lis2Protocol.DescribeCommand(data)}"));
+    }
+
+    private void ExportDiagnostics_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            RefreshDiagnostics();
+
+            var dialog = new SaveFileDialog
+            {
+                Title = LocalizationService.Translate("Export diagnostic report"),
+                Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+                FileName =
+                    $"LIS2-Diagnostics-{DateTime.Now:yyyyMMdd-HHmmss}.txt"
+            };
+
+            if (dialog.ShowDialog(this) != true)
+                return;
+
+            var report = string.Join(
+                Environment.NewLine,
+                "LIS2 CONTROL CENTER DIAGNOSTIC REPORT",
+                new string('=', 40),
+                DiagnosticsTextBox.Text,
+                "",
+                "VIRTUAL LIS2 STATE",
+                new string('-', 40),
+                VirtualLis2StateTextBox.Text,
+                "",
+                "DECODED COMMAND HISTORY",
+                new string('-', 40),
+                CommandHistoryTextBox.Text,
+                "",
+                "PROTOCOL LOG",
+                new string('-', 40),
+                LogTextBox.Text);
+
+            File.WriteAllText(dialog.FileName, report);
+            Log($"INFO diagnostic report exported to '{dialog.FileName}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
     }
 
     private void StartWithWindowsChanged(object sender, RoutedEventArgs e)
