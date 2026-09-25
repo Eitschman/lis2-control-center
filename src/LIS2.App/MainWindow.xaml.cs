@@ -111,12 +111,14 @@ public partial class MainWindow : Window
 
         _eventQueue.Changed += EventQueue_Changed;
         _winampSource.Changed += WinampSource_Changed;
-        _wmpLegacySource.Changed += WmpLegacySource_Changed;
+        // WMP integration is intentionally disabled for now.
+        // _wmpLegacySource.Changed += WmpLegacySource_Changed;
         _homeAssistantSource.Changed += HomeAssistantSource_Changed;
 
         _sources.Add(new ClockDataSource());
         _sources.Add(_winampSource);
-        _sources.Add(_wmpLegacySource);
+        // WMP integration is intentionally disabled for now.
+        // _sources.Add(_wmpLegacySource);
         _sources.Add(new LibreHardwareMonitorDataSource());
         _sources.Add(_homeAssistantSource);
 
@@ -140,9 +142,10 @@ public partial class MainWindow : Window
         ("WinampNowPlaying", "Winamp Now Playing", "Winamp"),
         ("WinampVU", "Winamp VU", "Winamp"),
         ("WinampSpectrum", "Winamp Spectrum", "Winamp"),
-        ("WmpLegacyNowPlaying", "WMP Legacy Now Playing", "Media"),
-        ("WmpLegacyVU", "WMP Legacy VU", "Media"),
-        ("WmpLegacySpectrum", "WMP Legacy Spectrum", "Media")
+        // WMP integration is intentionally disabled for now.
+        // ("WmpLegacyNowPlaying", "WMP Legacy Now Playing", "Media"),
+        // ("WmpLegacyVU", "WMP Legacy VU", "Media"),
+        // ("WmpLegacySpectrum", "WMP Legacy Spectrum", "Media")
     ];
 
     private static readonly (string Title, string Subtitle)[] Sections =
@@ -150,7 +153,7 @@ public partial class MainWindow : Window
         ("Dashboard", "Overview and quick access to the most important functions."),
         ("Display", "VFD output, brightness and direct display tests."),
         ("Pages", "Create and edit the rotating 20x2 display pages."),
-        ("Media", "Winamp and Windows Media Player Legacy integrations, telemetry and page variables."),
+        ("Winamp", "Winamp integration, pipe transport and available media variables."),
         ("Events", "Priority notifications and temporary VFD overlays."),
         ("Hardware", "LibreHardwareMonitor data sources and sensor availability."),
         ("Fan Control", "Manual output, automatic control, curves and safety limits."),
@@ -261,7 +264,8 @@ public partial class MainWindow : Window
         if (index == 3)
         {
             RefreshWinampView();
-            RefreshWmpLegacyView();
+            // WMP integration is intentionally disabled for now.
+            // RefreshWmpLegacyView();
         }
 
         if (index == 4)
@@ -306,9 +310,11 @@ public partial class MainWindow : Window
             await _sources.StartAllAsync();
             LogSourceHealth();
             RefreshWinampView();
-            RefreshWmpLegacyView();
+            // WMP integration is intentionally disabled for now.
+            // RefreshWmpLegacyView();
             _lastWinampConnected = _winampSource.IsRecentlyConnected;
-            _lastWmpLegacyConnected = _wmpLegacySource.IsRecentlyConnected;
+            // WMP integration is intentionally disabled for now.
+            // _lastWmpLegacyConnected = _wmpLegacySource.IsRecentlyConnected;
             RefreshHardwareSensors();
             RefreshFanSensorChoices();
             RefreshHomeAssistantView();
@@ -467,7 +473,8 @@ public partial class MainWindow : Window
         _pageEditorPreviewTimer.Stop();
         _eventQueue.Changed -= EventQueue_Changed;
         _winampSource.Changed -= WinampSource_Changed;
-        _wmpLegacySource.Changed -= WmpLegacySource_Changed;
+        // WMP integration is intentionally disabled for now.
+        // _wmpLegacySource.Changed -= WmpLegacySource_Changed;
         _homeAssistantSource.Changed -= HomeAssistantSource_Changed;
 
         await _sources.StopAllAsync();
@@ -1175,16 +1182,16 @@ public partial class MainWindow : Window
         if (MainTabs.SelectedIndex == 3)
         {
             RefreshWinampView();
-            RefreshWmpLegacyView();
+            // WMP integration is intentionally disabled for now.
+            // RefreshWmpLegacyView();
         }
 
-        var wmpLegacyConnected = _wmpLegacySource.IsRecentlyConnected;
-        var connectionChanged =
-            connected != _lastWinampConnected ||
-            wmpLegacyConnected != _lastWmpLegacyConnected;
+        // WMP integration is intentionally disabled for now.
+        // var wmpLegacyConnected = _wmpLegacySource.IsRecentlyConnected;
+        var connectionChanged = connected != _lastWinampConnected;
 
         _lastWinampConnected = connected;
-        _lastWmpLegacyConnected = wmpLegacyConnected;
+        // _lastWmpLegacyConnected = wmpLegacyConnected;
 
         if (connectionChanged)
         {
