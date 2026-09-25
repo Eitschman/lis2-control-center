@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.ProtocolTester", "tool
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.WinampSimulator", "tools\LIS2.WinampSimulator\LIS2.WinampSimulator.csproj", "{D79175D6-E5A2-46F9-B208-411F01221004}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.WmpLegacySimulator", "tools\LIS2.WmpLegacySimulator\LIS2.WmpLegacySimulator.csproj", "{68C445E2-FDD6-4656-8B7A-D525AE221006}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Core.Tests", "tests\LIS2.Core.Tests\LIS2.Core.Tests.csproj", "{D0B6272E-A002-49DD-BA84-A2F4E1A02010}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIS2.Display.Tests", "tests\LIS2.Display.Tests\LIS2.Display.Tests.csproj", "{8DEB3F3E-3479-49C7-9DFD-91BA2A102011}"
@@ -104,5 +106,9 @@ Global
 		{A5C33C72-8A65-4D9F-A8F0-8D33D7202016}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5C33C72-8A65-4D9F-A8F0-8D33D7202016}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5C33C72-8A65-4D9F-A8F0-8D33D7202016}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68C445E2-FDD6-4656-8B7A-D525AE221006}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68C445E2-FDD6-4656-8B7A-D525AE221006}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68C445E2-FDD6-4656-8B7A-D525AE221006}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68C445E2-FDD6-4656-8B7A-D525AE221006}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
