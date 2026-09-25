@@ -92,6 +92,7 @@ See [docs/home-assistant-integration.md](docs/home-assistant-integration.md).
 - tray operation and Windows autostart
 - Light, Dark and Windows-system themes
 - runtime localization: System, English, German, French, Turkish and Russian with English fallback
+- context-sensitive in-app help on every main page, including complete page/template configuration reference, all static display variables, dynamic hardware-variable discovery and detailed Home Assistant examples for states, aliases, attributes, formatting and visibility
 - application/version/about information
 - persistent JSON settings under the user's local application data
 - custom LIS2 application/tray/taskbar icon
