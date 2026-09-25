@@ -61,6 +61,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Icon = TrayIconService.CreateWindowIcon();
+        SourceInitialized += (_, _) => ThemeService.ApplyWindowChrome(this);
         LocalizationService.ApplyTo(this);
         FooterVersionText.Text = LocalizationService.Format("Version {0}", AppInfo.Version);
 
@@ -330,6 +331,16 @@ public partial class MainWindow : Window
     {
         Hide();
 
+        var originalTheme = ThemeService.Mode;
+
+        foreach (var theme in new[] { AppThemeMode.Light, AppThemeMode.Dark, originalTheme })
+        {
+            ThemeService.Apply(theme);
+            ThemeService.ApplyWindowChrome(this);
+            MainTabs.UpdateLayout();
+            await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+        }
+
         for (var index = 0; index < MainTabs.Items.Count; index++)
         {
             MainTabs.SelectedIndex = index;
@@ -340,7 +351,7 @@ public partial class MainWindow : Window
 
         await RenderRuntimePageAsync();
 
-        Log("INFO startup smoke test completed");
+        Log("INFO startup/theme/tab smoke test completed");
         _allowClose = true;
         Environment.ExitCode = 0;
         Close();
