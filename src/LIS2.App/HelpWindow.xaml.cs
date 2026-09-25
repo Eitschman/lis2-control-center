@@ -222,6 +222,23 @@ public partial class HelpWindow : Window
         AddCode("{Winamp.Artist|fallback:Nothing playing}");
         AddCode("{Winamp.Title|fallback:--}");
         AddCode("Visible when: Winamp.State=Playing");
+
+        AddHeading("Windows Media Player Legacy");
+        AddParagraph("Windows Media Player Legacy telemetry comes from the native background COM plug-in over the LIS2ControlCenter.WmpLegacy named pipe. The plug-in is telemetry-only and never accesses LIS2 hardware.");
+        AddVariable("WmpLegacy.State", "Unknown, Stopped, Paused or Playing.");
+        AddVariable("WmpLegacy.Artist", "Current artist.");
+        AddVariable("WmpLegacy.Title", "Current title.");
+        AddVariable("WmpLegacy.Album", "Current album.");
+        AddVariable("WmpLegacy.TrackNumber", "Current media track number.");
+        AddVariable("WmpLegacy.PlaylistCount", "Number of playlist entries.");
+        AddVariable("WmpLegacy.Elapsed", "Elapsed time as mm:ss.");
+        AddVariable("WmpLegacy.Duration", "Track duration as mm:ss.");
+        AddVariable("WmpLegacy.Connected", "True while snapshots are fresh.");
+        AddVariable("WmpLegacy.SnapshotAgeSeconds", "Age of the last snapshot.");
+        AddHeading("Typical WMP Legacy page");
+        AddCode("{WmpLegacy.Artist|fallback:Nothing playing}");
+        AddCode("{WmpLegacy.Title|fallback:--}");
+        AddCode("Visible when: WmpLegacy.State=Playing");
     }
 
     private void RenderEvents()
