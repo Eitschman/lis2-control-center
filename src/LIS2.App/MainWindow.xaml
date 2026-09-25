@@ -1865,7 +1865,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*" MinHeight="120"/>
+                            <RowDefinition Height="*" MinHeight="60"/>
                             <RowDefinition Height="6"/>
                             <RowDefinition Height="Auto" MinHeight="205"/>
                         </Grid.RowDefinitions>
@@ -2122,20 +2122,20 @@
                                                   VerticalAlignment="Center"/>
                                     </Grid>
 
-                                    <StackPanel x:Name="HomeAssistantEntityActionsPanel"
-                                                Grid.Row="3"
-                                                Orientation="Horizontal"
-                                                HorizontalAlignment="Right"
-                                                Margin="0,10,0,0">
+                                    <WrapPanel x:Name="HomeAssistantEntityActionsPanel"
+                                               Grid.Row="3"
+                                               HorizontalAlignment="Right"
+                                               Margin="0,10,0,0">
                                         <Button Content="Copy key"
                                                 Click="CopyHomeAssistantEntityKey_Click"
-                                                Margin="0,0,7,0"/>
+                                                Margin="0,0,7,6"/>
                                         <Button Content="Save entity"
                                                 Click="SaveHomeAssistantEntity_Click"
-                                                Margin="0,0,7,0"/>
+                                                Margin="0,0,7,6"/>
                                         <Button Content="Create display page"
-                                                Click="CreateHomeAssistantPage_Click"/>
-                                    </StackPanel>
+                                                Click="CreateHomeAssistantPage_Click"
+                                                Margin="0,0,0,6"/>
+                                    </WrapPanel>
                                 </Grid>
 
                                 <Grid Grid.Column="2">
