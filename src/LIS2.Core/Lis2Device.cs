@@ -25,6 +25,13 @@ public sealed class Lis2Device : ILis2Device
     public Task WriteAsync(int line, int column, string text, CancellationToken cancellationToken = default) =>
         SendAsync(Lis2Protocol.WriteLine(line, column, text), cancellationToken);
 
+    public Task WriteRawDisplayBytesAsync(
+        int line,
+        int column,
+        ReadOnlyMemory<byte> bytes,
+        CancellationToken cancellationToken = default) =>
+        SendAsync(Lis2Protocol.WriteRawLine(line, column, bytes.Span), cancellationToken);
+
     public Task SetBrightnessAsync(Lis2Brightness brightness, CancellationToken cancellationToken = default) =>
         SendAsync(Lis2Protocol.SetBrightness(brightness), cancellationToken);
 
