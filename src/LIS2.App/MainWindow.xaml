@@ -1692,42 +1692,123 @@
 
                 <!-- Diagnostics -->
                 <TabItem Header="Diagnostics">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel>
-                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
-                                <StackPanel>
-                                    <DockPanel Margin="0,0,0,10">
-                                        <TextBlock Text="Diagnostics Snapshot" FontWeight="SemiBold" FontSize="18" DockPanel.Dock="Left"/>
-                                        <Button Content="Refresh" Click="RefreshDiagnostics_Click" DockPanel.Dock="Right"/>
-                                    </DockPanel>
-                                    <TextBox x:Name="DiagnosticsTextBox"
-                                             Height="280"
-                                             IsReadOnly="True"
-                                             FontFamily="Consolas"
-                                             Background="{DynamicResource LogBackgroundBrush}"
-                                             Foreground="{DynamicResource LogTextBrush}"
-                                             VerticalScrollBarVisibility="Auto"
-                                             HorizontalScrollBarVisibility="Auto"
-                                             TextWrapping="NoWrap"/>
-                                </StackPanel>
-                            </Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="14"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.15*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="0.85*"/>
+                        </Grid.ColumnDefinitions>
 
-                            <Border Style="{StaticResource CardBorderStyle}">
-                                <StackPanel>
-                                    <TextBlock Text="Protocol Log" FontWeight="SemiBold" FontSize="18" Margin="0,0,0,10"/>
-                                    <TextBox x:Name="LogTextBox"
-                                             Height="260"
-                                             IsReadOnly="True"
-                                             FontFamily="Consolas"
-                                             Background="{DynamicResource LogBackgroundBrush}"
-                                             Foreground="{DynamicResource LogTextBrush}"
-                                             VerticalScrollBarVisibility="Auto"
-                                             HorizontalScrollBarVisibility="Auto"
-                                             TextWrapping="NoWrap"/>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </ScrollViewer>
+                        <Border Grid.Row="0" Grid.Column="0"
+                                Style="{StaticResource CardBorderStyle}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                                    <TextBlock Text="Diagnostics Snapshot"
+                                               FontWeight="SemiBold"
+                                               FontSize="18"
+                                               DockPanel.Dock="Left"/>
+                                    <StackPanel DockPanel.Dock="Right"
+                                                Orientation="Horizontal">
+                                        <Button Content="Export report..."
+                                                Click="ExportDiagnostics_Click"
+                                                Margin="0,0,7,0"/>
+                                        <Button Content="Refresh"
+                                                Click="RefreshDiagnostics_Click"/>
+                                    </StackPanel>
+                                </DockPanel>
+                                <TextBox x:Name="DiagnosticsTextBox"
+                                         Grid.Row="1"
+                                         IsReadOnly="True"
+                                         FontFamily="Consolas"
+                                         Background="{DynamicResource LogBackgroundBrush}"
+                                         Foreground="{DynamicResource LogTextBrush}"
+                                         VerticalScrollBarVisibility="Auto"
+                                         HorizontalScrollBarVisibility="Auto"
+                                         TextWrapping="NoWrap"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="0" Grid.Column="2"
+                                Style="{StaticResource CardBorderStyle}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0"
+                                           Text="Virtual LIS2 state"
+                                           FontWeight="SemiBold"
+                                           FontSize="18"
+                                           Margin="0,0,0,10"/>
+                                <TextBox x:Name="VirtualLis2StateTextBox"
+                                         Grid.Row="1"
+                                         IsReadOnly="True"
+                                         FontFamily="Consolas"
+                                         Background="{DynamicResource LogBackgroundBrush}"
+                                         Foreground="{DynamicResource LogTextBrush}"
+                                         VerticalScrollBarVisibility="Auto"
+                                         HorizontalScrollBarVisibility="Auto"
+                                         TextWrapping="NoWrap"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="2" Grid.Column="0"
+                                Style="{StaticResource CardBorderStyle}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0"
+                                           Text="Decoded command history"
+                                           FontWeight="SemiBold"
+                                           FontSize="18"
+                                           Margin="0,0,0,10"/>
+                                <TextBox x:Name="CommandHistoryTextBox"
+                                         Grid.Row="1"
+                                         IsReadOnly="True"
+                                         FontFamily="Consolas"
+                                         Background="{DynamicResource LogBackgroundBrush}"
+                                         Foreground="{DynamicResource LogTextBrush}"
+                                         VerticalScrollBarVisibility="Auto"
+                                         HorizontalScrollBarVisibility="Auto"
+                                         TextWrapping="NoWrap"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="2" Grid.Column="2"
+                                Style="{StaticResource CardBorderStyle}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0"
+                                           Text="Protocol Log"
+                                           FontWeight="SemiBold"
+                                           FontSize="18"
+                                           Margin="0,0,0,10"/>
+                                <TextBox x:Name="LogTextBox"
+                                         Grid.Row="1"
+                                         IsReadOnly="True"
+                                         FontFamily="Consolas"
+                                         Background="{DynamicResource LogBackgroundBrush}"
+                                         Foreground="{DynamicResource LogTextBrush}"
+                                         VerticalScrollBarVisibility="Auto"
+                                         HorizontalScrollBarVisibility="Auto"
+                                         TextWrapping="NoWrap"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
                 </TabItem>
 
                 <!-- Home Assistant -->
