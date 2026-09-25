@@ -31,17 +31,7 @@ public sealed class WinampMappingTests
         Assert.Equal(180, snapshot.VuLeft);
         Assert.Equal(160, snapshot.VuRight);
         Assert.Equal(20, snapshot.Spectrum?.Count);
-        private sealed class ManualTimeProvider : TimeProvider
-    {
-        private DateTimeOffset _utcNow;
-
-        public ManualTimeProvider(DateTimeOffset utcNow) => _utcNow = utcNow;
-
-        public override DateTimeOffset GetUtcNow() => _utcNow;
-
-        public void Advance(TimeSpan duration) => _utcNow += duration;
     }
-}
 
     [Fact]
     public void NativePluginCamelCaseJson_DeserializesAllFields()
@@ -106,12 +96,13 @@ public sealed class WinampMappingTests
         Assert.Equal(20, text.Length);
         Assert.StartsWith("L||||||||", text);
     }
+
     [Fact]
-    public void DataSource_MarksSnapshotStaleAfterTimeout()
+    public async Task DataSource_MarksSnapshotStaleAfterTimeout()
     {
         var time = new ManualTimeProvider(
             new DateTimeOffset(2026, 9, 25, 10, 0, 0, TimeSpan.Zero));
-        var source = new WinampDataSource(time);
+        await using var source = new WinampDataSource(time);
 
         source.ApplySnapshot(new WinampSnapshot(
             WinampPlaybackState.Playing,
@@ -149,5 +140,16 @@ public sealed class WinampMappingTests
         Assert.Equal(20, text.Length);
         Assert.Contains('#', text);
         Assert.NotEqual(new string(' ', 20), text);
+    }
+
+    private sealed class ManualTimeProvider : TimeProvider
+    {
+        private DateTimeOffset _utcNow;
+
+        public ManualTimeProvider(DateTimeOffset utcNow) => _utcNow = utcNow;
+
+        public override DateTimeOffset GetUtcNow() => _utcNow;
+
+        public void Advance(TimeSpan duration) => _utcNow += duration;
     }
 }
