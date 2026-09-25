@@ -842,9 +842,16 @@ public partial class MainWindow : Window
     {
         if (HomeAssistantEntitiesListBox.SelectedItem is HomeAssistantEntityRow entity)
         {
+            var preferredTemplateKey =
+                entity.AliasTemplateKey ?? entity.TemplateKey;
+
             SelectedHomeAssistantEntityText.Text =
                 $"{entity.FriendlyName} — {entity.DisplayState}{Environment.NewLine}" +
-                $"{entity.EntityId}{Environment.NewLine}{entity.TemplateKey}";
+                $"{entity.EntityId}{Environment.NewLine}" +
+                $"{preferredTemplateKey}" +
+                (entity.AliasTemplateKey is not null
+                    ? $"   ({entity.TemplateKey})"
+                    : string.Empty);
 
             HomeAssistantAliasTextBox.Text = entity.Alias;
             HomeAssistantFavoriteCheckBox.IsChecked = entity.IsFavorite;
