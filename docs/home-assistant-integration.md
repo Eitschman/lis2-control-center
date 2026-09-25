@@ -61,6 +61,27 @@ A user-defined alias creates an additional stable template name. For example, an
 
 The original entity-ID based variable remains available.
 
+## Entity attributes
+
+Home Assistant entity attributes are exposed as additional template values:
+
+```text
+{HA.sensor.example.attribute.device_class}
+{HA.sensor.example.attribute.friendly_name}
+{HA.sensor.example.attribute.some_integration_specific_value}
+```
+
+When an entity has an alias, the same attributes are also available through the alias:
+
+```text
+{HA.ServerDisk.attribute.free}
+{HA.ServerDisk.attribute.total}
+```
+
+The Home Assistant page lists all attributes of the selected entity with their current value and template key. A selected attribute can be turned directly into a display page.
+
+Scalar JSON values retain their natural string/number/boolean representation. Structured array/object attributes are retained as compact JSON text rather than being discarded.
+
 ## Updates
 
 This is not a polling integration. After the initial `get_states` snapshot, changes arrive from Home Assistant through `state_changed` WebSocket events.
