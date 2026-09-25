@@ -102,7 +102,7 @@ HRESULT GetDispId(IDispatch* dispatch, const wchar_t* name, DISPID* dispId)
         IID_NULL, names, 1, LOCALE_USER_DEFAULT, dispId);
 }
 
-HRESULT GetProperty(
+HRESULT DispatchGetProperty(
     IDispatch* dispatch,
     const wchar_t* name,
     VARIANT* result)
@@ -230,7 +230,7 @@ long VariantLong(const VARIANT& value, long fallback = -1)
 std::wstring ReadStringProperty(IDispatch* dispatch, const wchar_t* name)
 {
     Variant value;
-    return SUCCEEDED(GetProperty(dispatch, name, &value.value))
+    return SUCCEEDED(DispatchGetProperty(dispatch, name, &value.value))
         ? VariantString(value.value)
         : std::wstring{};
 }
@@ -238,7 +238,7 @@ std::wstring ReadStringProperty(IDispatch* dispatch, const wchar_t* name)
 double ReadDoubleProperty(IDispatch* dispatch, const wchar_t* name)
 {
     Variant value;
-    return SUCCEEDED(GetProperty(dispatch, name, &value.value))
+    return SUCCEEDED(DispatchGetProperty(dispatch, name, &value.value))
         ? VariantDouble(value.value)
         : -1;
 }
@@ -246,7 +246,7 @@ double ReadDoubleProperty(IDispatch* dispatch, const wchar_t* name)
 long ReadLongProperty(IDispatch* dispatch, const wchar_t* name)
 {
     Variant value;
-    return SUCCEEDED(GetProperty(dispatch, name, &value.value))
+    return SUCCEEDED(DispatchGetProperty(dispatch, name, &value.value))
         ? VariantLong(value.value)
         : -1;
 }
@@ -321,7 +321,7 @@ public:
         ++g_objectCount;
     }
 
-    ~WmpLegacyPlugin() override
+    ~WmpLegacyPlugin()
     {
         StopTimer();
         if (_core != nullptr)
@@ -460,17 +460,17 @@ public:
 
         Variant mediaValue;
         IDispatch* media = nullptr;
-        if (SUCCEEDED(GetProperty(core, L"currentMedia", &mediaValue.value)))
+        if (SUCCEEDED(DispatchGetProperty(core, L"currentMedia", &mediaValue.value)))
             media = VariantDispatch(mediaValue.value);
 
         Variant controlsValue;
         IDispatch* controls = nullptr;
-        if (SUCCEEDED(GetProperty(core, L"controls", &controlsValue.value)))
+        if (SUCCEEDED(DispatchGetProperty(core, L"controls", &controlsValue.value)))
             controls = VariantDispatch(controlsValue.value);
 
         Variant playlistValue;
         IDispatch* playlist = nullptr;
-        if (SUCCEEDED(GetProperty(core, L"currentPlaylist", &playlistValue.value)))
+        if (SUCCEEDED(DispatchGetProperty(core, L"currentPlaylist", &playlistValue.value)))
             playlist = VariantDispatch(playlistValue.value);
 
         std::wstring title;
@@ -767,19 +767,17 @@ extern "C" BOOL WINAPI DllMain(
     return TRUE;
 }
 
-extern "C" __declspec(dllexport)
-HRESULT __stdcall DllCanUnloadNow()
+STDAPI DllCanUnloadNow()
 {
     return g_objectCount.load() == 0 && g_lockCount.load() == 0
         ? S_OK
         : S_FALSE;
 }
 
-extern "C" __declspec(dllexport)
-HRESULT __stdcall DllGetClassObject(
+STDAPI DllGetClassObject(
     REFCLSID clsid,
     REFIID riid,
-    void** object)
+    LPVOID* object)
 {
     if (clsid != CLSID_Lis2WmpLegacy)
         return CLASS_E_CLASSNOTAVAILABLE;
@@ -793,8 +791,7 @@ HRESULT __stdcall DllGetClassObject(
     return hr;
 }
 
-extern "C" __declspec(dllexport)
-HRESULT __stdcall DllRegisterServer()
+STDAPI DllRegisterServer()
 {
     wchar_t modulePath[MAX_PATH]{};
     if (GetModuleFileNameW(
@@ -858,8 +855,7 @@ HRESULT __stdcall DllRegisterServer()
     return S_OK;
 }
 
-extern "C" __declspec(dllexport)
-HRESULT __stdcall DllUnregisterServer()
+STDAPI DllUnregisterServer()
 {
     const std::wstring clsid = GuidString(CLSID_Lis2WmpLegacy);
     const std::wstring classPath = L"CLSID\\" + clsid;
