@@ -76,12 +76,27 @@ jobs:
           cmake -S .\native\LIS2.WinampPlugin -B .\native\LIS2.WinampPlugin\build -A Win32
           cmake --build .\native\LIS2.WinampPlugin\build --config Release
 
+      - name: Build WMP Legacy native plugins
+        run: |
+          cmake -S .\native\LIS2.WmpLegacyPlugin -B .\native\LIS2.WmpLegacyPlugin\build-x86 -A Win32
+          cmake --build .\native\LIS2.WmpLegacyPlugin\build-x86 --config Release
+          cmake -S .\native\LIS2.WmpLegacyPlugin -B .\native\LIS2.WmpLegacyPlugin\build-x64 -A x64
+          cmake --build .\native\LIS2.WmpLegacyPlugin\build-x64 --config Release
+          cmake -S .\native\LIS2.WmpLegacyVisualization -B .\native\LIS2.WmpLegacyVisualization\build-x86 -A Win32
+          cmake --build .\native\LIS2.WmpLegacyVisualization\build-x86 --config Release
+          cmake -S .\native\LIS2.WmpLegacyVisualization -B .\native\LIS2.WmpLegacyVisualization\build-x64 -A x64
+          cmake --build .\native\LIS2.WmpLegacyVisualization\build-x64 --config Release
+
       - name: Package portable release
         shell: pwsh
         run: |
           Copy-Item README.md .\release\LIS2-Control-Center\README.md
           Copy-Item LICENSE .\release\LIS2-Control-Center\LICENSE
           Copy-Item .\native\LIS2.WinampPlugin\build\Release\gen_lis2.dll .\release\gen_lis2.dll
+          Copy-Item .\native\LIS2.WmpLegacyPlugin\build-x86\Release\lis2_wmp_legacy.dll .\release\lis2_wmp_legacy-x86.dll
+          Copy-Item .\native\LIS2.WmpLegacyPlugin\build-x64\Release\lis2_wmp_legacy.dll .\release\lis2_wmp_legacy-x64.dll
+          Copy-Item .\native\LIS2.WmpLegacyVisualization\build-x86\Release\lis2_wmp_legacy_visualization.dll .\release\lis2_wmp_legacy_visualization-x86.dll
+          Copy-Item .\native\LIS2.WmpLegacyVisualization\build-x64\Release\lis2_wmp_legacy_visualization.dll .\release\lis2_wmp_legacy_visualization-x64.dll
 
           Compress-Archive -Path .\release\LIS2-Control-Center\* -DestinationPath ".\release\LIS2-Control-Center-$env:LIS2_VERSION-win-x64.zip"
           Compress-Archive -Path .\release\LIS2-ProtocolTester\* -DestinationPath ".\release\LIS2-ProtocolTester-$env:LIS2_VERSION-win-x64.zip"
@@ -89,7 +104,11 @@ jobs:
           $files = @(
             ".\release\LIS2-Control-Center-$env:LIS2_VERSION-win-x64.zip",
             ".\release\LIS2-ProtocolTester-$env:LIS2_VERSION-win-x64.zip",
-            ".\release\gen_lis2.dll"
+            ".\release\gen_lis2.dll",
+            ".\release\lis2_wmp_legacy-x86.dll",
+            ".\release\lis2_wmp_legacy-x64.dll",
+            ".\release\lis2_wmp_legacy_visualization-x86.dll",
+            ".\release\lis2_wmp_legacy_visualization-x64.dll"
           )
 
           $lines = foreach ($file in $files) {
@@ -109,4 +128,8 @@ jobs:
             ".\release\LIS2-Control-Center-$env:LIS2_VERSION-win-x64.zip" `
             ".\release\LIS2-ProtocolTester-$env:LIS2_VERSION-win-x64.zip" `
             ".\release\gen_lis2.dll" `
+            ".\release\lis2_wmp_legacy-x86.dll" `
+            ".\release\lis2_wmp_legacy-x64.dll" `
+            ".\release\lis2_wmp_legacy_visualization-x86.dll" `
+            ".\release\lis2_wmp_legacy_visualization-x64.dll" `
             ".\release\SHA256SUMS.txt"
