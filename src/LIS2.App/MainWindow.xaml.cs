@@ -140,7 +140,9 @@ public partial class MainWindow : Window
         ("WinampNowPlaying", "Winamp Now Playing", "Winamp"),
         ("WinampVU", "Winamp VU", "Winamp"),
         ("WinampSpectrum", "Winamp Spectrum", "Winamp"),
-        ("WmpLegacyNowPlaying", "WMP Legacy Now Playing", "Media")
+        ("WmpLegacyNowPlaying", "WMP Legacy Now Playing", "Media"),
+        ("WmpLegacyVU", "WMP Legacy VU", "Media"),
+        ("WmpLegacySpectrum", "WMP Legacy Spectrum", "Media")
     ];
 
     private static readonly (string Title, string Subtitle)[] Sections =
@@ -2588,6 +2590,32 @@ public partial class MainWindow : Window
                 ScrollStepMilliseconds = 250,
                 ScrollEdgePauseMilliseconds = 800
             },
+            "WmpLegacyVU" => new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = "WMP Legacy VU",
+                Line1Template = "{WmpLegacy.Title|fallback:--}",
+                Line2Template = "{WmpLegacy.Vu}",
+                DurationSeconds = 7,
+                VisibilityExpression = "WmpLegacy.State=Playing",
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "Truncate",
+                ScrollStepMilliseconds = 250,
+                ScrollEdgePauseMilliseconds = 800
+            },
+            "WmpLegacySpectrum" => new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = "WMP Legacy Spectrum",
+                Line1Template = "{WmpLegacy.Artist|fallback:--}",
+                Line2Template = "{WmpLegacy.SpectrumGlyphs}",
+                DurationSeconds = 7,
+                VisibilityExpression = "WmpLegacy.State=Playing",
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "Truncate",
+                ScrollStepMilliseconds = 250,
+                ScrollEdgePauseMilliseconds = 800
+            },
             _ => throw new InvalidOperationException(
                 LocalizationService.Format("Unknown page preset '{0}'.", presetId))
         };
@@ -3314,6 +3342,24 @@ public partial class MainWindow : Window
         {
             values["Winamp.SpectrumGlyphs"] =
                 values.TryGetValue("Winamp.Spectrum", out var fallback)
+                    ? fallback
+                    : string.Empty;
+        }
+
+        if (values.TryGetValue("WmpLegacy.SpectrumRaw", out var wmpRawSpectrum) &&
+            wmpRawSpectrum is IReadOnlyList<int> wmpSpectrum)
+        {
+            values["WmpLegacy.SpectrumGlyphs"] =
+                BuiltInGlyphSets.IsSpectrumSet(_settings.CustomGlyphs)
+                    ? CreateSpectrumGlyphLine(wmpSpectrum)
+                    : values.TryGetValue("WmpLegacy.Spectrum", out var fallback)
+                        ? fallback
+                        : string.Empty;
+        }
+        else
+        {
+            values["WmpLegacy.SpectrumGlyphs"] =
+                values.TryGetValue("WmpLegacy.Spectrum", out var fallback)
                     ? fallback
                     : string.Empty;
         }
