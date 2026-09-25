@@ -288,7 +288,8 @@ public sealed class HomeAssistantDataSource : IDataSource
                 entity.EntityId,
                 entity.FriendlyName,
                 entity.State,
-                entity.Unit),
+                entity.Unit,
+                entity.Attributes),
             StringComparer.OrdinalIgnoreCase);
 
         if (data.TryGetProperty("new_state", out var newState) &&
@@ -325,13 +326,17 @@ public sealed class HomeAssistantDataSource : IDataSource
             values[$"{state.EntityId}.Unit"] = state.Unit;
             values[$"{state.EntityId}.FriendlyName"] = state.FriendlyName;
 
+            foreach (var attribute in state.Attributes)
+                values[$"{state.EntityId}.attribute.{attribute.Key}"] = attribute.Value;
+
             entities.Add(new HomeAssistantEntityInfo(
                 state.EntityId,
                 domain,
                 state.FriendlyName,
                 state.State,
                 state.Unit,
-                available));
+                available,
+                state.Attributes));
         }
 
         Volatile.Write(ref _values, values);
@@ -371,9 +376,15 @@ public sealed class HomeAssistantDataSource : IDataSource
 
         var friendlyName = entityId;
         var unit = string.Empty;
+        var parsedAttributes =
+            new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
 
-        if (state.TryGetProperty("attributes", out var attributes))
+        if (state.TryGetProperty("attributes", out var attributes) &&
+            attributes.ValueKind == JsonValueKind.Object)
         {
+            foreach (var attribute in attributes.EnumerateObject())
+                parsedAttributes[attribute.Name] = ReadAttributeValue(attribute.Value);
+
             if (attributes.TryGetProperty("friendly_name", out var rawFriendlyName))
                 friendlyName = rawFriendlyName.GetString() ?? entityId;
 
@@ -381,9 +392,26 @@ public sealed class HomeAssistantDataSource : IDataSource
                 unit = rawUnit.GetString() ?? string.Empty;
         }
 
-        parsed = new EntityState(entityId, friendlyName, value, unit);
+        parsed = new EntityState(
+            entityId,
+            friendlyName,
+            value,
+            unit,
+            parsedAttributes);
         return true;
     }
+
+    private static object? ReadAttributeValue(JsonElement value) =>
+        value.ValueKind switch
+        {
+            JsonValueKind.String => value.GetString(),
+            JsonValueKind.Number when value.TryGetInt64(out var integer) => integer,
+            JsonValueKind.Number when value.TryGetDouble(out var number) => number,
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            JsonValueKind.Null or JsonValueKind.Undefined => null,
+            _ => value.GetRawText()
+        };
 
     private Uri CreateWebSocketUri()
     {
@@ -450,7 +478,8 @@ public sealed class HomeAssistantDataSource : IDataSource
         string EntityId,
         string FriendlyName,
         string State,
-        string Unit);
+        string Unit,
+        IReadOnlyDictionary<string, object?> Attributes);
 
     public async ValueTask DisposeAsync()
     {
