@@ -128,6 +128,7 @@ jobs:
 
 
   wmp-legacy-plugin:
+    if: ${{ false }} # Deferred: retain WMP plugin build recipe without producing binaries/artifacts.
     name: WMP Legacy plugin ${{ matrix.arch }}
     runs-on: windows-latest
 
@@ -179,6 +180,7 @@ jobs:
 
 
   wmp-legacy-visualization:
+    if: ${{ false }} # Deferred: retain WMP plugin build recipe without producing binaries/artifacts.
     name: WMP Legacy visualization ${{ matrix.arch }}
     runs-on: windows-latest
 
