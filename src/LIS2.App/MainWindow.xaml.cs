@@ -834,6 +834,25 @@ public partial class MainWindow : Window
 
             HomeAssistantAliasTextBox.Text = entity.Alias;
             HomeAssistantFavoriteCheckBox.IsChecked = entity.IsFavorite;
+
+            var source = _homeAssistantSource.Entities.FirstOrDefault(item =>
+                string.Equals(
+                    item.EntityId,
+                    entity.EntityId,
+                    StringComparison.OrdinalIgnoreCase));
+
+            var alias = NormalizeHomeAssistantAlias(entity.Alias);
+            HomeAssistantAttributesListBox.ItemsSource = source?.Attributes
+                .OrderBy(item => item.Key, StringComparer.OrdinalIgnoreCase)
+                .Select(item => new HomeAssistantAttributeRow(
+                    item.Key,
+                    Convert.ToString(item.Value, CultureInfo.CurrentCulture) ?? string.Empty,
+                    $"{{HA.{entity.EntityId}.attribute.{item.Key}}}",
+                    string.IsNullOrWhiteSpace(alias)
+                        ? null
+                        : $"{{HA.{alias}.attribute.{item.Key}}}"))
+                .ToArray()
+                ?? Array.Empty<HomeAssistantAttributeRow>();
         }
         else
         {
@@ -841,6 +860,8 @@ public partial class MainWindow : Window
                 LocalizationService.Translate("Select an entity above.");
             HomeAssistantAliasTextBox.Text = string.Empty;
             HomeAssistantFavoriteCheckBox.IsChecked = false;
+            HomeAssistantAttributesListBox.ItemsSource =
+                Array.Empty<HomeAssistantAttributeRow>();
         }
     }
 
@@ -923,6 +944,53 @@ public partial class MainWindow : Window
             PagesListBox.SelectedItem = page;
 
             Log($"INFO created Home Assistant display page for '{entity.EntityId}'");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    private async void CreateHomeAssistantAttributePage_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        try
+        {
+            if (HomeAssistantEntitiesListBox.SelectedItem is not HomeAssistantEntityRow entity)
+                throw new InvalidOperationException(
+                    LocalizationService.Translate("Select a Home Assistant entity first."));
+
+            if (HomeAssistantAttributesListBox.SelectedItem is not HomeAssistantAttributeRow attribute)
+                throw new InvalidOperationException(
+                    LocalizationService.Translate("Select a Home Assistant attribute first."));
+
+            var templateKey =
+                attribute.AliasTemplateKey ?? attribute.TemplateKey;
+
+            var page = new PageDefinition
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = $"{entity.DisplayName} · {attribute.Name}",
+                Line1Template = entity.DisplayName,
+                Line2Template = templateKey,
+                DurationSeconds = 5,
+                Line1OverflowMode = "PingPong",
+                Line2OverflowMode = "PingPong"
+            };
+
+            _settings.Pages.Add(page);
+            await PersistPagesAsync();
+            LoadPagesIntoRuntime();
+            BindPages();
+
+            MainTabs.SelectedIndex = 2;
+            UpdateNavigationSelection(2);
+            PagesListBox.SelectedItem = page;
+
+            Log(
+                $"INFO created Home Assistant attribute page for " +
+                $"'{entity.EntityId}.{attribute.Name}'");
         }
         catch (Exception ex)
         {
@@ -2951,13 +3019,23 @@ public partial class MainWindow : Window
             if (string.IsNullOrWhiteSpace(preference.Alias))
                 continue;
 
-            var sourceKey = $"HA.{preference.EntityId}";
-            if (!values.TryGetValue(sourceKey, out var value))
+            var alias = NormalizeHomeAssistantAlias(preference.Alias);
+            if (string.IsNullOrWhiteSpace(alias))
                 continue;
 
-            var alias = NormalizeHomeAssistantAlias(preference.Alias);
-            if (!string.IsNullOrWhiteSpace(alias))
-                values[$"HA.{alias}"] = value;
+            var sourcePrefix = $"HA.{preference.EntityId}";
+            var aliasPrefix = $"HA.{alias}";
+
+            foreach (var item in values
+                         .Where(item =>
+                             item.Key.Equals(sourcePrefix, StringComparison.OrdinalIgnoreCase) ||
+                             item.Key.StartsWith(
+                                 sourcePrefix + ".",
+                                 StringComparison.OrdinalIgnoreCase))
+                         .ToArray())
+            {
+                values[aliasPrefix + item.Key[sourcePrefix.Length..]] = item.Value;
+            }
         }
 
         return values;
