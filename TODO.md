@@ -32,9 +32,9 @@ The following larger feature areas are already implemented:
 
 ## Display pages / runtime
 
-- [ ] Improve the **conditional visibility editor UX**. The runtime already supports `key=value`; the remaining work is making conditions easier to build without typing raw expressions.
-- [ ] Add general formatting helpers for numeric values, temperatures and percentages.
-- [ ] Add configurable fallback text for missing/unavailable variables.
+- [x] Improve the **conditional visibility editor UX** with live variable selection and `=`, `!=`, `>`, `>=`, `<`, `<=` operators.
+- [x] Add general template formatting helpers: number, percent, bytes, prefix/suffix and case conversion.
+- [x] Add per-variable `fallback:` text for missing, `unknown` and `unavailable` values.
 - [ ] Consider page transitions only if they produce a useful effect on a 20x2 character VFD.
 - [ ] Review source snapshot/thread-safety semantics as more background/event-driven sources are added.
 
@@ -177,7 +177,7 @@ Implemented:
 
 Remaining:
 
-- [ ] Theme the native Windows title bar consistently with the selected application theme.
+- [x] Theme the native Windows title bar consistently with the selected application theme.
 - [ ] Continue reviewing every control in both Light and Dark themes.
 - [ ] Continue UI polish where real-world data exposes layout problems.
 - [ ] Consider profile support only if multiple machine/use-case configurations actually need it.
@@ -199,9 +199,9 @@ Implemented:
 
 Remaining:
 
-- [ ] Expand the virtual-device diagnostics so display, fan, brightness and glyph state can be inspected together.
-- [ ] Add decoded command history.
-- [ ] Add an exportable diagnostic report.
+- [x] Expand virtual-device diagnostics so display, fan, brightness and glyph state can be inspected together.
+- [x] Add decoded command history for the virtual transport.
+- [x] Add an exportable diagnostic report.
 - [ ] Add optional raw serial capture for reverse-engineering sessions.
 - [ ] Never send unknown/experimental commands automatically.
 
@@ -242,10 +242,10 @@ Implemented:
 
 Remaining:
 
-- [ ] Add targeted tests for theme resource loading.
+- [x] Exercise Light and Dark theme resource loading in the WPF startup/tab smoke test.
 - [ ] Add tests for settings migration/defaulting.
 - [ ] Add more fan safety edge-case tests.
-- [ ] Review data-source concurrency/snapshot semantics.
+- [x] Review data-source snapshot semantics and add concurrent snapshot publication coverage.
 - [ ] Add a release/versioning workflow when the project reaches an explicit release milestone.
 
 ## Research / guardrails
