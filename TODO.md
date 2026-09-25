@@ -103,6 +103,8 @@ Remaining:
 
 ## Windows Media Player
 
+Status: **deferred / disabled**. The implementation work is intentionally retained in the repository, but WMP UI/runtime integration and native plug-in CI artifacts are disabled until the integration approach is revisited.
+
 Research completed:
 
 - [x] Research integration options for Windows Media Player Legacy and the current Windows 11 Media Player before implementation.
