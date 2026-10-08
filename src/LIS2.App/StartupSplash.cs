@@ -13,6 +13,7 @@ internal sealed class StartupSplash : IDisposable
     private Thread? _thread;
     private Dispatcher? _dispatcher;
     private Window? _window;
+    private TextBlock? _status;
 
     public void Show()
     {
@@ -30,13 +31,14 @@ internal sealed class StartupSplash : IDisposable
                     Foreground = Brushes.White,
                     Margin = new Thickness(0, 0, 0, 18)
                 });
-                panel.Children.Add(new TextBlock
+                _status = new TextBlock
                 {
-                    Text = LocalizationService.Translate("Control Center is loading..."),
+                    Text = "Control Center is loading...",
                     FontSize = 15,
                     Foreground = Brushes.White,
                     Margin = new Thickness(0, 0, 0, 14)
-                });
+                };
+                panel.Children.Add(_status);
                 panel.Children.Add(new ProgressBar
                 {
                     IsIndeterminate = true,
@@ -70,11 +72,16 @@ internal sealed class StartupSplash : IDisposable
         _ready.Wait(TimeSpan.FromSeconds(2));
     }
 
+    public void UpdateLanguage()
+    {
+        var translated = LocalizationService.Translate("Control Center is loading...");
+        _dispatcher?.BeginInvoke(() => { if (_status is not null) _status.Text = translated; });
+    }
+
     public void Dispose()
     {
         var dispatcher = _dispatcher;
         if (dispatcher is not null && !dispatcher.HasShutdownStarted)
             dispatcher.BeginInvoke(() => { _window?.Close(); dispatcher.BeginInvokeShutdown(DispatcherPriority.Background); });
-        _ready.Dispose();
     }
 }
