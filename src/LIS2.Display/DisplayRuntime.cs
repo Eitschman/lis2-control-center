@@ -117,6 +117,13 @@ public sealed class DisplayRuntime
 
         var nextDelay = untilPageChange;
 
+        // Refresh dynamic values independently of the page rotation duration.
+        var refreshInterval = _activePage?.RefreshInterval ?? TimeSpan.FromSeconds(1);
+        if (refreshInterval < TimeSpan.FromMilliseconds(100))
+            refreshInterval = TimeSpan.FromMilliseconds(100);
+        if (refreshInterval < nextDelay)
+            nextDelay = refreshInterval;
+
         var line1Delay = _line1Scroller.TimeUntilNextChange(
             now,
             _activePage?.Line1OverflowMode ?? DisplayOverflowMode.PingPong);
