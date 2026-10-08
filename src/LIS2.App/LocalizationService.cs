@@ -24,6 +24,9 @@ public static class LocalizationService
         {
             ["de"] = new(StringComparer.Ordinal)
             {
+                ["Refresh (ms)"]="Aktualisierung (ms)",
+                ["Refresh active page values every 100-60000 milliseconds, independent of page duration."]="Aktualisiert die Werte der aktiven Seite alle 100 bis 60000 Millisekunden, unabhängig von der Anzeigedauer.",
+                ["Control Center is loading..."]="Control Center wird geladen...",
                 ["Apply condition"]="Bedingung übernehmen",
                 ["Copy key"]="Schlüssel kopieren",
                 ["Export report..."]="Bericht exportieren...",
@@ -275,6 +278,9 @@ public static class LocalizationService
             },
             ["fr"] = new(StringComparer.Ordinal)
             {
+                ["Refresh (ms)"]="Actualisation (ms)",
+                ["Refresh active page values every 100-60000 milliseconds, independent of page duration."]="Actualise les valeurs de la page active toutes les 100 à 60000 millisecondes, indépendamment de sa durée d’affichage.",
+                ["Control Center is loading..."]="Chargement du Control Center...",
                 ["Apply condition"]="Appliquer la condition",
                 ["Copy key"]="Copier la clé",
                 ["Export report..."]="Exporter le rapport...",
@@ -531,6 +537,9 @@ public static class LocalizationService
             },
             ["tr"] = new(StringComparer.Ordinal)
             {
+                ["Refresh (ms)"]="Yenileme (ms)",
+                ["Refresh active page values every 100-60000 milliseconds, independent of page duration."]="Etkin sayfanın değerlerini görüntüleme süresinden bağımsız olarak her 100 ila 60000 milisaniyede bir yeniler.",
+                ["Control Center is loading..."]="Control Center yükleniyor...",
                 ["Apply condition"]="Koşulu uygula",
                 ["Copy key"]="Anahtarı kopyala",
                 ["Export report..."]="Raporu dışa aktar...",
@@ -795,6 +804,9 @@ public static class LocalizationService
             },
             ["ru"] = new(StringComparer.Ordinal)
             {
+                ["Refresh (ms)"]="Обновление (мс)",
+                ["Refresh active page values every 100-60000 milliseconds, independent of page duration."]="Обновляет значения активной страницы каждые 100–60000 миллисекунд независимо от времени её отображения.",
+                ["Control Center is loading..."]="Загрузка Control Center...",
                 ["Apply condition"]="Применить условие",
                 ["Copy key"]="Копировать ключ",
                 ["Export report..."]="Экспортировать отчёт...",
