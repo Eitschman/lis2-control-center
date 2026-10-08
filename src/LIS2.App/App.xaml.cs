@@ -29,6 +29,7 @@ public partial class App : System.Windows.Application
             }
 
             ApplySavedPreferencesBeforeWindowCreation();
+            _splash?.UpdateLanguage();
 
             try
             {
