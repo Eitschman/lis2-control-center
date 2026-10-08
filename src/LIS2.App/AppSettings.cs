@@ -41,6 +41,7 @@ public sealed class AppSettings
             page.Line1Template ??= string.Empty;
             page.Line2Template ??= string.Empty;
             page.DurationSeconds = Math.Clamp(page.DurationSeconds, 1, 3600);
+            page.RefreshIntervalMilliseconds = Math.Clamp(page.RefreshIntervalMilliseconds, 100, 60000);
             page.Line1OverflowMode = NormalizeOverflowMode(page.Line1OverflowMode);
             page.Line2OverflowMode = NormalizeOverflowMode(page.Line2OverflowMode);
             page.ScrollStepMilliseconds = Math.Clamp(page.ScrollStepMilliseconds, 50, 10000);
