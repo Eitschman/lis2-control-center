@@ -19,6 +19,7 @@ namespace LIS2.App;
 
 public partial class MainWindow : Window
 {
+    private readonly Stopwatch _startupWatch = Stopwatch.StartNew();
     private readonly SettingsStore _settingsStore = new();
     private readonly DataSourceRegistry _sources = new();
     private readonly PageScheduler _pageScheduler = new();
@@ -130,6 +131,7 @@ public partial class MainWindow : Window
         _trayIcon.ShowRequested += TrayIcon_ShowRequested;
         _trayIcon.ExitRequested += TrayIcon_ExitRequested;
 
+        ContentRendered += (_, _) => (System.Windows.Application.Current as App)?.HideStartupSplash();
         Loaded += MainWindow_Loaded;
         Closing += MainWindow_Closing;
         Closed += MainWindow_Closed;
@@ -298,7 +300,9 @@ public partial class MainWindow : Window
     {
         try
         {
+            Log($"INFO startup: window loaded at {_startupWatch.ElapsedMilliseconds} ms");
             _settings = await _settingsStore.LoadAsync();
+            Log($"INFO startup: settings loaded at {_startupWatch.ElapsedMilliseconds} ms");
             _settings.EnsureDefaults();
 
             RefreshPorts();
@@ -314,7 +318,9 @@ public partial class MainWindow : Window
             BindPages();
 
             await ReconnectAsync();
+            Log($"INFO startup: transport connected at {_startupWatch.ElapsedMilliseconds} ms");
             await _sources.StartAllAsync();
+            Log($"INFO startup: sources started at {_startupWatch.ElapsedMilliseconds} ms");
             LogSourceHealth();
             RefreshWinampView();
             // WMP integration is intentionally disabled for now.
@@ -327,6 +333,7 @@ public partial class MainWindow : Window
             RefreshHomeAssistantView();
             RefreshPageEditorPreview();
             await RenderRuntimePageAsync();
+            Log($"INFO startup: first frame rendered at {_startupWatch.ElapsedMilliseconds} ms");
 
             _pageTimer.Start();
             _fanTimer.Start();
