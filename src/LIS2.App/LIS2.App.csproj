@@ -4,6 +4,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>LIS2ControlCenter</AssemblyName>
+    <ApplicationIcon>$(MSBuildProjectDirectory)\obj\LIS2.ico</ApplicationIcon>
     <RootNamespace>LIS2.App</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
@@ -18,4 +19,7 @@
     <ProjectReference Include="..\LIS2.WindowsMedia\LIS2.WindowsMedia.csproj" />
     <ProjectReference Include="..\LIS2.WmpLegacy\LIS2.WmpLegacy.csproj" />
   </ItemGroup>
+  <Target Name="GenerateLis2ApplicationIcon" BeforeTargets="PrepareForBuild" Inputs="$(MSBuildProjectDirectory)\TrayIconService.cs;$(MSBuildProjectDirectory)\GenerateAppIcon.ps1" Outputs="$(ApplicationIcon)">
+    <Exec Command="powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\GenerateAppIcon.ps1&quot; -Source &quot;$(MSBuildProjectDirectory)\TrayIconService.cs&quot; -Destination &quot;$(ApplicationIcon)&quot;" />
+  </Target>
 </Project>
