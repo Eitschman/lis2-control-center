@@ -2612,7 +2612,8 @@ public partial class MainWindow : Window
                         ParseOverflowMode(page.Line1OverflowMode),
                         ParseOverflowMode(page.Line2OverflowMode),
                         TimeSpan.FromMilliseconds(Math.Clamp(page.ScrollStepMilliseconds, 50, 5000)),
-                        TimeSpan.FromMilliseconds(Math.Clamp(page.ScrollEdgePauseMilliseconds, 0, 10000)))));
+                        TimeSpan.FromMilliseconds(Math.Clamp(page.ScrollEdgePauseMilliseconds, 0, 10000)),
+                        TimeSpan.FromMilliseconds(Math.Clamp(page.RefreshIntervalMilliseconds, 100, 60000)))));
 
         _displayRuntime.ResetPageSelection();
     }
@@ -2852,6 +2853,7 @@ public partial class MainWindow : Window
         PageLine1TextBox.Text = page.Line1Template;
         PageLine2TextBox.Text = page.Line2Template;
         PageDurationTextBox.Text = page.DurationSeconds.ToString(CultureInfo.InvariantCulture);
+        PageRefreshIntervalTextBox.Text = page.RefreshIntervalMilliseconds.ToString(CultureInfo.InvariantCulture);
         PageVisibilityTextBox.Text = page.VisibilityExpression ?? string.Empty;
         ApplyVisibilityExpressionToBuilder(page.VisibilityExpression);
         SelectComboBoxTag(PageLine1OverflowComboBox, page.Line1OverflowMode);
@@ -3103,6 +3105,10 @@ public partial class MainWindow : Window
                 throw new InvalidOperationException(
                     LocalizationService.Translate("Page duration must be at least 1 second."));
 
+            if (!int.TryParse(PageRefreshIntervalTextBox.Text, out var refreshMilliseconds) ||
+                refreshMilliseconds is < 100 or > 60000)
+                throw new InvalidOperationException("Page refresh interval must be between 100 and 60000 ms.");
+
             var visibilityExpression = string.IsNullOrWhiteSpace(PageVisibilityTextBox.Text)
                 ? null
                 : PageVisibilityTextBox.Text.Trim();
@@ -3125,6 +3131,7 @@ public partial class MainWindow : Window
             page.Line1Template = PageLine1TextBox.Text;
             page.Line2Template = PageLine2TextBox.Text;
             page.DurationSeconds = duration;
+            page.RefreshIntervalMilliseconds = refreshMilliseconds;
             page.VisibilityExpression = visibilityExpression;
             page.Line1OverflowMode = GetComboBoxTag(PageLine1OverflowComboBox, "PingPong");
             page.Line2OverflowMode = GetComboBoxTag(PageLine2OverflowComboBox, "PingPong");
