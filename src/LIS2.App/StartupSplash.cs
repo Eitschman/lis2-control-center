@@ -28,22 +28,22 @@ internal sealed class StartupSplash : IDisposable
                     Text = "LIS2 Control Center",
                     FontSize = 22,
                     FontWeight = FontWeights.SemiBold,
-                    Foreground = Brushes.White,
+                    Foreground = System.Windows.Media.Brushes.White,
                     Margin = new Thickness(0, 0, 0, 18)
                 });
                 _status = new TextBlock
                 {
                     Text = "Control Center is loading...",
                     FontSize = 15,
-                    Foreground = Brushes.White,
+                    Foreground = System.Windows.Media.Brushes.White,
                     Margin = new Thickness(0, 0, 0, 14)
                 };
                 panel.Children.Add(_status);
-                panel.Children.Add(new ProgressBar
+                panel.Children.Add(new System.Windows.Controls.ProgressBar
                 {
                     IsIndeterminate = true,
                     Height = 6,
-                    Foreground = new SolidColorBrush(Color.FromRgb(77, 198, 142))
+                    Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(77, 198, 142))
                 });
                 _window = new Window
                 {
@@ -54,7 +54,7 @@ internal sealed class StartupSplash : IDisposable
                     ResizeMode = ResizeMode.NoResize,
                     ShowInTaskbar = false,
                     WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                    Background = new SolidColorBrush(Color.FromRgb(27, 45, 72)),
+                    Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(27, 45, 72)),
                     Content = panel,
                     Topmost = true
                 };
