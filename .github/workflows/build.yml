@@ -89,6 +89,24 @@ jobs:
           -p:DebugSymbols=false
           --output .\artifacts\LIS2.ProtocolTester
 
+      - name: Scan published application with Microsoft Defender
+        if: github.event_name != 'pull_request'
+        shell: pwsh
+        run: |
+          $defender = Join-Path $env:ProgramFiles 'Windows Defender/MpCmdRun.exe'
+          if (-not (Test-Path $defender)) { throw 'Microsoft Defender command-line scanner is unavailable.' }
+          & $defender -Scan -ScanType 3 -File (Resolve-Path '.\\artifacts\\LIS2ControlCenter').Path -DisableRemediation
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Defender scan failed (exit code $LASTEXITCODE)." }
+
+      - name: Record published application hashes
+        if: github.event_name != 'pull_request'
+        shell: pwsh
+        run: |
+          Get-ChildItem '.\\artifacts\\LIS2ControlCenter' -File -Recurse |
+            Get-FileHash -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash)  $([IO.Path]::GetRelativePath((Resolve-Path '.\\artifacts\\LIS2ControlCenter').Path, $_.Path))" } |
+            Set-Content -Encoding ascii '.\\artifacts\\LIS2ControlCenter\\SHA256SUMS.txt'
+
       - name: Upload LIS2 Control Center
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v7
