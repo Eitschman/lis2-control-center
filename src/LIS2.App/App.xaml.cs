@@ -6,6 +6,14 @@ namespace LIS2.App;
 
 public partial class App : System.Windows.Application
 {
+    private StartupSplash? _splash;
+
+    internal void HideStartupSplash()
+    {
+        _splash?.Dispose();
+        _splash = null;
+    }
+
     protected override void OnStartup(StartupEventArgs e)
     {
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -13,6 +21,13 @@ public partial class App : System.Windows.Application
 
         try
         {
+            if (!IsSmokeTestMode() && !Environment.GetCommandLineArgs().Any(arg =>
+                    arg.Equals("--ui-test", StringComparison.OrdinalIgnoreCase)))
+            {
+                _splash = new StartupSplash();
+                _splash.Show();
+            }
+
             ApplySavedPreferencesBeforeWindowCreation();
 
             try
@@ -28,6 +43,7 @@ public partial class App : System.Windows.Application
         }
         catch (Exception ex)
         {
+            HideStartupSplash();
             WriteStartupError("Application startup failed.", ex);
 
             if (IsSmokeTestMode())
@@ -44,6 +60,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        HideStartupSplash();
         try
         {
             SystemEvents.UserPreferenceChanged -= SystemEvents_UserPreferenceChanged;
