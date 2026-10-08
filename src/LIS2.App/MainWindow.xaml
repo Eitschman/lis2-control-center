@@ -702,7 +702,11 @@
                                              ToolTip="Formatting: {Key|fallback:--|number:1|percent:0|bytes:1|prefix:...|suffix:...|upper|lower}"/>
 
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Duration (s)" Margin="0,0,10,10" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="PageDurationTextBox" Grid.Row="3" Grid.Column="1" Width="100" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,10">
+                                        <TextBox x:Name="PageDurationTextBox" Width="100" Margin="0,0,20,0" ToolTip="Time before switching to another page (seconds)."/>
+                                        <TextBlock Text="Refresh (ms)" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <TextBox x:Name="PageRefreshIntervalTextBox" Width="100" ToolTip="Refresh active page values every 100-60000 milliseconds, independent of page duration."/>
+                                    </StackPanel>
 
                                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Visible when" Margin="0,0,10,10" VerticalAlignment="Top"/>
                                     <StackPanel Grid.Row="4" Grid.Column="1" Margin="0,0,0,10">
