@@ -11,4 +11,5 @@ public sealed record DisplayPage(
     DisplayOverflowMode Line1OverflowMode = DisplayOverflowMode.PingPong,
     DisplayOverflowMode Line2OverflowMode = DisplayOverflowMode.PingPong,
     TimeSpan? ScrollStepInterval = null,
-    TimeSpan? ScrollEdgePause = null);
+    TimeSpan? ScrollEdgePause = null,
+    TimeSpan? RefreshInterval = null);
