@@ -45,7 +45,7 @@ public partial class MainWindow
         _haUiTimer.Tick += (_, _) =>
         {
             RefreshHaEntities();
-            if (_pagePlaybackActive) RefreshPagePreview();
+            if ((_virtualSequence?.IsRunning == true)) RefreshPagePreview();
         };
         _haUiTimer.Start();
         RefreshHaEntities();
