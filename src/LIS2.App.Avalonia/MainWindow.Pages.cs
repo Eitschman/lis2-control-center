@@ -38,7 +38,7 @@ public partial class MainWindow
         this.FindControl<Button>("PageTest")!.Click += async (_, _) =>
         {
             if (SelectedPageIndex is not int i) return;
-            SavePageEditor();
+            if (!SavePageEditor()) return;
             var frame = _pages.Preview(i, PagePreviewValues());
             await RunVirtualActionAsync(() => _virtualDevice.RenderBothAsync(frame.Line1, frame.Line2));
         };
@@ -102,7 +102,7 @@ public partial class MainWindow
 
     private IReadOnlyDictionary<string, object?> PagePreviewValues()
     {
-        var values = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+        var values = new Dictionary<string, object?>(PageClockValues.Create(DateTimeOffset.Now), StringComparer.OrdinalIgnoreCase);
         for (var slot = 1; slot <= 8; slot++)
             values[$"Glyph.{slot}"] = LIS2.Core.Lis2Protocol.CustomGlyph(slot).ToString();
         return values;
