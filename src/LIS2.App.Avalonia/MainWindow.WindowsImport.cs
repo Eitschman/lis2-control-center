@@ -20,10 +20,20 @@ public partial class MainWindow
                 if (files.Count == 0) return;
                 await using var stream = await files[0].OpenReadAsync();
                 using var reader = new StreamReader(stream);
-                var imported = WindowsSettingsImporter.Import(await reader.ReadToEndAsync());
+                var imported = WindowsSettingsImporter.Import(await reader.ReadToEndAsync(), new PortableWorkspace
+                {
+                    Pages = System.Text.Json.JsonSerializer.Deserialize<List<PageDefinition>>(_pages.ExportJson()) ?? new(),
+                    CustomGlyphs = _glyphs.Glyphs.Select(g => new CustomGlyphSettings { Name = g.Name, Rows = g.Rows.ToArray() }).ToList(),
+                    HomeAssistantUrl = this.FindControl<TextBox>("HaUrl")!.Text ?? string.Empty,
+                    HomeAssistantEntityPreferences = _haPreferences.ToList(),
+                    BrightnessPercent = _preferredBrightness,
+                    ThemeMode = _preferredTheme,
+                    LanguageMode = _preferredLanguage,
+                    ProgramCustomGlyphsOnConnect = this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true
+                });
                 // Apply only after complete parsing and validation; never overwrite the Windows file.
                 ApplyPortableWorkspace(imported);
-                await SavePortableWorkspaceAsync();
+                await SavePortableWorkspaceAsync(throwOnFailure: true);
                 RefreshPageVariables();
                 this.FindControl<TextBlock>("WindowsImportStatus")!.Text =
                     $"Imported {imported.Pages.Count} pages, {imported.CustomGlyphs.Count} glyphs; token not imported.";
