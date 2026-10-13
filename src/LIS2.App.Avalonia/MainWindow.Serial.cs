@@ -120,7 +120,7 @@ public partial class MainWindow
     private async Task RunSerialActionAsync(Func<Task> action)
     {
         if (_serialBusy) return;
-        if (_serialPlaybackBusy) return;
+        if ((_serialSequence?.IsBusy == true)) return;
         StopSerialPlayback();
         _serialBusy = true;
         UpdateSerialControls();
@@ -136,15 +136,15 @@ public partial class MainWindow
         this.FindControl<Button>("SerialRefreshPorts")!.IsEnabled = !_serialBusy && _serialDisplay is null;
         this.FindControl<Button>("SerialConnect")!.IsEnabled = !_serialBusy && _serialDisplay is null &&
             this.FindControl<ComboBox>("SerialPortPicker")!.SelectedItem is string;
-        this.FindControl<Button>("SerialDisconnect")!.IsEnabled = !_serialBusy && !_serialPlaybackBusy && _serialDisplay is not null;
-        this.FindControl<Button>("SerialSendLines")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
-        this.FindControl<Button>("SerialClear")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
-        this.FindControl<Button>("SerialPlaybackStart")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
-        this.FindControl<Button>("SerialPlaybackStop")!.IsEnabled = _serialPlaybackActive;
+        this.FindControl<Button>("SerialDisconnect")!.IsEnabled = !_serialBusy && !(_serialSequence?.IsBusy == true) && _serialDisplay is not null;
+        this.FindControl<Button>("SerialSendLines")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
+        this.FindControl<Button>("SerialClear")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
+        this.FindControl<Button>("SerialPlaybackStart")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
+        this.FindControl<Button>("SerialPlaybackStop")!.IsEnabled = (_serialSequence?.IsRunning == true);
         UpdateSerialPlaybackStatus();
-        this.FindControl<Button>("SerialSendPage")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
-        this.FindControl<Button>("SerialSendGlyphs")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
-        this.FindControl<Button>("SerialApplyBrightness")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
+        this.FindControl<Button>("SerialSendPage")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
+        this.FindControl<Button>("SerialSendGlyphs")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
+        this.FindControl<Button>("SerialApplyBrightness")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
     }
 
     private void SetSerialStatus(string message) =>
