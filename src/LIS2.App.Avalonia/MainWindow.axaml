@@ -162,7 +162,7 @@
                 <TextBlock Text="Name" />
                 <TextBox IsEnabled="False" />
                 <TextBlock Text="Template key" />
-                <TextBlock Text="{Glyph.1}" FontFamily="Consolas" />
+                <TextBlock Text="{}{Glyph.1}" FontFamily="Consolas" />
               </StackPanel>
               <StackPanel Grid.Column="1" Spacing="5">
                 <TextBlock Text="5x8 bitmap (8 rows)" />
@@ -183,7 +183,7 @@
               <Button Content="Save set..." IsEnabled="False" />
               <Button Content="Load examples" IsEnabled="False" />
             </WrapPanel>
-            <TextBlock Text="Use {Glyph.Name} or {Glyph.1} through {Glyph.8} in page templates." Opacity="0.7" />
+            <TextBlock Text="{}Use {Glyph.Name} or {Glyph.1} through {Glyph.8} in page templates." Opacity="0.7" />
           </StackPanel>
         </Border>
         <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
