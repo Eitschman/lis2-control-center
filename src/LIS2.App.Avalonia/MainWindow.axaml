@@ -264,6 +264,21 @@
                 <TextBlock Grid.Row="7" Text="Enabled" />
                 <CheckBox Name="PageEnabled" Grid.Row="7" Grid.Column="1" />
               </Grid>
+              <TextBlock Text="Home Assistant (read-only WebSocket source)" FontWeight="SemiBold" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBox Name="HaUrl" Width="310" Watermark="http://homeassistant.local:8123" />
+                <TextBox Name="HaToken" Width="240" PasswordChar="*" Watermark="Long-lived access token" />
+                <Button Name="HaConnect" Content="Connect HA" />
+                <Button Name="HaDisconnect" Content="Disconnect HA" />
+                <Button Name="HaTest" Content="Test" />
+              </StackPanel>
+              <TextBlock Name="HaStatus" Text="Home Assistant not configured" Opacity="0.75" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBox Name="HaEntityFilter" Width="240" Watermark="Filter entities" />
+                <ComboBox Name="HaEntityPicker" Width="370" />
+                <Button Name="HaInsertLine1" Content="Insert state into line 1" />
+                <Button Name="HaInsertLine2" Content="Insert state into line 2" />
+              </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <ComboBox Name="PageVariablePicker" Width="220" />
                 <Button Name="PageInsertLine1" Content="Insert into line 1" />
