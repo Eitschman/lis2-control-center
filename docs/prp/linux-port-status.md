@@ -72,6 +72,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - Serial UI integration: separate experimental controls in Avalonia shell for port discovery/selection, explicit connect/disconnect, writing both display lines, and clearing the display. Serial session is disposed on window close. Virtual display/pages/glyphs remain separate; fan control remains disabled. No auto-reconnect or real hardware verification. CI pending for this integration.
 
+- Larger serial-display integration batch (2026-10-13): extended the display-only session to support both lines, page frames, 8 CG glyph slots, and brightness; added a virtual-transport-injectable constructor for headless tests; wired explicit page/glyph/brightness buttons to the separate serial session, without redirecting virtual playback or enabling fan control. Added serial-session regression tests for explicit lifecycle, validation and no fan command in tested operations. Real hardware, reconnect safe-fan sequencing, full UI parity and CI confirmation remain outstanding.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
