@@ -10,7 +10,7 @@
           <TextBlock Text="LIS2 Control Center" FontSize="20" FontWeight="Bold" Foreground="White" TextWrapping="Wrap" />
           <TextBlock Text="Windows / Linux" Foreground="#A7BBCB" />
         </StackPanel>
-        <ListBox Name="Navigation" SelectedIndex="0" SelectionChanged="OnNavigationChanged">
+        <ListBox Name="Navigation" SelectedIndex="0">
           <ListBoxItem Content="Dashboard" />
           <ListBoxItem Content="Display" />
           <ListBoxItem Content="Pages" />
