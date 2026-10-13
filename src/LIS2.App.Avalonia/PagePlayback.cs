@@ -18,6 +18,7 @@ public sealed class PagePlayback
     private string _renderedLine2 = string.Empty;
 
     public string? CurrentPageId => _current?.Id;
+    public TimeSpan NextDelay { get; private set; } = TimeSpan.FromMilliseconds(250);
 
     public void Reload(IEnumerable<PageDefinition> definitions)
     {
@@ -34,6 +35,7 @@ public sealed class PagePlayback
         _nextSwitch = default;
         _nextRefresh = default;
         _lastFrame = null;
+        NextDelay = TimeSpan.FromMilliseconds(250);
         _renderedLine1 = string.Empty;
         _renderedLine2 = string.Empty;
         _line1Scroller.Reset(string.Empty, DateTimeOffset.MinValue);
@@ -51,6 +53,7 @@ public sealed class PagePlayback
             if (_current is null)
             {
                 _lastFrame = null;
+                NextDelay = TimeSpan.FromMilliseconds(250);
                 return null;
             }
             _nextSwitch = now + _current.Duration;
@@ -77,6 +80,17 @@ public sealed class PagePlayback
                 _current.ScrollStepInterval, _current.ScrollEdgePause),
             _line2Scroller.Render(_renderedLine2, now, _current.Line2OverflowMode,
                 _current.ScrollStepInterval, _current.ScrollEdgePause));
+        // A bounded visibility poll retains immediate-ish reaction to external source changes.
+        var next = TimeSpan.FromSeconds(1);
+        var refresh = _nextRefresh - now;
+        var rotate = _nextSwitch - now;
+        if (refresh < next) next = refresh;
+        if (rotate < next) next = rotate;
+        var first = _line1Scroller.TimeUntilNextChange(now, _current.Line1OverflowMode);
+        var second = _line2Scroller.TimeUntilNextChange(now, _current.Line2OverflowMode);
+        if (first != Timeout.InfiniteTimeSpan && first < next) next = first;
+        if (second != Timeout.InfiniteTimeSpan && second < next) next = second;
+        NextDelay = next < TimeSpan.FromMilliseconds(1) ? TimeSpan.FromMilliseconds(1) : next;
         return _lastFrame;
     }
 

@@ -6,16 +6,19 @@ namespace LIS2.App.Avalonia;
 
 public partial class MainWindow
 {
-    private PeriodicRuntimeLoop _pageTimer = null!;
+    private AdaptiveRuntimeLoop _pageTimer = null!;
     private PageSequenceController? _virtualSequence;
 
-    private PeriodicRuntimeLoop CreatePageTimer() => new(
-        TimeSpan.FromMilliseconds(250),
-        cancellationToken => UiRuntimeDispatch.RunAsync(
+    private AdaptiveRuntimeLoop CreatePageTimer() => new(
+        async cancellationToken =>
+        {
+            await UiRuntimeDispatch.RunAsync(
             async () =>
             {
                 if (_virtualSequence?.IsRunning == true) await TickPagePlaybackAsync();
-            }, cancellationToken));
+            }, cancellationToken);
+            return _virtualSequence?.NextDelay ?? TimeSpan.FromSeconds(1);
+        });
 
     private PageSequenceController CreateVirtualSequence() => _runtime.CreateSequence(
         (frame, cancellationToken) => _virtualDevice.RenderBothAsync(frame.Line1, frame.Line2, cancellationToken),

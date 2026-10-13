@@ -17,6 +17,13 @@
     <ProjectReference Include="../LIS2.Runtime/LIS2.Runtime.csproj" />
   </ItemGroup>
   <ItemGroup>
-
+    <Compile Remove="DisplayRuntimeHost.cs" />
+    <Compile Remove="PagePlayback.cs" />
+    <Compile Remove="PageDefinition.cs" />
+    <Compile Remove="PageFrameDispatcher.cs" />
+    <Compile Remove="PageSourceValues.cs" />
+    <Compile Remove="PageClockValues.cs" />
+    <Compile Remove="PeriodicRuntimeLoop.cs" />
+    <Compile Remove="PageSequenceController.cs" />
   </ItemGroup>
 </Project>

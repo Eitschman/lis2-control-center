@@ -98,3 +98,5 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 ## Pull request gate
 Open a PR against `main` only when a coherent, tested slice is ready. Keep this branch isolated until then.
+
+- Runtime Core consolidation candidate (2026-10-13): moved portable source/page/scheduler/output/clock/periodic ownership into LIS2.Runtime through linked compile files, introduced adaptive display driver and shared priority event queue for Avalonia virtual/serial output; added headless deadline, priority, lifecycle and drain regression tests. WPF untouched and is reference only. Validation required before marking package complete.

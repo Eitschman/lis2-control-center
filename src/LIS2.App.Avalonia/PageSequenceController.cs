@@ -9,6 +9,7 @@ namespace LIS2.App.Avalonia;
 public sealed class PageSequenceController
 {
     private readonly PagePlayback _playback = new();
+    private readonly EventQueue _events;
     private readonly Func<DisplayFrame, CancellationToken, Task> _write;
     private readonly Func<CancellationToken, Task> _clear;
     private PageFrameDispatcher? _dispatcher;
@@ -16,15 +17,19 @@ public sealed class PageSequenceController
 
     public PageSequenceController(
         Func<DisplayFrame, CancellationToken, Task> write,
-        Func<CancellationToken, Task> clear)
+        Func<CancellationToken, Task> clear,
+        EventQueue? events = null)
     {
         _write = write ?? throw new ArgumentNullException(nameof(write));
         _clear = clear ?? throw new ArgumentNullException(nameof(clear));
+        _events = events ?? new EventQueue();
     }
 
     public bool IsRunning { get; private set; }
     public bool IsBusy { get; private set; }
     public string? CurrentPageId => _playback.CurrentPageId;
+    public TimeSpan NextDelay { get; private set; } = TimeSpan.FromMilliseconds(250);
+    public EventQueue Events => _events;
 
     public bool Start(IEnumerable<PageDefinition> pages)
     {
@@ -32,6 +37,7 @@ public sealed class PageSequenceController
         if (IsRunning || IsBusy) return false;
         _playback.Reload(pages);
         _dispatcher = new PageFrameDispatcher(_write, _clear);
+        NextDelay = TimeSpan.FromMilliseconds(1);
         IsRunning = true;
         return true;
     }
@@ -58,7 +64,21 @@ public sealed class PageSequenceController
         try
         {
             if (!IsRunning) return false;
-            var frame = _playback.Tick(now, values);
+            var activeEvent = _events.Peek(now);
+            DisplayFrame? frame;
+            if (activeEvent is not null)
+            {
+                frame = activeEvent.Frame;
+                var remaining = activeEvent.ExpiresAt - now;
+                NextDelay = remaining < TimeSpan.FromMilliseconds(1)
+                    ? TimeSpan.FromMilliseconds(1)
+                    : remaining < TimeSpan.FromSeconds(1) ? remaining : TimeSpan.FromSeconds(1);
+            }
+            else
+            {
+                frame = _playback.Tick(now, values);
+                NextDelay = _playback.NextDelay;
+            }
             return await (_dispatcher ?? throw new InvalidOperationException("Sequence not started."))
                 .DispatchAsync(frame, cancellationToken).ConfigureAwait(false);
         }

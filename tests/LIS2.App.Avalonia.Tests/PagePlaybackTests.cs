@@ -118,6 +118,20 @@ public sealed class PagePlaybackTests
     }
 
     [Fact]
+    public void NextDelayTracksRefreshAndScrollInsteadOfFixedPolling()
+    {
+        var playback = new PagePlayback();
+        playback.Reload(new[] { new PageDefinition { Line1Template = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            RefreshIntervalMilliseconds = 5000, ScrollEdgePauseMilliseconds = 400,
+            ScrollStepMilliseconds = 100, DurationSeconds = 10 } });
+        var now = DateTimeOffset.UnixEpoch;
+        playback.Tick(now, new Dictionary<string, object?>());
+        Assert.Equal(TimeSpan.FromMilliseconds(400), playback.NextDelay);
+        playback.Tick(now.AddMilliseconds(400), new Dictionary<string, object?>());
+        Assert.Equal(TimeSpan.FromMilliseconds(100), playback.NextDelay);
+    }
+
+    [Fact]
     public void ScrollPositionResetsWhenPageChanges()
     {
         var playback = new PagePlayback();

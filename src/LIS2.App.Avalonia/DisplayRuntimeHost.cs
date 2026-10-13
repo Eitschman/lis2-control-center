@@ -11,6 +11,7 @@ public sealed class DisplayRuntimeHost : IAsyncDisposable
     private readonly Func<DateTimeOffset> _clock;
     private readonly PageSourceValues _sources;
     private readonly List<PageSequenceController> _sequences = new();
+    private readonly EventQueue _events = new();
     private bool _disposed;
 
     public DisplayRuntimeHost(PageSourceValues? sources = null, Func<DateTimeOffset>? clock = null)
@@ -20,6 +21,12 @@ public sealed class DisplayRuntimeHost : IAsyncDisposable
     }
 
     public PageSourceValues Sources => _sources;
+    public EventQueue Events => _events;
+    public void EnqueueEvent(DisplayEvent displayEvent)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        _events.Add(displayEvent);
+    }
 
     public Task StartSourcesAsync(CancellationToken cancellationToken = default)
     {
@@ -38,7 +45,7 @@ public sealed class DisplayRuntimeHost : IAsyncDisposable
         Func<CancellationToken, Task> clear)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        var sequence = new PageSequenceController(write, clear);
+        var sequence = new PageSequenceController(write, clear, _events);
         _sequences.Add(sequence);
         return sequence;
     }

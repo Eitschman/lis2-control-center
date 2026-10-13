@@ -25,6 +25,28 @@ public sealed class DisplayRuntimeHostTests
     }
 
     [Fact]
+    public async Task SharedPriorityEventsOverridePageAndExpireWithoutResettingPage()
+    {
+        var now = DateTimeOffset.UnixEpoch;
+        var frames = new List<DisplayFrame>();
+        await using var runtime = new DisplayRuntimeHost(clock: () => now);
+        var sequence = runtime.CreateSequence((frame, _) => { frames.Add(frame); return Task.CompletedTask; }, _ => Task.CompletedTask);
+        sequence.Start(new[] { new PageDefinition { Id = "page", Line1Template = "NORMAL", DurationSeconds = 10 } });
+        Assert.True(await runtime.TickAsync(sequence));
+        runtime.EnqueueEvent(new DisplayEvent("low", new DisplayFrame("LOW", ""), 1, now.AddSeconds(3)));
+        runtime.EnqueueEvent(new DisplayEvent("high", new DisplayFrame("HIGH", ""), 10, now.AddSeconds(2)));
+        Assert.True(await runtime.TickAsync(sequence));
+        Assert.StartsWith("HIGH", frames[^1].Line1);
+        now = now.AddSeconds(2);
+        Assert.True(await runtime.TickAsync(sequence));
+        Assert.StartsWith("LOW", frames[^1].Line1);
+        now = now.AddSeconds(2);
+        Assert.True(await runtime.TickAsync(sequence));
+        Assert.StartsWith("NORMAL", frames[^1].Line1);
+        Assert.Equal("page", sequence.CurrentPageId);
+    }
+
+    [Fact]
     public async Task RejectsForeignSequences()
     {
         await using var runtime = new DisplayRuntimeHost();
