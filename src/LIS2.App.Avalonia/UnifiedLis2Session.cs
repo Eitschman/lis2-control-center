@@ -73,8 +73,10 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
             RequireConnected();
             if (_authorized || _safeFrame is not null)
                 throw new InvalidOperationException("Fan output already authorized or requires reconnect.");
-            await _device.SetFansAsync(safeFrame[0], safeFrame[1], safeFrame[2], safeFrame[3], token).ConfigureAwait(false);
+            // Keep the safety frame even when the initial write fails: the transport
+            // may have accepted bytes before reporting an I/O error.
             _safeFrame = safeFrame.ToArray();
+            await _device.SetFansAsync(safeFrame[0], safeFrame[1], safeFrame[2], safeFrame[3], token).ConfigureAwait(false);
             _authorized = true;
         }
         finally { _gate.Release(); }
