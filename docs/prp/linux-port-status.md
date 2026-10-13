@@ -144,3 +144,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Serialized safe shutdown (2026-10-13)
 - Authorized unified device sessions attempt their validated four-channel safety frame on disconnect and disposal, under the shared display/fan command gate, before transport closure. Virtual transport regression tests cover both paths. A physical write failure still propagates and transport closes; actual fan state cannot be guaranteed. Full fan UI activation and end-to-end lifecycle remain open.
+
+## Explicit fan runtime session lifecycle (2026-10-13)
+- Added AuthorizedFanRuntimeSession, an opt-in headless coordinator for unified serial safe-frame initialization, immediate four-channel evaluation, periodic FanRuntimeLoop, fault exposure, and ordered stop/drain/safe-frame disconnect. Virtual transport test checks first/last frames and initial regulated frame. NOT connected to the Avalonia live UI; physical hardware remains disabled by default. Device validation and further failure-mode tests remain required.
