@@ -130,6 +130,10 @@ public partial class MainWindow
             var pause = int.Parse(this.FindControl<TextBox>("PageScrollPause")!.Text ?? "", CultureInfo.InvariantCulture);
             if (duration <= 0 || refresh is < 100 or > 60000 || step <= 0 || pause < 0)
                 throw new ArgumentOutOfRangeException(nameof(duration), "Invalid page timing values.");
+            var visibility = this.FindControl<TextBox>("PageVisibility")!.Text;
+            if (!string.IsNullOrWhiteSpace(visibility) &&
+                !LIS2.Display.VisibilityEvaluator.TryParse(visibility, out _, out _, out _))
+                throw new InvalidOperationException("Invalid visibility expression.");
             var p = _pages.Get(i);
             p.Name = this.FindControl<TextBox>("PageName")!.Text ?? "";
             p.Line1Template = this.FindControl<TextBox>("PageLine1")!.Text ?? "";
@@ -138,13 +142,10 @@ public partial class MainWindow
             p.RefreshIntervalMilliseconds = refresh;
             p.ScrollStepMilliseconds = step;
             p.ScrollEdgePauseMilliseconds = pause;
-            p.VisibilityExpression = this.FindControl<TextBox>("PageVisibility")!.Text;
+            p.VisibilityExpression = visibility;
             p.Line1OverflowMode = OverflowName(this.FindControl<ComboBox>("PageOverflow1")!.SelectedIndex);
             p.Line2OverflowMode = OverflowName(this.FindControl<ComboBox>("PageOverflow2")!.SelectedIndex);
             p.Enabled = this.FindControl<CheckBox>("PageEnabled")!.IsChecked == true;
-            if (!string.IsNullOrWhiteSpace(p.VisibilityExpression) &&
-                !LIS2.Display.VisibilityEvaluator.TryParse(p.VisibilityExpression, out _, out _, out _))
-                throw new InvalidOperationException("Invalid visibility expression.");
             RefreshPageList(i);
             SetVirtualStatus($"Saved page '{p.Name}' in editor workspace.");
         }
