@@ -35,14 +35,16 @@ Deliver a native Linux desktop build (first x64, then ARM64), retaining the curr
 
 ## Phase 0 — Freeze and inventory (all unchecked)
 - [ ] Record baseline main commit SHA, latest passing Windows workflow and release artifacts.
-- [ ] Inventory complete repo tree, csproj properties, package/runtime compatibility and every Windows-only API.
+- [ ] Inventory complete repo tree, csproj properties, package/runtime compatibility and every Windows-only API. Initial verified source reconnaissance: [linux-port-inventory.md](linux-port-inventory.md); exhaustive recursive audit still open.
 - [ ] Review `AGENTS.md` / `CLAUDE.md` if present; list all WPF/WinForms references and code-behind dependencies.
-- [ ] Map each existing tab, dialog, custom control, page designer, CG builder, virtual preview, localization and settings interaction.
+- [ ] Map each existing tab, dialog, custom control, page designer, CG builder, virtual preview, localization and settings interaction. Initial UI entry points identified; full census pending.
 - [ ] Map each `DispatcherTimer` and startup/shutdown event; identify concurrency assumptions.
 - [ ] Map all Windows-specific settings, DPAPI, filesystem paths, registry, startup, tray, system theme, icon and logging code.
 - [ ] Enumerate tests and coverage gaps, hardware validation limitations and reproducible virtual-LIS2 scenarios.
 - [ ] Reconfirm current Avalonia/.NET version support and licensing from official documentation before selecting versions.
 - [ ] Document actual feature parity matrix (Windows baseline vs Linux target).
+
+**Critical discovery:** `Directory.Build.props` globally targets `net8.0-windows10.0.19041.0`; portable libraries must be retargeted explicitly. `MainWindow.xaml.cs` currently has 4551 lines. `LIS2.ProtocolTester` is also WPF. See [verified inventory](linux-port-inventory.md).
 
 ## Phase 1 — Decouple runtime from WPF
 - [ ] Add a UI-independent `src/LIS2.Runtime` project (name provisional), with lifecycle/start/stop, app orchestration and dependency injection.
