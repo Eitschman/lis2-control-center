@@ -264,6 +264,13 @@
                 <TextBlock Grid.Row="7" Text="Enabled" />
                 <CheckBox Name="PageEnabled" Grid.Row="7" Grid.Column="1" />
               </Grid>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <ComboBox Name="PageVariablePicker" Width="220" Watermark="Available template variables" />
+                <Button Name="PageInsertLine1" Content="Insert into line 1" />
+                <Button Name="PageInsertLine2" Content="Insert into line 2" />
+                <Button Name="PageRefreshVariables" Content="Refresh variables" />
+              </StackPanel>
+              <TextBlock Name="PageVariableStatus" Opacity="0.65" />
               <TextBlock Name="PagePlaybackStatus" Text="Sequence stopped" Opacity="0.75" />
               <TextBlock Text="Live preview" FontWeight="SemiBold" />
               <Border Background="#07190E" BorderBrush="#33523D" BorderThickness="1" CornerRadius="6" Padding="18,12" HorizontalAlignment="Left">
