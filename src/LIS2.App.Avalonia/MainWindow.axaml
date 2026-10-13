@@ -264,6 +264,7 @@
                 <TextBlock Grid.Row="7" Text="Enabled" />
                 <CheckBox Name="PageEnabled" Grid.Row="7" Grid.Column="1" />
               </Grid>
+              <TextBlock Name="PagePlaybackStatus" Text="Sequence stopped" Opacity="0.75" />
               <TextBlock Text="Live preview" FontWeight="SemiBold" />
               <Border Background="#07190E" BorderBrush="#33523D" BorderThickness="1" CornerRadius="6" Padding="18,12" HorizontalAlignment="Left">
                 <StackPanel>
@@ -274,6 +275,8 @@
               <StackPanel Orientation="Horizontal" Spacing="7">
                 <Button Name="PageSave" Content="Save page" />
                 <Button Name="PageTest" Content="Send page to virtual LIS2" />
+                <Button Name="PagePlaybackStart" Content="Start sequence" />
+                <Button Name="PagePlaybackStop" Content="Stop sequence" IsEnabled="False" />
               </StackPanel>
             </StackPanel>
           </Grid>
