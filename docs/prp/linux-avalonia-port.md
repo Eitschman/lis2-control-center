@@ -106,17 +106,30 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 - [ ] Review crash handling, permissions, logs, restart behavior, disconnected sensors, and serial unplug/replug.
 - [ ] Update README, architecture, troubleshooting and user guide; decide whether WPF retirement is warranted only after parity.
 
-## Binding implementation workflow: coherent large batches (project owner directive, 2026-10-13)
-This is a **mandatory working rule** for all subsequent LIS2 Avalonia port sessions, including sessions resumed from handover notes.
+## Binding implementation workflow: STRICT package/commit gate (owner directive, 2026-10-13)
 
-- Plan and implement **large, cohesive functional packages** rather than small incremental snippets or individual-file commits. A package should cover a meaningful end-to-end capability and all affected layers, UI adapters, tests, integration and status documentation.
-- **Prepare and inspect all files before pushing.** Verify actual interfaces and existing patterns; do not guess symbols or APIs. Include regression tests and documentation in the same package.
-- **Prefer one atomic Git commit per complete package**, using a single Git tree/commit/ref update (or equivalent). Do not push each intermediate file or small substep: every push triggers unnecessary GitHub Actions builds.
-- Trigger **one CI validation after the full package is pushed**. Review the latest HEAD's Windows and Linux results; when red, investigate and fix the actual cause, then rerun. Never interpret an earlier green run as proof that a newer HEAD is green.
-- While implementing, give the project owner occasional **substantive progress updates** (scope, discoveries, blockers, overall progress), not micro-commit reports. Do not wait for user approval between substeps of an authorized package.
-- Keep original WPF functionality and 1:1 UI parity requirements, fan safety, and isolated feature-branch boundaries intact. A larger batch must still be reviewable and safety-conscious.
-- A package is **not complete** until the current HEAD CI is green (and physical hardware tests, where required, are explicitly distinguished from CI).
-- Avoid repeatedly asking the user to say “grün” to unlock tiny next steps. Once a package is green, continue with the next coherent major package when authorized.
+**Mandatory and higher priority than convenience, context limits, or quick green CI.** This applies in every chat and after handovers. The previous repeated violation (pushing incomplete partial implementations despite promising two complete commits) must not recur.
+
+### Immutable agreed scope for Phase 1 / Package 1
+- **Runtime Core (logical commit 1):** finish Phase 1 steps 1–4 and 6 together: standalone portable runtime, display scheduling/event/output orchestration, source lifecycle, timers, concurrency/reconnect/shutdown, and platform contracts. Integration, regression tests, and documentation are part of the same deliverable.
+- **Integration & Safety (logical commit 2):** finish steps 5, 7, 8 together: move fan regulation loops without changing safety semantics, integrate WPF/Avalonia adapters, state/view models/commands, headless/compatibility/migration tests and docs.
+- Historical commit `1e0dc5d7` is **only an incomplete Runtime Core checkpoint**, not completion of logical commit 1. Do not rewrite published history without permission; finish the remainder in ONE cohesive completion commit. The historical partial commit does not justify further partial pushes.
+
+### NON-NEGOTIABLE PRE-PUSH CHECKLIST (all must pass)
+1. **Define package acceptance criteria BEFORE coding**: exact PRP steps, user-visible outcome, affected layers/files, tests, safety constraints, and what constitutes done. Do not silently narrow scope or re-label an intermediate implementation as a complete package.
+2. **Inspect all affected existing code and actual interfaces**. Prepare the entire package across runtime, adapters, tests and docs. Verify all automated text replacements actually occurred. Never push speculative references or incomplete stubs presented as finished integration.
+3. **NO intermediate Git pushes/commits** for a class, file, partial substep, status note, isolated test, or to trigger CI early. Keep incomplete work in the local working tree or uncommitted staging. If tool/environment limits prevent staging the full package, STOP without committing and clearly report the blocker. Never treat limited turn length as permission to commit a smaller slice.
+4. **Preflight**: inspect diff and changed-file inventory; verify each agreed acceptance criterion against implementation, build/test locally where possible, and review regression coverage. If local .NET is unavailable, explicitly record this and use CI only after the full coherent package is ready; do not use repeated partial pushes as a compilation probe.
+5. **ONE atomic commit/ref update per COMPLETE logical package**, including all code, tests and docs. If current scope genuinely needs to change, obtain explicit owner agreement **before** changing it or committing. Do not retroactively redefine a package after pushing.
+6. **Post-push CI**: check the exact newest HEAD, Windows and Linux results. Fix genuine failures with the minimum necessary repair commit; repair commits are exceptions, not a way to implement missing planned functionality piecemeal. A previous green run is not proof of the current HEAD.
+7. **Status honesty**: distinguish planned, implemented-but-unverified, CI-green and hardware-validated. Mark the package complete only when every acceptance criterion is met and latest HEAD CI green. Real hardware tests must be separately identified; fan safety never inferred from CI alone.
+8. **Progress reports without Git pushes**: provide substantive updates during long work, and keep going without requesting approval for each substep. Never repeatedly ask for "grün" to unlock micro-commits.
+
+### Enforcement / failure response
+- Immediately before **every** create_tree/create_commit/update_ref or equivalent, compare the complete staged file set with the agreed package checklist. If anything is missing, **DO NOT COMMIT**.
+- A partially complete package must stay **OPEN** even when all existing CI tests are green.
+- If completion cannot be guaranteed in the current session, explain the actual remaining work and preserve a precise handover; do not push an unfinished checkpoint.
+- Preserve WPF Windows behavior, 1:1 UI parity, fan fail-safe, serialized hardware writes, and the isolated feature branch. Hardware safety cannot be traded for fewer commits.
 
 ## Implementation ordering and checkpoints
 1. **Gate A:** Inventory and feature matrix approved; baseline Windows CI green.
