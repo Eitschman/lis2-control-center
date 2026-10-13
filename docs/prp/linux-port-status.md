@@ -4,6 +4,10 @@ Date: 2026-10-13
 Branch: `feature/linux-avalonia`
 Status: **Shared Avalonia shell with virtual LIS2 session committed; latest changes awaiting CI validation**
 
+## Binding UI acceptance criterion
+- User confirmed 2026-10-13: The existing Windows WPF UI is the authoritative reference for **layout, placement, interactions, workflows and visual appearance** on BOTH Windows and Linux. The Avalonia sidebar/virtual buttons are temporary engineering scaffolding, not a proposed redesign.
+- Before marking a screen done, compare against the WPF screen at matching resolution/DPI and document any unavoidable Avalonia differences; no arbitrary reorganization or missing controls.
+
 ## Target architecture
 - ONE Avalonia UI and application runtime for Windows x64 and Linux x64/ARM64.
 - Windows-only providers (Winamp, GSMTC, native plugins) and Linux-only providers (MPRIS, Linux sensors) are selected behind common interfaces.
