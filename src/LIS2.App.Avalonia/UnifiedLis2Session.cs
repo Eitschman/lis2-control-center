@@ -148,7 +148,7 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
         await _gate.WaitAsync(token).ConfigureAwait(false);
         try
         {
-            var safe = _authorized && IsConnected ? _safeFrame : null;
+            var safe = IsConnected ? _safeFrame : null;
             _authorized = false;
             _safeFrame = null;
             try

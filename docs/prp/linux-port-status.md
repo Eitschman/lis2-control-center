@@ -159,3 +159,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Dry-run monitor shutdown race (2026-10-13)
 - StopFanMonitorAsync now retains the running task and cancellation source until its completion, preventing a new preview from starting while the old one is still draining. This is read-only UI lifecycle hardening; hardware fan output remains disabled.
+
+## Safety-frame retention after revoked authorization (2026-10-13)
+- The safe shutdown attempt now uses the retained safety frame whenever a device remains connected, even if a failed fan write has revoked authorization. This avoids silently skipping safety restoration after an output error. Physical hardware validation remains outstanding.
