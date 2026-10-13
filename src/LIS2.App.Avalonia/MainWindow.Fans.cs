@@ -9,6 +9,7 @@ public partial class MainWindow
     private readonly SimulatedFanSensors _fanPreviewSensors = new();
     private readonly SimulatedFanOutput _fanPreviewSink = new();
     private bool _fanEditorLoading;
+    private int _fanEditingChannelIndex;
 
     private void InitializeFanEditor()
     {
@@ -16,8 +17,20 @@ public partial class MainWindow
         {
             if (_fanEditorLoading) return;
             // Do not silently discard edits when switching channels.
-            try { SaveFanEditor(); RefreshFanEditor(); }
-            catch (Exception ex) { SetFanStatus($"Unsaved changes: {ex.Message}"); }
+            var requested = this.FindControl<ComboBox>("FanChannelPicker")!.SelectedIndex;
+            try
+            {
+                SaveFanEditor();
+                _fanEditingChannelIndex = Math.Clamp(requested, 0, 3);
+                RefreshFanEditor();
+            }
+            catch (Exception ex)
+            {
+                _fanEditorLoading = true;
+                try { this.FindControl<ComboBox>("FanChannelPicker")!.SelectedIndex = _fanEditingChannelIndex; }
+                finally { _fanEditorLoading = false; }
+                SetFanStatus($"Unsaved changes: {ex.Message}");
+            }
         };
         this.FindControl<Button>("FanSave")!.Click += async (_, _) =>
         {
@@ -57,7 +70,7 @@ public partial class MainWindow
         _fanEditorLoading = true;
         try
         {
-            var channel = _fanSettings.Channels[Math.Clamp(picker.SelectedIndex, 0, 3)];
+            var channel = _fanSettings.Channels[_fanEditingChannelIndex];
             this.FindControl<CheckBox>("FanAutomatic")!.IsChecked = _fanSettings.AutomaticControlEnabled;
             this.FindControl<ComboBox>("FanModePicker")!.SelectedIndex =
                 Array.IndexOf(new[] { "Fixed", "Curve", "Follow", "External", "Off" }, channel.Mode);
@@ -77,7 +90,7 @@ public partial class MainWindow
 
     private void SaveFanEditor()
     {
-        var index = Math.Clamp(this.FindControl<ComboBox>("FanChannelPicker")!.SelectedIndex, 0, 3);
+        var index = _fanEditingChannelIndex;
         int ReadInt(string name) => int.Parse(this.FindControl<TextBox>(name)!.Text ?? "", CultureInfo.InvariantCulture);
         var curve = new List<PortableFanCurvePoint>();
         foreach (var line in (this.FindControl<TextBox>("FanCurve")!.Text ?? "").Split('\n'))

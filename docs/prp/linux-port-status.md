@@ -132,3 +132,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Unified display routing (2026-10-13)
 - Live SerialDisplaySession display calls now delegate to UnifiedLis2Session for single-owner serialization. Added virtual transport tests for display facade and concurrent display/fan commands.
 - Physical fans remain disabled in UI; periodic real regulation and fan authorization lifecycle remain open. Package 1B is NOT complete.
+
+## Fan channel editor regression repair (2026-10-13)
+- Channel selection now saves the previously edited channel rather than overwriting the destination channel; invalid edits restore the original selection without losing editor contents. Phase 2 remains open for live runtime integration and physical safety verification.
