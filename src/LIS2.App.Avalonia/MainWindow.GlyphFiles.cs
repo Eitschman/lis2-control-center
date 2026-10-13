@@ -5,6 +5,16 @@ namespace LIS2.App.Avalonia;
 
 public partial class MainWindow
 {
+    private async Task LoadGlyphSetAsync()
+    {
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions { Title = "Load glyph set" });
+        if (files.Count == 0) return;
+        await using var stream = await files[0].OpenReadAsync();
+        using var reader = new StreamReader(stream);
+        _glyphs.ImportJson(await reader.ReadToEndAsync());
+        LoadGlyphEditor();
+    }
+
     private async Task SaveGlyphSetAsync()
     {
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions

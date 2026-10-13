@@ -17,7 +17,19 @@ public partial class MainWindow
             _glyphs.LoadExamples();
             LoadGlyphEditor();
         };
+        this.FindControl<Button>("SendAllGlyphs")!.Click += async (_, _) =>
+            await RunVirtualActionAsync(() => _virtualDevice.ProgramAllGlyphsAsync(_glyphs.Glyphs));
+        this.FindControl<Button>("SaveGlyphSet")!.Click += async (_, _) =>
+            await RunGlyphFileActionAsync(SaveGlyphSetAsync);
+        this.FindControl<Button>("LoadGlyphSet")!.Click += async (_, _) =>
+            await RunGlyphFileActionAsync(LoadGlyphSetAsync);
         LoadGlyphEditor();
+    }
+
+    private async Task RunGlyphFileActionAsync(Func<Task> action)
+    {
+        try { await action(); }
+        catch (Exception ex) { SetVirtualStatus($"Glyph file error: {ex.Message}"); }
     }
 
     private void SaveGlyphEditor()

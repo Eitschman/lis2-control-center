@@ -154,15 +154,15 @@
         <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Custom Characters / CG Builder" FontWeight="SemiBold" FontSize="16" />
-            <CheckBox Content="Program saved glyphs on connect" IsEnabled="False" />
+            <CheckBox Name="ProgramGlyphsOnConnect" Content="Program saved glyphs on connect" />
             <Grid ColumnDefinitions="190,220,24,*">
               <StackPanel Grid.Column="0" Spacing="5">
                 <TextBlock Text="Slot" />
                 <ComboBox Name="GlyphSlot" SelectedIndex="0"><ComboBoxItem Content="1" /><ComboBoxItem Content="2" /><ComboBoxItem Content="3" /><ComboBoxItem Content="4" /><ComboBoxItem Content="5" /><ComboBoxItem Content="6" /><ComboBoxItem Content="7" /><ComboBoxItem Content="8" /></ComboBox>
                 <TextBlock Text="Name" />
-                <TextBox IsEnabled="False" />
+                <TextBox Name="GlyphName" Text="Glyph 1" />
                 <TextBlock Text="Template key" />
-                <TextBlock Text="{}{Glyph.1}" FontFamily="Consolas" />
+                <TextBlock Name="GlyphTemplateKey" Text="{}{Glyph.1}" FontFamily="Consolas" />
               </StackPanel>
               <StackPanel Grid.Column="1" Spacing="5">
                 <TextBlock Text="5x8 bitmap (8 rows)" />
@@ -170,18 +170,18 @@
               </StackPanel>
               <Border Grid.Column="3" Background="#07190E" CornerRadius="5" Padding="16">
                 <StackPanel Spacing="10">
-                  <TextBlock Text="·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····" FontFamily="Consolas" FontSize="22" Foreground="#70EF86" />
+                  <TextBlock Name="GlyphPixelPreview" Text="·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····" FontFamily="Consolas" FontSize="22" Foreground="#70EF86" />
                   <TextBlock Text="20x2 template preview" />
                 </StackPanel>
               </Border>
             </Grid>
             <WrapPanel>
-              <Button Content="Save glyph" IsEnabled="False" />
+              <Button Name="SaveGlyph" Content="Save glyph" />
               <Button Name="SendGlyphSlot" Content="Send slot to LIS2" />
-              <Button Content="Send all 8 slots" IsEnabled="False" />
-              <Button Content="Load set..." IsEnabled="False" />
-              <Button Content="Save set..." IsEnabled="False" />
-              <Button Content="Load examples" IsEnabled="False" />
+              <Button Name="SendAllGlyphs" Content="Send all 8 slots" />
+              <Button Name="LoadGlyphSet" Content="Load set..." />
+              <Button Name="SaveGlyphSet" Content="Save set..." />
+              <Button Name="LoadExampleGlyphs" Content="Load examples" />
             </WrapPanel>
             <TextBlock Text="{}Use {Glyph.Name} or {Glyph.1} through {Glyph.8} in page templates." Opacity="0.7" />
           </StackPanel>

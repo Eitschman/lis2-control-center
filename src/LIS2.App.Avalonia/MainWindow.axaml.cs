@@ -19,7 +19,7 @@ public partial class MainWindow : Window
             navigation.SelectionChanged += OnNavigationChanged;
 
         this.FindControl<Button>("VirtualConnect")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.ConnectAsync());
+            await RunVirtualActionAsync(ConnectWithGlyphsAsync);
         this.FindControl<Button>("VirtualDemo")!.Click += async (_, _) =>
             await RunVirtualActionAsync(() => _virtualDevice.WriteDemoAsync());
         this.FindControl<Button>("VirtualDisconnect")!.Click += async (_, _) =>
@@ -62,6 +62,7 @@ public partial class MainWindow : Window
                 this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1,
                 GlyphBitmap.Parse(this.FindControl<TextBox>("GlyphBitmapEditor")!.Text)));
 
+        InitializeGlyphEditor();
         Closed += OnWindowClosed;
         UpdateSection();
         UpdateVirtualControls();
@@ -154,7 +155,7 @@ public partial class MainWindow : Window
         this.FindControl<Button>("VirtualDisconnect")!.IsEnabled = !_busy && connected;
         foreach (var name in new[] { "SendLine1", "SendLine2", "RenderBoth", "ClearDisplay",
                                     "Brightness100", "Brightness75", "Brightness50", "Brightness25",
-                                    "SendSpecialCharacterTest", "SendCharacterRomRange", "SendGlyphSlot" })
+                                    "SendSpecialCharacterTest", "SendCharacterRomRange", "SendGlyphSlot", "SendAllGlyphs" })
             this.FindControl<Button>(name)!.IsEnabled = !_busy && connected;
         var badge = this.FindControl<TextBlock>("ConnectionText");
         if (badge is not null)
