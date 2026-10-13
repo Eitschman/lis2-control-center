@@ -13,6 +13,7 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
     private readonly Lis2Device _device;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private bool _authorized;
+    private int[]? _safeFrame;
     private bool _disposed;
 
     public UnifiedLis2Session(ILis2Transport transport) =>
@@ -29,6 +30,7 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
             ObjectDisposedException.ThrowIf(_disposed, this);
             if (IsConnected) throw new InvalidOperationException("Already connected.");
             _authorized = false;
+            _safeFrame = null;
             await _device.ConnectAsync(token).ConfigureAwait(false);
         }
         finally { _gate.Release(); }
@@ -43,10 +45,12 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
             ObjectDisposedException.ThrowIf(_disposed, this);
             if (IsConnected) throw new InvalidOperationException("Already connected.");
             _authorized = false;
+            _safeFrame = null;
             await _device.ConnectAsync(token).ConfigureAwait(false);
             try
             {
                 await _device.SetFansAsync(safeFrame[0], safeFrame[1], safeFrame[2], safeFrame[3], token).ConfigureAwait(false);
+                _safeFrame = safeFrame.ToArray();
                 _authorized = true;
             }
             catch
@@ -144,8 +148,15 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
         await _gate.WaitAsync(token).ConfigureAwait(false);
         try
         {
+            var safe = _authorized && IsConnected ? _safeFrame : null;
             _authorized = false;
-            await _device.DisconnectAsync(token).ConfigureAwait(false);
+            _safeFrame = null;
+            try
+            {
+                if (safe is not null)
+                    await _device.SetFansAsync(safe[0], safe[1], safe[2], safe[3], CancellationToken.None).ConfigureAwait(false);
+            }
+            finally { await _device.DisconnectAsync(CancellationToken.None).ConfigureAwait(false); }
         }
         finally { _gate.Release(); }
     }
@@ -163,8 +174,15 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
         {
             if (_disposed) return;
             _disposed = true;
+            var safe = _authorized && IsConnected ? _safeFrame : null;
             _authorized = false;
-            await _device.DisposeAsync().ConfigureAwait(false);
+            _safeFrame = null;
+            try
+            {
+                if (safe is not null)
+                    await _device.SetFansAsync(safe[0], safe[1], safe[2], safe[3], CancellationToken.None).ConfigureAwait(false);
+            }
+            finally { await _device.DisposeAsync().ConfigureAwait(false); }
         }
         finally { _gate.Release(); }
     }

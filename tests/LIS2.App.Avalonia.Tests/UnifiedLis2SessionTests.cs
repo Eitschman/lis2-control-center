@@ -23,6 +23,31 @@ public sealed class UnifiedLis2SessionTests
     }
 
     [Fact]
+    public async Task AuthorizedDisconnectRestoresSafetyFrameBeforeClosing()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var session = new UnifiedLis2Session(transport);
+        await session.ConnectWithFanSafetyAsync(new[] { 100, 90, 80, 70 });
+        await session.WriteAsync(new[] { 30, 40, 50, 60 }, CancellationToken.None);
+        await session.DisconnectAsync();
+        Assert.False(transport.IsOpen);
+        Assert.False(session.FansAuthorized);
+        Assert.Equal(Lis2Protocol.SetFans(100, 90, 80, 70), transport.Writes[^1]);
+    }
+
+    [Fact]
+    public async Task AuthorizedDisposalRestoresSafetyFrame()
+    {
+        var transport = new VirtualLis2Transport();
+        var session = new UnifiedLis2Session(transport);
+        await session.ConnectWithFanSafetyAsync(new[] { 100, 100, 100, 100 });
+        await session.WriteAsync(new[] { 25, 25, 25, 25 }, CancellationToken.None);
+        await session.DisposeAsync();
+        Assert.False(transport.IsOpen);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
+    }
+
+    [Fact]
     public async Task DisplayOnlyNeverAuthorizesFans()
     {
         var transport = new VirtualLis2Transport();

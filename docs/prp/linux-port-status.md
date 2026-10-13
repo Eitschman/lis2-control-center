@@ -141,3 +141,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Fan runtime loop fault isolation (2026-10-13)
 - The periodic fan loop now disables physical output on an unhandled tick/write exception and exposes LastFault/Faulted instead of silently terminating. No automatic reconnect. Live hardware activation remains disabled pending UI integration and safety validation.
+
+## Serialized safe shutdown (2026-10-13)
+- Authorized unified device sessions attempt their validated four-channel safety frame on disconnect and disposal, under the shared display/fan command gate, before transport closure. Virtual transport regression tests cover both paths. A physical write failure still propagates and transport closes; actual fan state cannot be guaranteed. Full fan UI activation and end-to-end lifecycle remain open.
