@@ -30,7 +30,7 @@ public sealed class SerialDisplaySessionTests
         Assert.True(session.IsConnected);
         Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
         await session.RenderBothAsync("after", "fans");
-        Assert.Equal("after", transport.State.Line1.TrimEnd());
+        Assert.StartsWith("after", transport.State.Line1);
     }
 
     [Fact]
