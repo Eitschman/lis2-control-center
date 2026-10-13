@@ -25,7 +25,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
         try
         {
             var runtime = new FanRuntime(sensors, _session, channels);
-            var loop = new FanRuntimeLoop(runtime);
+            var loop = new FanRuntimeLoop(runtime, onFault: _ => _session.RevokeFansAsync());
             try
             {
                 await _session.AuthorizeConnectedFansAsync(new[] { 100, 100, 100, 100 });

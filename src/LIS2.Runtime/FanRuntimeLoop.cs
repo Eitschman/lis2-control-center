@@ -5,6 +5,7 @@ public sealed class FanRuntimeLoop : IAsyncDisposable
 {
     private readonly FanRuntime _runtime;
     private readonly TimeSpan _interval;
+    private readonly Func<Exception, Task>? _onFault;
     private readonly object _gate = new();
     private CancellationTokenSource? _stop;
     private Task? _task;
@@ -13,9 +14,10 @@ public sealed class FanRuntimeLoop : IAsyncDisposable
     public Exception? LastFault { get { lock (_gate) return _lastFault; } }
     public event Action<Exception>? Faulted;
 
-    public FanRuntimeLoop(FanRuntime runtime, TimeSpan? interval = null)
+    public FanRuntimeLoop(FanRuntime runtime, TimeSpan? interval = null, Func<Exception, Task>? onFault = null)
     {
         _runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
+        _onFault = onFault;
         _interval = interval ?? TimeSpan.FromSeconds(2);
         if (_interval <= TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(interval));
     }
@@ -47,6 +49,12 @@ public sealed class FanRuntimeLoop : IAsyncDisposable
             // Disable output, clear history, and expose the failure to the operator.
             try { await _runtime.SetOutputEnabledAsync(false, CancellationToken.None).ConfigureAwait(false); }
             catch (Exception) { /* Preserve original loop failure. */ }
+            // Await safety restoration before the loop is considered drained.
+            if (_onFault is not null)
+            {
+                try { await _onFault(ex).ConfigureAwait(false); }
+                catch (Exception) { /* Preserve the original fault; shutdown retries safety. */ }
+            }
             lock (_gate) _lastFault = ex;
             try { Faulted?.Invoke(ex); }
             catch (Exception) { /* Observer failures must not fault the loop. */ }
