@@ -264,6 +264,10 @@
                 <TextBlock Grid.Row="7" Text="Enabled" />
                 <CheckBox Name="PageEnabled" Grid.Row="7" Grid.Column="1" />
               </Grid>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Name="ImportWindowsSettings" Content="Import Windows settings.json..." />
+                <TextBlock Name="WindowsImportStatus" Text="Existing Windows settings remain unchanged." VerticalAlignment="Center" Opacity="0.7" />
+              </StackPanel>
               <TextBlock Text="Home Assistant (read-only WebSocket source)" FontWeight="SemiBold" />
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <TextBox Name="HaUrl" Width="310" Watermark="http://homeassistant.local:8123" />
