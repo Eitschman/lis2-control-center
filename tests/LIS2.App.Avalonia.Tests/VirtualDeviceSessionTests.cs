@@ -83,6 +83,30 @@ public sealed class VirtualDeviceSessionTests
     }
 
     [Fact]
+    public async Task CustomGlyph_ProgramsEightRows_AndUpdatesVirtualState()
+    {
+        const string bitmap = "00100\n01110\n11111\n00100\n00100\n00100\n00000\n00000";
+        var rows = GlyphBitmap.Parse(bitmap);
+        Assert.Equal(bitmap, GlyphBitmap.Format(rows));
+
+        await using var session = new VirtualDeviceSession();
+        await session.ConnectAsync();
+        await session.ProgramGlyphAsync(3, rows);
+
+        Assert.Equal(rows, session.State.CustomCharacters[2]);
+        Assert.Equal(8, session.CommandCount);
+        Assert.Equal(0, session.State.RejectedCommandCount);
+    }
+
+    [Theory]
+    [InlineData("00000")]
+    [InlineData("00000\n00000\n00000\n00000\n00000\n00000\n00000\n00002")]
+    public void GlyphBitmap_RejectsMalformedRows(string bitmap)
+    {
+        Assert.Throws<ArgumentException>(() => GlyphBitmap.Parse(bitmap));
+    }
+
+    [Fact]
     public async Task WritesRequireConnection()
     {
         await using var session = new VirtualDeviceSession();
