@@ -29,7 +29,7 @@ public partial class MainWindow
                 session = new SerialDisplaySession(port);
                 await session.ConnectAsync();
                 _serialDisplay = session;
-                session.FanFaulted += ex => Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                session.FanFaulted += ex => global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 {
                     SetFanStatus("HARDWARE FAN CONTROL FAILED; safety restoration attempted: " + ex.Message);
                     UpdateHardwareFanControls();
