@@ -131,6 +131,23 @@ public sealed class UnifiedLis2SessionTests
         Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
     }
 
+    [Fact]
+    public async Task FailedInitialAuthorizationDoesNotAllowFanWritesAndDisconnectRetriesSafety()
+    {
+        var transport = new FailOnceFanTransport();
+        await using var session = new UnifiedLis2Session(transport);
+        await session.ConnectDisplayOnlyAsync();
+        transport.FailNextWrite = true;
+        await Assert.ThrowsAsync<IOException>(() =>
+            session.AuthorizeConnectedFansAsync(new[] { 100, 100, 100, 100 }));
+        Assert.False(session.FansAuthorized);
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            session.WriteAsync(new[] { 40, 40, 40, 40 }, CancellationToken.None));
+        await session.DisconnectAsync();
+        Assert.False(transport.IsOpen);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
+    }
+
     private sealed class FailOnceFanTransport : ILis2Transport
     {
         private readonly VirtualLis2Transport _inner = new();

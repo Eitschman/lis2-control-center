@@ -186,13 +186,16 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
         {
             var safe = IsConnected ? _safeFrame : null;
             _authorized = false;
-            _safeFrame = null;
             try
             {
                 if (safe is not null)
                     await _device.SetFansAsync(safe[0], safe[1], safe[2], safe[3], CancellationToken.None).ConfigureAwait(false);
             }
-            finally { await _device.DisconnectAsync(CancellationToken.None).ConfigureAwait(false); }
+            finally
+            {
+                try { await _device.DisconnectAsync(CancellationToken.None).ConfigureAwait(false); }
+                finally { _safeFrame = null; }
+            }
         }
         finally { _gate.Release(); }
     }
