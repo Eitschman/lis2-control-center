@@ -31,6 +31,7 @@ public partial class MainWindow
             if (SelectedPageIndex is not null && !SavePageEditor()) return;
             _serialSequence ??= CreateSerialSequence();
             if (!_serialSequence.Start(_pages.Pages)) return;
+            await _serialPlaybackTimer.StopAndDrainAsync();
             _serialPlaybackTimer.Start();
             UpdateSerialControls();
             await TickSerialPlaybackAsync();

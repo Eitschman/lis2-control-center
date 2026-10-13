@@ -36,6 +36,7 @@ public partial class MainWindow
             if (SelectedPageIndex is not null && !SavePageEditor()) return;
             _virtualSequence ??= CreateVirtualSequence();
             if (!_virtualSequence.Start(_pages.Pages)) return;
+            await _pageTimer.StopAndDrainAsync();
             _pageTimer.Start();
             UpdatePagePlaybackControls();
             await TickPagePlaybackAsync();
