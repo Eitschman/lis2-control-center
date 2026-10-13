@@ -78,4 +78,60 @@ public sealed class PagePlaybackTests
         Assert.StartsWith("Second", playback.Tick(now.AddSeconds(1), values)!.Line1);
     }
 
+    [Theory]
+    [InlineData("PingPong", "BCDEFGHIJKLMNOPQRSTU")]
+    [InlineData("Marquee", "BCDEFGHIJKLMNOPQRSTU")]
+    [InlineData("Truncate", "ABCDEFGHIJKLMNOPQRST")]
+    public void OverflowModesApplyToPagePlayback(string mode, string expected)
+    {
+        var playback = new PagePlayback();
+        playback.Reload(new[] { new PageDefinition
+        {
+            Id = "scroll", Line1Template = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            Line1OverflowMode = mode, ScrollStepMilliseconds = 300,
+            ScrollEdgePauseMilliseconds = 900, RefreshIntervalMilliseconds = 60000
+        } });
+        var now = DateTimeOffset.UnixEpoch;
+        var values = new Dictionary<string, object?>();
+        Assert.Equal("ABCDEFGHIJKLMNOPQRST", playback.Tick(now, values)!.Line1);
+        Assert.Equal(expected, playback.Tick(now.AddMilliseconds(900), values)!.Line1);
+    }
+
+    [Fact]
+    public void LinesScrollIndependentlyAndRespectStepTiming()
+    {
+        var playback = new PagePlayback();
+        playback.Reload(new[] { new PageDefinition
+        {
+            Id = "scroll", Line1Template = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            Line2Template = "123456789012345678901234",
+            Line1OverflowMode = "PingPong", Line2OverflowMode = "Truncate",
+            ScrollStepMilliseconds = 200, ScrollEdgePauseMilliseconds = 400,
+            RefreshIntervalMilliseconds = 60000
+        } });
+        var now = DateTimeOffset.UnixEpoch;
+        var values = new Dictionary<string, object?>();
+        playback.Tick(now, values);
+        var frame = playback.Tick(now.AddMilliseconds(400), values)!;
+        Assert.Equal("BCDEFGHIJKLMNOPQRSTU", frame.Line1);
+        Assert.Equal("12345678901234567890", frame.Line2);
+    }
+
+    [Fact]
+    public void ScrollPositionResetsWhenPageChanges()
+    {
+        var playback = new PagePlayback();
+        playback.Reload(new[]
+        {
+            new PageDefinition { Id = "a", Line1Template = "ABCDEFGHIJKLMNOPQRSTUVWXYZ", DurationSeconds = 2, ScrollEdgePauseMilliseconds = 100 },
+            new PageDefinition { Id = "b", Line1Template = "123456789012345678901234", DurationSeconds = 2, ScrollEdgePauseMilliseconds = 100 }
+        });
+        var now = DateTimeOffset.UnixEpoch;
+        var values = new Dictionary<string, object?>();
+        playback.Tick(now, values);
+        Assert.StartsWith("BCDE", playback.Tick(now.AddMilliseconds(100), values)!.Line1);
+        Assert.Equal("12345678901234567890", playback.Tick(now.AddSeconds(2), values)!.Line1);
+        Assert.Equal("ABCDEFGHIJKLMNOPQRST", playback.Tick(now.AddSeconds(4), values)!.Line1);
+    }
+
 }
