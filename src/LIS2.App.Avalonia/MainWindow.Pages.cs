@@ -44,6 +44,7 @@ public partial class MainWindow
         };
         foreach (var name in new[] { "PageLine1", "PageLine2" })
             this.FindControl<TextBox>(name)!.TextChanged += (_, _) => RefreshPagePreview();
+        InitializePageTools();
         _pages.Add();
         RefreshPageList(0);
     }
@@ -141,6 +142,9 @@ public partial class MainWindow
             p.Line1OverflowMode = OverflowName(this.FindControl<ComboBox>("PageOverflow1")!.SelectedIndex);
             p.Line2OverflowMode = OverflowName(this.FindControl<ComboBox>("PageOverflow2")!.SelectedIndex);
             p.Enabled = this.FindControl<CheckBox>("PageEnabled")!.IsChecked == true;
+            if (!string.IsNullOrWhiteSpace(p.VisibilityExpression) &&
+                !LIS2.Display.VisibilityEvaluator.TryParse(p.VisibilityExpression, out _, out _, out _))
+                throw new InvalidOperationException("Invalid visibility expression.");
             RefreshPageList(i);
             SetVirtualStatus($"Saved page '{p.Name}' in editor workspace.");
         }
