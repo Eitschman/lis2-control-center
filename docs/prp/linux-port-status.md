@@ -2,7 +2,7 @@
 
 Date: 2026-10-13
 Branch: `feature/linux-avalonia`
-Status: **Initial shared Avalonia desktop shell committed; compilation and runtime not yet verified**
+Status: **Shared Avalonia shell with selectable navigation committed; compilation and runtime not yet verified**
 
 ## Target architecture
 - ONE Avalonia UI and application runtime for Windows x64 and Linux x64/ARM64.
@@ -18,18 +18,20 @@ Status: **Initial shared Avalonia desktop shell committed; compilation and runti
 - Added `src/LIS2.App.Avalonia` with `net8.0`, Avalonia 11.3.6 references, `Program`, `App`, and a static main window displaying ten navigation labels. This is a nonfunctional UI shell, not a port of the existing WPF workflows.
 - Expanded GitHub Actions matrix to Windows and Ubuntu for both portable unit tests and Avalonia shell compilation.
 
+- Made all ten sidebar sections selectable in the shared Avalonia shell; selection updates the section heading and explicitly labels unavailable functionality. This is not feature parity.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
 - No .NET SDK is installed in the current execution environment; local `dotnet build` / `dotnet test` could not be run.
-- The GitHub Actions workflow has been committed, but its result has not been confirmed. Do not mark Linux tests green until Actions succeeds.
+- GitHub commit status query returned no reported statuses and the PR-run endpoint returned no runs for the previous commit. This does NOT prove either success or failure. A local container execution attempt failed with an infrastructure ClientError; therefore no actual compile/test was performed. Do not mark Windows or Linux tests green until Actions succeeds.
 - Avalonia package references and a static UI shell have been added, but package restore, Windows/Linux compilation and GUI startup have not yet been confirmed.
 - The Windows release workflow and WPF source files have not been modified.
 
 ## Next work
 1. Confirm Ubuntu workflow success and Windows solution CI.
 2. Introduce platform-neutral application runtime with tests while preserving WPF behavior.
-3. Confirm the shared Avalonia shell builds and launches on Windows and Linux; then add real navigation, shared view models and a virtual LIS2 smoke test.
+3. Confirm the shared Avalonia shell builds and launches on Windows and Linux; then add shared view models and a virtual LIS2 smoke test.
 4. Implement Windows and Linux providers, then UI feature parity and physical-device safety validation on both systems.
 
 ## Pull request gate
