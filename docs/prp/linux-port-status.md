@@ -192,3 +192,20 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Connect-with-safety failure containment (2026-10-13)
 - Retain the safe fan frame before the first connect-time write and attempt a safety-frame retry before transport close if that initial write fails. The safety attempt is best-effort; physical verification remains deferred by owner.
+
+## Paket 1 acceptance audit (2026-10-13)
+
+**Result: NOT ACCEPTED.** Audit performed against `docs/prp/linux-avalonia-port.md` and the WPF/Avalonia source. Hardware tests are explicitly deferred by owner and are not part of this audit.
+
+| Gate | Evidence | Result |
+|---|---|---|
+| Windows + Ubuntu CI | `f5f41cf9555bb5966310285533646b283e061f63`, Actions run `38452801359`: all four jobs successful | PASS |
+| Headless four-channel fan runtime | Runtime, simulated sensors/sink, regression tests and successful CI | PASS (automated scope) |
+| Single-owner serial fan/display, authorization and shutdown | `UnifiedLis2Session`, `SerialDisplaySession`, virtual transport tests, successful CI | PASS (automated scope; physical state unverified) |
+| Windows/Linux temperature providers | `WindowsHardwareFanSensors`, Linux hwmon source and dry-run UI present | PARTIAL: sensor identity/alias and freshness parity not fully proven |
+| Fan editor/configuration | Four-channel editor, persistence, simulated and live dry-run, explicit opt-in | PARTIAL: WPF interaction/layout parity not verified |
+| Complete WPF-equivalent Avalonia UI | WPF `MainWindow.xaml` vs Avalonia `MainWindow.axaml` have different navigation/device layout and missing comparable controls | FAIL |
+| Visual and interactive screenshot parity | No matched-resolution WPF/Avalonia screenshots or interactive desktop acceptance evidence | NOT TESTED |
+| Physical LIS2 hardware | Explicitly excluded by owner | EXCLUDED |
+
+**Blocking work:** port the WPF layout and screen interactions to Avalonia without redesign; create per-screen parity matrix, automate interaction/screenshot comparisons and run desktop smoke checks; close outstanding sensor-key compatibility and error-path coverage. The existing four green CI jobs prove compilation/tests, not visual/functional UI parity. Do not mark package 1 done until these gates pass. WPF stays read-only reference and main remains unchanged.
