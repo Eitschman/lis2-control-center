@@ -12,6 +12,10 @@ public sealed class PagePlayback
     private DateTimeOffset _nextSwitch;
     private DateTimeOffset _nextRefresh;
     private DisplayFrame? _lastFrame;
+    private readonly PingPongScroller _line1Scroller = new();
+    private readonly PingPongScroller _line2Scroller = new();
+    private string _renderedLine1 = string.Empty;
+    private string _renderedLine2 = string.Empty;
 
     public string? CurrentPageId => _current?.Id;
 
@@ -30,6 +34,10 @@ public sealed class PagePlayback
         _nextSwitch = default;
         _nextRefresh = default;
         _lastFrame = null;
+        _renderedLine1 = string.Empty;
+        _renderedLine2 = string.Empty;
+        _line1Scroller.Reset(string.Empty, DateTimeOffset.MinValue);
+        _line2Scroller.Reset(string.Empty, DateTimeOffset.MinValue);
     }
 
     public DisplayFrame? Tick(DateTimeOffset now, IReadOnlyDictionary<string, object?> values)
@@ -49,10 +57,26 @@ public sealed class PagePlayback
             if (!ReferenceEquals(previous, _current))
                 _nextRefresh = default;
         }
-        if (_lastFrame is not null && now < _nextRefresh)
-            return _lastFrame;
-        _lastFrame = _renderer.RenderFrame(_current.Line1Template, _current.Line2Template, values);
-        _nextRefresh = now + (_current.RefreshInterval ?? TimeSpan.FromSeconds(1));
+        if (!ReferenceEquals(previous, _current))
+        {
+            _renderedLine1 = string.Empty;
+            _renderedLine2 = string.Empty;
+            _line1Scroller.Reset(string.Empty, now);
+            _line2Scroller.Reset(string.Empty, now);
+        }
+
+        if (_lastFrame is null || now >= _nextRefresh || !ReferenceEquals(previous, _current))
+        {
+            _renderedLine1 = _renderer.Render(_current.Line1Template, values);
+            _renderedLine2 = _renderer.Render(_current.Line2Template, values);
+            _nextRefresh = now + (_current.RefreshInterval ?? TimeSpan.FromSeconds(1));
+        }
+
+        _lastFrame = new DisplayFrame(
+            _line1Scroller.Render(_renderedLine1, now, _current.Line1OverflowMode,
+                _current.ScrollStepInterval, _current.ScrollEdgePause),
+            _line2Scroller.Render(_renderedLine2, now, _current.Line2OverflowMode,
+                _current.ScrollStepInterval, _current.ScrollEdgePause));
         return _lastFrame;
     }
 
