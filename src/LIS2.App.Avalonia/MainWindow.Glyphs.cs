@@ -19,4 +19,30 @@ public partial class MainWindow
         };
         LoadGlyphEditor();
     }
+
+    private void LoadGlyphEditor()
+    {
+        var slot = this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1;
+        if (slot is < 1 or > 8) return;
+        var glyph = _glyphs.GetSlot(slot);
+        this.FindControl<TextBox>("GlyphName")!.Text = glyph.Name;
+        this.FindControl<TextBox>("GlyphBitmapEditor")!.Text = GlyphBitmap.Format(glyph.Rows);
+        RefreshGlyphPreview();
+    }
+
+    private void RefreshGlyphPreview()
+    {
+        var slot = this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1;
+        if (slot is < 1 or > 8) return;
+        this.FindControl<TextBlock>("GlyphTemplateKey")!.Text = $"{{Glyph.{slot}}}";
+        try
+        {
+            var rows = GlyphBitmap.Parse(this.FindControl<TextBox>("GlyphBitmapEditor")!.Text);
+            this.FindControl<TextBlock>("GlyphPixelPreview")!.Text = GlyphBitmap.Preview(rows);
+        }
+        catch (ArgumentException)
+        {
+            this.FindControl<TextBlock>("GlyphPixelPreview")!.Text = "Invalid 5x8 bitmap";
+        }
+    }
 }
