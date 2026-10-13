@@ -13,6 +13,23 @@ public static class WindowsSettingsImporter
             throw new InvalidOperationException("Windows settings must be a JSON object.");
 
         var result = new PortableWorkspace();
+        if (root.TryGetProperty("BrightnessPercent", out var brightness) &&
+            brightness.ValueKind == JsonValueKind.Number &&
+            brightness.TryGetInt32(out var percent) &&
+            percent is 25 or 50 or 75 or 100)
+            result.BrightnessPercent = percent;
+        if (root.TryGetProperty("ProgramCustomGlyphsOnConnect", out var programGlyphs) &&
+            programGlyphs.ValueKind is JsonValueKind.True or JsonValueKind.False)
+            result.ProgramCustomGlyphsOnConnect = programGlyphs.GetBoolean();
+        if (root.TryGetProperty("ThemeMode", out var theme) && theme.ValueKind == JsonValueKind.String)
+        {
+            var mode = theme.GetString();
+            if (mode is "System" or "Light" or "Dark")
+                result.ThemeMode = mode;
+        }
+        if (root.TryGetProperty("LanguageMode", out var language) && language.ValueKind == JsonValueKind.String)
+            result.LanguageMode = language.GetString() ?? "System";
+
         if (root.TryGetProperty("Pages", out var pages))
         {
             if (pages.ValueKind != JsonValueKind.Array)
