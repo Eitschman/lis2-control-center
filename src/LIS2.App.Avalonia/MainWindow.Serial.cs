@@ -120,6 +120,7 @@ public partial class MainWindow
     private async Task RunSerialActionAsync(Func<Task> action)
     {
         if (_serialBusy) return;
+        if (_serialPlaybackBusy) return;
         StopSerialPlayback();
         _serialBusy = true;
         UpdateSerialControls();
