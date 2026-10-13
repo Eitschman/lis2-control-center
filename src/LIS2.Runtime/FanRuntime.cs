@@ -78,7 +78,14 @@ public sealed class FanRuntime : IAsyncDisposable
         try
         {
             ThrowIfDisposed();
-            var snapshot = _sensors.Snapshot();
+            // A sensor provider can fail transiently (unplugged device, sysfs I/O).
+            // Treat it as missing readings rather than abandoning fan regulation.
+            IReadOnlyDictionary<string, object?> snapshot;
+            try { snapshot = _sensors.Snapshot() ?? new Dictionary<string, object?>(); }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                snapshot = new Dictionary<string, object?>();
+            }
             var outputs = new int[4];
             var sensorValues = new double?[4];
             var states = new FanChannelState[4];

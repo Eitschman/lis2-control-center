@@ -59,6 +59,22 @@ public sealed class FanRuntimeTests
     }
 
     [Fact]
+    public async Task SensorProviderFailureAppliesFailSafeToAllDependentChannels()
+    {
+        var sink = new SimulatedFanOutput();
+        await using var runtime = new FanRuntime(new ThrowingSensors(), sink, Config(FanMode.Curve));
+        await runtime.SetOutputEnabledAsync(true);
+        var state = await runtime.TickAsync();
+        Assert.All(state.Channels, c => { Assert.False(c.SensorValid); Assert.Equal(85, c.OutputPercent); });
+        Assert.Equal(new[] { 85, 85, 85, 85 }, sink.Writes.Single());
+    }
+
+    private sealed class ThrowingSensors : IFanSensorSource
+    {
+        public IReadOnlyDictionary<string, object?> Snapshot() => throw new IOException("sensor disconnected");
+    }
+
+    [Fact]
     public async Task CurveHysteresisAndThresholdMatchFanController()
     {
         var sensors = new SimulatedFanSensors();

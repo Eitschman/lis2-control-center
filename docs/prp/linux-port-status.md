@@ -147,3 +147,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Explicit fan runtime session lifecycle (2026-10-13)
 - Added AuthorizedFanRuntimeSession, an opt-in headless coordinator for unified serial safe-frame initialization, immediate four-channel evaluation, periodic FanRuntimeLoop, fault exposure, and ordered stop/drain/safe-frame disconnect. Virtual transport test checks first/last frames and initial regulated frame. NOT connected to the Avalonia live UI; physical hardware remains disabled by default. Device validation and further failure-mode tests remain required.
+
+## Sensor-provider I/O fail-safe (2026-10-13)
+- Sensor snapshot exceptions are treated as missing readings, so sensor-dependent channels still calculate and (when explicitly enabled) write their configured fail-safe outputs rather than silently stopping regulation. Added regression test for an I/O-failing provider. Physical fan output remains UI-disabled pending complete end-to-end safety acceptance.
