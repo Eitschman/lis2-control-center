@@ -6,6 +6,7 @@ namespace LIS2.App.Avalonia;
 public sealed class PortableWorkspaceStore
 {
     private readonly string _path;
+    private readonly SemaphoreSlim _saveLock = new(1, 1);
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
 
     public PortableWorkspaceStore(string? path = null)
@@ -37,11 +38,16 @@ public sealed class PortableWorkspaceStore
     public async Task SaveAsync(PortableWorkspace workspace)
     {
         ArgumentNullException.ThrowIfNull(workspace);
-        var directory = Path.GetDirectoryName(_path);
-        if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
-        var temp = _path + ".tmp";
-        await File.WriteAllTextAsync(temp, JsonSerializer.Serialize(workspace, Options));
-        File.Move(temp, _path, overwrite: true);
+        await _saveLock.WaitAsync();
+        try
+        {
+            var directory = Path.GetDirectoryName(_path);
+            if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
+            var temp = _path + ".tmp";
+            await File.WriteAllTextAsync(temp, JsonSerializer.Serialize(workspace, Options));
+            File.Move(temp, _path, overwrite: true);
+        }
+        finally { _saveLock.Release(); }
     }
 }
 
