@@ -49,7 +49,7 @@
           <TextBlock Name="ConnectionText" Text="Disconnected" FontWeight="SemiBold" />
         </Border>
       </Grid>
-      <ScrollViewer Grid.Row="1">
+      <ScrollViewer Name="DashboardView" Grid.Row="1">
         <StackPanel Spacing="14">
           <Grid ColumnDefinitions="3*,14,2*">
             <Border Grid.Column="0" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
@@ -114,6 +114,91 @@
           </Border>
         </StackPanel>
       </ScrollViewer>
+    <ScrollViewer Name="DisplayView" Grid.Row="1" IsVisible="False">
+      <StackPanel Spacing="14">
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Quick Display Test" FontWeight="SemiBold" FontSize="16" />
+            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
+              <TextBlock Grid.Row="0" Text="Line 1" VerticalAlignment="Center" Margin="0,0,10,9" />
+              <TextBox Name="Line1TextBox" Grid.Row="0" Grid.Column="1" Text="LIS2 Control Center" Margin="0,0,10,9" />
+              <Button Name="SendLine1" Grid.Row="0" Grid.Column="2" Content="Send" Margin="0,0,0,9" />
+              <TextBlock Grid.Row="1" Text="Line 2" VerticalAlignment="Center" Margin="0,0,10,9" />
+              <TextBox Name="Line2TextBox" Grid.Row="1" Grid.Column="1" Text="Virtual device" Margin="0,0,10,9" />
+              <Button Name="SendLine2" Grid.Row="1" Grid.Column="2" Content="Send" Margin="0,0,0,9" />
+              <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="7">
+                <Button Name="RenderBoth" Content="Render both lines" />
+                <Button Name="ClearDisplay" Content="Clear" />
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Character ROM / Special Characters" FontWeight="SemiBold" FontSize="16" />
+            <TextBlock Text="Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display." TextWrapping="Wrap" Opacity="0.7" />
+            <WrapPanel>
+              <Button Content="Send special-character test" IsEnabled="False" Margin="0,0,8,0" />
+              <TextBlock Text="Ä Ö Ü  ä ö ü  ß  °  µ  ±  £  ×  ÷  ← →  Ω π Σ √ ∞" FontFamily="Consolas" />
+            </WrapPanel>
+            <StackPanel Orientation="Horizontal" Spacing="7">
+              <TextBlock Text="ROM start byte" VerticalAlignment="Center" />
+              <TextBox Text="80" Width="90" IsEnabled="False" />
+              <Button Content="Previous" IsEnabled="False" />
+              <Button Content="Send 40 bytes" IsEnabled="False" />
+              <Button Content="Next" IsEnabled="False" />
+              <TextBlock Text="80-A7" VerticalAlignment="Center" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Custom Characters / CG Builder" FontWeight="SemiBold" FontSize="16" />
+            <CheckBox Content="Program saved glyphs on connect" IsEnabled="False" />
+            <Grid ColumnDefinitions="190,220,24,*">
+              <StackPanel Grid.Column="0" Spacing="5">
+                <TextBlock Text="Slot" />
+                <ComboBox IsEnabled="False" />
+                <TextBlock Text="Name" />
+                <TextBox IsEnabled="False" />
+                <TextBlock Text="Template key" />
+                <TextBlock Text="{Glyph.1}" FontFamily="Consolas" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="5">
+                <TextBlock Text="5x8 bitmap (8 rows)" />
+                <TextBox AcceptsReturn="True" Height="150" IsEnabled="False" Text="00000&#10;00000&#10;00000&#10;00000&#10;00000&#10;00000&#10;00000&#10;00000" />
+              </StackPanel>
+              <Border Grid.Column="3" Background="#07190E" CornerRadius="5" Padding="16">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····" FontFamily="Consolas" FontSize="22" Foreground="#70EF86" />
+                  <TextBlock Text="20x2 template preview" />
+                </StackPanel>
+              </Border>
+            </Grid>
+            <WrapPanel>
+              <Button Content="Save glyph" IsEnabled="False" />
+              <Button Content="Send slot to LIS2" IsEnabled="False" />
+              <Button Content="Send all 8 slots" IsEnabled="False" />
+              <Button Content="Load set..." IsEnabled="False" />
+              <Button Content="Save set..." IsEnabled="False" />
+              <Button Content="Load examples" IsEnabled="False" />
+            </WrapPanel>
+            <TextBlock Text="Use {Glyph.Name} or {Glyph.1} through {Glyph.8} in page templates." Opacity="0.7" />
+          </StackPanel>
+        </Border>
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Brightness" FontWeight="SemiBold" FontSize="16" />
+            <StackPanel Orientation="Horizontal" Spacing="7">
+              <Button Name="Brightness100" Content="100%" />
+              <Button Name="Brightness75" Content="75%" />
+              <Button Name="Brightness50" Content="50%" />
+              <Button Name="Brightness25" Content="25%" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
     </Grid>
   </Grid>
 </Window>
