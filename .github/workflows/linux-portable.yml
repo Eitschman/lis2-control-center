@@ -1,0 +1,31 @@
+name: Linux portable libraries
+
+on:
+  push:
+    branches:
+      - feature/linux-avalonia
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    name: Linux .NET 8 shared libraries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Test portable core
+        run: dotnet test tests/LIS2.Core.Tests/LIS2.Core.Tests.csproj --configuration Release
+      - name: Test portable display
+        run: dotnet test tests/LIS2.Display.Tests/LIS2.Display.Tests.csproj --configuration Release
+      - name: Test portable fans
+        run: dotnet test tests/LIS2.Fans.Tests/LIS2.Fans.Tests.csproj --configuration Release
