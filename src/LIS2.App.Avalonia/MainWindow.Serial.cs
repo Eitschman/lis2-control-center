@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using LIS2.Core;
 
 namespace LIS2.App.Avalonia;
 
@@ -61,6 +62,40 @@ public partial class MainWindow
                 await (_serialDisplay ?? throw new InvalidOperationException("Serial display not connected.")).ClearAsync();
                 SetSerialStatus("Serial LIS2 display cleared.");
             });
+        this.FindControl<Button>("SerialSendPage")!.Click += async (_, _) =>
+            await RunSerialActionAsync(async () =>
+            {
+                if (SelectedPageIndex is not int i)
+                    throw new InvalidOperationException("Select a page first.");
+                if (!SavePageEditor())
+                    throw new InvalidOperationException("Page contains invalid settings.");
+                var frame = _pages.Preview(i, PagePreviewValues());
+                await (_serialDisplay ?? throw new InvalidOperationException("Serial display not connected."))
+                    .RenderBothAsync(frame.Line1, frame.Line2);
+                SetSerialStatus($"Sent page '{_pages.Get(i).Name}' to serial LIS2.");
+            });
+        this.FindControl<Button>("SerialSendGlyphs")!.Click += async (_, _) =>
+            await RunSerialActionAsync(async () =>
+            {
+                await (_serialDisplay ?? throw new InvalidOperationException("Serial display not connected."))
+                    .ProgramAllGlyphsAsync(_glyphs.Glyphs);
+                SetSerialStatus("Programmed all 8 glyph slots on serial LIS2.");
+            });
+        this.FindControl<Button>("SerialApplyBrightness")!.Click += async (_, _) =>
+            await RunSerialActionAsync(async () =>
+            {
+                var brightness = this.FindControl<ComboBox>("SerialBrightness")!.SelectedIndex switch
+                {
+                    0 => Lis2Brightness.Percent100,
+                    1 => Lis2Brightness.Percent75,
+                    2 => Lis2Brightness.Percent50,
+                    3 => Lis2Brightness.Percent25,
+                    _ => throw new InvalidOperationException("Select a brightness level.")
+                };
+                await (_serialDisplay ?? throw new InvalidOperationException("Serial display not connected."))
+                    .SetBrightnessAsync(brightness);
+                SetSerialStatus("Serial LIS2 brightness updated.");
+            });
         RefreshSerialPorts();
     }
 
@@ -100,6 +135,9 @@ public partial class MainWindow
         this.FindControl<Button>("SerialDisconnect")!.IsEnabled = !_serialBusy && _serialDisplay is not null;
         this.FindControl<Button>("SerialSendLines")!.IsEnabled = !_serialBusy && connected;
         this.FindControl<Button>("SerialClear")!.IsEnabled = !_serialBusy && connected;
+        this.FindControl<Button>("SerialSendPage")!.IsEnabled = !_serialBusy && connected;
+        this.FindControl<Button>("SerialSendGlyphs")!.IsEnabled = !_serialBusy && connected;
+        this.FindControl<Button>("SerialApplyBrightness")!.IsEnabled = !_serialBusy && connected;
     }
 
     private void SetSerialStatus(string message) =>
