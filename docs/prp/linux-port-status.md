@@ -100,3 +100,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 Open a PR against `main` only when a coherent, tested slice is ready. Keep this branch isolated until then.
 
 - Runtime Core consolidation candidate (2026-10-13): moved portable source/page/scheduler/output/clock/periodic ownership into LIS2.Runtime through linked compile files, introduced adaptive display driver and shared priority event queue for Avalonia virtual/serial output; added headless deadline, priority, lifecycle and drain regression tests. WPF untouched and is reference only. Validation required before marking package complete.
+
+## Fan safety phase 1 (headless; hardware disabled)
+- Added LIS2.Runtime.FanRuntime with four-channel configuration snapshots, existing LIS2.Fans.FanController calculation, finite sensor validation, curve/hysteresis history, explicit opt-in output, write-on-change, serialized ticks, reset on disconnect/reconfigure and safe failed-write retry.
+- Added IFanSensorSource/IFanOutputSink and deterministic SimulatedFanSensors/SimulatedFanOutput; FanRuntimeLoop provides periodic evaluation and drain on shutdown. No physical serial fan writes or Avalonia fan control are enabled by this phase.
+- Headless tests cover dry-run, all four outputs, modes, invalid sensors/fail-safe, hysteresis, reconfigure, disconnect, failed writes and concurrent ticks. CI and real-hardware validation are separate; Phase 2 must connect platform sensors, hardware, UI and settings.
