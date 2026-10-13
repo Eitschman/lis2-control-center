@@ -52,26 +52,30 @@ public partial class MainWindow
         }
     }
 
+    private PortableWorkspace CapturePortableWorkspace() => new()
+    {
+        Pages = System.Text.Json.JsonSerializer.Deserialize<List<PageDefinition>>(_pages.ExportJson()) ?? new(),
+        HomeAssistantUrl = this.FindControl<TextBox>("HaUrl")!.Text ?? string.Empty,
+        CustomGlyphs = _glyphs.Glyphs.Select(g => new CustomGlyphSettings
+        {
+            Name = g.Name, Rows = g.Rows.ToArray()
+        }).ToList(),
+        HomeAssistantEntityPreferences = _haPreferences.Select(p => new PortableHaEntityPreference
+        {
+            EntityId = p.EntityId, Alias = p.Alias, IsFavorite = p.IsFavorite
+        }).ToList(),
+        BrightnessPercent = _preferredBrightness,
+        ThemeMode = _preferredTheme,
+        LanguageMode = _preferredLanguage,
+        ProgramCustomGlyphsOnConnect = this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true
+    };
+
     private async Task SavePortableWorkspaceAsync(bool throwOnFailure = false)
     {
         if (!_workspaceLoaded) return;
         try
         {
-            await _workspaceStore.SaveAsync(new PortableWorkspace
-            {
-                Pages = System.Text.Json.JsonSerializer.Deserialize<List<PageDefinition>>(_pages.ExportJson())
-                    ?? new List<PageDefinition>(),
-                HomeAssistantUrl = this.FindControl<TextBox>("HaUrl")!.Text ?? string.Empty,
-                CustomGlyphs = _glyphs.Glyphs.Select(g => new CustomGlyphSettings
-                {
-                    Name = g.Name, Rows = g.Rows.ToArray()
-                }).ToList(),
-                HomeAssistantEntityPreferences = _haPreferences.ToList(),
-                BrightnessPercent = _preferredBrightness,
-                ThemeMode = _preferredTheme,
-                LanguageMode = _preferredLanguage,
-                ProgramCustomGlyphsOnConnect = this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true
-            });
+            await _workspaceStore.SaveAsync(CapturePortableWorkspace());
         }
         catch (Exception ex)
         {
