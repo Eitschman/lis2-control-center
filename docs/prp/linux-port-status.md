@@ -80,6 +80,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - Overflow integration: shared `PagePlayback` now uses the existing `LIS2.Display.PingPongScroller` independently per line, honoring PingPong/Marquee/Truncate, scroll step interval, edge pause, and resetting scroll position on page changes. Template value refresh remains separately throttled by each page's refresh interval, while scrolling continues between refreshes. Added deterministic tests for modes, independent lines, and reset on page switch. Both virtual and serial playback use this shared engine. CI and hardware behavior pending verification.
 
+- Headless frame dispatch extraction: added `PageFrameDispatcher` (serialized writes, duplicate-frame suppression, one-time clear for no visible page, failed-write retry), reused by virtual and serial page playback. Added headless regression tests including concurrent dispatch and failure/retry; guarded playback restart while an output write is in flight. UI timer orchestration remains in Avalonia and is not yet a standalone runtime service. CI pending.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
