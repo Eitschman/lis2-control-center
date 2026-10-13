@@ -49,14 +49,14 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 
 **Archive-wide static inventory complete (2026-10-13):** 172 files, 113 C# source files, 19 .NET projects, eight test projects. Static scan is not a Linux build or complete semantic code review. **Critical discovery:** `Directory.Build.props` globally targets `net8.0-windows10.0.19041.0`; portable libraries must be retargeted explicitly. `MainWindow.xaml.cs` currently has 4551 lines. `LIS2.ProtocolTester` is also WPF. See [verified inventory](linux-port-inventory.md).
 
-## Phase 1 — Decouple runtime from WPF
+## Phase 1 — Extract WPF behavior into Avalonia and portable runtime
 - [ ] Add a UI-independent `src/LIS2.Runtime` project (name provisional), with lifecycle/start/stop, app orchestration and dependency injection.
 - [ ] Move scheduler, display update runner, event queue, source lifecycle and timers out of `MainWindow.xaml.cs`.
 - [ ] Move fan regulation loops out of WPF dispatcher; use cancellation-aware async services and enforce safe shutdown.
 - [ ] Extract application state/view models and commands; UI must only bind/invoke services.
 - [ ] Introduce platform service contracts for media, hardware sensors, serial-port discovery, tray, autostart, secrets and OS appearance.
 - [ ] Preserve existing template variable names and settings compatibility; write migration tests.
-- [ ] Keep WPF as Windows adapter until Avalonia parity is proven.
+- [ ] Keep WPF unchanged solely as a temporary behavioral/visual reference until Avalonia Windows parity is verified; DO NOT integrate WPF as a runtime adapter.
 - [ ] Add headless runtime tests with virtual transport and deterministic clocks/timers.
 
 ## Phase 2 — Shared libraries and Linux providers
@@ -104,7 +104,15 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 - [ ] Test real LIS2 hardware only with explicit controlled fan-safe procedure; keep virtual transport as default during development.
 - [ ] Verify existing Windows WPF build and native gen_lis2.dll remain unchanged during migration; add and validate Windows Avalonia win-x64 packaging and regression tests before switching the release.
 - [ ] Review crash handling, permissions, logs, restart behavior, disconnected sensors, and serial unplug/replug.
-- [ ] Update README, architecture, troubleshooting and user guide; decide whether WPF retirement is warranted only after parity.
+- [ ] Update README, architecture, troubleshooting and user guide; retire WPF as a REQUIRED end-state after verified Avalonia parity, not an optional decision.
+
+## Non-negotiable product goal: REMOVE WPF (owner directive, 2026-10-13)
+
+- **Final product is ONE Avalonia application for BOTH Windows and Linux (including Linux ARM64). WPF must be removed from the product and release after verified functional, visual, and hardware-safety parity.** WPF is NOT a supported long-term frontend, runtime client, or alternate Windows UI.
+- **During migration, existing WPF code is read-only reference material** for exact behavior, screen layout, settings, templates, dynamic scheduling, fan safety, and regression expectations. Keep it buildable temporarily as a regression baseline, but do NOT spend implementation effort wiring WPF to `LIS2.Runtime`, extracting WPF adapters, or maintaining dual frontends as an architectural objective.
+- Phase 1 Runtime Core: implement the shared portable orchestration for the **Avalonia target only**; read WPF implementation for parity but integrate only Avalonia. Phase 1 Integration & Safety: fan runtime, Avalonia view models and adapters, headless tests, configuration compatibility. Any earlier checklist demanding WPF runtime integration is superseded by this rule.
+- **Removal gate:** after Avalonia parity and Windows/Linux/ARM64 packaging are verified, remove WPF app/project and WPF-only build/release jobs and update docs. Do not delete the reference prematurely before comparison and safe validation. WPF retirement is mandatory, not a future optional decision.
+- This section takes precedence over any other text suggesting WPF is a permanent Windows adapter. Do not silently reintroduce that work in future chats.
 
 ## Binding implementation workflow: STRICT package/commit gate (owner directive, 2026-10-13)
 
@@ -112,7 +120,7 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 
 ### Immutable agreed scope for Phase 1 / Package 1
 - **Runtime Core (logical commit 1):** finish Phase 1 steps 1–4 and 6 together: standalone portable runtime, display scheduling/event/output orchestration, source lifecycle, timers, concurrency/reconnect/shutdown, and platform contracts. Integration, regression tests, and documentation are part of the same deliverable.
-- **Integration & Safety (logical commit 2):** finish steps 5, 7, 8 together: move fan regulation loops without changing safety semantics, integrate WPF/Avalonia adapters, state/view models/commands, headless/compatibility/migration tests and docs.
+- **Integration & Safety (logical commit 2):** finish steps 5, 7, 8 together: move fan regulation loops without changing safety semantics, integrate Avalonia adapters (NOT WPF adapters), state/view models/commands, headless/compatibility/migration tests and docs.
 - Historical commit `1e0dc5d7` is **only an incomplete Runtime Core checkpoint**, not completion of logical commit 1. Do not rewrite published history without permission; finish the remainder in ONE cohesive completion commit. The historical partial commit does not justify further partial pushes.
 
 ### NON-NEGOTIABLE PRE-PUSH CHECKLIST (all must pass)
@@ -129,7 +137,7 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 - Immediately before **every** create_tree/create_commit/update_ref or equivalent, compare the complete staged file set with the agreed package checklist. If anything is missing, **DO NOT COMMIT**.
 - A partially complete package must stay **OPEN** even when all existing CI tests are green.
 - If completion cannot be guaranteed in the current session, explain the actual remaining work and preserve a precise handover; do not push an unfinished checkpoint.
-- Preserve WPF Windows behavior, 1:1 UI parity, fan fail-safe, serialized hardware writes, and the isolated feature branch. Hardware safety cannot be traded for fewer commits.
+- Preserve existing WPF Windows behavior only as an untouched migration reference until Avalonia parity is verified; DO NOT add a WPF runtime adapter. Preserve 1:1 UI parity, fan fail-safe, serialized hardware writes, and the isolated feature branch. Hardware safety cannot be traded for fewer commits.
 
 ## Implementation ordering and checkpoints
 1. **Gate A:** Inventory and feature matrix approved; baseline Windows CI green.
