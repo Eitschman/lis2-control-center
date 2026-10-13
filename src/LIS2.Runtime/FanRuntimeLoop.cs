@@ -8,6 +8,10 @@ public sealed class FanRuntimeLoop : IAsyncDisposable
     private readonly object _gate = new();
     private CancellationTokenSource? _stop;
     private Task? _task;
+    private Exception? _lastFault;
+
+    public Exception? LastFault { get { lock (_gate) return _lastFault; } }
+    public event Action<Exception>? Faulted;
 
     public FanRuntimeLoop(FanRuntime runtime, TimeSpan? interval = null)
     {
@@ -21,6 +25,7 @@ public sealed class FanRuntimeLoop : IAsyncDisposable
         lock (_gate)
         {
             if (_stop is not null) return false;
+            _lastFault = null;
             _stop = new CancellationTokenSource();
             _task = RunAsync(_stop.Token);
             return true;
@@ -36,6 +41,17 @@ public sealed class FanRuntimeLoop : IAsyncDisposable
                 await _runtime.TickAsync(token).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+        catch (Exception ex)
+        {
+            // A failed hardware write must not leave a silent dead control loop.
+            // Disable output, clear history, and expose the failure to the operator.
+            try { await _runtime.SetOutputEnabledAsync(false, CancellationToken.None).ConfigureAwait(false); }
+            finally
+            {
+                lock (_gate) _lastFault = ex;
+                Faulted?.Invoke(ex);
+            }
+        }
     }
 
     public async Task StopAndDrainAsync()

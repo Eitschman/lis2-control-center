@@ -138,3 +138,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Live Linux hwmon sensor preview (2026-10-13)
 - Fan UI can now list current Linux hwmon sensor keys and calculate all four channel outputs from real read-only sensor snapshots without sending physical fan commands. Missing sensors continue to trigger runtime fail-safe. Windows displays no hwmon sensors (Windows provider still pending). Explicit hardware enable, continuous periodic fan runtime and safe lifecycle remain open.
+
+## Fan runtime loop fault isolation (2026-10-13)
+- The periodic fan loop now disables physical output on an unhandled tick/write exception and exposes LastFault/Faulted instead of silently terminating. No automatic reconnect. Live hardware activation remains disabled pending UI integration and safety validation.
