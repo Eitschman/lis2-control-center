@@ -41,6 +41,9 @@ Status: **Shared Avalonia shell with virtual LIS2 session committed; latest chan
 
 - CG Builder functional port expanded: original WPF `CustomGlyphSettings`, `CustomGlyphSetFile` and `BuiltInGlyphSets` copied to the cross-platform Avalonia project (same versioned `.lis2glyphs.json` schema); `GlyphWorkspace` implements eight slots, name/bitmap editing, validated JSON import/export, original examples; Avalonia storage-provider dialogs load/save sets, live 5x8 pixel preview, send-all 64-row virtual protocol operation, and optional virtual-connect auto-programming. Added workspace roundtrip/examples/send-all tests. Note: Save glyph updates in-memory workspace only; persistent app settings, per-pixel mouse grid, named template binding and real-device integration remain pending. Main integrated commit a31f630. CI on latest head pending.
 
+- Pages editor first functional block ported using the exact original WPF `PageDefinition` fields. `PageWorkspace` supports add/duplicate/delete/reorder, JSON roundtrip and `LIS2.Display.TemplateRenderer`-based 20x2 preview. Avalonia Pages view adds editing of name, both templates, duration, refresh, visibility expression, overflow modes, scroll timing and enabled state, plus virtual-device page send. Tests added for CRUD, templates, JSON and invalid imports. Commit 5b7d4b3. Not yet 1:1 complete: condition builder, template-variable picker, event test, persistent settings and full scrolling/scheduler integration remain pending; CI for integrated Pages view pending.
+- CG Builder integrated commits a31f630 and a5c85bed were verified successful on Windows and Linux CI; two red runs at intermediate commits 75d82759 and 348042e7 were superseded by green builds.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
