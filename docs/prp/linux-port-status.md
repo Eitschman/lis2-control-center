@@ -50,6 +50,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - Live virtual page playback integration: Avalonia Pages view now has Start/Stop sequence and active page status, with a guarded 250 ms dispatcher timer calling headless `PagePlayback.Tick`. Writes only when the 20x2 frame changes; validates selected page before starting, stops on disconnect/close/errors, never issues fan commands. Playback uses current in-memory pages and static preview values (no real source-provider updates yet), and changes to page definitions require restart. Commit sequence a6b49a4e, 54a9e1bd, 20f2a94a, 7781fb9f. CI pending; actual GUI behavior not yet manually verified.
 
+- First dynamic page source: `PageClockValues` exposes portable live `Clock.Time`, `Clock.Date`, `Clock.Hour`, `Clock.Minute`, `Clock.Second`, `Clock.Day`, `Clock.Month`, `Clock.Year`, `Clock.DayOfWeek` variables. Page editor preview and virtual page scheduler now consume current clock values on every tick, with xUnit regression tests. This does not yet reproduce all Windows WPF clock formatting or provider variables; media, sensors and HA are pending. Fixed PageTest sending invalid unsaved content. Commits 11e068c1, 8012c5f0, da0b67c1; CI pending.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
