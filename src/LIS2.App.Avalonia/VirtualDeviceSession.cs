@@ -46,6 +46,15 @@ public sealed class VirtualDeviceSession : IAsyncDisposable
     public Task ProgramGlyphAsync(int slot, byte[] rows, CancellationToken cancellationToken = default) =>
         _device.ProgramCharacterAsync(slot, rows, cancellationToken);
 
+    public async Task ProgramAllGlyphsAsync(IReadOnlyList<CustomGlyphSettings> glyphs, CancellationToken cancellationToken = default)
+    {
+        if (glyphs.Count != 8 || glyphs.Any(g => g.Rows is null || g.Rows.Length != 8 || g.Rows.Any(row => row > 31)))
+            throw new ArgumentException("Exactly eight valid 5x8 glyphs are required.", nameof(glyphs));
+
+        for (var slot = 1; slot <= 8; slot++)
+            await _device.ProgramCharacterAsync(slot, glyphs[slot - 1].Rows, cancellationToken);
+    }
+
     public Task ClearAsync(CancellationToken cancellationToken = default) =>
         _device.ClearAsync(cancellationToken);
 
