@@ -23,13 +23,16 @@ Deliver ONE shared Avalonia desktop application for Windows x64 and Linux x64/AR
 
 **Evidence limits:** Uploaded repository ZIP was fully enumerated and statically scanned (172 files); full semantic review, runtime tests, and real hardware validation are outstanding. See [inventory](linux-port-inventory.md).
 
+## Binding UI parity requirement (confirmed by project owner, 2026-10-13)
+The existing Windows WPF application is the **authoritative UI/UX specification**, not merely a feature checklist. The shared Avalonia app must preserve the same screen structure, tab order, control placement, dialog flows, terminology, keyboard/mouse interactions, resizing behavior, visual preview and theme behavior on BOTH Windows and Linux. Reuse the existing WPF layout and resources as the primary migration reference; do not invent a redesigned dashboard or reorganize controls for convenience. The current Avalonia sidebar and virtual-device buttons are temporary engineering scaffolding and are **not** approved as the final layout. Where WPF-specific widgets have no exact Avalonia equivalent, implement the closest behavior and document the discrepancy in a per-screen parity matrix. Compare real rendered screenshots at matching resolution and DPI, plus interaction tests, before marking any screen complete. OS-specific capabilities may differ internally, but they must not arbitrarily change the UI arrangement. Keep WPF intact until Windows Avalonia parity is proven.
+
 ## Definition of done
 - One shared Avalonia UI and shared runtime ship on Windows x64 AND Linux x64/ARM64; existing Winamp/GSMTC features remain available on Windows. Windows CI stays green throughout.
 - Avalonia desktop starts and runs on real Windows x64 and Linux x64 desktops; Linux ARM64 validated separately.
 - Serial LIS2 or virtual transport, brightness, glyphs, page templates, scroll/events, HA and four fan modes operate as applicable.
 - Linux MPRIS metadata, playback state and timeline available to page templates; missing player state handled.
 - Linux hardware sensors have stable identities and safe missing-sensor behavior; fan fail-safe verified under disconnect and invalid data.
-- UI pages, editors, localization, theme, tray, autostart, logs and settings parity documented; differences explicitly tracked.
+- UI pages, editors, localization, theme, tray, autostart, logs and settings parity documented; differences explicitly tracked. **Visual/layout/interaction parity against existing WPF is a hard acceptance criterion on both platforms.**
 - Linux artifacts, dependencies, install instructions, checksums, smoke tests and CI implemented.
 - No regression of safety-sensitive serial command ordering.
 
@@ -42,7 +45,7 @@ Deliver ONE shared Avalonia desktop application for Windows x64 and Linux x64/AR
 - [x] Locate Windows-specific settings, DPAPI, filesystem paths, registry, startup, tray, system theme, icon generation and diagnostic code by static source scan; behavior/edge cases remain to be tested.
 - [x] Enumerate all eight test projects and their test source files; identify virtual-LIS2 tests and outstanding hardware validation in TODO. Actual test execution and coverage measurement remain open.
 - [ ] Reconfirm current Avalonia/.NET version support and licensing from official documentation before selecting versions.
-- [ ] Document actual feature parity matrix (Windows baseline vs Linux target).
+- [ ] Document actual feature parity matrix (Windows baseline vs Windows Avalonia vs Linux Avalonia), including visual and interaction differences for every screen.
 
 **Archive-wide static inventory complete (2026-10-13):** 172 files, 113 C# source files, 19 .NET projects, eight test projects. Static scan is not a Linux build or complete semantic code review. **Critical discovery:** `Directory.Build.props` globally targets `net8.0-windows10.0.19041.0`; portable libraries must be retargeted explicitly. `MainWindow.xaml.cs` currently has 4551 lines. `LIS2.ProtocolTester` is also WPF. See [verified inventory](linux-port-inventory.md).
 
