@@ -32,6 +32,18 @@
           <Button Name="SerialConnect" Content="Connect serial display" HorizontalAlignment="Left" />
           <Button Name="SerialDisconnect" Content="Disconnect serial" HorizontalAlignment="Left" IsEnabled="False" />
           <Button Name="SerialSendLines" Content="Send display lines" HorizontalAlignment="Left" IsEnabled="False" />
+          <Button Name="SerialSendPage" Content="Send selected page" HorizontalAlignment="Left" IsEnabled="False" />
+          <Button Name="SerialSendGlyphs" Content="Program 8 glyphs" HorizontalAlignment="Left" IsEnabled="False" />
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBlock Text="Brightness" VerticalAlignment="Center" />
+            <ComboBox Name="SerialBrightness" SelectedIndex="0" Width="75">
+              <ComboBoxItem Content="100%" />
+              <ComboBoxItem Content="75%" />
+              <ComboBoxItem Content="50%" />
+              <ComboBoxItem Content="25%" />
+            </ComboBox>
+            <Button Name="SerialApplyBrightness" Content="Apply" IsEnabled="False" />
+          </StackPanel>
           <Button Name="SerialClear" Content="Clear serial display" HorizontalAlignment="Left" IsEnabled="False" />
           <TextBlock Name="SerialStatus" Text="Serial display disconnected; fan control unavailable." TextWrapping="Wrap" />
           <Button Name="VirtualConnect" Content="Connect virtual LIS2" HorizontalAlignment="Left" />
