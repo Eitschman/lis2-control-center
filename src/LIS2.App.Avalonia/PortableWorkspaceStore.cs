@@ -59,4 +59,8 @@ public sealed class PortableWorkspace
     public string HomeAssistantUrl { get; set; } = string.Empty;
     public List<CustomGlyphSettings> CustomGlyphs { get; set; } = new();
     public List<PortableHaEntityPreference> HomeAssistantEntityPreferences { get; set; } = new();
+    public int BrightnessPercent { get; set; } = 100;
+    public bool ProgramCustomGlyphsOnConnect { get; set; }
+    public string ThemeMode { get; set; } = "System";
+    public string LanguageMode { get; set; } = "System";
 }
