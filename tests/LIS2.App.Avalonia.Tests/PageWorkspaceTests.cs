@@ -61,7 +61,7 @@ public sealed class PageWorkspaceTests
         var workspace = new PageWorkspace();
         workspace.Add();
         Assert.Throws<InvalidOperationException>(() =>
-            workspace.ImportJson("[{\\"Id\\":\\"valid\\",\\"DurationSeconds\\":5,\\"RefreshIntervalMilliseconds\\":1000,\\"VisibilityExpression\\":\\"invalid\\"}]"));
+            workspace.ImportJson("""[{"Id":"valid","DurationSeconds":5,"RefreshIntervalMilliseconds":1000,"VisibilityExpression":"invalid"}]"""));
         Assert.Single(workspace.Pages);
     }
 
