@@ -14,10 +14,11 @@ public sealed class SerialDisplaySession : IAsyncDisposable
     private bool _fanTransition;
     private bool _disposed;
     private bool _disconnected;
-    private bool _closing;
+    private volatile bool _closing;
+    private Exception? _lastFanFault;
     public bool FansRunning => _fanLoop is not null;
     public bool FansBusy => _fanTransition;
-    public Exception? FanFault => _fanLoop?.LastFault;
+    public Exception? FanFault => _fanLoop?.LastFault ?? _lastFanFault;
     public event Action<Exception>? FanFaulted;
     public SerialDisplaySession(string portName) : this(new SerialLis2Transport(portName)) { }
     public SerialDisplaySession(ILis2Transport transport) => _session = new UnifiedLis2Session(transport);
@@ -42,9 +43,14 @@ public sealed class SerialDisplaySession : IAsyncDisposable
             ObjectDisposedException.ThrowIf(_disposed, this);
             if (_disconnected || _closing) throw new InvalidOperationException("Session is closing or disconnected.");
             if (_fanLoop is not null) throw new InvalidOperationException("Fan control already active.");
+            _lastFanFault = null;
             var runtime = new FanRuntime(sensors, _session, channels);
             var loop = new FanRuntimeLoop(runtime, onFault: _ => _session.RevokeFansAsync());
-            loop.Faulted += ex => FanFaulted?.Invoke(ex);
+            loop.Faulted += ex =>
+            {
+                _lastFanFault = ex;
+                FanFaulted?.Invoke(ex);
+            };
             try
             {
                 await _session.AuthorizeConnectedFansAsync(new[] { 100, 100, 100, 100 });
