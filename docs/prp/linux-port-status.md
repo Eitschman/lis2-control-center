@@ -168,3 +168,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## End-to-end virtual fan control in Avalonia (2026-10-13)
 - Fan editor now offers a separate virtual LIS2 four-channel runtime: explicit start, safe 100% frame before first regulation, simulated sensor inputs, periodic regulation, stop/drain and restored safety frame. Dedicated VirtualLis2Transport never opens a physical port. The virtual session is disposed on window close. Added missing-sensor fail-safe + safety-restoration integration test. Physical fan UI authorization remains disabled and is not claimed complete; owner deferred physical validation, not safety implementation.
+
+## Safe disposal after revoked fan authorization (2026-10-13)
+- Fixed UnifiedLis2Session.DisposeAsync to attempt the stored safe frame whenever the transport remains connected, even after a failed fan write revoked authorization. Added explicit regression for revoked authorization followed by disposal. This closes the discrepancy with DisconnectAsync; virtual CI verification pending.

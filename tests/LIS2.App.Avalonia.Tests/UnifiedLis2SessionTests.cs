@@ -48,6 +48,21 @@ public sealed class UnifiedLis2SessionTests
     }
 
     [Fact]
+    public async Task RevokedAuthorizationStillRestoresSafetyOnDisposal()
+    {
+        var transport = new FailOnceFanTransport();
+        var session = new UnifiedLis2Session(transport);
+        await session.ConnectWithFanSafetyAsync(new[] { 100, 95, 90, 85 });
+        transport.FailNextWrite = true;
+        await Assert.ThrowsAsync<IOException>(() =>
+            session.WriteAsync(new[] { 40, 40, 40, 40 }, CancellationToken.None));
+        Assert.False(session.FansAuthorized);
+        await session.DisposeAsync();
+        Assert.False(transport.IsOpen);
+        Assert.Equal(Lis2Protocol.SetFans(100, 95, 90, 85), transport.Writes[^1]);
+    }
+
+    [Fact]
     public async Task DisplayOnlyNeverAuthorizesFans()
     {
         var transport = new VirtualLis2Transport();
