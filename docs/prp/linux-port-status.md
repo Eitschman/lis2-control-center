@@ -114,3 +114,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Portable four-channel fan settings preserve original Windows JSON property names and defaults, normalization, mode, sensor key, curves, limits, hysteresis and allow-stop; Windows settings import now includes Fans and portable workspace persists them.
 - Regression tests cover default values, Windows import, invalid data normalization and portable roundtrip. No fan hardware or automatic control is activated by importing AutomaticControlEnabled; physical integration and Avalonia fan UI remain OPEN.
 - Current CI validation required for this commit.
+
+## Fan Control Avalonia editor and simulation (2026-10-13)
+- Added four-channel Fan Control screen for modes, sensor keys, fixed/limits/fail-safe/hysteresis, stop permissions, curve points, persisted automatic preference and safe simulated sensor temperature preview using headless FanRuntime.
+- Physical fan output stays DISABLED; no SetFans serial command is wired, no real sensor provider is assumed. Actual sensor/serial integration and hardware validation remain open.
+- This commit needs Windows and Linux CI before acceptance.

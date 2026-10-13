@@ -46,6 +46,7 @@ public partial class MainWindow
         _preferredTheme = saved.ThemeMode;
         _preferredLanguage = saved.LanguageMode;
         _fanSettings = PortableFanSettings.Normalize(saved.Fans);
+        RefreshFanEditor();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked = saved.ProgramCustomGlyphsOnConnect;
         if (saved.Pages.Count > 0)
         {

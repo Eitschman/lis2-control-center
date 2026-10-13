@@ -333,6 +333,51 @@
         </Border>
       </StackPanel>
     </ScrollViewer>
+    <ScrollViewer Name="FanControlView" Grid.Row="1" IsVisible="False">
+      <StackPanel Spacing="12">
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Four-channel fan configuration" FontSize="17" FontWeight="SemiBold" />
+            <TextBlock Text="Configuration and preview only. Physical fan output is disabled. Preview uses simulated sensor values." TextWrapping="Wrap" />
+            <CheckBox Name="FanAutomatic" Content="Automatic control preference (saved only)" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Channel" VerticalAlignment="Center" />
+              <ComboBox Name="FanChannelPicker" Width="140" SelectedIndex="0">
+                <ComboBoxItem Content="Fan 1" /><ComboBoxItem Content="Fan 2" />
+                <ComboBoxItem Content="Fan 3" /><ComboBoxItem Content="Fan 4" />
+              </ComboBox>
+              <TextBlock Text="Mode" VerticalAlignment="Center" />
+              <ComboBox Name="FanModePicker" Width="140" SelectedIndex="0">
+                <ComboBoxItem Content="Fixed" /><ComboBoxItem Content="Curve" />
+                <ComboBoxItem Content="Follow" /><ComboBoxItem Content="External" />
+                <ComboBoxItem Content="Off" />
+              </ComboBox>
+            </StackPanel>
+            <Grid ColumnDefinitions="180,240" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+              <TextBlock Grid.Row="0" Text="Name" /><TextBox Grid.Row="0" Grid.Column="1" Name="FanName" />
+              <TextBlock Grid.Row="1" Text="Sensor key" /><TextBox Grid.Row="1" Grid.Column="1" Name="FanSensorKey" />
+              <TextBlock Grid.Row="2" Text="Fixed percent" /><TextBox Grid.Row="2" Grid.Column="1" Name="FanFixed" />
+              <TextBlock Grid.Row="3" Text="Minimum / maximum" />
+              <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                <TextBox Name="FanMinimum" Width="110" /><TextBox Name="FanMaximum" Width="110" />
+              </StackPanel>
+              <TextBlock Grid.Row="4" Text="Fail-safe percent" /><TextBox Grid.Row="4" Grid.Column="1" Name="FanFailSafe" />
+              <TextBlock Grid.Row="5" Text="Hysteresis (C)" /><TextBox Grid.Row="5" Grid.Column="1" Name="FanHysteresis" />
+              <TextBlock Grid.Row="6" Text="Allow stop" /><CheckBox Grid.Row="6" Grid.Column="1" Name="FanAllowStop" />
+            </Grid>
+            <TextBlock Text="Curve points (temperature=percent, one per line)" />
+            <TextBox Name="FanCurve" Width="240" Height="110" HorizontalAlignment="Left" AcceptsReturn="True" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Simulated sensor temperature" VerticalAlignment="Center" />
+              <TextBox Name="FanSimulatedTemperature" Width="90" Text="50" />
+              <Button Name="FanSave" Content="Save configuration" />
+              <Button Name="FanPreview" Content="Simulate all four channels" />
+            </StackPanel>
+            <TextBlock Name="FanPreviewStatus" Text="Physical fan output disabled." TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
     </Grid>
   </Grid>
 </Window>

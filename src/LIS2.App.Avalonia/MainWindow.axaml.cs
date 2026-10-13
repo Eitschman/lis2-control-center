@@ -63,6 +63,7 @@ public partial class MainWindow : Window
                 GlyphBitmap.Parse(this.FindControl<TextBox>("GlyphBitmapEditor")!.Text)));
 
         InitializeSerialDisplay();
+        InitializeFanEditor();
         InitializeGlyphEditor();
         InitializePagesEditor();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
@@ -209,6 +210,7 @@ public partial class MainWindow : Window
         this.FindControl<ScrollViewer>("DashboardView")!.IsVisible = section == "Dashboard";
         this.FindControl<ScrollViewer>("DisplayView")!.IsVisible = section == "Display";
         this.FindControl<ScrollViewer>("PagesView")!.IsVisible = section == "Pages";
+        this.FindControl<ScrollViewer>("FanControlView")!.IsVisible = section == "Fan Control";
 
         if (description is not null)
             description.Text = section == "Dashboard"
@@ -217,6 +219,8 @@ public partial class MainWindow : Window
                     ? "Quick display tests, custom characters and brightness."
                 : section == "Pages"
                     ? "Manage display pages, templates, conditions and live preview."
+                    : section == "Fan Control"
+                    ? "Configure four fan channels and test the regulation in a safe simulation."
                     : $"{section} is not connected to the LIS2 runtime yet.";
     }
 }
