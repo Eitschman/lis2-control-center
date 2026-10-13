@@ -50,6 +50,7 @@ public partial class MainWindow
         RefreshPageList(0);
         InitializePagePlayback();
         InitializePageVariables();
+        InitializeHomeAssistant();
         _ = StartPageSourcesAsync();
     }
 
