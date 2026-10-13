@@ -1,6 +1,6 @@
 # Linux/Avalonia port — code inventory (2026-10-13)
 
-**Status: repository reconnaissance, not a complete exhaustive file-tree audit.** Source and project files listed below were read directly from GitHub default branch. Repository-wide recursive enumeration and execution of builds were unavailable in this session; therefore the Phase 0 *full inventory* gate remains OPEN. Do not treat this report as proof that every source file has been inspected.
+**Status: complete repository archive inventory and static API/dependency scan (2026-10-13).** Input: user-supplied GitHub main ZIP, 172 files / 113 C# files / 19 csproj / approximately 24,020 text lines. The archive contains no .git metadata, so the exact source commit SHA cannot be independently established from the ZIP. Builds and physical hardware tests were NOT executed. See detailed audit below.
 
 ## Critical findings (ordered by priority)
 
@@ -30,7 +30,7 @@
 | `LIS2.ProtocolTester` | Core, System.IO.Ports; WPF | Separate Linux tool strategy |
 | `LIS2.WinampSimulator` | Winamp library; console executable | Test IPC portability independently |
 
-The solution also includes `LIS2.WmpLegacySimulator` and seven named test projects: Core, Display, Sources, Fans, Winamp, WmpLegacy, WindowsMedia, App. Their implementation files still require exhaustive review.
+The solution also includes `LIS2.WmpLegacySimulator` and eight named test projects: Core, Display, Sources, Fans, Winamp, WmpLegacy, WindowsMedia, App. Their implementation files still require exhaustive review.
 
 ## Verified implementation entry points
 
@@ -54,14 +54,14 @@ The solution also includes `LIS2.WmpLegacySimulator` and seven named test projec
 - UI: tray, autostart, splash, Light/Dark/System, six languages, context help, diagnostics/export.
 - CI: Windows build/tests/WPF smoke and screenshot regression; win-x64 artifacts and native x86 plugin.
 
-## Concrete follow-up audit checklist (DO NOT check until done)
-- [ ] Obtain recursive, SHA-pinned repository tree; list every source, XAML, CMake, workflow, test and resource file with size.
-- [ ] Read *all* source files, including remaining partial `MainWindow` and XAML; create view-to-service call graph.
-- [ ] Inventory every OS-specific import/API, native interop, Windows target/package and build target across the tree.
-- [ ] Map every UI event handler, timer, service lifecycle, error path and startup/shutdown dependency.
+## Archive-wide static audit and remaining validation
+- [x] Enumerate complete uploaded repository archive recursively: 172 files, 113 .cs, 19 .csproj, 9 .xaml, 3 .cpp, 3 .def, 2 workflows, 1 .props, 1 solution. The ZIP is not SHA-pinned; record a Git commit for later exact baseline.
+- [x] Scan all source and configuration files for framework dependencies and Windows APIs; identify major view/service orchestration entry points. Full per-handler semantic review and call graph still pending.
+- [x] Search all .cs/.cpp/.h/.xaml/.csproj/.props/.yml files for WPF, WinForms, registry, WinRT, P/Invoke, DPAPI, PowerShell, named pipes, serial and timers. Heuristic scan is not a compiler/platform analyzer.
+- [ ] Audit every UI event handler and error path semantically. Six DispatcherTimers identified in MainWindow (pages 5s, fans 2s, hardware 1s, Winamp 1s, event UI 1s, page preview 100ms).
 - [ ] Audit every test fixture and assertions for Windows-only assumptions; establish baseline pass/fail and CI commit SHA.
-- [ ] Inspect `native/` and all CMake targets, message schema and Wine constraints.
-- [ ] Inspect complete `TODO.md`, protocol unknowns and outstanding physical-device issues before feature parity claims.
+- [x] Inventory native projects: WinampPlugin (plugin.cpp, winamp_sdk_min.h, .def, CMakeLists); WmpLegacyPlugin (plugin.cpp, .def, CMakeLists); WmpLegacyVisualization (visualization.cpp, .def, CMakeLists). Wine compatibility still unverified.
+- [x] Review remaining TODO headings and open hardware issues: protocol trailing 00, brightness/off, 8 custom glyphs, unknown device detection, fan safe minimum, real HA/sensor stability, physical hardware verification.
 - [ ] Produce an exhaustive file-level migration matrix with change owner, dependencies and acceptance tests.
 - [ ] Execute platform-neutral library builds and tests on Linux only after code changes are authorized.
 
@@ -73,4 +73,31 @@ The solution also includes `LIS2.WmpLegacySimulator` and seven named test projec
 5. Port to Avalonia incrementally; preserve Windows baseline and fan safety at each gate.
 6. Treat Wine Winamp and macOS as optional, separate validation tracks.
 
-**No porting work performed in this inventory.**
+## Additional verified findings from full ZIP
+- **Exact file counts**: 172 regular files, including 113 C# sources, 19 C# projects, 9 XAML, 14 Markdown, 3 C++, 3 .def, 3 CMakeLists.txt, 2 GitHub Actions YAML, 1 .props, 1 .sln, 1 PowerShell script, 1 header, .gitignore and LICENSE.
+- **Eight test projects**, not seven. Test source files: Core (Lis2ProtocolTests, Lis2DeviceTests); Display (PingPongScroller, AsyncCoalescingRunner, EventQueue, DisplayFrameWriter, DisplayTests, VisibilityEvaluator, TemplateRenderer, DisplayRuntime); Sources (HomeAssistantValueConverter, DataSourceRegistry); Fans (FanController); Winamp (WinampMapping); WindowsMedia (WindowsMediaValues); WmpLegacy (WmpLegacyMapping); App (VirtualLis2EndToEnd, SettingsStore).
+- **Largest migration hotspots**: `MainWindow.xaml.cs` ~160 KB / 4550 newline-separated lines; `MainWindow.xaml` ~159 KB / 2307 lines; `LocalizationService.cs` ~106 KB / 1259 lines; `Themes/Common.xaml` ~32 KB / 562 lines; `HelpWindow.xaml.cs` ~26 KB / 506 lines. File line counts can differ by one with trailing newline.
+- **UI navigation**: Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics, Home Assistant (10 sections). Main window size 1320x900, minimum 1120x760. Port main navigation, 10 sections, About and Help dialogs, glyph builder, theme dictionaries and screenshot test harness.
+- **UI regression matrix**: `MainWindow.UiTests.cs` explicitly iterates 2 themes (Light/Dark) x 5 languages (English, German, French, Turkish, Russian) x main tabs, captures screenshots and checks layouts. System language/theme are modes, not additional translation languages.
+- **Fan runtime**: six WPF timers, including fan update every 2 seconds; current `FanController` itself is a calculation service (`CalculateOutput`, curve, clamping) rather than a background scheduler. Move timer orchestration out of UI, not the controller's math.
+- **Media architecture**: `WindowsMediaDataSource` uses WinRT GSMTC and session callbacks; Winamp and WMP Legacy each use named pipes and snapshot/value classes. Linux MPRIS provider should integrate via `IDataSource` and `DataSourceRegistry`.
+- **Security**: `HomeAssistantTokenProtector.cs` uses DPAPI CurrentUser with prefix `dpapi:v1:`; cannot decrypt those ciphertexts on Linux. Explicit re-entry or export/import strategy is needed; never silently discard or store tokens in cleartext.
+- **OS integration**: Windows registry Run autostart, registry/DWM theme selection, WPF/WinForms tray, Windows file dialogs, Clipboard, splash STA dispatcher, Windows-only icon generation via powershell.exe, and serial port discovery using `SerialPort.GetPortNames()`.
+- **App settings**: JSON LocalApplicationData settings.json, pages, glyphs, hardware preferences, HA, fan channels; existing refresh interval per page is 100–60000 ms. Preserve semantics in Avalonia.
+- **Packaging**: Windows release ZIPs include app, ProtocolTester and native x86 Winamp DLL; two Windows Actions workflows. Add Linux matrix without breaking Windows artifacts.
+- **No runtime verification**: .NET SDK availability and Linux compatibility of packages were not established by this archive-only scan.
+
+## Exact migration file groups (all files in each group must be considered)
+- **Shared protocol (10 C# files)**: `src/LIS2.Core/`: Lis2Protocol, Lis2Device, ILis2Device, ILis2Transport, SerialLis2Transport, VirtualLis2Transport, VirtualLis2State, VirtualLis2ProtocolInterpreter, CustomCharacterManager, Lis2Brightness. Keep protocol/virtual logic, validate serial OS behavior.
+- **Display (11 C# files)**: `src/LIS2.Display/`: AsyncCoalescingRunner, DisplayEvent, PageScheduler, DisplayFrame, TemplateRenderer, DisplayOverflowMode, PingPongScroller, DisplayPage, DisplayRuntime, DisplayFrameWriter, EventQueue, VisibilityEvaluator. Retarget net8.0, preserve template, glyph and rendering semantics.
+- **Sources (9 C# files)**: `src/LIS2.Sources/`: HomeAssistantDataSource, SensorRegistry, ClockDataSource, HomeAssistantValueConverter, HomeAssistantEntityInfo, LibreHardwareMonitorDataSource, DataSourceRegistry, SensorValue, IDataSource. Separate Windows LibreHardwareMonitor and Linux hwmon backend from shared contracts and HA.
+- **Fans (4 C# files)**: `src/LIS2.Fans/`: FanController, FanChannelConfiguration, FanMode, FanCurvePoint. Keep shared calculations and safety tests.
+- **Windows media (4 C# files)**: `src/LIS2.WindowsMedia/`: WindowsMediaValues, WindowsMediaPlaybackState, WindowsMediaSnapshot, WindowsMediaDataSource. Keep Windows-only, optionally extract snapshot model.
+- **Winamp (7 C# files)**: `src/LIS2.Winamp/`: WinampPipeServer, WinampMessage, WinampValues, WinampPlaybackState, WinampDataSource, WinampSnapshot, AssemblyInfo. Preserve Windows IPC and value keys.
+- **WMP Legacy (9 C# files)**: `src/LIS2.WmpLegacy/`: WmpLegacyVisualizationMessage, WmpLegacyVisualizationPipeServer, WmpLegacyDataSource, WmpLegacyMessage, WmpLegacySnapshot, WmpLegacyPipeServer, WmpLegacyValues, WmpLegacyPlaybackState, AssemblyInfo. Deferred Windows-only.
+- **WPF app (35+ C# and XAML/resource files)**: `src/LIS2.App/`: MainWindow.xaml/.xaml.cs/.UiTests.cs, App.xaml/.xaml.cs, AboutWindow.xaml/.xaml.cs, HelpWindow.xaml/.xaml.cs, UiTestSupport.cs, HelpLocalization(.de/.fr/.ru/.tr).cs, LocalizationService.cs, Themes/Common/Light/Dark.xaml, SettingsStore.cs, AppSettings.cs, HomeAssistantTokenProtector.cs, ThemeService.cs, StartupService.cs, StartupSplash.cs, TrayIconService.cs, GenerateAppIcon.ps1, and row/settings/preset/glyph model files. Reuse models after moving to shared assemblies; rewrite view code and OS shell.
+- **Tools**: `tools/LIS2.ProtocolTester/` (App.xaml/.xaml.cs, MainWindow.xaml/.xaml.cs, csproj), `tools/LIS2.WinampSimulator/` (Program.cs, csproj), `tools/LIS2.WmpLegacySimulator/` (Program.cs, csproj). ProtocolTester is WPF; simulators are console apps but depend on Windows IPC libraries.
+- **Native**: `native/LIS2.WinampPlugin/`, `native/LIS2.WmpLegacyPlugin/`, `native/LIS2.WmpLegacyVisualization/`: all three CMake/native source sets; keep Windows-only.
+- **Tests**: `tests/LIS2.Core.Tests/`, `LIS2.Display.Tests/`, `LIS2.Sources.Tests/`, `LIS2.Fans.Tests/`, `LIS2.Winamp.Tests/`, `LIS2.WindowsMedia.Tests/`, `LIS2.WmpLegacy.Tests/`, `LIS2.App.Tests/`. Extract portable test subsets and preserve Windows UI-specific suite.
+
+**No application source, project or workflow was changed. Static inventory is complete for the uploaded ZIP; execution, full semantic review and physical validation remain open.**
