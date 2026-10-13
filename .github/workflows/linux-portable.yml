@@ -48,4 +48,6 @@ jobs:
           dotnet-version: 8.0.x
       - name: Build shared Avalonia desktop
         run: dotnet build src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release
+      - name: Test Avalonia virtual session
+        run: dotnet test tests/LIS2.App.Avalonia.Tests/LIS2.App.Avalonia.Tests.csproj --configuration Release
 
