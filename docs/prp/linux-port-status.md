@@ -162,3 +162,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Safety-frame retention after revoked authorization (2026-10-13)
 - The safe shutdown attempt now uses the retained safety frame whenever a device remains connected, even if a failed fan write has revoked authorization. This avoids silently skipping safety restoration after an output error. Physical hardware validation remains outstanding.
+
+## Virtual fault-injection regression tests (2026-10-13)
+- Added simulated one-shot serial write failures to verify fan authorization is revoked and the previously established safety frame is still written during both explicit disconnect and disposal. No physical device is required. Owner has explicitly deferred physical-hardware validation; virtual transport, CI and platform builds are the current verification scope.

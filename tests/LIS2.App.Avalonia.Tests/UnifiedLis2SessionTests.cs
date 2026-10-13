@@ -69,4 +69,55 @@ public sealed class UnifiedLis2SessionTests
             session.ConnectWithFanSafetyAsync(new[] { 100, 100, -1, 100 }));
         Assert.False(transport.IsOpen);
     }
+    [Fact]
+    public async Task FailedFanWriteRevokesAuthorizationButShutdownStillSendsSafetyFrame()
+    {
+        var transport = new FailOnceFanTransport();
+        await using var session = new UnifiedLis2Session(transport);
+        var safety = new[] { 100, 90, 80, 70 };
+        await session.ConnectWithFanSafetyAsync(safety);
+        transport.FailNextWrite = true;
+        await Assert.ThrowsAsync<IOException>(() =>
+            session.WriteAsync(new[] { 40, 40, 40, 40 }, CancellationToken.None));
+        Assert.False(session.FansAuthorized);
+        await session.DisconnectAsync();
+        Assert.False(transport.IsOpen);
+        Assert.Equal(Lis2Protocol.SetFans(100, 90, 80, 70), transport.Writes[^1]);
+    }
+
+    [Fact]
+    public async Task FailedFanWriteStillRestoresSafetyFrameDuringDisposal()
+    {
+        var transport = new FailOnceFanTransport();
+        var session = new UnifiedLis2Session(transport);
+        await session.ConnectWithFanSafetyAsync(new[] { 100, 100, 100, 100 });
+        transport.FailNextWrite = true;
+        await Assert.ThrowsAsync<IOException>(() =>
+            session.WriteAsync(new[] { 40, 40, 40, 40 }, CancellationToken.None));
+        await session.DisposeAsync();
+        Assert.False(transport.IsOpen);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
+    }
+
+    private sealed class FailOnceFanTransport : ILis2Transport
+    {
+        private readonly VirtualLis2Transport _inner = new();
+        public bool FailNextWrite { get; set; }
+        public bool IsOpen => _inner.IsOpen;
+        public IReadOnlyList<byte[]> Writes => _inner.Writes;
+        public Task OpenAsync(CancellationToken cancellationToken = default) =>
+            _inner.OpenAsync(cancellationToken);
+        public Task CloseAsync(CancellationToken cancellationToken = default) =>
+            _inner.CloseAsync(cancellationToken);
+        public Task WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+        {
+            if (FailNextWrite)
+            {
+                FailNextWrite = false;
+                throw new IOException("Simulated transient serial write failure.");
+            }
+            return _inner.WriteAsync(data, cancellationToken);
+        }
+        public ValueTask DisposeAsync() => _inner.DisposeAsync();
+    }
 }
