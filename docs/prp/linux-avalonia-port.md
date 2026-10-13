@@ -34,17 +34,17 @@ Deliver a native Linux desktop build (first x64, then ARM64), retaining the curr
 - No regression of safety-sensitive serial command ordering.
 
 ## Phase 0 — Freeze and inventory (all unchecked)
-- [ ] Record baseline main commit SHA, latest passing Windows workflow and release artifacts.
-- [ ] Inventory complete repo tree, csproj properties, package/runtime compatibility and every Windows-only API. Initial verified source reconnaissance: [linux-port-inventory.md](linux-port-inventory.md); exhaustive recursive audit still open.
-- [ ] Review `AGENTS.md` / `CLAUDE.md` if present; list all WPF/WinForms references and code-behind dependencies.
-- [ ] Map each existing tab, dialog, custom control, page designer, CG builder, virtual preview, localization and settings interaction. Initial UI entry points identified; full census pending.
+- [ ] Record source baseline commit SHA, latest passing Windows workflow and release artifacts (uploaded ZIP has no .git metadata).
+- [x] Inventory complete uploaded repository tree (172 files), all 19 csproj references/packages, global target framework and static Windows-API scan. See [linux-port-inventory.md](linux-port-inventory.md). Full semantic API review and Linux compilation remain open.
+- [x] Check archive for AGENTS.md / CLAUDE.md (neither present); scan WPF/WinForms references and code-behind files.
+- [x] Inventory ten navigation sections, About/Help windows, WPF resource/theme files, UI test matrix and page/glyph/settings feature groups. Detailed handler-to-service call graph remains open.
 - [ ] Map each `DispatcherTimer` and startup/shutdown event; identify concurrency assumptions.
-- [ ] Map all Windows-specific settings, DPAPI, filesystem paths, registry, startup, tray, system theme, icon and logging code.
-- [ ] Enumerate tests and coverage gaps, hardware validation limitations and reproducible virtual-LIS2 scenarios.
+- [x] Locate Windows-specific settings, DPAPI, filesystem paths, registry, startup, tray, system theme, icon generation and diagnostic code by static source scan; behavior/edge cases remain to be tested.
+- [x] Enumerate all eight test projects and their test source files; identify virtual-LIS2 tests and outstanding hardware validation in TODO. Actual test execution and coverage measurement remain open.
 - [ ] Reconfirm current Avalonia/.NET version support and licensing from official documentation before selecting versions.
 - [ ] Document actual feature parity matrix (Windows baseline vs Linux target).
 
-**Critical discovery:** `Directory.Build.props` globally targets `net8.0-windows10.0.19041.0`; portable libraries must be retargeted explicitly. `MainWindow.xaml.cs` currently has 4551 lines. `LIS2.ProtocolTester` is also WPF. See [verified inventory](linux-port-inventory.md).
+**Archive-wide static inventory complete (2026-10-13):** 172 files, 113 C# source files, 19 .NET projects, eight test projects. Static scan is not a Linux build or complete semantic code review. **Critical discovery:** `Directory.Build.props` globally targets `net8.0-windows10.0.19041.0`; portable libraries must be retargeted explicitly. `MainWindow.xaml.cs` currently has 4551 lines. `LIS2.ProtocolTester` is also WPF. See [verified inventory](linux-port-inventory.md).
 
 ## Phase 1 — Decouple runtime from WPF
 - [ ] Add a UI-independent `src/LIS2.Runtime` project (name provisional), with lifecycle/start/stop, app orchestration and dependency injection.
