@@ -58,6 +58,11 @@ public partial class MainWindow
         try
         {
             var frame = _serialPlayback.Tick(DateTimeOffset.UtcNow, PagePreviewValues());
+            if (frame is null && _lastSerialFrame is not null)
+            {
+                await _serialDisplay.ClearAsync();
+                _lastSerialFrame = null;
+            }
             if (frame is not null)
             {
                 var signature = frame.Line1 + "\n" + frame.Line2;
