@@ -29,9 +29,9 @@ public partial class MainWindow : Window
         this.FindControl<Button>("OpenFanControl")!.Click += (_, _) => NavigateTo(6);
 
         this.FindControl<Button>("SendLine1")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.WriteLineAsync(0, this.FindControl<TextBox>("Line1TextBox")!.Text ?? ""));
+            await RunVirtualActionAsync(() => _virtualDevice.WriteLineAsync(1, this.FindControl<TextBox>("Line1TextBox")!.Text ?? ""));
         this.FindControl<Button>("SendLine2")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.WriteLineAsync(1, this.FindControl<TextBox>("Line2TextBox")!.Text ?? ""));
+            await RunVirtualActionAsync(() => _virtualDevice.WriteLineAsync(2, this.FindControl<TextBox>("Line2TextBox")!.Text ?? ""));
         this.FindControl<Button>("RenderBoth")!.Click += async (_, _) =>
             await RunVirtualActionAsync(() => _virtualDevice.RenderBothAsync(
                 this.FindControl<TextBox>("Line1TextBox")!.Text ?? "",
