@@ -73,6 +73,7 @@ public partial class MainWindow : Window
     {
         StopPagePlayback();
         await _virtualDevice.DisposeAsync();
+        await _pageSources.DisposeAsync();
     }
 
     private async Task RunVirtualActionAsync(Func<Task> action)
