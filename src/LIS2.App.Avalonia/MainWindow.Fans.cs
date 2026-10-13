@@ -8,6 +8,9 @@ public partial class MainWindow
 {
     private readonly SimulatedFanSensors _fanPreviewSensors = new();
     private readonly SimulatedFanOutput _fanPreviewSink = new();
+    private readonly IFanSensorSource _liveFanSensors = OperatingSystem.IsLinux()
+        ? new LinuxHwmonFanSensors()
+        : new SnapshotFanSensors(() => new Dictionary<string, object?>());
     private bool _fanEditorLoading;
     private int _fanEditingChannelIndex;
 
@@ -59,6 +62,31 @@ public partial class MainWindow
                     $"Fan {i + 1}: {c.OutputPercent}%{(c.SensorValid ? "" : " (fail-safe)") }")));
             }
             catch (Exception ex) { SetFanStatus($"Simulation failed: {ex.Message}"); }
+        };
+        this.FindControl<Button>("FanReadSensors")!.Click += (_, _) =>
+        {
+            try
+            {
+                var values = _liveFanSensors.Snapshot();
+                this.FindControl<TextBlock>("FanSensorStatus")!.Text = values.Count == 0
+                    ? "No readable hwmon temperature sensors found. Missing keys trigger fail-safe."
+                    : string.Join(Environment.NewLine, values.OrderBy(x => x.Key).Select(x =>
+                        x.Key + " = " + Convert.ToString(x.Value, CultureInfo.InvariantCulture) + " C"));
+            }
+            catch (Exception ex) { this.FindControl<TextBlock>("FanSensorStatus")!.Text = "Sensor read failed: " + ex.Message; }
+        };
+        this.FindControl<Button>("FanLivePreview")!.Click += async (_, _) =>
+        {
+            try
+            {
+                SaveFanEditor();
+                await using var runtime = new FanRuntime(_liveFanSensors, _fanPreviewSink, _fanSettings.ToRuntimeChannels());
+                var state = await runtime.TickAsync();
+                SetFanStatus("LIVE SENSOR DRY RUN (no hardware output): " +
+                    string.Join(" / ", state.Channels.Select((c, i) =>
+                        $"Fan {i + 1}: {c.OutputPercent}%{(c.SensorValid ? "" : " (fail-safe)")}")));
+            }
+            catch (Exception ex) { SetFanStatus("Live sensor preview failed: " + ex.Message); }
         };
         RefreshFanEditor();
     }

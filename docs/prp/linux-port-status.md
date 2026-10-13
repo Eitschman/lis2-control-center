@@ -135,3 +135,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Fan channel editor regression repair (2026-10-13)
 - Channel selection now saves the previously edited channel rather than overwriting the destination channel; invalid edits restore the original selection without losing editor contents. Phase 2 remains open for live runtime integration and physical safety verification.
+
+## Live Linux hwmon sensor preview (2026-10-13)
+- Fan UI can now list current Linux hwmon sensor keys and calculate all four channel outputs from real read-only sensor snapshots without sending physical fan commands. Missing sensors continue to trigger runtime fail-safe. Windows displays no hwmon sensors (Windows provider still pending). Explicit hardware enable, continuous periodic fan runtime and safe lifecycle remain open.
