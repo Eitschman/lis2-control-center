@@ -7,10 +7,21 @@ public sealed class PageSourceValues : IAsyncDisposable
 {
     private readonly DataSourceRegistry _registry = new();
     private bool _started;
+    private readonly HomeAssistantDataSource _homeAssistant = new();
+
+    public HomeAssistantDataSource HomeAssistant => _homeAssistant;
+
+    public async Task ConfigureHomeAssistantAsync(string? url, string? token)
+    {
+        await _homeAssistant.StopAsync();
+        _homeAssistant.Configure(url, token);
+        if (_started) await _homeAssistant.StartAsync();
+    }
 
     public PageSourceValues()
     {
         _registry.Add(new ClockDataSource());
+        _registry.Add(_homeAssistant);
     }
 
     public IReadOnlyDictionary<string, object?> Snapshot(DateTimeOffset now)
