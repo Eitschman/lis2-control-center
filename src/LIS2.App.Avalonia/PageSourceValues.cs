@@ -1,33 +1,22 @@
+using LIS2.Runtime;
 using LIS2.Sources;
 
 namespace LIS2.App.Avalonia;
 
-/// <summary>Combines original registered source values with portable display-specific glyph variables.</summary>
+/// <summary>Portable template variable adapter over the shared source runtime.</summary>
 public sealed class PageSourceValues : IAsyncDisposable
 {
-    private readonly DataSourceRegistry _registry = new();
-    private bool _started;
-    private readonly HomeAssistantDataSource _homeAssistant = new();
+    private readonly SourceRuntime _runtime = new();
 
-    public HomeAssistantDataSource HomeAssistant => _homeAssistant;
+    public HomeAssistantDataSource HomeAssistant => _runtime.HomeAssistant;
+    public IReadOnlyDictionary<string, string?> Errors => _runtime.Errors;
 
-    public async Task ConfigureHomeAssistantAsync(string? url, string? token)
-    {
-        await _homeAssistant.StopAsync();
-        _homeAssistant.Configure(url, token);
-        if (_started) await _homeAssistant.StartAsync();
-    }
-
-    public PageSourceValues()
-    {
-        _registry.Add(new ClockDataSource());
-        _registry.Add(_homeAssistant);
-    }
+    public Task ConfigureHomeAssistantAsync(string? url, string? token) =>
+        _runtime.ConfigureHomeAssistantAsync(url, token);
 
     public IReadOnlyDictionary<string, object?> Snapshot(DateTimeOffset now)
     {
-        var values = new Dictionary<string, object?>(_registry.Snapshot(), StringComparer.OrdinalIgnoreCase);
-        // Keep the original Clock.Time/Clock.Date/Clock.Day names and values authoritative.
+        var values = new Dictionary<string, object?>(_runtime.Snapshot(), StringComparer.OrdinalIgnoreCase);
         foreach (var pair in PageClockValues.Create(now))
             values.TryAdd(pair.Key, pair.Value);
         for (var slot = 1; slot <= 8; slot++)
@@ -35,16 +24,8 @@ public sealed class PageSourceValues : IAsyncDisposable
         return values;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken = default)
-    {
-        if (_started) return;
-        await _registry.StartAllAsync(cancellationToken);
-        _started = true;
-    }
+    public Task StartAsync(CancellationToken cancellationToken = default) =>
+        _runtime.StartAsync(cancellationToken);
 
-    public async ValueTask DisposeAsync()
-    {
-        await _registry.StopAllAsync();
-        await _registry.DisposeAsync();
-    }
+    public ValueTask DisposeAsync() => _runtime.DisposeAsync();
 }

@@ -14,13 +14,9 @@
     <ProjectReference Include="../LIS2.Core/LIS2.Core.csproj" />
     <ProjectReference Include="../LIS2.Display/LIS2.Display.csproj" />
     <ProjectReference Include="../LIS2.Fans/LIS2.Fans.csproj" />
+    <ProjectReference Include="../LIS2.Runtime/LIS2.Runtime.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../LIS2.Sources/IDataSource.cs" Link="Sources/IDataSource.cs" />
-    <Compile Include="../LIS2.Sources/DataSourceRegistry.cs" Link="Sources/DataSourceRegistry.cs" />
-    <Compile Include="../LIS2.Sources/ClockDataSource.cs" Link="Sources/ClockDataSource.cs" />
-    <Compile Include="../LIS2.Sources/HomeAssistantDataSource.cs" Link="Sources/HomeAssistantDataSource.cs" />
-    <Compile Include="../LIS2.Sources/HomeAssistantEntityInfo.cs" Link="Sources/HomeAssistantEntityInfo.cs" />
-    <Compile Include="../LIS2.Sources/HomeAssistantValueConverter.cs" Link="Sources/HomeAssistantValueConverter.cs" />
+
   </ItemGroup>
 </Project>
