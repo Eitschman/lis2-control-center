@@ -7,6 +7,9 @@ public partial class MainWindow
     private readonly PortableWorkspaceStore _workspaceStore = new();
     private bool _workspaceLoaded;
     private List<PortableHaEntityPreference> _haPreferences = new();
+    private int _preferredBrightness = 100;
+    private string _preferredTheme = "System";
+    private string _preferredLanguage = "System";
 
     private void LoadPortableWorkspace()
     {
@@ -32,6 +35,10 @@ public partial class MainWindow
             LoadGlyphEditor();
         }
         _haPreferences = saved.HomeAssistantEntityPreferences.ToList();
+        _preferredBrightness = saved.BrightnessPercent;
+        _preferredTheme = saved.ThemeMode;
+        _preferredLanguage = saved.LanguageMode;
+        this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked = saved.ProgramCustomGlyphsOnConnect;
         if (saved.Pages.Count > 0)
         {
             _pages.ImportJson(System.Text.Json.JsonSerializer.Serialize(saved.Pages));
@@ -53,7 +60,11 @@ public partial class MainWindow
                 {
                     Name = g.Name, Rows = g.Rows.ToArray()
                 }).ToList(),
-                HomeAssistantEntityPreferences = _haPreferences.ToList()
+                HomeAssistantEntityPreferences = _haPreferences.ToList(),
+                BrightnessPercent = _preferredBrightness,
+                ThemeMode = _preferredTheme,
+                LanguageMode = _preferredLanguage,
+                ProgramCustomGlyphsOnConnect = this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true
             });
         }
         catch (Exception ex)
