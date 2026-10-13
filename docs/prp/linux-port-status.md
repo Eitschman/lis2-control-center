@@ -78,6 +78,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - Playback correctness batch: shared `PagePlayback` now honors each page's refresh interval while still switching pages immediately; both virtual and serial sequences inherit this behavior. Serial UI locks all manual display/glyph/brightness controls while sequence writes are active, and clears stale serial frames when no page remains visible. Added deterministic refresh/page-switch regression tests. Scrolling parity and physical fan-safe reconnect remain outstanding; CI pending.
 
+- Overflow integration: shared `PagePlayback` now uses the existing `LIS2.Display.PingPongScroller` independently per line, honoring PingPong/Marquee/Truncate, scroll step interval, edge pause, and resetting scroll position on page changes. Template value refresh remains separately throttled by each page's refresh interval, while scrolling continues between refreshes. Added deterministic tests for modes, independent lines, and reset on page switch. Both virtual and serial playback use this shared engine. CI and hardware behavior pending verification.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
