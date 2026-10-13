@@ -155,6 +155,7 @@ public partial class MainWindow
         StopSerialPlayback();
         var session = _serialDisplay;
         _serialDisplay = null;
+        if (_serialSequence is not null) await _serialSequence.StopAndDrainAsync();
         if (session is not null) await session.DisposeAsync();
     }
 }

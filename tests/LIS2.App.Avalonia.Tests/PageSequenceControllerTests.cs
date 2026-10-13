@@ -75,4 +75,33 @@ public sealed class PageSequenceControllerTests
         await pending;
         Assert.True(runtime.Start(pages));
     }
+    [Fact]
+    public async Task StopAndDrainWaitsForPendingWrite()
+    {
+        var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var runtime = new PageSequenceController(
+            async (_, _) => { entered.SetResult(true); await release.Task; },
+            _ => Task.CompletedTask);
+        runtime.Start(new[] { new PageDefinition { Line1Template = "HELLO" } });
+        var pending = runtime.TickAsync(DateTimeOffset.UnixEpoch, new Dictionary<string, object?>());
+        await entered.Task;
+        var drain = runtime.StopAndDrainAsync();
+        Assert.False(drain.IsCompleted);
+        Assert.False(runtime.IsRunning);
+        release.SetResult(true);
+        await pending;
+        await drain;
+        Assert.False(runtime.IsBusy);
+        Assert.True(runtime.Start(new[] { new PageDefinition { Line1Template = "NEXT" } }));
+    }
+
+    [Fact]
+    public async Task StopAndDrainIsSafeWithoutActiveSequence()
+    {
+        var runtime = new PageSequenceController((_, _) => Task.CompletedTask, _ => Task.CompletedTask);
+        await runtime.StopAndDrainAsync();
+        Assert.False(runtime.IsRunning);
+    }
+
 }

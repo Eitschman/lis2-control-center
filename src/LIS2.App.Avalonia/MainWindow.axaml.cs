@@ -75,6 +75,7 @@ public partial class MainWindow : Window
     {
         StopPagePlayback();
         StopHomeAssistantUi();
+        if (_virtualSequence is not null) await _virtualSequence.StopAndDrainAsync();
         await CloseSerialDisplayAsync();
         await _virtualDevice.DisposeAsync();
         await _pageSources.DisposeAsync();
@@ -82,8 +83,11 @@ public partial class MainWindow : Window
 
     private async Task RunVirtualActionAsync(Func<Task> action)
     {
-        if (_busy)
+        if (_busy || _virtualSequence?.IsBusy == true)
             return;
+
+        // Manual display actions take ownership of the virtual device.
+        StopPagePlayback();
 
         _busy = true;
         UpdateVirtualControls();
@@ -157,13 +161,15 @@ public partial class MainWindow : Window
     private void UpdateVirtualControls()
     {
         var connected = _virtualDevice.IsConnected;
-        this.FindControl<Button>("VirtualConnect")!.IsEnabled = !_busy && !connected;
-        this.FindControl<Button>("VirtualDemo")!.IsEnabled = !_busy && connected;
-        this.FindControl<Button>("VirtualDisconnect")!.IsEnabled = !_busy && connected;
+        var playbackBusy = _virtualSequence?.IsBusy == true;
+        var playbackRunning = _virtualSequence?.IsRunning == true;
+        this.FindControl<Button>("VirtualConnect")!.IsEnabled = !_busy && !playbackBusy && !connected;
+        this.FindControl<Button>("VirtualDemo")!.IsEnabled = !_busy && !playbackBusy && !playbackRunning && connected;
+        this.FindControl<Button>("VirtualDisconnect")!.IsEnabled = !_busy && !playbackBusy && connected;
         foreach (var name in new[] { "SendLine1", "SendLine2", "RenderBoth", "ClearDisplay",
                                     "Brightness100", "Brightness75", "Brightness50", "Brightness25",
                                     "SendSpecialCharacterTest", "SendCharacterRomRange", "SendGlyphSlot", "SendAllGlyphs" })
-            this.FindControl<Button>(name)!.IsEnabled = !_busy && connected;
+            this.FindControl<Button>(name)!.IsEnabled = !_busy && !playbackBusy && !playbackRunning && connected;
         var badge = this.FindControl<TextBlock>("ConnectionText");
         if (badge is not null)
             badge.Text = connected ? "Connected (Virtual)" : "Disconnected";

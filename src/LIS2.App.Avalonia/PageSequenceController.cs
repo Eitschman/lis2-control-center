@@ -38,6 +38,14 @@ public sealed class PageSequenceController
 
     public void Stop() => IsRunning = false;
 
+    /// <summary>Stop new ticks and wait for any in-flight display write to finish.</summary>
+    public async Task StopAndDrainAsync(CancellationToken cancellationToken = default)
+    {
+        Stop();
+        await _tickGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        _tickGate.Release();
+    }
+
     public async Task<bool> TickAsync(
         DateTimeOffset now,
         IReadOnlyDictionary<string, object?> values,

@@ -40,6 +40,7 @@ public partial class MainWindow
         _pageTimer.Stop();
         _virtualSequence?.Stop();
         UpdatePagePlaybackControls();
+        UpdateVirtualControls();
     }
 
     private void UpdatePagePlaybackControls()
@@ -71,6 +72,6 @@ public partial class MainWindow
             StopPagePlayback();
             SetVirtualStatus($"Page sequence stopped: {ex.Message}");
         }
-        finally { UpdatePagePlaybackControls(); }
+        finally { UpdatePagePlaybackControls(); UpdateVirtualControls(); }
     }
 }
