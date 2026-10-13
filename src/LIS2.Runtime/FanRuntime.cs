@@ -93,8 +93,8 @@ public sealed class FanRuntime : IAsyncDisposable
                 double? sensor = null;
                 if (valid && requiresSensor)
                 {
-                    snapshot.TryGetValue(config.SensorKey!, out var raw);
-                    TryConvertSensor(raw, out sensor);
+                    snapshot.TryGetValue(config.SensorKey!, out var sensorRaw);
+                    TryConvertSensor(sensorRaw, out sensor);
                 }
                 sensorValues[i] = valid ? sensor : null;
                 outputs[i] = _controller.CalculateOutput(config, sensor, null, valid,

@@ -2,6 +2,47 @@
 
 Status: **IMPLEMENTATION STARTED ON feature/linux-avalonia** (2026-10-13). Preserve existing Windows release behavior throughout. See [implementation status](linux-port-status.md).
 
+## Active execution protocol — binding update 2026-10-13
+
+This section supersedes the earlier immutable two-commit Phase 1 packaging plan and any obsolete next-work lists. The owner explicitly approved splitting **fan Integration & Safety** into two independently testable, cohesive packages. The strict no-partial-package rule still applies **within** each agreed package. Never reinterpret an unfinished package as done.
+
+### Read first on every new chat or work session
+1. Read this PRP completely, then `docs/prp/linux-port-status.md`, `docs/architecture.md`, `docs/protocol.md`, relevant source/tests and current GitHub branch HEAD. Do not rely on old chat summaries as source of truth.
+2. Check the **latest HEAD's** Windows and Ubuntu CI jobs and exact failing logs **before** any new implementation. Repair failed CI first. An older green commit never validates the new HEAD.
+3. Follow the `prp-workflow` execution skill. Work directly in `Eitschman/lis2-control-center` on `feature/linux-avalonia`. Do not modify `main` or WPF during the port.
+4. Inspect all existing interfaces and the original WPF behavior before changing implementation; never invent APIs, sensor names, serial commands or UI behavior.
+5. Define package scope and acceptance tests, implement all layers of that package together, preflight the complete diff, then **one atomic package commit**. CI-failure-only repair commits are permitted. Do not push a smaller slice to trigger CI.
+6. Report substantive interim progress during longer work **without requiring user confirmation**, and continue until a genuine external blocker or a validated package boundary. Do not ask the owner to say "green" between micro-commits.
+7. Keep documentation current, distinguishing **code written**, **CI green**, **desktop verified**, **real hardware verified**. Never infer hardware safety from unit tests.
+8. When the execution environment lacks local `dotnet`, use the connected GitHub repository and Actions for source editing and validation; this is not a reason to stop implementation. However, CI is only run after a cohesive package is committed, not as a substitute for package completeness.
+
+### Current checkpoint / immediate next action
+- Last confirmed green runtime-core HEAD: `d0dd881ca7a69c4f7b6790d98c4547b24052c400`, GitHub Actions run `38436009321`.
+- Fan Phase 1 implementation commit: `5b6156d988dc98bc70b9befb71cb21cf10299450`. Its Actions run `38437023413` **FAILED** on both Avalonia builds; shared-library jobs passed. Ubuntu build log shows `FanRuntime.cs(96,69): CS0136` due to conflicting `raw` variable declarations. **Fix and revalidate before starting Phase 2.** A fix commit does not itself mark Phase 1 green.
+- No real fan commands are enabled in Avalonia. `SerialDisplaySession` remains display-only, deliberately.
+
+### Fan Integration & Safety — agreed package A: headless runtime
+**Scope:** `src/LIS2.Runtime/FanRuntime.cs`, `FanRuntimeLoop.cs`, headless regression tests and status docs. Portable four-channel fan control using existing `LIS2.Fans.FanController`, sensor snapshot validation, fixed/curve/follow/external/off modes, hysteresis, limits, fail-safe, serializable single-flight ticks, output-on-change, failed-write retry, disconnect/reconfigure reset, explicit disabled-by-default output and simulated sensors/sinks. Do **not** connect physical serial fan output or enable UI in this package.
+
+**Acceptance:** compile/test on both Windows and Ubuntu; test missing, null, malformed, nonfinite sensors, curve/hysteresis, all modes, bounds/stop permissions, four-channel output, failed writes, concurrent ticks, disable/re-enable, configuration isolation and shutdown. CI green is required to mark package A complete; physical validation does not apply to simulated output. Review uncovered cases before closing it.
+
+### Fan Integration & Safety — agreed package B: physical integration + Avalonia UI
+**Prerequisite:** package A green on current HEAD.
+**Scope:** actual platform sensor providers and stable keys/aliases, safe sensor snapshot freshness, fan settings schema/import/persistence compatible with WPF, serial output adapter via existing `LIS2.Core.Lis2Device.SetFansAsync` with serialized commands, explicit hardware safety authorization, safe initial fan state on connect/reconnect **before normal page/brightness writes**, automatic regulation lifecycle/stop/drain/error reporting, manual output limits, and WPF-faithful Avalonia fan channels/curves/live values/status/settings. Do not enable controls or hardware writes until the complete safety path exists.
+
+**Safety acceptance:** missing/stale sensors force configured fail-safe, invalid values never turn off fans, failed writes are retried or cause safe disable/reporting, no concurrent fan/serial command races, no automatic reconnect that skips safe initialization, shutdown drains writes before transport disposal. Validate headless protocol bytes, virtual transport behavior, Linux/Windows builds, UI behavior and real-device procedure separately. If safe reconnect/transport arbitration cannot be demonstrated, **do not enable physical output** and keep package B open. No invented hardware test claims.
+
+### Remaining ordered work after fan package B
+- Shared Windows/Linux sensor and media providers (Winamp/GSMTC preserved on Windows; MPRIS2 on Linux); settings/secrets migration.
+- WPF-exact Avalonia screen-by-screen functional, visual, interaction, localization and accessibility parity; current sidebar is only scaffolding.
+- Windows x64 and Linux x64/ARM64 packaging, desktop smoke tests, Raspberry Pi 5 validation, physical LIS2 controlled safety tests.
+- **Mandatory** removal of WPF project/release jobs **only after** verified Avalonia Windows/Linux parity and hardware safety. WPF is read-only reference until then.
+
+### Handover / progress format
+Record after each coherent package: branch and exact HEAD SHA, CI run URL and per-job conclusions, affected files, verified acceptance criteria, unverified hardware/UI items, open risks and the **single next actionable task**. Update the status file in the same package commit when possible. Never claim green while the current HEAD is red or pending.
+
+---
+
 ## Goal and scope
 Deliver ONE shared Avalonia desktop application for Windows x64 and Linux x64/ARM64, retaining the current LIS2 display/page/fan features and Home Assistant integration. Continue supporting Windows Winamp (native x86 plugin) and modern Windows Media Player (GSMTC). On Linux add MPRIS-compatible players (e.g. VLC/Plexamp when MPRIS is exposed); Wine Winamp interoperability is optional research, not a guaranteed deliverable. Windows Media Player is not a native Linux application. Use **Avalonia UI** as preferred UI migration path; Wails/Go was assessed and rejected provisionally because it introduces a Go/C# boundary or backend rewrite.
 
@@ -116,9 +157,9 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 
 ## Binding implementation workflow: STRICT package/commit gate (owner directive, 2026-10-13)
 
-**Mandatory and higher priority than convenience, context limits, or quick green CI.** This applies in every chat and after handovers. The previous repeated violation (pushing incomplete partial implementations despite promising two complete commits) must not recur.
+**Mandatory within each current owner-approved package; see the newer Active execution protocol above.** This applies in every chat and after handovers. The previous repeated violation (pushing incomplete partial implementations despite promising two complete commits) must not recur.
 
-### Immutable agreed scope for Phase 1 / Package 1
+### Historical two-package agreement (superseded for fan work by Active execution protocol above)
 - **Runtime Core (logical commit 1):** finish Phase 1 steps 1–4 and 6 together: standalone portable runtime, display scheduling/event/output orchestration, source lifecycle, timers, concurrency/reconnect/shutdown, and platform contracts. Integration, regression tests, and documentation are part of the same deliverable.
 - **Integration & Safety (logical commit 2):** finish steps 5, 7, 8 together: move fan regulation loops without changing safety semantics, integrate Avalonia adapters (NOT WPF adapters), state/view models/commands, headless/compatibility/migration tests and docs.
 - Historical commit `1e0dc5d7` is **only an incomplete Runtime Core checkpoint**, not completion of logical commit 1. Do not rewrite published history without permission; finish the remainder in ONE cohesive completion commit. The historical partial commit does not justify further partial pushes.

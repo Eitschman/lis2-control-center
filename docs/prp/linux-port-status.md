@@ -105,3 +105,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Added LIS2.Runtime.FanRuntime with four-channel configuration snapshots, existing LIS2.Fans.FanController calculation, finite sensor validation, curve/hysteresis history, explicit opt-in output, write-on-change, serialized ticks, reset on disconnect/reconfigure and safe failed-write retry.
 - Added IFanSensorSource/IFanOutputSink and deterministic SimulatedFanSensors/SimulatedFanOutput; FanRuntimeLoop provides periodic evaluation and drain on shutdown. No physical serial fan writes or Avalonia fan control are enabled by this phase.
 - Headless tests cover dry-run, all four outputs, modes, invalid sensors/fail-safe, hysteresis, reconfigure, disconnect, failed writes and concurrent ticks. CI and real-hardware validation are separate; Phase 2 must connect platform sensors, hardware, UI and settings.
+
+## CI repair checkpoint (2026-10-13)
+- Fan Phase 1 commit `5b6156d` failed Actions run `38437023413` on both Avalonia jobs; portable library jobs green. Identified `CS0136` in `src/LIS2.Runtime/FanRuntime.cs` due to conflicting `raw` local declarations. Repair required; package A remains OPEN until newest CI green.
+- PRP execution protocol revised to explicitly capture owner-approved fan package A (headless) and B (hardware+UI), exact CI-first workflow, handover requirements, and no partial pushes within a package.
