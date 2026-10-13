@@ -106,6 +106,18 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 - [ ] Review crash handling, permissions, logs, restart behavior, disconnected sensors, and serial unplug/replug.
 - [ ] Update README, architecture, troubleshooting and user guide; decide whether WPF retirement is warranted only after parity.
 
+## Binding implementation workflow: coherent large batches (project owner directive, 2026-10-13)
+This is a **mandatory working rule** for all subsequent LIS2 Avalonia port sessions, including sessions resumed from handover notes.
+
+- Plan and implement **large, cohesive functional packages** rather than small incremental snippets or individual-file commits. A package should cover a meaningful end-to-end capability and all affected layers, UI adapters, tests, integration and status documentation.
+- **Prepare and inspect all files before pushing.** Verify actual interfaces and existing patterns; do not guess symbols or APIs. Include regression tests and documentation in the same package.
+- **Prefer one atomic Git commit per complete package**, using a single Git tree/commit/ref update (or equivalent). Do not push each intermediate file or small substep: every push triggers unnecessary GitHub Actions builds.
+- Trigger **one CI validation after the full package is pushed**. Review the latest HEAD's Windows and Linux results; when red, investigate and fix the actual cause, then rerun. Never interpret an earlier green run as proof that a newer HEAD is green.
+- While implementing, give the project owner occasional **substantive progress updates** (scope, discoveries, blockers, overall progress), not micro-commit reports. Do not wait for user approval between substeps of an authorized package.
+- Keep original WPF functionality and 1:1 UI parity requirements, fan safety, and isolated feature-branch boundaries intact. A larger batch must still be reviewable and safety-conscious.
+- A package is **not complete** until the current HEAD CI is green (and physical hardware tests, where required, are explicitly distinguished from CI).
+- Avoid repeatedly asking the user to say “grün” to unlock tiny next steps. Once a package is green, continue with the next coherent major package when authorized.
+
 ## Implementation ordering and checkpoints
 1. **Gate A:** Inventory and feature matrix approved; baseline Windows CI green.
 2. **Gate B:** Headless runtime extracted and tested; Windows application still green.
