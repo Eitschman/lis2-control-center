@@ -111,8 +111,7 @@ public partial class MainWindow
             catch (Exception ex) { SetFanStatus("Monitor start failed: " + ex.Message); }
         };
         this.FindControl<Button>("FanMonitorStop")!.Click += async (_, _) => await StopFanMonitorAsync();
-        this.FindControl<CheckBox>("FanHardwareConsent")!.Checked += (_, _) => UpdateHardwareFanControls();
-        this.FindControl<CheckBox>("FanHardwareConsent")!.Unchecked += (_, _) => UpdateHardwareFanControls();
+        this.FindControl<CheckBox>("FanHardwareConsent")!.IsCheckedChanged += (_, _) => UpdateHardwareFanControls();
         this.FindControl<Button>("FanHardwareStart")!.Click += async (_, _) =>
         {
             var session = _serialDisplay;
