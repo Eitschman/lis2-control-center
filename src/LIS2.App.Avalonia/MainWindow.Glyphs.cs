@@ -16,6 +16,7 @@ public partial class MainWindow
         {
             _glyphs.LoadExamples();
             LoadGlyphEditor();
+            _ = SavePortableWorkspaceAsync();
         };
         this.FindControl<Button>("SendAllGlyphs")!.Click += async (_, _) =>
             await RunVirtualActionAsync(() => _virtualDevice.ProgramAllGlyphsAsync(_glyphs.Glyphs));
@@ -41,6 +42,7 @@ public partial class MainWindow
                 this.FindControl<TextBox>("GlyphBitmapEditor")!.Text);
             RefreshGlyphPreview();
             SetVirtualStatus($"Saved glyph slot {slot} in workspace.");
+            _ = SavePortableWorkspaceAsync();
         }
         catch (Exception ex)
         {
