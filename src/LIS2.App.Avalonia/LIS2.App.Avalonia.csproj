@@ -15,4 +15,9 @@
     <ProjectReference Include="../LIS2.Display/LIS2.Display.csproj" />
     <ProjectReference Include="../LIS2.Fans/LIS2.Fans.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../LIS2.Sources/IDataSource.cs" Link="Sources/IDataSource.cs" />
+    <Compile Include="../LIS2.Sources/DataSourceRegistry.cs" Link="Sources/DataSourceRegistry.cs" />
+    <Compile Include="../LIS2.Sources/ClockDataSource.cs" Link="Sources/ClockDataSource.cs" />
+  </ItemGroup>
 </Project>
