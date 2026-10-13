@@ -46,4 +46,36 @@ public sealed class PagePlaybackTests
         playback.Reload(new[] { new PageDefinition { Enabled = false } });
         Assert.Null(playback.Tick(DateTimeOffset.UnixEpoch, new Dictionary<string, object?>()));
     }
+    [Fact]
+    public void RefreshIntervalCachesValuesUntilNextRefresh()
+    {
+        var playback = new PagePlayback();
+        playback.Reload(new[] { new PageDefinition
+        {
+            Id = "dynamic", Line1Template = "{Test.Value}",
+            RefreshIntervalMilliseconds = 2000, DurationSeconds = 10
+        } });
+        var now = DateTimeOffset.UnixEpoch;
+        var values = new Dictionary<string, object?> { ["Test.Value"] = "Before" };
+        Assert.StartsWith("Before", playback.Tick(now, values)!.Line1);
+        values["Test.Value"] = "After";
+        Assert.StartsWith("Before", playback.Tick(now.AddMilliseconds(1000), values)!.Line1);
+        Assert.StartsWith("After", playback.Tick(now.AddMilliseconds(2000), values)!.Line1);
+    }
+
+    [Fact]
+    public void PageChangeRendersImmediatelyEvenWhenRefreshIsLong()
+    {
+        var playback = new PagePlayback();
+        playback.Reload(new[]
+        {
+            new PageDefinition { Id = "first", Line1Template = "First", DurationSeconds = 1, RefreshIntervalMilliseconds = 60000 },
+            new PageDefinition { Id = "second", Line1Template = "Second", DurationSeconds = 1, RefreshIntervalMilliseconds = 60000 }
+        });
+        var now = DateTimeOffset.UnixEpoch;
+        var values = new Dictionary<string, object?>();
+        Assert.StartsWith("First", playback.Tick(now, values)!.Line1);
+        Assert.StartsWith("Second", playback.Tick(now.AddSeconds(1), values)!.Line1);
+    }
+
 }
