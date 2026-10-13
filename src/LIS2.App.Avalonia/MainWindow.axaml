@@ -265,7 +265,7 @@
                 <CheckBox Name="PageEnabled" Grid.Row="7" Grid.Column="1" />
               </Grid>
               <StackPanel Orientation="Horizontal" Spacing="8">
-                <ComboBox Name="PageVariablePicker" Width="220" Watermark="Available template variables" />
+                <ComboBox Name="PageVariablePicker" Width="220" />
                 <Button Name="PageInsertLine1" Content="Insert into line 1" />
                 <Button Name="PageInsertLine2" Content="Insert into line 2" />
                 <Button Name="PageRefreshVariables" Content="Refresh variables" />
