@@ -31,7 +31,13 @@
         <StackPanel Spacing="8">
           <TextBlock Text="Migration status" FontWeight="SemiBold" />
           <TextBlock Name="SectionDescription" Text="Dashboard is not connected to the LIS2 runtime yet." TextWrapping="Wrap" />
-          <TextBlock Text="No hardware commands are sent by this preview shell." Opacity="0.7" />
+          <TextBlock Text="Virtual mode only: no physical hardware or fans are accessed." Opacity="0.7" />
+          <TextBlock Name="VirtualStatus" Text="Virtual LIS2: disconnected" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Name="VirtualConnect" Content="Connect virtual LIS2" />
+            <Button Name="VirtualDemo" Content="Send demo display" IsEnabled="False" />
+            <Button Name="VirtualDisconnect" Content="Disconnect" IsEnabled="False" />
+          </StackPanel>
         </StackPanel>
       </Border>
     </StackPanel>
