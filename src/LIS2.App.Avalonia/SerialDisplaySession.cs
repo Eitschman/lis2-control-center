@@ -14,6 +14,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
     private bool _fanTransition;
     private bool _disposed;
     private bool _disconnected;
+    private bool _closing;
     public bool FansRunning => _fanLoop is not null;
     public bool FansBusy => _fanTransition;
     public Exception? FanFault => _fanLoop?.LastFault;
@@ -27,7 +28,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
         try
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
-            if (_disconnected) throw new InvalidOperationException("Session was disconnected.");
+            if (_disconnected || _closing) throw new InvalidOperationException("Session is closing or disconnected.");
             await _session.ConnectDisplayOnlyAsync(cancellationToken);
         }
         finally { _lifecycle.Release(); }
@@ -39,7 +40,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
         try
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
-            if (_disconnected) throw new InvalidOperationException("Session was disconnected.");
+            if (_disconnected || _closing) throw new InvalidOperationException("Session is closing or disconnected.");
             if (_fanLoop is not null) throw new InvalidOperationException("Fan control already active.");
             var runtime = new FanRuntime(sensors, _session, channels);
             var loop = new FanRuntimeLoop(runtime, onFault: _ => _session.RevokeFansAsync());
@@ -106,6 +107,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
 
     public async Task DisconnectAsync(CancellationToken cancellationToken = default)
     {
+        _closing = true;
         await _lifecycle.WaitAsync();
         _fanTransition = true;
         try
@@ -125,6 +127,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
     public Task SetBrightnessAsync(Lis2Brightness brightness, CancellationToken cancellationToken = default) => _session.SetBrightnessAsync(brightness, cancellationToken);
     public async ValueTask DisposeAsync()
     {
+        _closing = true;
         await _lifecycle.WaitAsync();
         _fanTransition = true;
         try
