@@ -55,6 +55,7 @@ public partial class MainWindow
         InitializePageVariables();
         InitializeHomeAssistant();
         LoadPortableWorkspace();
+        InitializeWindowsSettingsImport();
         _ = StartPageSourcesAsync();
     }
 
