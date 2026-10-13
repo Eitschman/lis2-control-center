@@ -64,8 +64,7 @@ public partial class MainWindow : Window
 
         InitializeGlyphEditor();
         InitializePagesEditor();
-        this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.Checked += (_, _) => _ = SavePortableWorkspaceAsync();
-        this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.Unchecked += (_, _) => _ = SavePortableWorkspaceAsync();
+        this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
         Closed += OnWindowClosed;
         UpdateSection();
         UpdateVirtualControls();
