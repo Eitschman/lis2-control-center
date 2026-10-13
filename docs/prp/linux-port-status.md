@@ -1,8 +1,14 @@
-# Linux/Avalonia port — implementation status
+# Windows + Linux shared Avalonia port — implementation status
 
 Date: 2026-10-13
 Branch: `feature/linux-avalonia`
-Status: **Phase 1 groundwork only — no Linux desktop app yet**
+Status: **Shared cross-platform groundwork only — no Avalonia desktop app yet**
+
+## Target architecture
+- ONE Avalonia UI and application runtime for Windows x64 and Linux x64/ARM64.
+- Windows-only providers (Winamp, GSMTC, native plugins) and Linux-only providers (MPRIS, Linux sensors) are selected behind common interfaces.
+- The WPF app remains an interim regression baseline, not a permanent separate Windows product.
+- Both Windows and Linux builds, UI behavior, packaging and hardware safety must be validated before WPF retirement.
 
 ## Implemented
 - Retargeted `LIS2.Core`, `LIS2.Display`, `LIS2.Fans` to `net8.0`, overriding the inherited Windows-only framework. Existing Windows WPF app remains unchanged.
@@ -20,8 +26,8 @@ Status: **Phase 1 groundwork only — no Linux desktop app yet**
 ## Next work
 1. Confirm Ubuntu workflow success and Windows solution CI.
 2. Introduce platform-neutral application runtime with tests while preserving WPF behavior.
-3. Add independent Avalonia app and virtual LIS2 smoke test.
-4. Implement Linux providers, then UI feature parity and physical-device safety validation.
+3. Add a single shared Avalonia app that targets Windows and Linux and a virtual LIS2 smoke test.
+4. Implement Windows and Linux providers, then UI feature parity and physical-device safety validation on both systems.
 
 ## Pull request gate
 Open a PR against `main` only when a coherent, tested slice is ready. Keep this branch isolated until then.
