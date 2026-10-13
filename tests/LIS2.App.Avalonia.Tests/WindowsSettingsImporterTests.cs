@@ -39,6 +39,23 @@ public sealed class WindowsSettingsImporterTests
     }
 
     [Fact]
+    public void PartialImportPreservesExistingSettings()
+    {
+        var existing = new PortableWorkspace
+        {
+            HomeAssistantUrl = "https://existing.test",
+            BrightnessPercent = 75,
+            Pages = new List<PageDefinition> { new() { Id = "old", Name = "Old", DurationSeconds = 5 } }
+        };
+        var imported = WindowsSettingsImporter.Import("{\"ThemeMode\":\"Dark\"}", existing);
+        Assert.Equal("https://existing.test", imported.HomeAssistantUrl);
+        Assert.Equal(75, imported.BrightnessPercent);
+        Assert.Single(imported.Pages);
+        Assert.Equal("Dark", imported.ThemeMode);
+        Assert.Equal("System", existing.ThemeMode);
+    }
+
+    [Fact]
     public void InvalidOriginalPageConfigurationIsRejected()
     {
         Assert.Throws<InvalidOperationException>(() =>
