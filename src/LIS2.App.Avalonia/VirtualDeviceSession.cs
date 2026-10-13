@@ -43,6 +43,9 @@ public sealed class VirtualDeviceSession : IAsyncDisposable
         await _device.WriteRawDisplayBytesAsync(2, 0, secondLine, cancellationToken);
     }
 
+    public Task ProgramGlyphAsync(int slot, byte[] rows, CancellationToken cancellationToken = default) =>
+        _device.ProgramCharacterAsync(slot, rows, cancellationToken);
+
     public Task ClearAsync(CancellationToken cancellationToken = default) =>
         _device.ClearAsync(cancellationToken);
 
