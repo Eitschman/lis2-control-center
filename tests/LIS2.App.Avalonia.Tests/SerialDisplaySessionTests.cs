@@ -116,6 +116,35 @@ public sealed class SerialDisplaySessionTests
             session.StartFansAsync(new SimulatedFanSensors(), channels));
     }
 
+    [Fact]
+    public async Task DisposeDuringBlockedStartDrainsAndRejectsFurtherAuthorization()
+    {
+        var transport = new VirtualLis2Transport();
+        var session = new SerialDisplaySession(transport);
+        await session.ConnectAsync();
+        var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var channels = Enumerable.Range(0, 4).Select(_ => new FanChannelConfiguration
+        {
+            Mode = FanMode.Curve, SensorKey = "cpu", MinimumPercent = 30,
+            MaximumPercent = 100, FailSafePercent = 100
+        }).ToArray();
+        var start = Task.Run(() => session.StartFansAsync(new BlockingSensors(entered, release), channels));
+        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        var dispose = session.DisposeAsync().AsTask();
+        Assert.False(dispose.IsCompleted);
+        release.TrySetResult(true);
+        await start;
+        await dispose;
+        Assert.False(session.IsConnected);
+        Assert.False(session.FansRunning);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => session.ConnectAsync());
+        await Assert.ThrowsAsync<ObjectDisposedException>(() =>
+            session.StartFansAsync(new SimulatedFanSensors(), channels));
+        await session.DisposeAsync();
+    }
+
     private sealed class BlockingSensors : IFanSensorSource
     {
         private readonly TaskCompletionSource<bool> _entered;
