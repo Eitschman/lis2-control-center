@@ -12,6 +12,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
     private FanRuntimeLoop? _fanLoop;
     private bool _fanTransition;
     public bool FansRunning => _fanLoop is not null;
+    public bool FansBusy => _fanTransition;
     public Exception? FanFault => _fanLoop?.LastFault;
     public SerialDisplaySession(string portName) : this(new SerialLis2Transport(portName)) { }
     public SerialDisplaySession(ILis2Transport transport) => _session = new UnifiedLis2Session(transport);
@@ -36,9 +37,12 @@ public sealed class SerialDisplaySession : IAsyncDisposable
             }
             catch
             {
-                await loop.DisposeAsync();
-                await runtime.DisposeAsync();
-                await _session.RevokeFansAsync();
+                try { await loop.DisposeAsync(); }
+                finally
+                {
+                    try { await runtime.DisposeAsync(); }
+                    finally { await _session.RevokeFansAsync(); }
+                }
                 throw;
             }
         }

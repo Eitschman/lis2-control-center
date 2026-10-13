@@ -187,9 +187,9 @@ public partial class MainWindow
         var session = _serialDisplay;
         var connected = session?.IsConnected == true;
         var running = session?.FansRunning == true;
-        start.IsEnabled = connected && !running && !_serialBusy &&
+        start.IsEnabled = connected && !running && session?.FansBusy != true && !_serialBusy &&
             this.FindControl<CheckBox>("FanHardwareConsent")?.IsChecked == true;
-        stop.IsEnabled = connected && running && !_serialBusy;
+        stop.IsEnabled = connected && running && session?.FansBusy != true && !_serialBusy;
     }
 
     private async Task StopVirtualFanSessionAsync()

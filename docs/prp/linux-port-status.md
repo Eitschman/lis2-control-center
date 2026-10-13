@@ -174,3 +174,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Shared live serial fan/display integration (2026-10-13)
 - SerialDisplaySession now owns an optional FanRuntime/FanRuntimeLoop over the SAME UnifiedLis2Session and serial transport used for display. Explicit UI checkbox and start/stop buttons enable fan writes only on a connected port; consent is not persisted and is cleared on start. Safe 100% frame precedes the first regulated write, stop drains periodic output and restores the safe frame without closing the display, disconnect/dispose drain fans first. Display commands are serialized through the unified gate. Added virtual transport regression for display -> fan authorization -> regulation -> safe revocation -> continued display. Windows temperature provider remains unavailable; missing sensor keys fail safe. Real hardware validation deferred by owner. CI pending.
+
+## Shared serial session regression coverage (2026-10-13)
+- Added end-to-end VirtualLis2Transport tests through SerialDisplaySession verifying a single connected display port, initial safety frame, regulated frame, interleaved display commands, stop without disconnect, and disconnect while fan loop is active. UI disables start/stop during a fan transition. CI validation required.
