@@ -6,8 +6,15 @@ namespace LIS2.App.Avalonia;
 
 public partial class MainWindow
 {
-    private readonly DispatcherTimer _pageTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
+    private PeriodicRuntimeLoop _pageTimer = null!;
     private PageSequenceController? _virtualSequence;
+
+    private PeriodicRuntimeLoop CreatePageTimer() => new(
+        TimeSpan.FromMilliseconds(250),
+        _ => { Dispatcher.UIThread.Post(async () =>
+        {
+            if (_virtualSequence?.IsRunning == true) await TickPagePlaybackAsync();
+        }); return Task.CompletedTask; });
 
     private PageSequenceController CreateVirtualSequence() => new(
         (frame, cancellationToken) => _virtualDevice.RenderBothAsync(frame.Line1, frame.Line2, cancellationToken),
@@ -15,7 +22,9 @@ public partial class MainWindow
 
     private void InitializePagePlayback()
     {
-        _pageTimer.Tick += async (_, _) => await TickPagePlaybackAsync();
+        _pageTimer = CreatePageTimer();
+        // The timer runs headlessly; UI and source snapshots stay on the UI thread.
+
         this.FindControl<Button>("PagePlaybackStart")!.Click += async (_, _) =>
         {
             if (_virtualSequence?.IsRunning == true || _virtualSequence?.IsBusy == true) return;

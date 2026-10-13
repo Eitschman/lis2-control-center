@@ -6,7 +6,7 @@ namespace LIS2.App.Avalonia;
 
 public partial class MainWindow
 {
-    private readonly DispatcherTimer _serialPlaybackTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
+    private PeriodicRuntimeLoop _serialPlaybackTimer = null!;
     private PageSequenceController? _serialSequence;
 
     private PageSequenceController CreateSerialSequence() => new(
@@ -19,7 +19,11 @@ public partial class MainWindow
 
     private void InitializeSerialPlayback()
     {
-        _serialPlaybackTimer.Tick += async (_, _) => await TickSerialPlaybackAsync();
+        _serialPlaybackTimer = new PeriodicRuntimeLoop(TimeSpan.FromMilliseconds(250),
+            _ => { Dispatcher.UIThread.Post(async () =>
+            {
+                if (_serialSequence?.IsRunning == true) await TickSerialPlaybackAsync();
+            }); return Task.CompletedTask; });
         this.FindControl<Button>("SerialPlaybackStart")!.Click += async (_, _) =>
         {
             if (_serialDisplay?.IsConnected != true || _serialBusy || _serialSequence?.IsRunning == true ||

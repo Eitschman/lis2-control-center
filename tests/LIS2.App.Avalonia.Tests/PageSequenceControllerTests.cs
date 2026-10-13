@@ -104,4 +104,40 @@ public sealed class PageSequenceControllerTests
         Assert.False(runtime.IsRunning);
     }
 
+    [Fact]
+    public async Task PeriodicRuntimeLoopStopsWithoutFurtherCallbacks()
+    {
+        var count = 0;
+        await using var loop = new PeriodicRuntimeLoop(TimeSpan.FromMilliseconds(10),
+            _ => { Interlocked.Increment(ref count); return Task.CompletedTask; });
+        Assert.True(loop.Start());
+        Assert.False(loop.Start());
+        await Task.Delay(75);
+        await loop.StopAndDrainAsync();
+        var stoppedAt = Volatile.Read(ref count);
+        Assert.True(stoppedAt > 0);
+        await Task.Delay(40);
+        Assert.Equal(stoppedAt, Volatile.Read(ref count));
+        Assert.True(loop.Start());
+        await Task.Delay(30);
+        await loop.StopAndDrainAsync();
+        Assert.True(Volatile.Read(ref count) > stoppedAt);
+    }
+
+    [Fact]
+    public async Task PeriodicRuntimeLoopDrainsInFlightCallback()
+    {
+        var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await using var loop = new PeriodicRuntimeLoop(TimeSpan.FromMilliseconds(10),
+            async _ => { entered.TrySetResult(true); await release.Task; });
+        Assert.True(loop.Start());
+        await entered.Task;
+        var drain = loop.StopAndDrainAsync();
+        Assert.False(drain.IsCompleted);
+        Assert.False(loop.Start());
+        release.SetResult(true);
+        await drain;
+        Assert.False(loop.IsRunning);
+    }
 }

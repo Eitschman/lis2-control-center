@@ -75,6 +75,8 @@ public partial class MainWindow : Window
     {
         StopPagePlayback();
         StopHomeAssistantUi();
+        await _pageTimer.StopAndDrainAsync();
+        await _serialPlaybackTimer.StopAndDrainAsync();
         if (_virtualSequence is not null) await _virtualSequence.StopAndDrainAsync();
         await CloseSerialDisplayAsync();
         await _virtualDevice.DisposeAsync();
