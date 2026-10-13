@@ -46,6 +46,26 @@ public sealed class PageWorkspaceTests
     }
 
     [Fact]
+    public void VisibilityExpressionsUseSharedDisplaySemantics()
+    {
+        var evaluator = new LIS2.Display.VisibilityEvaluator();
+        var values = new Dictionary<string, object?> { ["Winamp.State"] = "Playing" };
+        Assert.True(evaluator.IsVisible("Winamp.State=Playing", values));
+        Assert.False(evaluator.IsVisible("Winamp.State=Paused", values));
+        Assert.False(LIS2.Display.VisibilityEvaluator.TryParse("invalid expression", out _, out _, out _));
+    }
+
+    [Fact]
+    public void InvalidVisibilityImportDoesNotReplaceExistingPages()
+    {
+        var workspace = new PageWorkspace();
+        workspace.Add();
+        Assert.Throws<InvalidOperationException>(() =>
+            workspace.ImportJson("[{\\"Id\\":\\"valid\\",\\"DurationSeconds\\":5,\\"RefreshIntervalMilliseconds\\":1000,\\"VisibilityExpression\\":\\"invalid\\"}]"));
+        Assert.Single(workspace.Pages);
+    }
+
+    [Fact]
     public void InvalidImportDoesNotReplaceExistingPages()
     {
         var workspace = new PageWorkspace();
