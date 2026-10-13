@@ -43,6 +43,7 @@ public partial class MainWindow : Window
         try
         {
             await action();
+            UpdatePreview();
             SetVirtualStatus(_virtualDevice.IsConnected
                 ? $"Virtual LIS2: connected ({_virtualDevice.CommandCount} commands)"
                 : "Virtual LIS2: disconnected");
@@ -55,6 +56,25 @@ public partial class MainWindow : Window
         {
             _busy = false;
             UpdateVirtualControls();
+        }
+    }
+
+    private void UpdatePreview()
+    {
+        var first = this.FindControl<TextBlock>("PreviewLine1");
+        var second = this.FindControl<TextBlock>("PreviewLine2");
+        if (first is null || second is null)
+            return;
+
+        if (_virtualDevice.IsConnected && _virtualDevice.CommandCount > 0)
+        {
+            first.Text = "LIS2 Control Center";
+            second.Text = "Avalonia Windows/Linux";
+        }
+        else
+        {
+            first.Text = "                    ";
+            second.Text = "                    ";
         }
     }
 
@@ -71,6 +91,9 @@ public partial class MainWindow : Window
         this.FindControl<Button>("VirtualConnect")!.IsEnabled = !_busy && !connected;
         this.FindControl<Button>("VirtualDemo")!.IsEnabled = !_busy && connected;
         this.FindControl<Button>("VirtualDisconnect")!.IsEnabled = !_busy && connected;
+        var badge = this.FindControl<TextBlock>("ConnectionText");
+        if (badge is not null)
+            badge.Text = connected ? "Connected (Virtual)" : "Disconnected";
     }
 
     private void OnNavigationChanged(object? sender, SelectionChangedEventArgs e) =>
@@ -81,7 +104,8 @@ public partial class MainWindow : Window
         if (this.FindControl<ListBox>("Navigation") is not { SelectedItem: ListBoxItem item })
             return;
 
-        var section = item.Content?.ToString() ?? "Dashboard";
+        var rawLabel = item.Content?.ToString() ?? "Dashboard";
+        var section = rawLabel.Length > 5 ? rawLabel[5..].Trim() : rawLabel;
         var title = this.FindControl<TextBlock>("SectionTitle");
         var description = this.FindControl<TextBlock>("SectionDescription");
 
@@ -89,6 +113,8 @@ public partial class MainWindow : Window
             title.Text = section;
 
         if (description is not null)
-            description.Text = $"{section} is not connected to the LIS2 runtime yet.";
+            description.Text = section == "Dashboard"
+                ? "Overview and quick access to the most important functions."
+                : $"{section} is not connected to the LIS2 runtime yet.";
     }
 }
