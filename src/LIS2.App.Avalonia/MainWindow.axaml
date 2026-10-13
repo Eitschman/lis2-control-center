@@ -57,22 +57,61 @@
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
                 <Border Background="#07190E" BorderBrush="#33523D" BorderThickness="1" CornerRadius="6" Padding="24,20">
                   <StackPanel>
-                    <TextBlock Name="PreviewLine1" Text="                    " FontFamily="Consolas" FontSize="25" Foreground="#70EF86" />
-                    <TextBlock Name="PreviewLine2" Text="                    " FontFamily="Consolas" FontSize="25" Foreground="#70EF86" />
+                    <TextBlock Name="PreviewLine1" Text="                    " FontFamily="Consolas" FontSize="31" Foreground="#70EF86" />
+                    <TextBlock Name="PreviewLine2" Text="                    " FontFamily="Consolas" FontSize="31" Foreground="#70EF86" />
                   </StackPanel>
                 </Border>
-                <TextBlock Text="Virtual LIS2 preview (hardware-free)" Opacity="0.65" />
                 <Button Name="VirtualDemo" Content="Send demo display" IsEnabled="False" HorizontalAlignment="Left" />
               </StackPanel>
             </Border>
-            <Border Grid.Column="2" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
-              <StackPanel Spacing="10">
-                <TextBlock Text="Connection" FontSize="16" FontWeight="SemiBold" />
-                <TextBlock Text="Virtual transport during migration" TextWrapping="Wrap" />
-                <TextBlock Text="Physical LIS2 and fan control are not connected." Opacity="0.7" TextWrapping="Wrap" />
-              </StackPanel>
-            </Border>
+            <StackPanel Grid.Column="2" Spacing="14">
+              <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="System Status" FontSize="16" FontWeight="SemiBold" />
+                  <TextBlock Name="VirtualStateText" Text="State available when Virtual transport is active." TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Quick Links" FontSize="16" FontWeight="SemiBold" />
+                  <Button Name="OpenDisplayControls" Content="Open Display Controls" />
+                  <Button Name="OpenFanControl" Content="Open Fan Control" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
           </Grid>
+          <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Fan Outputs" FontWeight="SemiBold" FontSize="16" />
+              <Grid ColumnDefinitions="*,18,*" RowDefinitions="Auto,12,Auto,14,Auto">
+                <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="70,*,55">
+                <TextBlock Grid.Column="0" Text="Fan 1" VerticalAlignment="Center" />
+                <Slider Name="DashboardFan1Slider" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="6,0,10,0" IsEnabled="False" />
+                <TextBlock Name="DashboardFan1Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
+              </Grid>
+                <Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="70,*,55">
+                <TextBlock Grid.Column="0" Text="Fan 2" VerticalAlignment="Center" />
+                <Slider Name="DashboardFan2Slider" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="6,0,10,0" IsEnabled="False" />
+                <TextBlock Name="DashboardFan2Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
+              </Grid>
+                <Grid Grid.Row="2" Grid.Column="0" ColumnDefinitions="70,*,55">
+                <TextBlock Grid.Column="0" Text="Fan 3" VerticalAlignment="Center" />
+                <Slider Name="DashboardFan3Slider" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="6,0,10,0" IsEnabled="False" />
+                <TextBlock Name="DashboardFan3Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
+              </Grid>
+                <Grid Grid.Row="2" Grid.Column="2" ColumnDefinitions="70,*,55">
+                <TextBlock Grid.Column="0" Text="Fan 4" VerticalAlignment="Center" />
+                <Slider Name="DashboardFan4Slider" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="6,0,10,0" IsEnabled="False" />
+                <TextBlock Name="DashboardFan4Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
+              </Grid>
+                <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Name="DashboardFansApply" Content="Apply" HorizontalAlignment="Right" MinWidth="110" IsEnabled="False" />
+              </Grid>
+              <TextBlock Text="Fan outputs are read-only until the safety-reviewed fan runtime is ported." Opacity="0.65" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="6" Padding="12,9">
+            <TextBlock Text="💡  Tip: Use the navigation on the left to access display settings, page editor, Winamp integration, hardware and fan control." TextWrapping="Wrap" />
+          </Border>
         </StackPanel>
       </ScrollViewer>
     </Grid>
