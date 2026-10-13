@@ -6,6 +6,20 @@ Status: **IMPLEMENTATION STARTED ON feature/linux-avalonia** (2026-10-13). Prese
 
 This section supersedes the earlier immutable two-commit Phase 1 packaging plan and any obsolete next-work lists. The owner explicitly approved splitting **fan Integration & Safety** into two independently testable, cohesive packages. The strict no-partial-package rule still applies **within** each agreed package. Never reinterpret an unfinished package as done.
 
+### General package-sizing authority — applies to the ENTIRE port
+
+**The assistant independently chooses and sizes the next work package.** The owner must not have to break work into tasks, repeatedly approve boundaries, or signal "green" to proceed. This rule applies to all remaining phases (runtime, sensors, serial, UI, media, settings, packaging, testing and WPF retirement), not just fan work.
+
+- Prefer **large, coherent, end-to-end vertical slices** with a meaningful, demonstrable result, spanning implementation, integration, regression tests and documentation. Avoid file-by-file, method-by-method, placeholder-only or CI-trigger commits.
+- Balance scope against **actual executability in the available tools and context window**. A package should be substantial but small enough to inspect, implement, review, commit and validate reliably without relying on future turns to finish its agreed acceptance criteria. Avoid giant packages that are practically impossible to complete.
+- Choose boundaries by **functional cohesion, safety and testability**, not arbitrary numbers of files or commits. If a feature cannot safely be enabled yet, a complete headless subsystem with a stable interface, realistic simulation and comprehensive tests may be a valid package; describe its limitations clearly.
+- Before starting, briefly record the package's intended outcome, required files/layers, dependencies, acceptance tests and explicit exclusions. This is an **internal execution decision**, not a request for user permission. Adjust the size **before committing** when inspection reveals unexpected dependencies; document why. Ask the owner only for a genuine product/safety decision or material scope change, not for ordinary engineering decomposition.
+- Keep incomplete changes uncommitted until a coherent package is ready; do not claim completion merely because a commit exists. CI failures may receive targeted repair commits. When CI is green, continue automatically with the next suitably sized package if work is authorized and execution resources permit.
+- Give occasional **substantive progress updates** during long execution, including completed integration areas, remaining risks and verified CI results. Do not replace implementation with repeated planning/status messages.
+- At handover, provide exact HEAD/CI, what was actually completed and the next **self-contained, appropriately sized package** so another session can continue without renegotiating granularity.
+
+**Priority:** This general rule supersedes older text that mandates an immutable package breakdown or owner approval for routine resizing. Safety gates, WPF parity, CI verification and the ban on misleading partial completion remain mandatory. Owner-approved specific boundaries (such as current fan package A/B) remain in force until finished or a justified revision is recorded.
+
 ### Read first on every new chat or work session
 1. Read this PRP completely, then `docs/prp/linux-port-status.md`, `docs/architecture.md`, `docs/protocol.md`, relevant source/tests and current GitHub branch HEAD. Do not rely on old chat summaries as source of truth.
 2. Check the **latest HEAD's** Windows and Ubuntu CI jobs and exact failing logs **before** any new implementation. Repair failed CI first. An older green commit never validates the new HEAD.
