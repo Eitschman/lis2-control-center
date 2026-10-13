@@ -25,7 +25,7 @@ public partial class MainWindow
         _serialPlaybackTimer.Tick += async (_, _) => await TickSerialPlaybackAsync();
         this.FindControl<Button>("SerialPlaybackStart")!.Click += async (_, _) =>
         {
-            if (_serialDisplay?.IsConnected != true || _serialBusy || _serialPlaybackActive) return;
+            if (_serialDisplay?.IsConnected != true || _serialBusy || _serialPlaybackActive || _serialPlaybackBusy) return;
             if (SelectedPageIndex is not null && !SavePageEditor()) return;
             _serialPlayback.Reload(_pages.Pages);
             _serialFrameDispatcher = CreateSerialFrameDispatcher();
