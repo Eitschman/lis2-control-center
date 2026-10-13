@@ -1,9 +1,9 @@
-# PRP: Cross-platform LIS2 Control Center (Avalonia / Linux)
+# PRP: Cross-platform LIS2 Control Center (Avalonia / Windows + Linux)
 
-Status: **PLANNED — NOT STARTED**. Baseline: repository main as inspected 2026-10-13. This document is a future implementation checklist, not evidence of completed porting. Do not begin implementation without a separate decision. Preserve existing Windows release behavior throughout.
+Status: **IMPLEMENTATION STARTED ON feature/linux-avalonia** (2026-10-13). Preserve existing Windows release behavior throughout. See [implementation status](linux-port-status.md).
 
 ## Goal and scope
-Deliver a native Linux desktop build (first x64, then ARM64), retaining the current LIS2 display/page/fan features and Home Assistant integration. Continue supporting Windows Winamp (native x86 plugin) and modern Windows Media Player (GSMTC). On Linux add MPRIS-compatible players (e.g. VLC/Plexamp when MPRIS is exposed); Wine Winamp interoperability is optional research, not a guaranteed deliverable. Windows Media Player is not a native Linux application. Use **Avalonia UI** as preferred UI migration path; Wails/Go was assessed and rejected provisionally because it introduces a Go/C# boundary or backend rewrite.
+Deliver ONE shared Avalonia desktop application for Windows x64 and Linux x64/ARM64, retaining the current LIS2 display/page/fan features and Home Assistant integration. Continue supporting Windows Winamp (native x86 plugin) and modern Windows Media Player (GSMTC). On Linux add MPRIS-compatible players (e.g. VLC/Plexamp when MPRIS is exposed); Wine Winamp interoperability is optional research, not a guaranteed deliverable. Windows Media Player is not a native Linux application. Use **Avalonia UI** as preferred UI migration path; Wails/Go was assessed and rejected provisionally because it introduces a Go/C# boundary or backend rewrite.
 
 ## Baseline and references
 - `README.md`: features, known protocol gaps, release status.
@@ -21,11 +21,11 @@ Deliver a native Linux desktop build (first x64, then ARM64), retaining the curr
 - `native/LIS2.WinampPlugin`: native Win32 gen_lis2.dll.
 - `.github/workflows/build.yml`: Windows restore/build/tests/WPF UI smoke and regression, win-x64 publish and x86 Winamp plugin; deferred WMP Legacy jobs.
 
-**Evidence limits:** Above paths and key entry points were inspected, but not every file, runtime behavior or dependency has been audited. Before coding, enumerate repository tree and all C# / XAML / native sources; validate every candidate file and method name. No Linux build or hardware test has yet been performed.
+**Evidence limits:** Uploaded repository ZIP was fully enumerated and statically scanned (172 files); full semantic review, runtime tests, and real hardware validation are outstanding. See [inventory](linux-port-inventory.md).
 
 ## Definition of done
-- Windows CI and existing Winamp/GSMTC features remain green throughout.
-- Linux x64 desktop starts and runs on a real Linux desktop; ARM64 validated separately.
+- One shared Avalonia UI and shared runtime ship on Windows x64 AND Linux x64/ARM64; existing Winamp/GSMTC features remain available on Windows. Windows CI stays green throughout.
+- Avalonia desktop starts and runs on real Windows x64 and Linux x64 desktops; Linux ARM64 validated separately.
 - Serial LIS2 or virtual transport, brightness, glyphs, page templates, scroll/events, HA and four fan modes operate as applicable.
 - Linux MPRIS metadata, playback state and timeline available to page templates; missing player state handled.
 - Linux hardware sensors have stable identities and safe missing-sensor behavior; fan fail-safe verified under disconnect and invalid data.
@@ -78,28 +78,28 @@ Deliver a native Linux desktop build (first x64, then ARM64), retaining the curr
 - [ ] Document spectrum/VU limitation: MPRIS metadata does **not** expose Winamp's raw 20-band spectrum; do not claim parity without a separate audio-analysis backend.
 
 ## Phase 4 — Avalonia UI
-- [ ] Create `src/LIS2.App.Avalonia` as separate app initially; do not replace `LIS2.App` WPF.
+- [ ] Create `src/LIS2.App.Avalonia` as a temporary parallel application; this is the **single future cross-platform Windows/Linux GUI**, not a Linux-only fork. Keep WPF only as migration reference until Windows Avalonia parity is proven.
 - [ ] Port shell/navigation, dashboard, device connection and virtual LIS2 display first.
 - [ ] Port page sequence editor, template/visibility builders, preview, scrolling and overlays.
 - [ ] Port CG Builder, custom glyph editing and raw ROM test UI.
 - [ ] Port hardware sensor browser, fan channels, curve editor and fail-safe status.
 - [ ] Port Home Assistant entity/attribute browser and source configuration.
-- [ ] Port Winamp, WindowsMedia and Linux media cards with capability-based visibility.
-- [ ] Port all settings, diagnostics, export, help, six-language localization and theme modes.
+- [ ] Port Windows Winamp/GSMTC and Linux MPRIS media cards into the SAME Avalonia app with capability-based visibility.
+- [ ] Port all settings, diagnostics, export, help, existing five translation languages plus system-language mode, and theme modes.
 - [ ] Implement Linux tray behavior for KDE/other desktops, window close-to-tray, single instance, autostart and splash; document Wayland/X11 differences.
 - [ ] Replace WPF-specific converters, bindings, resource dictionaries, window chrome, icon generation and WinForms tray with Avalonia/platform equivalents.
 - [ ] Compare each screen with Windows baseline and test high-DPI, keyboard navigation, resizing, localization overflow and startup failure behavior.
 
 ## Phase 5 — CI, packaging and validation
 - [ ] Preserve existing Windows Actions and native plugin artifacts unchanged while introducing Linux jobs.
-- [ ] Add Linux x64 restore/build/unit tests, virtual transport smoke tests and UI smoke tests with suitable display environment.
+- [ ] Add Windows x64 AND Linux x64 Avalonia restore/build/unit tests, virtual transport smoke tests and UI smoke tests with suitable display environments.
 - [ ] Add ARM64 build and actual ARM64 runtime validation (not just cross-publish).
 - [ ] Publish self-contained Linux x64/ARM64 artifacts; decide tar.gz/AppImage/deb only after dependency testing.
 - [ ] Document GTK/Wayland/X11/DBus/runtime dependencies, serial device access and secure secret-store prerequisites.
 - [ ] Add checksums, version metadata and release documentation; verify extracted archive launch.
 - [ ] Test on representative Debian/KDE desktop and Raspberry Pi 5 ARM64; record exact distro/kernel/runtime versions.
 - [ ] Test real LIS2 hardware only with explicit controlled fan-safe procedure; keep virtual transport as default during development.
-- [ ] Verify Windows win-x64, WPF UI smoke/regression, native gen_lis2.dll and release ZIP remain unchanged.
+- [ ] Verify existing Windows WPF build and native gen_lis2.dll remain unchanged during migration; add and validate Windows Avalonia win-x64 packaging and regression tests before switching the release.
 - [ ] Review crash handling, permissions, logs, restart behavior, disconnected sensors, and serial unplug/replug.
 - [ ] Update README, architecture, troubleshooting and user guide; decide whether WPF retirement is warranted only after parity.
 
@@ -109,7 +109,7 @@ Deliver a native Linux desktop build (first x64, then ARM64), retaining the curr
 3. **Gate C:** Linux core + virtual LIS2 + sensors/media adapters pass unit/integration tests.
 4. **Gate D:** Avalonia Linux UI reaches feature parity for virtual hardware.
 5. **Gate E:** Hardware safety and real-device validation complete; Linux release candidate.
-6. **Gate F:** Windows Avalonia parity reviewed; only then consider removing WPF.
+6. **Gate F:** Windows Avalonia feature parity (including Winamp/GSMTC), packaging and real desktop testing verified; only then retire WPF and switch BOTH Windows and Linux releases to shared Avalonia.
 
 ## Risks / non-goals
 - Fan safety is non-negotiable; never use unknown LIS2 commands or alter fail-safe semantics to obtain UI parity.
@@ -117,12 +117,12 @@ Deliver a native Linux desktop build (first x64, then ARM64), retaining the curr
 - Wine/Winamp, WMP Legacy, full spectrum capture on Linux and macOS are **not** prerequisites for first Linux release.
 - Do not assume hardware sensor IDs or permissions remain identical across OSes.
 - Do not migrate user settings destructively; provide backups and explicit fallback handling.
-- No implementation, branching or changes to existing source/build files are authorized by this planning document.
+- Implementation is authorized on the isolated feature branch; changes to main require review/merge.
 
 ## Status log
 - [x] 2026-10-13: Initial architecture evaluation; Avalonia selected as preferred direction over Wails.
 - [x] 2026-10-13: Planning checklist recorded.
-- [ ] Implementation started.
+- [x] 2026-10-13: Implementation started on feature/linux-avalonia; portable libraries and Ubuntu test workflow committed (not yet verified green).
 - [ ] Linux CI build green.
 - [ ] Linux UI feature parity reached.
 - [ ] Physical Linux LIS2 hardware verified.
