@@ -9,7 +9,12 @@ public partial class MainWindow
     private readonly DispatcherTimer _pageTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private bool _pagePlaybackActive;
     private bool _pageTickBusy;
-    private string? _lastPageFrame;
+    private PageFrameDispatcher? _virtualFrameDispatcher;
+
+    private PageFrameDispatcher CreateVirtualFrameDispatcher() => new(
+        async (frame, cancellationToken) =>
+            await _virtualDevice.RenderBothAsync(frame.Line1, frame.Line2, cancellationToken),
+        cancellationToken => _virtualDevice.ClearAsync(cancellationToken));
 
     private void InitializePagePlayback()
     {
@@ -24,7 +29,7 @@ public partial class MainWindow
             if (SelectedPageIndex is not null && !SavePageEditor())
                 return;
             _pagePlayback.Reload(_pages.Pages);
-            _lastPageFrame = null;
+            _virtualFrameDispatcher = CreateVirtualFrameDispatcher();
             _pagePlaybackActive = true;
             _pageTimer.Start();
             UpdatePagePlaybackControls();
@@ -38,7 +43,6 @@ public partial class MainWindow
     {
         _pageTimer.Stop();
         _pagePlaybackActive = false;
-        _lastPageFrame = null;
         UpdatePagePlaybackControls();
     }
 
@@ -63,18 +67,8 @@ public partial class MainWindow
         try
         {
             var frame = _pagePlayback.Tick(DateTimeOffset.UtcNow, PagePreviewValues());
-            if (frame is null)
-            {
-                UpdatePagePlaybackControls();
-                return;
-            }
-            var signature = frame.Line1 + "\n" + frame.Line2;
-            if (signature != _lastPageFrame)
-            {
-                await _virtualDevice.RenderBothAsync(frame.Line1, frame.Line2);
-                _lastPageFrame = signature;
-                UpdatePreview();
-            }
+            var changed = await (_virtualFrameDispatcher ?? throw new InvalidOperationException("Virtual playback not initialized.")).DispatchAsync(frame);
+            if (changed) UpdatePreview();
             UpdatePagePlaybackControls();
         }
         catch (Exception ex)
