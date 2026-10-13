@@ -156,3 +156,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Continuous read-only fan monitoring (2026-10-13)
 - Avalonia fan editor now supports start/stop of a 2-second continuous four-channel sensor-driven dry-run, with fail-safe indications, cancellation, and shutdown drain. The monitoring output uses SimulatedFanOutput exclusively; it never opens a serial port or authorizes hardware fans. Live physical fan activation remains gated pending complete safety review.
+
+## Dry-run monitor shutdown race (2026-10-13)
+- StopFanMonitorAsync now retains the running task and cancellation source until its completion, preventing a new preview from starting while the old one is still draining. This is read-only UI lifecycle hardening; hardware fan output remains disabled.

@@ -144,11 +144,17 @@ public partial class MainWindow
     {
         var stop = _fanMonitorStop;
         var task = _fanMonitorTask;
-        _fanMonitorStop = null;
-        _fanMonitorTask = null;
         stop?.Cancel();
         try { if (task is not null) await task; }
-        finally { stop?.Dispose(); }
+        finally
+        {
+            stop?.Dispose();
+            if (ReferenceEquals(_fanMonitorStop, stop))
+            {
+                _fanMonitorStop = null;
+                _fanMonitorTask = null;
+            }
+        }
     }
 
     private void RefreshFanEditor()
