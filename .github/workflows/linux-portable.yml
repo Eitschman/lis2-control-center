@@ -1,4 +1,4 @@
-name: Linux portable libraries
+name: Cross-platform portable libraries
 
 on:
   push:
@@ -14,8 +14,12 @@ permissions:
 
 jobs:
   portable:
-    name: Linux .NET 8 shared libraries
-    runs-on: ubuntu-latest
+    name: .NET 8 shared libraries (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
