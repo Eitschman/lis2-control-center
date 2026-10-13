@@ -25,8 +25,8 @@ public sealed class VirtualDeviceSession : IAsyncDisposable
 
     public async Task RenderBothAsync(string line1, string line2, CancellationToken cancellationToken = default)
     {
-        await _device.WriteLineAsync(0, line1, cancellationToken);
-        await _device.WriteLineAsync(1, line2, cancellationToken);
+        await _device.WriteLineAsync(1, line1, cancellationToken);
+        await _device.WriteLineAsync(2, line2, cancellationToken);
     }
 
     public Task SendSpecialCharacterTestAsync(CancellationToken cancellationToken = default) =>
@@ -61,8 +61,8 @@ public sealed class VirtualDeviceSession : IAsyncDisposable
             throw new InvalidOperationException("Connect the virtual LIS2 first.");
 
         await _device.ClearAsync(cancellationToken);
-        await _device.WriteLineAsync(0, "LIS2 Control Center", cancellationToken);
-        await _device.WriteLineAsync(1, "Avalonia Windows/Linux", cancellationToken);
+        await _device.WriteLineAsync(1, "LIS2 Control Center", cancellationToken);
+        await _device.WriteLineAsync(2, "Avalonia Windows/Linux", cancellationToken);
     }
 
     public ValueTask DisposeAsync() => _device.DisposeAsync();
