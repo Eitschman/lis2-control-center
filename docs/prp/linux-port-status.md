@@ -70,6 +70,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - Serial transport foundation: added `SerialPortDiscovery` with Linux `/dev/serial/by-id` preference, duplicate suppression and fallback to `SerialPort.GetPortNames`; added explicit-connect `SerialDisplaySession` wrapping the original 19200/8N1 transport for display-only commands, with no automatic reconnect or fan commands. Added discovery regression tests. This is NOT wired to the Avalonia UI yet; no hardware tests or fail-safe validation, and real-device fan control remains disabled. CI pending.
 
+- Serial UI integration: separate experimental controls in Avalonia shell for port discovery/selection, explicit connect/disconnect, writing both display lines, and clearing the display. Serial session is disposed on window close. Virtual display/pages/glyphs remain separate; fan control remains disabled. No auto-reconnect or real hardware verification. CI pending for this integration.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
