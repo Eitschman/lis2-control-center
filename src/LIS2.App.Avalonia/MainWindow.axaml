@@ -138,16 +138,16 @@
             <TextBlock Text="Character ROM / Special Characters" FontWeight="SemiBold" FontSize="16" />
             <TextBlock Text="Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display." TextWrapping="Wrap" Opacity="0.7" />
             <WrapPanel>
-              <Button Content="Send special-character test" IsEnabled="False" Margin="0,0,8,0" />
+              <Button Name="SendSpecialCharacterTest" Content="Send special-character test" Margin="0,0,8,0" />
               <TextBlock Text="Ä Ö Ü  ä ö ü  ß  °  µ  ±  £  ×  ÷  ← →  Ω π Σ √ ∞" FontFamily="Consolas" />
             </WrapPanel>
             <StackPanel Orientation="Horizontal" Spacing="7">
               <TextBlock Text="ROM start byte" VerticalAlignment="Center" />
-              <TextBox Text="80" Width="90" IsEnabled="False" />
-              <Button Content="Previous" IsEnabled="False" />
-              <Button Content="Send 40 bytes" IsEnabled="False" />
-              <Button Content="Next" IsEnabled="False" />
-              <TextBlock Text="80-A7" VerticalAlignment="Center" />
+              <TextBox Name="CharacterRomStartTextBox" Text="80" Width="90" MaxLength="2" />
+              <Button Name="CharacterRomPrevious" Content="Previous" />
+              <Button Name="SendCharacterRomRange" Content="Send 40 bytes" />
+              <Button Name="CharacterRomNext" Content="Next" />
+              <TextBlock Name="CharacterRomRangeText" Text="80-A7" VerticalAlignment="Center" />
             </StackPanel>
           </StackPanel>
         </Border>
