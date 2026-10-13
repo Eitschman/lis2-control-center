@@ -150,3 +150,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Sensor-provider I/O fail-safe (2026-10-13)
 - Sensor snapshot exceptions are treated as missing readings, so sensor-dependent channels still calculate and (when explicitly enabled) write their configured fail-safe outputs rather than silently stopping regulation. Added regression test for an I/O-failing provider. Physical fan output remains UI-disabled pending complete end-to-end safety acceptance.
+
+## Fault containment and disconnect attempt (2026-10-13)
+- Background fan-loop errors now preserve the original fault even if output disable or event subscribers throw. Ordered stop attempts output disable and serial disconnect even when loop draining fails. Actual physical output state still requires hardware validation.

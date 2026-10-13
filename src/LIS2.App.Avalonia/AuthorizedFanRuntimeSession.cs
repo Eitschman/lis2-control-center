@@ -56,10 +56,16 @@ public sealed class AuthorizedFanRuntimeSession : IAsyncDisposable
 
     public async Task StopAsync()
     {
-        await _loop.StopAndDrainAsync().ConfigureAwait(false);
-        await _runtime.SetOutputEnabledAsync(false, CancellationToken.None).ConfigureAwait(false);
-        _started = false;
-        if (_device.IsConnected) await _device.DisconnectAsync(CancellationToken.None).ConfigureAwait(false);
+        try { await _loop.StopAndDrainAsync().ConfigureAwait(false); }
+        finally
+        {
+            try { await _runtime.SetOutputEnabledAsync(false, CancellationToken.None).ConfigureAwait(false); }
+            finally
+            {
+                _started = false;
+                if (_device.IsConnected) await _device.DisconnectAsync(CancellationToken.None).ConfigureAwait(false);
+            }
+        }
     }
 
     public async ValueTask DisposeAsync()

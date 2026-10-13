@@ -46,11 +46,10 @@ public sealed class FanRuntimeLoop : IAsyncDisposable
             // A failed hardware write must not leave a silent dead control loop.
             // Disable output, clear history, and expose the failure to the operator.
             try { await _runtime.SetOutputEnabledAsync(false, CancellationToken.None).ConfigureAwait(false); }
-            finally
-            {
-                lock (_gate) _lastFault = ex;
-                Faulted?.Invoke(ex);
-            }
+            catch (Exception) { /* Preserve original loop failure. */ }
+            lock (_gate) _lastFault = ex;
+            try { Faulted?.Invoke(ex); }
+            catch (Exception) { /* Observer failures must not fault the loop. */ }
         }
     }
 
