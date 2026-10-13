@@ -2,7 +2,7 @@
 
 Date: 2026-10-13
 Branch: `feature/linux-avalonia`
-Status: **Shared Avalonia shell with virtual LIS2 session committed; latest changes awaiting CI validation**
+Status: **Active incremental port; CG Builder and Pages editor available in virtual transport; latest CI must be verified**
 
 ## Binding UI acceptance criterion
 - User confirmed 2026-10-13: The existing Windows WPF UI is the authoritative reference for **layout, placement, interactions, workflows and visual appearance** on BOTH Windows and Linux. The Avalonia sidebar/virtual buttons are temporary engineering scaffolding, not a proposed redesign.
@@ -43,6 +43,8 @@ Status: **Shared Avalonia shell with virtual LIS2 session committed; latest chan
 
 - Pages editor first functional block ported using the exact original WPF `PageDefinition` fields. `PageWorkspace` supports add/duplicate/delete/reorder, JSON roundtrip and `LIS2.Display.TemplateRenderer`-based 20x2 preview. Avalonia Pages view adds editing of name, both templates, duration, refresh, visibility expression, overflow modes, scroll timing and enabled state, plus virtual-device page send. Tests added for CRUD, templates, JSON and invalid imports. Commit 5b7d4b3. Not yet 1:1 complete: condition builder, template-variable picker, event test, persistent settings and full scrolling/scheduler integration remain pending; CI for integrated Pages view pending.
 - CG Builder integrated commits a31f630 and a5c85bed were verified successful on Windows and Linux CI; two red runs at intermediate commits 75d82759 and 348042e7 were superseded by green builds.
+
+- Pages editor follow-up: added Windows-style visibility condition builder (free-form template key, six comparison operators, value, apply), live syntax validation via existing `LIS2.Display.VisibilityEvaluator`, cross-platform page JSON import/export and transactional validation of visibility expressions and scroll timings. Existing WPF `PageDefinition` field names preserved. Added visibility semantics/import regression tests. This is manual file import/export, not automatic application-settings persistence; source-variable discovery, running scheduler, and full UI parity remain pending. Earlier intermediate CI red at f47089f and 3404f25 due to nonexistent Avalonia `ComboBox.Text`; corrected by TextBox input in eb c0f1f (commit `ebc0f1f`). Final integrated CI pending.
 
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
