@@ -80,7 +80,7 @@ public partial class MainWindow : Window
         if (_virtualSequence is not null) await _virtualSequence.StopAndDrainAsync();
         await CloseSerialDisplayAsync();
         await _virtualDevice.DisposeAsync();
-        await _pageSources.DisposeAsync();
+        await _runtime.DisposeAsync();
     }
 
     private async Task RunVirtualActionAsync(Func<Task> action)

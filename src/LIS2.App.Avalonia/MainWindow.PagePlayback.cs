@@ -16,7 +16,7 @@ public partial class MainWindow
             if (_virtualSequence?.IsRunning == true) await TickPagePlaybackAsync();
         }); return Task.CompletedTask; });
 
-    private PageSequenceController CreateVirtualSequence() => new(
+    private PageSequenceController CreateVirtualSequence() => _runtime.CreateSequence(
         (frame, cancellationToken) => _virtualDevice.RenderBothAsync(frame.Line1, frame.Line2, cancellationToken),
         cancellationToken => _virtualDevice.ClearAsync(cancellationToken));
 
@@ -73,7 +73,7 @@ public partial class MainWindow
         }
         try
         {
-            var changed = await _virtualSequence.TickAsync(DateTimeOffset.UtcNow, PagePreviewValues());
+            var changed = await _runtime.TickAsync(_virtualSequence);
             if (changed) UpdatePreview();
             UpdatePagePlaybackControls();
         }

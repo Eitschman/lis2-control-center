@@ -9,7 +9,7 @@ public partial class MainWindow
     private PeriodicRuntimeLoop _serialPlaybackTimer = null!;
     private PageSequenceController? _serialSequence;
 
-    private PageSequenceController CreateSerialSequence() => new(
+    private PageSequenceController CreateSerialSequence() => _runtime.CreateSequence(
         (frame, cancellationToken) =>
             (_serialDisplay ?? throw new InvalidOperationException("Serial LIS2 disconnected."))
                 .RenderBothAsync(frame.Line1, frame.Line2, cancellationToken),
@@ -65,7 +65,7 @@ public partial class MainWindow
         }
         try
         {
-            await _serialSequence.TickAsync(DateTimeOffset.UtcNow, PagePreviewValues());
+            await _runtime.TickAsync(_serialSequence);
             UpdateSerialPlaybackStatus();
         }
         catch (Exception ex)

@@ -6,7 +6,8 @@ namespace LIS2.App.Avalonia;
 public partial class MainWindow
 {
     private readonly PageWorkspace _pages = new();
-    private readonly PageSourceValues _pageSources = new();
+    private readonly DisplayRuntimeHost _runtime = new();
+    private PageSourceValues _pageSources => _runtime.Sources;
     private bool _loadingPage;
 
     private void InitializePagesEditor()
@@ -112,14 +113,14 @@ public partial class MainWindow
 
     private IReadOnlyDictionary<string, object?> PagePreviewValues()
     {
-        return _pageSources.Snapshot(DateTimeOffset.Now);
+        return _runtime.Snapshot();
     }
 
     private async Task StartPageSourcesAsync()
     {
         try
         {
-            await _pageSources.StartAsync();
+            await _runtime.StartSourcesAsync();
             RefreshPageVariables();
         }
         catch (Exception ex)
