@@ -123,12 +123,13 @@ public partial class MainWindow
                 SaveFanEditor();
                 // Consent is per connection, never persisted. No automatic hardware startup.
                 this.FindControl<CheckBox>("FanHardwareConsent")!.IsChecked = false;
-                UpdateHardwareFanControls();
+                _serialBusy = true;
+                UpdateSerialControls();
                 await session.StartFansAsync(_liveFanSensors, _fanSettings.ToRuntimeChannels());
                 SetFanStatus("LIVE SERIAL FAN CONTROL ACTIVE: four channels, 2-second loop, fail-safe enabled.");
             }
             catch (Exception ex) { SetFanStatus("Hardware fan start failed: " + ex.Message); }
-            finally { UpdateHardwareFanControls(); }
+            finally { _serialBusy = false; UpdateSerialControls(); }
         };
         this.FindControl<Button>("FanHardwareStop")!.Click += async (_, _) =>
         {
@@ -136,11 +137,13 @@ public partial class MainWindow
             if (session is null) return;
             try
             {
+                _serialBusy = true;
+                UpdateSerialControls();
                 await session.StopFansAsync();
                 SetFanStatus("Hardware fan control stopped; safety frame requested; display stays connected.");
             }
             catch (Exception ex) { SetFanStatus("Hardware fan stop failed: " + ex.Message); }
-            finally { UpdateHardwareFanControls(); }
+            finally { _serialBusy = false; UpdateSerialControls(); }
         };
         this.FindControl<Button>("FanVirtualStart")!.Click += async (_, _) =>
         {
