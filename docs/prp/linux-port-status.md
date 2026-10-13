@@ -177,3 +177,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Shared serial session regression coverage (2026-10-13)
 - Added end-to-end VirtualLis2Transport tests through SerialDisplaySession verifying a single connected display port, initial safety frame, regulated frame, interleaved display commands, stop without disconnect, and disconnect while fan loop is active. UI disables start/stop during a fan transition. CI validation required.
+
+## Windows sensor provider (2026-10-13)
+- Added WindowsHardwareFanSensors using the original WPF LibreHardwareMonitorLib 0.9.6 and compatible temperature keys. Snapshots update sensors synchronously rather than using stale cached readings; invalid/missing readings fail safe. Windows provider is disposed on Avalonia window shutdown. Linux continues using hwmon. CI compilation and Windows hardware-dependent runtime behavior still require validation; physical LIS2 device validation deferred.

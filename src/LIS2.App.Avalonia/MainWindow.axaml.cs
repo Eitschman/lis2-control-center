@@ -83,6 +83,7 @@ public partial class MainWindow : Window
         await StopFanMonitorAsync();
         await StopVirtualFanSessionAsync();
         await CloseSerialDisplayAsync();
+        if (_liveFanSensors is IDisposable fanSensors) fanSensors.Dispose();
         await _virtualDevice.DisposeAsync();
         await _runtime.DisposeAsync();
     }

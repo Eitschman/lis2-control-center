@@ -12,6 +12,7 @@ public partial class MainWindow
     private readonly SimulatedFanOutput _fanPreviewSink = new();
     private readonly IFanSensorSource _liveFanSensors = OperatingSystem.IsLinux()
         ? new LinuxHwmonFanSensors()
+        : OperatingSystem.IsWindows() ? new WindowsHardwareFanSensors()
         : new SnapshotFanSensors(() => new Dictionary<string, object?>());
     private AuthorizedFanRuntimeSession? _virtualFanSession;
     private VirtualLis2Transport? _virtualFanTransport;
@@ -75,7 +76,7 @@ public partial class MainWindow
             {
                 var values = _liveFanSensors.Snapshot();
                 this.FindControl<TextBlock>("FanSensorStatus")!.Text = values.Count == 0
-                    ? "No readable hwmon temperature sensors found. Missing keys trigger fail-safe."
+                    ? "No readable temperature sensors found. Missing keys trigger fail-safe."
                     : string.Join(Environment.NewLine, values.OrderBy(x => x.Key).Select(x =>
                         x.Key + " = " + Convert.ToString(x.Value, CultureInfo.InvariantCulture) + " C"));
             }
