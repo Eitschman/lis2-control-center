@@ -47,6 +47,7 @@ public partial class MainWindow
         InitializePageTools();
         _pages.Add();
         RefreshPageList(0);
+        InitializePagePlayback();
     }
 
     private int? SelectedPageIndex =>
@@ -119,9 +120,9 @@ public partial class MainWindow
         this.FindControl<TextBlock>("PagePreview2")!.Text = frame.Line2;
     }
 
-    private void SavePageEditor()
+    private bool SavePageEditor()
     {
-        if (SelectedPageIndex is not int i) return;
+        if (SelectedPageIndex is not int i) return false;
         try
         {
             var duration = int.Parse(this.FindControl<TextBox>("PageDuration")!.Text ?? "", CultureInfo.InvariantCulture);
@@ -148,10 +149,12 @@ public partial class MainWindow
             p.Enabled = this.FindControl<CheckBox>("PageEnabled")!.IsChecked == true;
             RefreshPageList(i);
             SetVirtualStatus($"Saved page '{p.Name}' in editor workspace.");
+            return true;
         }
         catch (Exception ex)
         {
             SetVirtualStatus($"Page validation error: {ex.Message}");
+            return false;
         }
     }
 }
