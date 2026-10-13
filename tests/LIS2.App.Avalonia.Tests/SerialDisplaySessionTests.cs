@@ -102,7 +102,7 @@ public sealed class SerialDisplaySessionTests
             Mode = FanMode.Curve, SensorKey = "cpu", MinimumPercent = 30,
             MaximumPercent = 100, FailSafePercent = 100
         }).ToArray();
-        var start = session.StartFansAsync(sensors, channels);
+        var start = Task.Run(() => session.StartFansAsync(sensors, channels));
         await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
         var disconnect = session.DisconnectAsync();
         Assert.False(disconnect.IsCompleted);
