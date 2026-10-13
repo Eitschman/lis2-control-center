@@ -62,6 +62,7 @@ public partial class MainWindow : Window
                 this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1,
                 GlyphBitmap.Parse(this.FindControl<TextBox>("GlyphBitmapEditor")!.Text)));
 
+        InitializeSerialDisplay();
         InitializeGlyphEditor();
         InitializePagesEditor();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
@@ -74,6 +75,7 @@ public partial class MainWindow : Window
     {
         StopPagePlayback();
         StopHomeAssistantUi();
+        await CloseSerialDisplayAsync();
         await _virtualDevice.DisposeAsync();
         await _pageSources.DisposeAsync();
     }
