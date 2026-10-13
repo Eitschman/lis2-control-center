@@ -171,3 +171,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Safe disposal after revoked fan authorization (2026-10-13)
 - Fixed UnifiedLis2Session.DisposeAsync to attempt the stored safe frame whenever the transport remains connected, even after a failed fan write revoked authorization. Added explicit regression for revoked authorization followed by disposal. This closes the discrepancy with DisconnectAsync; virtual CI verification pending.
+
+## Shared live serial fan/display integration (2026-10-13)
+- SerialDisplaySession now owns an optional FanRuntime/FanRuntimeLoop over the SAME UnifiedLis2Session and serial transport used for display. Explicit UI checkbox and start/stop buttons enable fan writes only on a connected port; consent is not persisted and is cleared on start. Safe 100% frame precedes the first regulated write, stop drains periodic output and restores the safe frame without closing the display, disconnect/dispose drain fans first. Display commands are serialized through the unified gate. Added virtual transport regression for display -> fan authorization -> regulation -> safe revocation -> continued display. Windows temperature provider remains unavailable; missing sensor keys fail safe. Real hardware validation deferred by owner. CI pending.

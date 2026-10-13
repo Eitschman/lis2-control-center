@@ -111,6 +111,36 @@ public partial class MainWindow
             catch (Exception ex) { SetFanStatus("Monitor start failed: " + ex.Message); }
         };
         this.FindControl<Button>("FanMonitorStop")!.Click += async (_, _) => await StopFanMonitorAsync();
+        this.FindControl<CheckBox>("FanHardwareConsent")!.IsCheckedChanged += (_, _) => UpdateHardwareFanControls();
+        this.FindControl<Button>("FanHardwareStart")!.Click += async (_, _) =>
+        {
+            var session = _serialDisplay;
+            if (session is null || !session.IsConnected ||
+                this.FindControl<CheckBox>("FanHardwareConsent")!.IsChecked != true) return;
+            try
+            {
+                SaveFanEditor();
+                // Consent is per connection, never persisted. No automatic hardware startup.
+                this.FindControl<CheckBox>("FanHardwareConsent")!.IsChecked = false;
+                UpdateHardwareFanControls();
+                await session.StartFansAsync(_liveFanSensors, _fanSettings.ToRuntimeChannels());
+                SetFanStatus("LIVE SERIAL FAN CONTROL ACTIVE: four channels, 2-second loop, fail-safe enabled.");
+            }
+            catch (Exception ex) { SetFanStatus("Hardware fan start failed: " + ex.Message); }
+            finally { UpdateHardwareFanControls(); }
+        };
+        this.FindControl<Button>("FanHardwareStop")!.Click += async (_, _) =>
+        {
+            var session = _serialDisplay;
+            if (session is null) return;
+            try
+            {
+                await session.StopFansAsync();
+                SetFanStatus("Hardware fan control stopped; safety frame requested; display stays connected.");
+            }
+            catch (Exception ex) { SetFanStatus("Hardware fan stop failed: " + ex.Message); }
+            finally { UpdateHardwareFanControls(); }
+        };
         this.FindControl<Button>("FanVirtualStart")!.Click += async (_, _) =>
         {
             if (_virtualFanSession is not null) return;
@@ -147,6 +177,19 @@ public partial class MainWindow
             catch (Exception ex) { SetFanStatus("Virtual fan shutdown failed: " + ex.Message); }
         };
         RefreshFanEditor();
+    }
+
+    private void UpdateHardwareFanControls()
+    {
+        var start = this.FindControl<Button>("FanHardwareStart");
+        var stop = this.FindControl<Button>("FanHardwareStop");
+        if (start is null || stop is null) return;
+        var session = _serialDisplay;
+        var connected = session?.IsConnected == true;
+        var running = session?.FansRunning == true;
+        start.IsEnabled = connected && !running && !_serialBusy &&
+            this.FindControl<CheckBox>("FanHardwareConsent")?.IsChecked == true;
+        stop.IsEnabled = connected && running && !_serialBusy;
     }
 
     private async Task StopVirtualFanSessionAsync()

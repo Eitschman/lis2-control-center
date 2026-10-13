@@ -387,6 +387,13 @@
               <Button Name="FanVirtualStart" Content="Start virtual four-fan controller" />
               <Button Name="FanVirtualStop" Content="Stop and restore safety frame" IsEnabled="False" />
             </StackPanel>
+            <TextBlock Text="Physical LIS2 fans: explicit per-connection authorization (experimental)" FontWeight="SemiBold" />
+            <TextBlock Text="Only use with a connected LIS2 and verified fan wiring. The first fan command sets all four fans to 100%. Stopping restores 100%. This feature is never auto-enabled by saved settings." TextWrapping="Wrap" />
+            <CheckBox Name="FanHardwareConsent" Content="I explicitly authorize physical fan output for this connection" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Name="FanHardwareStart" Content="Enable physical four-fan control" IsEnabled="False" />
+              <Button Name="FanHardwareStop" Content="Stop and restore 100% safety frame" IsEnabled="False" />
+            </StackPanel>
             <TextBlock Name="FanSensorStatus" Text="Sensor discovery has not run." TextWrapping="Wrap" />
             <TextBlock Name="FanPreviewStatus" Text="Physical fan output disabled." TextWrapping="Wrap" />
           </StackPanel>

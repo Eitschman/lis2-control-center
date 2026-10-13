@@ -62,6 +62,40 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
         finally { _gate.Release(); }
     }
 
+    /// <summary>Explicitly authorize fans on an already-open display connection.
+    /// The safe frame is the first fan command; display writes share the same gate.</summary>
+    public async Task AuthorizeConnectedFansAsync(IReadOnlyList<int> safeFrame, CancellationToken token = default)
+    {
+        Validate(safeFrame);
+        await _gate.WaitAsync(token).ConfigureAwait(false);
+        try
+        {
+            RequireConnected();
+            if (_authorized || _safeFrame is not null)
+                throw new InvalidOperationException("Fan output already authorized or requires reconnect.");
+            await _device.SetFansAsync(safeFrame[0], safeFrame[1], safeFrame[2], safeFrame[3], token).ConfigureAwait(false);
+            _safeFrame = safeFrame.ToArray();
+            _authorized = true;
+        }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>Revoke authorization while retaining the display connection.</summary>
+    public async Task RevokeFansAsync()
+    {
+        await _gate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            var safe = IsConnected ? _safeFrame : null;
+            _authorized = false;
+            // Retain the frame if restoration fails; disconnect/disposal must retry.
+            if (safe is null) { _safeFrame = null; return; }
+            await _device.SetFansAsync(safe[0], safe[1], safe[2], safe[3], CancellationToken.None).ConfigureAwait(false);
+            _safeFrame = null;
+        }
+        finally { _gate.Release(); }
+    }
+
     public async Task WriteAsync(IReadOnlyList<int> outputs, CancellationToken token)
     {
         Validate(outputs);

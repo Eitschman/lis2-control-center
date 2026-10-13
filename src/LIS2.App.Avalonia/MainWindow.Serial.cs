@@ -31,6 +31,7 @@ public partial class MainWindow
                 _serialDisplay = session;
                 session = null;
                 SetSerialStatus($"Connected to {port} (display only; fans disabled).");
+                UpdateHardwareFanControls();
             }
             catch (Exception ex) { SetSerialStatus($"Serial connect failed: {ex.Message}"); }
             finally
@@ -49,6 +50,7 @@ public partial class MainWindow
                 var session = _serialDisplay;
                 _serialDisplay = null;
                 if (session is not null) await session.DisposeAsync();
+                UpdateHardwareFanControls();
                 SetSerialStatus("Serial display disconnected.");
             });
         this.FindControl<Button>("SerialSendLines")!.Click += async (_, _) =>
@@ -144,6 +146,7 @@ public partial class MainWindow
         this.FindControl<Button>("SerialPlaybackStart")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
         this.FindControl<Button>("SerialPlaybackStop")!.IsEnabled = (_serialSequence?.IsRunning == true);
         UpdateSerialPlaybackStatus();
+        UpdateHardwareFanControls();
         this.FindControl<Button>("SerialSendPage")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
         this.FindControl<Button>("SerialSendGlyphs")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
         this.FindControl<Button>("SerialApplyBrightness")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);

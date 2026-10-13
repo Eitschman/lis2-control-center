@@ -63,6 +63,23 @@ public sealed class UnifiedLis2SessionTests
     }
 
     [Fact]
+    public async Task ConnectedDisplayCanAuthorizeFansAndRevokeWithoutClosingPort()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var session = new UnifiedLis2Session(transport);
+        await session.ConnectDisplayOnlyAsync();
+        await session.RenderBothAsync("hello", "world");
+        await session.AuthorizeConnectedFansAsync(new[] { 100, 100, 100, 100 });
+        await session.WriteAsync(new[] { 40, 50, 60, 70 }, CancellationToken.None);
+        await session.RevokeFansAsync();
+        Assert.True(transport.IsOpen);
+        Assert.False(session.FansAuthorized);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[2]);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
+        await session.RenderBothAsync("still", "connected");
+    }
+
+    [Fact]
     public async Task DisplayOnlyNeverAuthorizesFans()
     {
         var transport = new VirtualLis2Transport();
