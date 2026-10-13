@@ -2,7 +2,7 @@
 
 Date: 2026-10-13
 Branch: `feature/linux-avalonia`
-Status: **Shared Avalonia shell with selectable navigation committed; compilation and runtime not yet verified**
+Status: **Shared Avalonia shell with virtual LIS2 session committed; latest changes awaiting CI validation**
 
 ## Target architecture
 - ONE Avalonia UI and application runtime for Windows x64 and Linux x64/ARM64.
@@ -20,18 +20,21 @@ Status: **Shared Avalonia shell with selectable navigation committed; compilatio
 
 - Made all ten sidebar sections selectable in the shared Avalonia shell; selection updates the section heading and explicitly labels unavailable functionality. This is not feature parity.
 
+- Confirmed GitHub Actions run 38406414651: all three portable test projects passed on Windows and Ubuntu; Avalonia builds failed with AVLN3000 due to SelectionChanged AXAML handler. Fixed by subscribing in code-behind (commits d85503f and 15756d6). User subsequently reported green CI; independently verifying the exact newer run remains outstanding.
+- Added `VirtualDeviceSession` backed by the existing `VirtualLis2Transport` and `Lis2Device`; connect, disconnect and demo display commands can now be triggered from the shared Avalonia UI. No serial hardware or fan commands are issued. Latest code has not yet passed CI.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
 - No .NET SDK is installed in the current execution environment; local `dotnet build` / `dotnet test` could not be run.
-- GitHub commit status query returned no reported statuses and the PR-run endpoint returned no runs for the previous commit. This does NOT prove either success or failure. A local container execution attempt failed with an infrastructure ClientError; therefore no actual compile/test was performed. Do not mark Windows or Linux tests green until Actions succeeds.
+- Run 38406414651 was inspected including job logs; earlier AVLN3000 failure is fixed. New virtual UI integration still requires CI validation and real desktop smoke testing.
 - Avalonia package references and a static UI shell have been added, but package restore, Windows/Linux compilation and GUI startup have not yet been confirmed.
 - The Windows release workflow and WPF source files have not been modified.
 
 ## Next work
 1. Confirm Ubuntu workflow success and Windows solution CI.
 2. Introduce platform-neutral application runtime with tests while preserving WPF behavior.
-3. Confirm the shared Avalonia shell builds and launches on Windows and Linux; then add shared view models and a virtual LIS2 smoke test.
+3. Confirm the virtual-session Avalonia shell builds and launches on Windows and Linux; add automated virtual-device tests and shared view models.
 4. Implement Windows and Linux providers, then UI feature parity and physical-device safety validation on both systems.
 
 ## Pull request gate
