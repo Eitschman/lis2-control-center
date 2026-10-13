@@ -28,6 +28,12 @@ public partial class MainWindow
 
     private void ApplyPortableWorkspace(PortableWorkspace saved)
     {
+        // Validate page data before mutating any live UI or workspace state.
+        if (saved.Pages.Count > 0)
+        {
+            var validation = new PageWorkspace();
+            validation.ImportJson(System.Text.Json.JsonSerializer.Serialize(saved.Pages));
+        }
         this.FindControl<TextBox>("HaUrl")!.Text = saved.HomeAssistantUrl;
         if (saved.CustomGlyphs.Count == 8)
         {
@@ -46,7 +52,7 @@ public partial class MainWindow
         }
     }
 
-    private async Task SavePortableWorkspaceAsync()
+    private async Task SavePortableWorkspaceAsync(bool throwOnFailure = false)
     {
         if (!_workspaceLoaded) return;
         try
@@ -70,6 +76,7 @@ public partial class MainWindow
         catch (Exception ex)
         {
             SetVirtualStatus($"Workspace save failed: {ex.Message}");
+            if (throwOnFailure) throw;
         }
     }
 }
