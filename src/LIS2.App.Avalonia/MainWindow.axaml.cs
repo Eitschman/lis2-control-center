@@ -8,6 +8,12 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        var navigation = this.FindControl<ListBox>("Navigation");
+        if (navigation is not null)
+        {
+            navigation.SelectionChanged += OnNavigationChanged;
+        }
+
         UpdateSection();
     }
 
