@@ -2,7 +2,7 @@
 
 Date: 2026-10-13
 Branch: `feature/linux-avalonia`
-Status: **Shared cross-platform groundwork only — no Avalonia desktop app yet**
+Status: **Initial shared Avalonia desktop shell committed; compilation and runtime not yet verified**
 
 ## Target architecture
 - ONE Avalonia UI and application runtime for Windows x64 and Linux x64/ARM64.
@@ -15,18 +15,21 @@ Status: **Shared cross-platform groundwork only — no Avalonia desktop app yet*
 - Retargeted their three xUnit test projects to `net8.0`.
 - Added `.github/workflows/linux-portable.yml` to run these test projects on Ubuntu on branch pushes and PRs.
 
+- Added `src/LIS2.App.Avalonia` with `net8.0`, Avalonia 11.3.6 references, `Program`, `App`, and a static main window displaying ten navigation labels. This is a nonfunctional UI shell, not a port of the existing WPF workflows.
+- Expanded GitHub Actions matrix to Windows and Ubuntu for both portable unit tests and Avalonia shell compilation.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
 - No .NET SDK is installed in the current execution environment; local `dotnet build` / `dotnet test` could not be run.
 - The GitHub Actions workflow has been committed, but its result has not been confirmed. Do not mark Linux tests green until Actions succeeds.
-- No Avalonia packages or GUI have been added yet; no claims of an operational Linux build.
+- Avalonia package references and a static UI shell have been added, but package restore, Windows/Linux compilation and GUI startup have not yet been confirmed.
 - The Windows release workflow and WPF source files have not been modified.
 
 ## Next work
 1. Confirm Ubuntu workflow success and Windows solution CI.
 2. Introduce platform-neutral application runtime with tests while preserving WPF behavior.
-3. Add a single shared Avalonia app that targets Windows and Linux and a virtual LIS2 smoke test.
+3. Confirm the shared Avalonia shell builds and launches on Windows and Linux; then add real navigation, shared view models and a virtual LIS2 smoke test.
 4. Implement Windows and Linux providers, then UI feature parity and physical-device safety validation on both systems.
 
 ## Pull request gate
