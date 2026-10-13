@@ -12,10 +12,10 @@ public sealed class SerialDisplaySessionTests
         await using var session = new SerialDisplaySession(transport);
         await session.ConnectAsync();
         await session.RenderBothAsync("Line one", "Line two");
+        Assert.Equal("Line one", transport.State.Line1.TrimEnd());
         await session.SetBrightnessAsync(Lis2Brightness.Percent50);
         await session.ClearAsync();
         Assert.NotEmpty(transport.Writes);
-        Assert.Equal("Line one", transport.State.Line1.TrimEnd());
         Assert.False(transport.Writes.Any(w => w.SequenceEqual(Lis2Protocol.SetFans(0, 0, 0, 0))));
     }
 
