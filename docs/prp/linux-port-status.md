@@ -48,6 +48,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - Page runtime extraction started: `PagePlayback` is a headless sequence engine using existing `LIS2.Display.PageScheduler`, `TemplateRenderer`, `VisibilityEvaluator`, original page durations, enabled flags and visibility expressions; deterministic `Tick(DateTimeOffset, values)` supports time-based page rotation, immediate visibility changes and no-visible-page result. Added `PagePlaybackTests` for rotation, disabled pages and visibility transitions. Editor save now validates visibility before changing existing page fields. Not yet connected to a running UI timer or real LIS2 device; this is a tested model only pending CI. Commits e92ca95a, 146650a9, c5b4b43c.
 
+- Live virtual page playback integration: Avalonia Pages view now has Start/Stop sequence and active page status, with a guarded 250 ms dispatcher timer calling headless `PagePlayback.Tick`. Writes only when the 20x2 frame changes; validates selected page before starting, stops on disconnect/close/errors, never issues fan commands. Playback uses current in-memory pages and static preview values (no real source-provider updates yet), and changes to page definitions require restart. Commit sequence a6b49a4e, 54a9e1bd, 20f2a94a, 7781fb9f. CI pending; actual GUI behavior not yet manually verified.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
