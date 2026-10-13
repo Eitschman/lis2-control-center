@@ -6,6 +6,7 @@ namespace LIS2.App.Avalonia;
 public partial class MainWindow
 {
     private readonly PageWorkspace _pages = new();
+    private readonly PageSourceValues _pageSources = new();
     private bool _loadingPage;
 
     private void InitializePagesEditor()
@@ -48,6 +49,7 @@ public partial class MainWindow
         _pages.Add();
         RefreshPageList(0);
         InitializePagePlayback();
+        _ = StartPageSourcesAsync();
     }
 
     private int? SelectedPageIndex =>
@@ -102,10 +104,20 @@ public partial class MainWindow
 
     private IReadOnlyDictionary<string, object?> PagePreviewValues()
     {
-        var values = new Dictionary<string, object?>(PageClockValues.Create(DateTimeOffset.Now), StringComparer.OrdinalIgnoreCase);
-        for (var slot = 1; slot <= 8; slot++)
-            values[$"Glyph.{slot}"] = LIS2.Core.Lis2Protocol.CustomGlyph(slot).ToString();
-        return values;
+        return _pageSources.Snapshot(DateTimeOffset.Now);
+    }
+
+    private async Task StartPageSourcesAsync()
+    {
+        try
+        {
+            await _pageSources.StartAsync();
+            RefreshPagePreview();
+        }
+        catch (Exception ex)
+        {
+            SetVirtualStatus($"Clock source startup failed: {ex.Message}");
+        }
     }
 
     private void RefreshPagePreview()
