@@ -22,6 +22,8 @@ public static class GlyphBitmap
         return result;
     }
 
+    public static string Preview(byte[] rows) => string.Join("\n", rows.Select(row => new string(Enumerable.Range(0, 5).Select(x => (row & (1 << (4 - x))) != 0 ? '█' : '·').ToArray())));
+
     public static string Format(byte[] rows)
     {
         if (rows.Length != 8 || rows.Any(v => v > 31))
