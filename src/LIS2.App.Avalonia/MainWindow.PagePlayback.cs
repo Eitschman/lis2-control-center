@@ -21,6 +21,7 @@ public partial class MainWindow
         _pageTimer.Tick += async (_, _) => await TickPagePlaybackAsync();
         this.FindControl<Button>("PagePlaybackStart")!.Click += async (_, _) =>
         {
+            if (_pageTickBusy || _pagePlaybackActive) return;
             if (!_virtualDevice.IsConnected)
             {
                 SetVirtualStatus("Connect the virtual LIS2 before starting the sequence.");
@@ -48,7 +49,7 @@ public partial class MainWindow
 
     private void UpdatePagePlaybackControls()
     {
-        this.FindControl<Button>("PagePlaybackStart")!.IsEnabled = !_pagePlaybackActive;
+        this.FindControl<Button>("PagePlaybackStart")!.IsEnabled = !_pagePlaybackActive && !_pageTickBusy;
         this.FindControl<Button>("PagePlaybackStop")!.IsEnabled = _pagePlaybackActive;
         this.FindControl<TextBlock>("PagePlaybackStatus")!.Text = _pagePlaybackActive
             ? $"Sequence running: {_pagePlayback.CurrentPageId ?? "waiting for visible page"}"
