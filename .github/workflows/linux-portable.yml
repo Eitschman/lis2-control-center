@@ -33,3 +33,18 @@ jobs:
         run: dotnet test tests/LIS2.Display.Tests/LIS2.Display.Tests.csproj --configuration Release
       - name: Test portable fans
         run: dotnet test tests/LIS2.Fans.Tests/LIS2.Fans.Tests.csproj --configuration Release
+
+  avalonia-shell:
+    name: Avalonia shell (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build shared Avalonia desktop
+        run: dotnet build src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release
