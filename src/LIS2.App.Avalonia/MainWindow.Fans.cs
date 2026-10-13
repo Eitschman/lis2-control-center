@@ -48,7 +48,7 @@ public partial class MainWindow
             {
                 SaveFanEditor();
                 await SavePortableWorkspaceAsync(true);
-                SetFanStatus("Fan settings saved. Hardware output remains disabled.");
+                SetFanStatus("Fan settings saved. Physical fan output requires separate authorization.");
             }
             catch (Exception ex) { SetFanStatus($"Invalid fan settings: {ex.Message}"); }
         };
