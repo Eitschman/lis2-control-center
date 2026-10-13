@@ -20,6 +20,29 @@ public partial class MainWindow
         LoadGlyphEditor();
     }
 
+    private void SaveGlyphEditor()
+    {
+        try
+        {
+            var slot = this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1;
+            _glyphs.SaveSlot(slot, this.FindControl<TextBox>("GlyphName")!.Text,
+                this.FindControl<TextBox>("GlyphBitmapEditor")!.Text);
+            RefreshGlyphPreview();
+            SetVirtualStatus($"Saved glyph slot {slot} in workspace.");
+        }
+        catch (Exception ex)
+        {
+            SetVirtualStatus($"Glyph error: {ex.Message}");
+        }
+    }
+
+    private async Task ConnectWithGlyphsAsync()
+    {
+        await _virtualDevice.ConnectAsync();
+        if (this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true)
+            await _virtualDevice.ProgramAllGlyphsAsync(_glyphs.Glyphs);
+    }
+
     private void LoadGlyphEditor()
     {
         var slot = this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1;
