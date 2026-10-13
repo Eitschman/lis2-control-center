@@ -189,3 +189,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Serial fan fault notification and UI transition guard (2026-10-13)
 - Forward background fan loop faults to the Avalonia UI, showing an explicit safety-restoration-attempt warning. Guard hardware start/stop against overlapping serial actions; retain session ownership through disposal. Safety restoration on serial I/O failures is best-effort, not guaranteed without hardware verification.
+
+## Connect-with-safety failure containment (2026-10-13)
+- Retain the safe fan frame before the first connect-time write and attempt a safety-frame retry before transport close if that initial write fails. The safety attempt is best-effort; physical verification remains deferred by owner.

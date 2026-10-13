@@ -49,13 +49,23 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
             await _device.ConnectAsync(token).ConfigureAwait(false);
             try
             {
-                await _device.SetFansAsync(safeFrame[0], safeFrame[1], safeFrame[2], safeFrame[3], token).ConfigureAwait(false);
                 _safeFrame = safeFrame.ToArray();
+                await _device.SetFansAsync(safeFrame[0], safeFrame[1], safeFrame[2], safeFrame[3], token).ConfigureAwait(false);
                 _authorized = true;
             }
             catch
             {
-                await _device.DisconnectAsync(CancellationToken.None).ConfigureAwait(false);
+                try
+                {
+                    var safe = _safeFrame;
+                    if (safe is not null && IsConnected)
+                        await _device.SetFansAsync(safe[0], safe[1], safe[2], safe[3], CancellationToken.None).ConfigureAwait(false);
+                }
+                finally
+                {
+                    _safeFrame = null;
+                    await _device.DisconnectAsync(CancellationToken.None).ConfigureAwait(false);
+                }
                 throw;
             }
         }
