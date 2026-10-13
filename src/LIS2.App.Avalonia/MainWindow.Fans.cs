@@ -116,7 +116,7 @@ public partial class MainWindow
         this.FindControl<Button>("FanHardwareStart")!.Click += async (_, _) =>
         {
             var session = _serialDisplay;
-            if (session is null || !session.IsConnected ||
+            if (_serialBusy || session is null || !session.IsConnected ||
                 this.FindControl<CheckBox>("FanHardwareConsent")!.IsChecked != true) return;
             try
             {
@@ -134,7 +134,7 @@ public partial class MainWindow
         this.FindControl<Button>("FanHardwareStop")!.Click += async (_, _) =>
         {
             var session = _serialDisplay;
-            if (session is null) return;
+            if (_serialBusy || session is null) return;
             try
             {
                 _serialBusy = true;
@@ -194,6 +194,8 @@ public partial class MainWindow
         start.IsEnabled = connected && !running && session?.FansBusy != true && !_serialBusy &&
             this.FindControl<CheckBox>("FanHardwareConsent")?.IsChecked == true;
         stop.IsEnabled = connected && running && session?.FansBusy != true && !_serialBusy;
+        if (session?.FanFault is { } fault)
+            SetFanStatus("HARDWARE FAN CONTROL FAILED; safety restoration attempted: " + fault.Message);
     }
 
     private async Task StopVirtualFanSessionAsync()

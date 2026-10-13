@@ -14,6 +14,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
     public bool FansRunning => _fanLoop is not null;
     public bool FansBusy => _fanTransition;
     public Exception? FanFault => _fanLoop?.LastFault;
+    public event Action<Exception>? FanFaulted;
     public SerialDisplaySession(string portName) : this(new SerialLis2Transport(portName)) { }
     public SerialDisplaySession(ILis2Transport transport) => _session = new UnifiedLis2Session(transport);
     public bool IsConnected => _session.IsConnected;
@@ -26,6 +27,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
         {
             var runtime = new FanRuntime(sensors, _session, channels);
             var loop = new FanRuntimeLoop(runtime, onFault: _ => _session.RevokeFansAsync());
+            loop.Faulted += ex => FanFaulted?.Invoke(ex);
             try
             {
                 await _session.AuthorizeConnectedFansAsync(new[] { 100, 100, 100, 100 });

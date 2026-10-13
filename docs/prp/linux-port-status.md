@@ -186,3 +186,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Initial authorization I/O failure hardening (2026-10-13)
 - On an already-connected display session, retain the 100% safe frame before attempting the initial fan authorization write. A failed initial write leaves fan authorization false, prevents regulated writes, and disconnect retries the safe frame before closing the transport. Added regression with an injected serial write failure. CI pending.
+
+## Serial fan fault notification and UI transition guard (2026-10-13)
+- Forward background fan loop faults to the Avalonia UI, showing an explicit safety-restoration-attempt warning. Guard hardware start/stop against overlapping serial actions; retain session ownership through disposal. Safety restoration on serial I/O failures is best-effort, not guaranteed without hardware verification.

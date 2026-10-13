@@ -29,6 +29,11 @@ public partial class MainWindow
                 session = new SerialDisplaySession(port);
                 await session.ConnectAsync();
                 _serialDisplay = session;
+                session.FanFaulted += ex => Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                {
+                    SetFanStatus("HARDWARE FAN CONTROL FAILED; safety restoration attempted: " + ex.Message);
+                    UpdateHardwareFanControls();
+                });
                 session = null;
                 SetSerialStatus($"Connected to {port} (display only; fans disabled).");
                 UpdateHardwareFanControls();
@@ -48,8 +53,8 @@ public partial class MainWindow
                 await _serialPlaybackTimer.StopAndDrainAsync();
                 if (_serialSequence is not null) await _serialSequence.StopAndDrainAsync();
                 var session = _serialDisplay;
-                _serialDisplay = null;
                 if (session is not null) await session.DisposeAsync();
+                _serialDisplay = null;
                 UpdateHardwareFanControls();
                 SetSerialStatus("Serial display disconnected.");
             });
@@ -159,8 +164,8 @@ public partial class MainWindow
     {
         StopSerialPlayback();
         var session = _serialDisplay;
-        _serialDisplay = null;
         if (_serialSequence is not null) await _serialSequence.StopAndDrainAsync();
         if (session is not null) await session.DisposeAsync();
+        _serialDisplay = null;
     }
 }
