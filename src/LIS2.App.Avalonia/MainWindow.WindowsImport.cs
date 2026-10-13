@@ -20,20 +20,31 @@ public partial class MainWindow
                 if (files.Count == 0) return;
                 await using var stream = await files[0].OpenReadAsync();
                 using var reader = new StreamReader(stream);
-                var imported = WindowsSettingsImporter.Import(await reader.ReadToEndAsync(), new PortableWorkspace
+                var before = CapturePortableWorkspace();
+                var imported = WindowsSettingsImporter.Import(await reader.ReadToEndAsync(), before);
+                // Validate, persist first, then apply. No UI changes if persistence fails.
+                if (imported.Pages.Count > 0)
                 {
-                    Pages = System.Text.Json.JsonSerializer.Deserialize<List<PageDefinition>>(_pages.ExportJson()) ?? new(),
-                    CustomGlyphs = _glyphs.Glyphs.Select(g => new CustomGlyphSettings { Name = g.Name, Rows = g.Rows.ToArray() }).ToList(),
-                    HomeAssistantUrl = this.FindControl<TextBox>("HaUrl")!.Text ?? string.Empty,
-                    HomeAssistantEntityPreferences = _haPreferences.ToList(),
-                    BrightnessPercent = _preferredBrightness,
-                    ThemeMode = _preferredTheme,
-                    LanguageMode = _preferredLanguage,
-                    ProgramCustomGlyphsOnConnect = this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true
-                });
-                // Apply only after complete parsing and validation; never overwrite the Windows file.
-                ApplyPortableWorkspace(imported);
-                await SavePortableWorkspaceAsync(throwOnFailure: true);
+                    var validation = new PageWorkspace();
+                    validation.ImportJson(System.Text.Json.JsonSerializer.Serialize(imported.Pages));
+                }
+                if (imported.CustomGlyphs.Count == 8)
+                {
+                    var validation = new GlyphWorkspace();
+                    validation.Replace(imported.CustomGlyphs);
+                }
+                await _workspaceStore.SaveAsync(imported);
+                try
+                {
+                    ApplyPortableWorkspace(imported);
+                }
+                catch
+                {
+                    // Restore both disk and UI after an unexpected application failure.
+                    try { await _workspaceStore.SaveAsync(before); }
+                    finally { ApplyPortableWorkspace(before); }
+                    throw;
+                }
                 RefreshPageVariables();
                 this.FindControl<TextBlock>("WindowsImportStatus")!.Text =
                     $"Imported {imported.Pages.Count} pages, {imported.CustomGlyphs.Count} glyphs; token not imported.";
