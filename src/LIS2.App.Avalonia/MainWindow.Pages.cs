@@ -49,6 +49,7 @@ public partial class MainWindow
         _pages.Add();
         RefreshPageList(0);
         InitializePagePlayback();
+        InitializePageVariables();
         _ = StartPageSourcesAsync();
     }
 
@@ -112,7 +113,7 @@ public partial class MainWindow
         try
         {
             await _pageSources.StartAsync();
-            RefreshPagePreview();
+            RefreshPageVariables();
         }
         catch (Exception ex)
         {
