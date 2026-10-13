@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using LIS2.Core;
 
 namespace LIS2.App.Avalonia;
 
@@ -25,6 +26,28 @@ public partial class MainWindow : Window
 
         this.FindControl<Button>("OpenDisplayControls")!.Click += (_, _) => NavigateTo(1);
         this.FindControl<Button>("OpenFanControl")!.Click += (_, _) => NavigateTo(6);
+
+        this.FindControl<Button>("SendLine1")!.Click += async (_, _) =>
+            await RunVirtualActionAsync(() => _virtualDevice.WriteLineAsync(0, this.FindControl<TextBox>("Line1TextBox")!.Text ?? ""));
+        this.FindControl<Button>("SendLine2")!.Click += async (_, _) =>
+            await RunVirtualActionAsync(() => _virtualDevice.WriteLineAsync(1, this.FindControl<TextBox>("Line2TextBox")!.Text ?? ""));
+        this.FindControl<Button>("RenderBoth")!.Click += async (_, _) =>
+            await RunVirtualActionAsync(() => _virtualDevice.RenderBothAsync(
+                this.FindControl<TextBox>("Line1TextBox")!.Text ?? "",
+                this.FindControl<TextBox>("Line2TextBox")!.Text ?? ""));
+        this.FindControl<Button>("ClearDisplay")!.Click += async (_, _) =>
+            await RunVirtualActionAsync(() => _virtualDevice.ClearAsync());
+        foreach (var (name, brightness) in new[]
+        {
+            ("Brightness100", Lis2Brightness.Percent100),
+            ("Brightness75", Lis2Brightness.Percent75),
+            ("Brightness50", Lis2Brightness.Percent50),
+            ("Brightness25", Lis2Brightness.Percent25)
+        })
+        {
+            this.FindControl<Button>(name)!.Click += async (_, _) =>
+                await RunVirtualActionAsync(() => _virtualDevice.SetBrightnessAsync(brightness));
+        }
 
         Closed += OnWindowClosed;
         UpdateSection();
@@ -69,16 +92,8 @@ public partial class MainWindow : Window
         if (first is null || second is null)
             return;
 
-        if (_virtualDevice.IsConnected && _virtualDevice.CommandCount > 0)
-        {
-            first.Text = "LIS2 Control Center";
-            second.Text = "Avalonia Windows/Linux";
-        }
-        else
-        {
-            first.Text = "                    ";
-            second.Text = "                    ";
-        }
+        first.Text = _virtualDevice.IsConnected ? _virtualDevice.State.Line1 : new string(' ', 20);
+        second.Text = _virtualDevice.IsConnected ? _virtualDevice.State.Line2 : new string(' ', 20);
     }
 
     private void SetVirtualStatus(string message)
@@ -94,6 +109,9 @@ public partial class MainWindow : Window
         this.FindControl<Button>("VirtualConnect")!.IsEnabled = !_busy && !connected;
         this.FindControl<Button>("VirtualDemo")!.IsEnabled = !_busy && connected;
         this.FindControl<Button>("VirtualDisconnect")!.IsEnabled = !_busy && connected;
+        foreach (var name in new[] { "SendLine1", "SendLine2", "RenderBoth", "ClearDisplay",
+                                    "Brightness100", "Brightness75", "Brightness50", "Brightness25" })
+            this.FindControl<Button>(name)!.IsEnabled = !_busy && connected;
         var badge = this.FindControl<TextBlock>("ConnectionText");
         if (badge is not null)
             badge.Text = connected ? "Connected (Virtual)" : "Disconnected";
@@ -127,9 +145,14 @@ public partial class MainWindow : Window
         if (title is not null)
             title.Text = section;
 
+        this.FindControl<ScrollViewer>("DashboardView")!.IsVisible = section == "Dashboard";
+        this.FindControl<ScrollViewer>("DisplayView")!.IsVisible = section == "Display";
+
         if (description is not null)
             description.Text = section == "Dashboard"
                 ? "Overview and quick access to the most important functions."
-                : $"{section} is not connected to the LIS2 runtime yet.";
+                : section == "Display"
+                    ? "Quick display tests, custom characters and brightness."
+                    : $"{section} is not connected to the LIS2 runtime yet.";
     }
 }
