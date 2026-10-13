@@ -11,10 +11,11 @@ public partial class MainWindow
 
     private PeriodicRuntimeLoop CreatePageTimer() => new(
         TimeSpan.FromMilliseconds(250),
-        _ => { Dispatcher.UIThread.Post(async () =>
-        {
-            if (_virtualSequence?.IsRunning == true) await TickPagePlaybackAsync();
-        }); return Task.CompletedTask; });
+        cancellationToken => UiRuntimeDispatch.RunAsync(
+            async () =>
+            {
+                if (_virtualSequence?.IsRunning == true) await TickPagePlaybackAsync();
+            }, cancellationToken));
 
     private PageSequenceController CreateVirtualSequence() => _runtime.CreateSequence(
         (frame, cancellationToken) => _virtualDevice.RenderBothAsync(frame.Line1, frame.Line2, cancellationToken),

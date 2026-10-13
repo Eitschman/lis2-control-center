@@ -44,6 +44,8 @@ public partial class MainWindow
             await RunSerialActionAsync(async () =>
             {
                 StopSerialPlayback();
+                await _serialPlaybackTimer.StopAndDrainAsync();
+                if (_serialSequence is not null) await _serialSequence.StopAndDrainAsync();
                 var session = _serialDisplay;
                 _serialDisplay = null;
                 if (session is not null) await session.DisposeAsync();

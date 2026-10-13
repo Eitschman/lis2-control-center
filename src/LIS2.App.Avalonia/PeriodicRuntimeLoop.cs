@@ -51,14 +51,20 @@ public sealed class PeriodicRuntimeLoop : IAsyncDisposable
             running = _running;
             stop?.Cancel();
         }
-        if (running is not null) await running.ConfigureAwait(false);
-        lock (_sync)
+        try
         {
-            if (ReferenceEquals(_stop, stop))
+            if (running is not null) await running.ConfigureAwait(false);
+        }
+        finally
+        {
+            lock (_sync)
             {
-                _stop = null;
-                _running = null;
-                stop?.Dispose();
+                if (ReferenceEquals(_stop, stop))
+                {
+                    _stop = null;
+                    _running = null;
+                    stop?.Dispose();
+                }
             }
         }
     }

@@ -20,10 +20,11 @@ public partial class MainWindow
     private void InitializeSerialPlayback()
     {
         _serialPlaybackTimer = new PeriodicRuntimeLoop(TimeSpan.FromMilliseconds(250),
-            _ => { Dispatcher.UIThread.Post(async () =>
-            {
-                if (_serialSequence?.IsRunning == true) await TickSerialPlaybackAsync();
-            }); return Task.CompletedTask; });
+            cancellationToken => UiRuntimeDispatch.RunAsync(
+                async () =>
+                {
+                    if (_serialSequence?.IsRunning == true) await TickSerialPlaybackAsync();
+                }, cancellationToken));
         this.FindControl<Button>("SerialPlaybackStart")!.Click += async (_, _) =>
         {
             if (_serialDisplay?.IsConnected != true || _serialBusy || _serialSequence?.IsRunning == true ||

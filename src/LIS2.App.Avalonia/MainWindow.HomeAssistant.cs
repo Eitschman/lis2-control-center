@@ -43,11 +43,12 @@ public partial class MainWindow
         this.FindControl<Button>("HaInsertLine1")!.Click += (_, _) => InsertHaEntity("PageLine1");
         this.FindControl<Button>("HaInsertLine2")!.Click += (_, _) => InsertHaEntity("PageLine2");
         _haUiTimer = new PeriodicRuntimeLoop(TimeSpan.FromSeconds(2),
-            _ => { Dispatcher.UIThread.Post(() =>
+            cancellationToken => UiRuntimeDispatch.RunAsync(() =>
             {
                 RefreshHaEntities();
                 if (_virtualSequence?.IsRunning == true) RefreshPagePreview();
-            }); return Task.CompletedTask; });
+                return Task.CompletedTask;
+            }, cancellationToken));
         _haUiTimer.Start();
         RefreshHaEntities();
     }

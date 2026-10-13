@@ -140,4 +140,24 @@ public sealed class PageSequenceControllerTests
         await drain;
         Assert.False(loop.IsRunning);
     }
+    [Fact]
+    public async Task PeriodicRuntimeLoopCanRestartAfterCallbackFailureWasObserved()
+    {
+        var attempts = 0;
+        await using var loop = new PeriodicRuntimeLoop(TimeSpan.FromMilliseconds(10),
+            _ =>
+            {
+                if (Interlocked.Increment(ref attempts) == 1)
+                    throw new IOException("Simulated source failure");
+                return Task.CompletedTask;
+            });
+        Assert.True(loop.Start());
+        await Task.Delay(70);
+        await Assert.ThrowsAsync<IOException>(() => loop.StopAndDrainAsync());
+        Assert.False(loop.IsRunning);
+        Assert.True(loop.Start());
+        await Task.Delay(50);
+        await loop.StopAndDrainAsync();
+        Assert.True(Volatile.Read(ref attempts) > 1);
+    }
 }
