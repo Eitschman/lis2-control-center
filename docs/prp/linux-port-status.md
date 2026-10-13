@@ -52,6 +52,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - First dynamic page source: `PageClockValues` exposes portable live `Clock.Time`, `Clock.Date`, `Clock.Hour`, `Clock.Minute`, `Clock.Second`, `Clock.Day`, `Clock.Month`, `Clock.Year`, `Clock.DayOfWeek` variables. Page editor preview and virtual page scheduler now consume current clock values on every tick, with xUnit regression tests. This does not yet reproduce all Windows WPF clock formatting or provider variables; media, sensors and HA are pending. Fixed PageTest sending invalid unsaved content. Commits 11e068c1, 8012c5f0, da0b67c1; CI pending.
 
+- Data-source compatibility block: the Avalonia project now compiles the **original** `LIS2.Sources/IDataSource.cs`, `DataSourceRegistry.cs`, and `ClockDataSource.cs` as linked source, without referencing Windows-only LibreHardwareMonitor. `PageSourceValues` starts/stops the original clock, snapshots `Clock.Time`, `Clock.Date`, `Clock.Day` (original semantics), supplements newer clock components and glyph keys, and is consumed by the preview and running virtual sequence. A variable picker supports discovering keys and inserting templates at the caret on either display line. Source lifecycle and template compatibility tests added. This is a transitional source-sharing strategy, not yet a dedicated shared source assembly. Sensor, HA and media sources are **not** integrated; live GUI remains unverified. CI pending.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
