@@ -43,6 +43,7 @@ public partial class MainWindow
         this.FindControl<Button>("SerialDisconnect")!.Click += async (_, _) =>
             await RunSerialActionAsync(async () =>
             {
+                StopSerialPlayback();
                 var session = _serialDisplay;
                 _serialDisplay = null;
                 if (session is not null) await session.DisposeAsync();
@@ -96,6 +97,7 @@ public partial class MainWindow
                     .SetBrightnessAsync(brightness);
                 SetSerialStatus("Serial LIS2 brightness updated.");
             });
+        InitializeSerialPlayback();
         RefreshSerialPorts();
     }
 
@@ -118,6 +120,7 @@ public partial class MainWindow
     private async Task RunSerialActionAsync(Func<Task> action)
     {
         if (_serialBusy) return;
+        StopSerialPlayback();
         _serialBusy = true;
         UpdateSerialControls();
         try { await action(); }
@@ -133,8 +136,11 @@ public partial class MainWindow
         this.FindControl<Button>("SerialConnect")!.IsEnabled = !_serialBusy && _serialDisplay is null &&
             this.FindControl<ComboBox>("SerialPortPicker")!.SelectedItem is string;
         this.FindControl<Button>("SerialDisconnect")!.IsEnabled = !_serialBusy && _serialDisplay is not null;
-        this.FindControl<Button>("SerialSendLines")!.IsEnabled = !_serialBusy && connected;
-        this.FindControl<Button>("SerialClear")!.IsEnabled = !_serialBusy && connected;
+        this.FindControl<Button>("SerialSendLines")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
+        this.FindControl<Button>("SerialClear")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
+        this.FindControl<Button>("SerialPlaybackStart")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
+        this.FindControl<Button>("SerialPlaybackStop")!.IsEnabled = _serialPlaybackActive;
+        UpdateSerialPlaybackStatus();
         this.FindControl<Button>("SerialSendPage")!.IsEnabled = !_serialBusy && connected;
         this.FindControl<Button>("SerialSendGlyphs")!.IsEnabled = !_serialBusy && connected;
         this.FindControl<Button>("SerialApplyBrightness")!.IsEnabled = !_serialBusy && connected;
@@ -145,6 +151,7 @@ public partial class MainWindow
 
     private async Task CloseSerialDisplayAsync()
     {
+        StopSerialPlayback();
         var session = _serialDisplay;
         _serialDisplay = null;
         if (session is not null) await session.DisposeAsync();
