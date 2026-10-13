@@ -16,6 +16,7 @@ public partial class MainWindow
         {
             _pages.Add();
             RefreshPageList(_pages.Pages.Count - 1);
+            _ = SavePortableWorkspaceAsync();
         };
         this.FindControl<Button>("PageDuplicate")!.Click += (_, _) =>
         {
@@ -23,6 +24,7 @@ public partial class MainWindow
             {
                 _pages.Duplicate(i);
                 RefreshPageList(i + 1);
+                _ = SavePortableWorkspaceAsync();
             }
         };
         this.FindControl<Button>("PageDelete")!.Click += (_, _) =>
@@ -31,6 +33,7 @@ public partial class MainWindow
             {
                 _pages.Delete(i);
                 RefreshPageList(Math.Min(i, _pages.Pages.Count - 1));
+                _ = SavePortableWorkspaceAsync();
             }
         };
         this.FindControl<Button>("PageUp")!.Click += (_, _) => MovePage(-1);
@@ -51,6 +54,7 @@ public partial class MainWindow
         InitializePagePlayback();
         InitializePageVariables();
         InitializeHomeAssistant();
+        LoadPortableWorkspace();
         _ = StartPageSourcesAsync();
     }
 
@@ -72,6 +76,7 @@ public partial class MainWindow
     {
         if (SelectedPageIndex is not int i) return;
         RefreshPageList(_pages.Move(i, offset));
+        _ = SavePortableWorkspaceAsync();
     }
 
     private void LoadPageEditor()
@@ -163,6 +168,7 @@ public partial class MainWindow
             p.Enabled = this.FindControl<CheckBox>("PageEnabled")!.IsChecked == true;
             RefreshPageList(i);
             SetVirtualStatus($"Saved page '{p.Name}' in editor workspace.");
+            _ = SavePortableWorkspaceAsync();
             return true;
         }
         catch (Exception ex)
