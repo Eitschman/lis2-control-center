@@ -24,6 +24,8 @@ public sealed class PortableWorkspaceStore
             var result = JsonSerializer.Deserialize<PortableWorkspace>(File.ReadAllText(_path), Options)
                 ?? new PortableWorkspace();
             result.Pages ??= new List<PageDefinition>();
+            result.CustomGlyphs ??= new List<CustomGlyphSettings>();
+            result.HomeAssistantEntityPreferences ??= new List<PortableHaEntityPreference>();
             result.HomeAssistantUrl ??= string.Empty;
             return result;
         }
@@ -55,4 +57,6 @@ public sealed class PortableWorkspace
 {
     public List<PageDefinition> Pages { get; set; } = new();
     public string HomeAssistantUrl { get; set; } = string.Empty;
+    public List<CustomGlyphSettings> CustomGlyphs { get; set; } = new();
+    public List<PortableHaEntityPreference> HomeAssistantEntityPreferences { get; set; } = new();
 }
