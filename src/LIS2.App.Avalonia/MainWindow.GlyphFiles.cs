@@ -13,6 +13,7 @@ public partial class MainWindow
         using var reader = new StreamReader(stream);
         _glyphs.ImportJson(await reader.ReadToEndAsync());
         LoadGlyphEditor();
+        await SavePortableWorkspaceAsync();
     }
 
     private async Task SaveGlyphSetAsync()
