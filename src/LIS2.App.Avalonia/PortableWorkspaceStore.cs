@@ -27,6 +27,7 @@ public sealed class PortableWorkspaceStore
             result.CustomGlyphs ??= new List<CustomGlyphSettings>();
             result.HomeAssistantEntityPreferences ??= new List<PortableHaEntityPreference>();
             result.HomeAssistantUrl ??= string.Empty;
+            result.Fans = PortableFanSettings.Normalize(result.Fans);
             return result;
         }
         catch (JsonException)
@@ -56,6 +57,7 @@ public sealed class PortableWorkspaceStore
 public sealed class PortableWorkspace
 {
     public List<PageDefinition> Pages { get; set; } = new();
+    public PortableFanSettings Fans { get; set; } = new();
     public string HomeAssistantUrl { get; set; } = string.Empty;
     public List<CustomGlyphSettings> CustomGlyphs { get; set; } = new();
     public List<PortableHaEntityPreference> HomeAssistantEntityPreferences { get; set; } = new();

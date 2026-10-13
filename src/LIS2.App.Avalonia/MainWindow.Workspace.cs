@@ -10,6 +10,7 @@ public partial class MainWindow
     private int _preferredBrightness = 100;
     private string _preferredTheme = "System";
     private string _preferredLanguage = "System";
+    private PortableFanSettings _fanSettings = new();
 
     private void LoadPortableWorkspace()
     {
@@ -44,6 +45,7 @@ public partial class MainWindow
         _preferredBrightness = saved.BrightnessPercent;
         _preferredTheme = saved.ThemeMode;
         _preferredLanguage = saved.LanguageMode;
+        _fanSettings = PortableFanSettings.Normalize(saved.Fans);
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked = saved.ProgramCustomGlyphsOnConnect;
         if (saved.Pages.Count > 0)
         {
@@ -67,6 +69,7 @@ public partial class MainWindow
         BrightnessPercent = _preferredBrightness,
         ThemeMode = _preferredTheme,
         LanguageMode = _preferredLanguage,
+        Fans = PortableFanSettings.Normalize(_fanSettings),
         ProgramCustomGlyphsOnConnect = this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true
     };
 

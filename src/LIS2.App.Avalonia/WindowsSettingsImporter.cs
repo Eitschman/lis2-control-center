@@ -74,6 +74,13 @@ public static class WindowsSettingsImporter
             }
         }
 
+        if (root.TryGetProperty("Fans", out var fans))
+        {
+            if (fans.ValueKind != JsonValueKind.Object)
+                throw new InvalidOperationException("Windows Fans must be an object.");
+            result.Fans = PortableFanSettings.Normalize(JsonSerializer.Deserialize<PortableFanSettings>(fans.GetRawText()));
+        }
+
         // Intentionally never read, decrypt, serialize, or copy HomeAssistant.AccessToken.
         // Other Windows-only settings remain in the untouched original file.
         return result;

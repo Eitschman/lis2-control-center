@@ -109,3 +109,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## CI repair checkpoint (2026-10-13)
 - Fan Phase 1 commit `5b6156d` failed Actions run `38437023413` on both Avalonia jobs; portable library jobs green. Identified `CS0136` in `src/LIS2.Runtime/FanRuntime.cs` due to conflicting `raw` local declarations. Repair required; package A remains OPEN until newest CI green.
 - PRP execution protocol revised to explicitly capture owner-approved fan package A (headless) and B (hardware+UI), exact CI-first workflow, handover requirements, and no partial pushes within a package.
+
+## Fan settings compatibility slice (2026-10-13)
+- Portable four-channel fan settings preserve original Windows JSON property names and defaults, normalization, mode, sensor key, curves, limits, hysteresis and allow-stop; Windows settings import now includes Fans and portable workspace persists them.
+- Regression tests cover default values, Windows import, invalid data normalization and portable roundtrip. No fan hardware or automatic control is activated by importing AutomaticControlEnabled; physical integration and Avalonia fan UI remain OPEN.
+- Current CI validation required for this commit.
