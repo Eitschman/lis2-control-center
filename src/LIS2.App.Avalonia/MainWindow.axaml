@@ -25,6 +25,15 @@
           <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
           <TextBlock Name="TransportSummaryText" Text="Virtual LIS2" TextWrapping="Wrap" Margin="4,0,0,0" />
           <TextBlock Name="VirtualStatus" Text="Disconnected" Margin="4,4,0,0" />
+          <Separator Margin="0,12,0,4" />
+          <TextBlock Text="Serial display (experimental)" FontWeight="SemiBold" />
+          <ComboBox Name="SerialPortPicker" MinWidth="180" />
+          <Button Name="SerialRefreshPorts" Content="Refresh serial ports" HorizontalAlignment="Left" />
+          <Button Name="SerialConnect" Content="Connect serial display" HorizontalAlignment="Left" />
+          <Button Name="SerialDisconnect" Content="Disconnect serial" HorizontalAlignment="Left" IsEnabled="False" />
+          <Button Name="SerialSendLines" Content="Send display lines" HorizontalAlignment="Left" IsEnabled="False" />
+          <Button Name="SerialClear" Content="Clear serial display" HorizontalAlignment="Left" IsEnabled="False" />
+          <TextBlock Name="SerialStatus" Text="Serial display disconnected; fan control unavailable." TextWrapping="Wrap" />
           <Button Name="VirtualConnect" Content="Connect virtual LIS2" HorizontalAlignment="Left" />
           <Button Name="VirtualDisconnect" Content="Disconnect" IsEnabled="False" HorizontalAlignment="Left" />
         </StackPanel>
