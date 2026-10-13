@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using LIS2.Core;
+using System.Globalization;
 
 namespace LIS2.App.Avalonia;
 
@@ -49,6 +50,13 @@ public partial class MainWindow : Window
                 await RunVirtualActionAsync(() => _virtualDevice.SetBrightnessAsync(brightness));
         }
 
+        this.FindControl<Button>("SendSpecialCharacterTest")!.Click += async (_, _) =>
+            await RunVirtualActionAsync(() => _virtualDevice.SendSpecialCharacterTestAsync());
+        this.FindControl<Button>("SendCharacterRomRange")!.Click += async (_, _) =>
+            await RunVirtualActionAsync(() => _virtualDevice.SendCharacterRomRangeAsync(ParseCharacterRomStart()));
+        this.FindControl<Button>("CharacterRomPrevious")!.Click += (_, _) => ChangeCharacterRomRange(-0x28);
+        this.FindControl<Button>("CharacterRomNext")!.Click += (_, _) => ChangeCharacterRomRange(0x28);
+
         Closed += OnWindowClosed;
         UpdateSection();
         UpdateVirtualControls();
@@ -85,6 +93,36 @@ public partial class MainWindow : Window
         }
     }
 
+    private int ParseCharacterRomStart()
+    {
+        var text = this.FindControl<TextBox>("CharacterRomStartTextBox")!.Text?.Trim();
+        if (!int.TryParse(text, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var start)
+            || start is < 0x20 or > 0xD8)
+            throw new InvalidOperationException("ROM start byte must be hexadecimal 20 through D8.");
+
+        SetCharacterRomStart(start);
+        return start;
+    }
+
+    private void SetCharacterRomStart(int start)
+    {
+        start = Math.Clamp(start, 0x20, 0xD8);
+        this.FindControl<TextBox>("CharacterRomStartTextBox")!.Text = start.ToString("X2", CultureInfo.InvariantCulture);
+        this.FindControl<TextBlock>("CharacterRomRangeText")!.Text = $"{start:X2}-{start + 39:X2}";
+    }
+
+    private void ChangeCharacterRomRange(int offset)
+    {
+        try
+        {
+            SetCharacterRomStart(ParseCharacterRomStart() + offset);
+        }
+        catch (Exception ex)
+        {
+            SetVirtualStatus($"Virtual LIS2 error: {ex.Message}");
+        }
+    }
+
     private void UpdatePreview()
     {
         var first = this.FindControl<TextBlock>("PreviewLine1");
@@ -110,7 +148,8 @@ public partial class MainWindow : Window
         this.FindControl<Button>("VirtualDemo")!.IsEnabled = !_busy && connected;
         this.FindControl<Button>("VirtualDisconnect")!.IsEnabled = !_busy && connected;
         foreach (var name in new[] { "SendLine1", "SendLine2", "RenderBoth", "ClearDisplay",
-                                    "Brightness100", "Brightness75", "Brightness50", "Brightness25" })
+                                    "Brightness100", "Brightness75", "Brightness50", "Brightness25",
+                                    "SendSpecialCharacterTest", "SendCharacterRomRange" })
             this.FindControl<Button>(name)!.IsEnabled = !_busy && connected;
         var badge = this.FindControl<TextBlock>("ConnectionText");
         if (badge is not null)
