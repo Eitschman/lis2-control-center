@@ -136,15 +136,15 @@ public partial class MainWindow
         this.FindControl<Button>("SerialRefreshPorts")!.IsEnabled = !_serialBusy && _serialDisplay is null;
         this.FindControl<Button>("SerialConnect")!.IsEnabled = !_serialBusy && _serialDisplay is null &&
             this.FindControl<ComboBox>("SerialPortPicker")!.SelectedItem is string;
-        this.FindControl<Button>("SerialDisconnect")!.IsEnabled = !_serialBusy && _serialDisplay is not null;
+        this.FindControl<Button>("SerialDisconnect")!.IsEnabled = !_serialBusy && !_serialPlaybackBusy && _serialDisplay is not null;
         this.FindControl<Button>("SerialSendLines")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
         this.FindControl<Button>("SerialClear")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
         this.FindControl<Button>("SerialPlaybackStart")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
         this.FindControl<Button>("SerialPlaybackStop")!.IsEnabled = _serialPlaybackActive;
         UpdateSerialPlaybackStatus();
-        this.FindControl<Button>("SerialSendPage")!.IsEnabled = !_serialBusy && connected;
-        this.FindControl<Button>("SerialSendGlyphs")!.IsEnabled = !_serialBusy && connected;
-        this.FindControl<Button>("SerialApplyBrightness")!.IsEnabled = !_serialBusy && connected;
+        this.FindControl<Button>("SerialSendPage")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
+        this.FindControl<Button>("SerialSendGlyphs")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
+        this.FindControl<Button>("SerialApplyBrightness")!.IsEnabled = !_serialBusy && connected && !_serialPlaybackActive && !_serialPlaybackBusy;
     }
 
     private void SetSerialStatus(string message) =>
