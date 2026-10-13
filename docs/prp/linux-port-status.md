@@ -128,3 +128,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Single-owner serial integration contract (2026-10-13)
 - Introduced UnifiedLis2Session with one Lis2Device and one session semaphore for fan/display command ordering; explicit display-only or safe-frame-first fan connection, fan write revocation on errors, no automatic reconnect, serialized disconnect/dispose. Virtual protocol regression tests cover ordering and authorization.
 - IMPORTANT: This is a tested integration building block, not yet the live Avalonia session. UI still uses display-only SerialDisplaySession. Real sensors, periodic fan loop, UI lifecycle and hardware verification remain outstanding; phase 2 remains OPEN.
+
+## Unified display routing (2026-10-13)
+- Live SerialDisplaySession display calls now delegate to UnifiedLis2Session for single-owner serialization. Added virtual transport tests for display facade and concurrent display/fan commands.
+- Physical fans remain disabled in UI; periodic real regulation and fan authorization lifecycle remain open. Package 1B is NOT complete.

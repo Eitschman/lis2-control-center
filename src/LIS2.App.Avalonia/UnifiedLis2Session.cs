@@ -83,6 +83,62 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
         finally { _gate.Release(); }
     }
 
+
+    public async Task WriteLineAsync(int line, string text, CancellationToken token = default)
+    {
+        await _gate.WaitAsync(token).ConfigureAwait(false);
+        try { RequireConnected(); await _device.WriteLineAsync(line, text, token).ConfigureAwait(false); }
+        finally { _gate.Release(); }
+    }
+
+    public async Task ClearAsync(CancellationToken token = default)
+    {
+        await _gate.WaitAsync(token).ConfigureAwait(false);
+        try { RequireConnected(); await _device.ClearAsync(token).ConfigureAwait(false); }
+        finally { _gate.Release(); }
+    }
+
+    public async Task SetBrightnessAsync(Lis2Brightness brightness, CancellationToken token = default)
+    {
+        await _gate.WaitAsync(token).ConfigureAwait(false);
+        try { RequireConnected(); await _device.SetBrightnessAsync(brightness, token).ConfigureAwait(false); }
+        finally { _gate.Release(); }
+    }
+
+    public async Task ProgramGlyphAsync(int slot, byte[] rows, CancellationToken token = default)
+    {
+        await _gate.WaitAsync(token).ConfigureAwait(false);
+        try { RequireConnected(); await _device.ProgramCharacterAsync(slot, rows, token).ConfigureAwait(false); }
+        finally { _gate.Release(); }
+    }
+
+    public async Task ProgramAllGlyphsAsync(IReadOnlyList<CustomGlyphSettings> glyphs, CancellationToken token = default)
+    {
+        if (glyphs is null || glyphs.Count != 8 || glyphs.Any(g => g.Rows is null || g.Rows.Length != 8 || g.Rows.Any(row => row > 31)))
+            throw new ArgumentException("Exactly eight valid 5x8 glyphs are required.", nameof(glyphs));
+        await _gate.WaitAsync(token).ConfigureAwait(false);
+        try
+        {
+            RequireConnected();
+            for (var slot = 1; slot <= 8; slot++)
+                await _device.ProgramCharacterAsync(slot, glyphs[slot - 1].Rows, token).ConfigureAwait(false);
+        }
+        finally { _gate.Release(); }
+    }
+
+    public async Task WriteRawDisplayBytesAsync(int line, int column, byte[] bytes, CancellationToken token = default)
+    {
+        await _gate.WaitAsync(token).ConfigureAwait(false);
+        try { RequireConnected(); await _device.WriteRawDisplayBytesAsync(line, column, bytes, token).ConfigureAwait(false); }
+        finally { _gate.Release(); }
+    }
+
+    private void RequireConnected()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (!IsConnected) throw new InvalidOperationException("LIS2 device is disconnected.");
+    }
+
     public async Task DisconnectAsync(CancellationToken token = default)
     {
         await _gate.WaitAsync(token).ConfigureAwait(false);
