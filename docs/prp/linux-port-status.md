@@ -76,6 +76,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - Serial page-sequence block: added independent explicit serial sequence start/stop/status using the same `PagePlayback` scheduler as the virtual display, 250 ms polling, frame deduplication, stop on write errors/disconnect, and disabling manual serial operations during playback. Fan commands remain unavailable. Serial playback does not yet implement all per-page scroll/refresh behavior, physical disconnect monitoring, or real hardware tests. CI pending.
 
+- Playback correctness batch: shared `PagePlayback` now honors each page's refresh interval while still switching pages immediately; both virtual and serial sequences inherit this behavior. Serial UI locks all manual display/glyph/brightness controls while sequence writes are active, and clears stale serial frames when no page remains visible. Added deterministic refresh/page-switch regression tests. Scrolling parity and physical fan-safe reconnect remain outstanding; CI pending.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
