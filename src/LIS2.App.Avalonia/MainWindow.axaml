@@ -237,7 +237,7 @@
                 <TextBlock Grid.Row="4" Text="Visible when" />
                 <StackPanel Grid.Row="4" Grid.Column="1" Spacing="5">
                   <StackPanel Orientation="Horizontal" Spacing="7">
-                    <ComboBox Name="PageConditionKey" Width="185" IsEditable="True" />
+                    <TextBox Name="PageConditionKey" Width="185" Watermark="Template key" />
                     <ComboBox Name="PageConditionOperator" Width="85">
                       <ComboBoxItem Content="=" /><ComboBoxItem Content="!=" />
                       <ComboBoxItem Content="&gt;" /><ComboBoxItem Content="&gt;=" />
