@@ -60,6 +60,9 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - Explicit Windows settings migration: `WindowsSettingsImporter` reads the **original** `settings.json` in a read-only file picker and validates pages using `PageWorkspace`, imports eight original `CustomGlyphs` slots, HA URL and entity preferences. Import is user-triggered, not automatic; source Windows file is never modified. Original DPAPI `HomeAssistant.AccessToken` is **not read or migrated**, and must be entered again. Portable workspace now persists imported glyphs and HA preferences, with autosave after glyph edits/imports. Migration tests cover schema, invalid pages/glyph count, round-trip, and secret exclusion. **Not yet imported:** transport/brightness/theme/language, fan configuration, sensor preferences and other Windows-only fields. This is not full settings parity. CI pending.
 
+- CI investigation: workflow run `38420805175` failed on both OSes at commit `66701582` because `WindowsSettingsImporter` referenced `PortableWorkspace.CustomGlyphs` and `HomeAssistantEntityPreferences` before the next commit added those properties. Subsequent runs through `38421112925` passed on both OSes; the red intermediate commit does not reflect the final state.
+- Windows preference migration extension: original `BrightnessPercent`, `ProgramCustomGlyphsOnConnect`, `ThemeMode`, and `LanguageMode` now parse into the portable workspace and survive restart. Glyph-on-connect checkbox is applied and saved; brightness/theme/language values are **retained only**, not yet applied to full UI/platform behavior. Serial COM port and other platform-specific values are intentionally not imported. New tests added; CI pending.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
