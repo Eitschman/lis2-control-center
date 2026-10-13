@@ -88,4 +88,49 @@ public sealed class SerialDisplaySessionTests
         Assert.False(session.IsConnected);
         await Assert.ThrowsAsync<InvalidOperationException>(() => session.WriteLineAsync(1, "disconnected"));
     }
+    [Fact]
+    public async Task ConcurrentStartAndDisconnectNeverAuthorizeAfterDisconnect()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var session = new SerialDisplaySession(transport);
+        await session.ConnectAsync();
+        var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var sensors = new BlockingSensors(entered, release);
+        var channels = Enumerable.Range(0, 4).Select(_ => new FanChannelConfiguration
+        {
+            Mode = FanMode.Curve, SensorKey = "cpu", MinimumPercent = 30,
+            MaximumPercent = 100, FailSafePercent = 100
+        }).ToArray();
+        var start = session.StartFansAsync(sensors, channels);
+        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        var disconnect = session.DisconnectAsync();
+        Assert.False(disconnect.IsCompleted);
+        release.TrySetResult(true);
+        await start;
+        await disconnect;
+        Assert.False(session.IsConnected);
+        Assert.False(session.FansRunning);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            session.StartFansAsync(new SimulatedFanSensors(), channels));
+    }
+
+    private sealed class BlockingSensors : IFanSensorSource
+    {
+        private readonly TaskCompletionSource<bool> _entered;
+        private readonly TaskCompletionSource<bool> _release;
+        public BlockingSensors(TaskCompletionSource<bool> entered, TaskCompletionSource<bool> release)
+        {
+            _entered = entered;
+            _release = release;
+        }
+        public IReadOnlyDictionary<string, object?> Snapshot()
+        {
+            _entered.TrySetResult(true);
+            _release.Task.GetAwaiter().GetResult();
+            return new Dictionary<string, object?> { ["cpu"] = 40d };
+        }
+    }
+
 }

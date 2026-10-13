@@ -13,6 +13,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
     private readonly SemaphoreSlim _lifecycle = new(1, 1);
     private bool _fanTransition;
     private bool _disposed;
+    private bool _disconnected;
     public bool FansRunning => _fanLoop is not null;
     public bool FansBusy => _fanTransition;
     public Exception? FanFault => _fanLoop?.LastFault;
@@ -20,7 +21,17 @@ public sealed class SerialDisplaySession : IAsyncDisposable
     public SerialDisplaySession(string portName) : this(new SerialLis2Transport(portName)) { }
     public SerialDisplaySession(ILis2Transport transport) => _session = new UnifiedLis2Session(transport);
     public bool IsConnected => _session.IsConnected;
-    public Task ConnectAsync(CancellationToken cancellationToken = default) => _session.ConnectDisplayOnlyAsync(cancellationToken);
+    public async Task ConnectAsync(CancellationToken cancellationToken = default)
+    {
+        await _lifecycle.WaitAsync(cancellationToken);
+        try
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            if (_disconnected) throw new InvalidOperationException("Session was disconnected.");
+            await _session.ConnectDisplayOnlyAsync(cancellationToken);
+        }
+        finally { _lifecycle.Release(); }
+    }
     public async Task StartFansAsync(IFanSensorSource sensors, IReadOnlyList<FanChannelConfiguration> channels)
     {
         await _lifecycle.WaitAsync();
@@ -28,6 +39,7 @@ public sealed class SerialDisplaySession : IAsyncDisposable
         try
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
+            if (_disconnected) throw new InvalidOperationException("Session was disconnected.");
             if (_fanLoop is not null) throw new InvalidOperationException("Fan control already active.");
             var runtime = new FanRuntime(sensors, _session, channels);
             var loop = new FanRuntimeLoop(runtime, onFault: _ => _session.RevokeFansAsync());
@@ -59,37 +71,50 @@ public sealed class SerialDisplaySession : IAsyncDisposable
     {
         await _lifecycle.WaitAsync();
         _fanTransition = true;
-        try
+        try { await StopFansCoreAsync(); }
+        finally { _fanTransition = false; _lifecycle.Release(); }
+    }
+
+    private async Task StopFansCoreAsync()
+    {
+        var loop = _fanLoop;
+        var runtime = _fanRuntime;
+        if (loop is null) return;
+        try { await loop.StopAndDrainAsync(); }
+        finally
         {
-            var loop = _fanLoop;
-            var runtime = _fanRuntime;
-            if (loop is null) return;
-            try { await loop.StopAndDrainAsync(); }
+            try { if (runtime is not null) await runtime.SetOutputEnabledAsync(false); }
             finally
             {
-                try { if (runtime is not null) await runtime.SetOutputEnabledAsync(false); }
+                try { await _session.RevokeFansAsync(); }
                 finally
                 {
-                    try { await _session.RevokeFansAsync(); }
-                    finally
+                    try
                     {
                         await loop.DisposeAsync();
                         if (runtime is not null) await runtime.DisposeAsync();
+                    }
+                    finally
+                    {
                         _fanLoop = null;
                         _fanRuntime = null;
                     }
                 }
             }
         }
-        finally { _fanTransition = false; _lifecycle.Release(); }
     }
 
     public async Task DisconnectAsync(CancellationToken cancellationToken = default)
     {
-        await StopFansAsync();
-        await _lifecycle.WaitAsync(cancellationToken);
-        try { await _session.DisconnectAsync(cancellationToken); }
-        finally { _lifecycle.Release(); }
+        await _lifecycle.WaitAsync();
+        _fanTransition = true;
+        try
+        {
+            _disconnected = true;
+            try { await StopFansCoreAsync(); }
+            finally { await _session.DisconnectAsync(CancellationToken.None); }
+        }
+        finally { _fanTransition = false; _lifecycle.Release(); }
     }
     public Task WriteLineAsync(int line, string text, CancellationToken cancellationToken = default) => _session.WriteLineAsync(line, text, cancellationToken);
     public Task RenderBothAsync(string line1, string line2, CancellationToken cancellationToken = default) => _session.RenderBothAsync(line1, line2, cancellationToken);
@@ -101,13 +126,15 @@ public sealed class SerialDisplaySession : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await _lifecycle.WaitAsync();
+        _fanTransition = true;
         try
         {
             if (_disposed) return;
             _disposed = true;
+            _disconnected = true;
+            try { await StopFansCoreAsync(); }
+            finally { await _session.DisposeAsync(); }
         }
-        finally { _lifecycle.Release(); }
-        try { await StopFansAsync(); }
-        finally { await _session.DisposeAsync(); }
+        finally { _fanTransition = false; _lifecycle.Release(); }
     }
 }
