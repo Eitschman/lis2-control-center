@@ -23,6 +23,9 @@ public partial class MainWindow : Window
         this.FindControl<Button>("VirtualDisconnect")!.Click += async (_, _) =>
             await RunVirtualActionAsync(() => _virtualDevice.DisconnectAsync());
 
+        this.FindControl<Button>("OpenDisplayControls")!.Click += (_, _) => NavigateTo(1);
+        this.FindControl<Button>("OpenFanControl")!.Click += (_, _) => NavigateTo(6);
+
         Closed += OnWindowClosed;
         UpdateSection();
         UpdateVirtualControls();
@@ -94,6 +97,18 @@ public partial class MainWindow : Window
         var badge = this.FindControl<TextBlock>("ConnectionText");
         if (badge is not null)
             badge.Text = connected ? "Connected (Virtual)" : "Disconnected";
+        var virtualState = this.FindControl<TextBlock>("VirtualStateText");
+        if (virtualState is not null)
+            virtualState.Text = connected
+                ? $"Virtual LIS2 connected. Commands: {_virtualDevice.CommandCount}."
+                : "State available when Virtual transport is active.";
+    }
+
+    private void NavigateTo(int index)
+    {
+        var navigation = this.FindControl<ListBox>("Navigation");
+        if (navigation is not null)
+            navigation.SelectedIndex = index;
     }
 
     private void OnNavigationChanged(object? sender, SelectionChangedEventArgs e) =>
