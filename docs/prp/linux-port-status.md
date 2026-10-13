@@ -68,6 +68,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - 2026-10-13 follow-up: Windows settings import now captures the current workspace once, validates the candidate, persists it before modifying the UI, and attempts disk/UI rollback if application fails. This avoids partial UI changes on save errors; rollback itself can still fail on underlying I/O errors. CI and real desktop behavior pending verification.
 
+- Serial transport foundation: added `SerialPortDiscovery` with Linux `/dev/serial/by-id` preference, duplicate suppression and fallback to `SerialPort.GetPortNames`; added explicit-connect `SerialDisplaySession` wrapping the original 19200/8N1 transport for display-only commands, with no automatic reconnect or fan commands. Added discovery regression tests. This is NOT wired to the Avalonia UI yet; no hardware tests or fail-safe validation, and real-device fan control remains disabled. CI pending.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
