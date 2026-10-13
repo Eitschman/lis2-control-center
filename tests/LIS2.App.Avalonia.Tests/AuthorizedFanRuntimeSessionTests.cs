@@ -8,6 +8,27 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class AuthorizedFanRuntimeSessionTests
 {
     [Fact]
+    public async Task VirtualFanSessionUsesFailSafeForMissingSensorAndRestoresSafetyOnDispose()
+    {
+        var transport = new VirtualLis2Transport();
+        var sensors = new SimulatedFanSensors();
+        var channels = Enumerable.Range(0, 4).Select(_ => new FanChannelConfiguration
+        {
+            Mode = FanMode.Curve, SensorKey = "missing", MinimumPercent = 30,
+            MaximumPercent = 100, FailSafePercent = 85,
+            Curve = new List<FanCurvePoint> { new(30, 40), new(70, 100) }
+        }).ToArray();
+        var session = new AuthorizedFanRuntimeSession(transport, sensors, channels,
+            TimeSpan.FromHours(1));
+        await session.StartAsync(new[] { 100, 100, 100, 100 });
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[0]);
+        Assert.Equal(Lis2Protocol.SetFans(85, 85, 85, 85), transport.Writes[1]);
+        await session.DisposeAsync();
+        Assert.False(transport.IsOpen);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
+    }
+
+    [Fact]
     public async Task StartsWithSafetyFrameAndRestoresItAfterRegulation()
     {
         var transport = new VirtualLis2Transport();

@@ -1,6 +1,7 @@
 using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using LIS2.Core;
 using LIS2.Runtime;
 
 namespace LIS2.App.Avalonia;
@@ -12,6 +13,8 @@ public partial class MainWindow
     private readonly IFanSensorSource _liveFanSensors = OperatingSystem.IsLinux()
         ? new LinuxHwmonFanSensors()
         : new SnapshotFanSensors(() => new Dictionary<string, object?>());
+    private AuthorizedFanRuntimeSession? _virtualFanSession;
+    private VirtualLis2Transport? _virtualFanTransport;
     private CancellationTokenSource? _fanMonitorStop;
     private Task? _fanMonitorTask;
     private bool _fanEditorLoading;
@@ -108,7 +111,62 @@ public partial class MainWindow
             catch (Exception ex) { SetFanStatus("Monitor start failed: " + ex.Message); }
         };
         this.FindControl<Button>("FanMonitorStop")!.Click += async (_, _) => await StopFanMonitorAsync();
+        this.FindControl<Button>("FanVirtualStart")!.Click += async (_, _) =>
+        {
+            if (_virtualFanSession is not null) return;
+            AuthorizedFanRuntimeSession? pending = null;
+            try
+            {
+                SaveFanEditor();
+                var temperature = double.Parse(this.FindControl<TextBox>("FanSimulatedTemperature")!.Text ?? "",
+                    CultureInfo.InvariantCulture);
+                if (!double.IsFinite(temperature)) throw new FormatException("Simulated temperature must be finite.");
+                foreach (var channel in _fanSettings.Channels)
+                    if (!string.IsNullOrWhiteSpace(channel.SensorKey))
+                        _fanPreviewSensors.Set(channel.SensorKey, temperature);
+                var transport = new VirtualLis2Transport();
+                pending = new AuthorizedFanRuntimeSession(transport, _fanPreviewSensors,
+                    _fanSettings.ToRuntimeChannels());
+                pending.Faulted += ex => Dispatcher.UIThread.Post(() =>
+                    SetFanStatus("VIRTUAL FAN LOOP FAILED: " + ex.Message));
+                await pending.StartAsync(new[] { 100, 100, 100, 100 });
+                _virtualFanTransport = transport;
+                _virtualFanSession = pending;
+                pending = null;
+                this.FindControl<Button>("FanVirtualStart")!.IsEnabled = false;
+                this.FindControl<Button>("FanVirtualStop")!.IsEnabled = true;
+                SetFanStatus("VIRTUAL LIS2 FAN CONTROL: safe frame 100% sent first; " +
+                    "four-channel regulation active; no physical port opened.");
+            }
+            catch (Exception ex) { SetFanStatus("Virtual fan startup failed: " + ex.Message); }
+            finally { if (pending is not null) await pending.DisposeAsync(); }
+        };
+        this.FindControl<Button>("FanVirtualStop")!.Click += async (_, _) =>
+        {
+            try { await StopVirtualFanSessionAsync(); }
+            catch (Exception ex) { SetFanStatus("Virtual fan shutdown failed: " + ex.Message); }
+        };
         RefreshFanEditor();
+    }
+
+    private async Task StopVirtualFanSessionAsync()
+    {
+        var session = _virtualFanSession;
+        if (session is null) return;
+        // Retain ownership until drain and disposal complete; never start a second loop mid-shutdown.
+        try
+        {
+            await session.DisposeAsync();
+            var writes = _virtualFanTransport?.Writes.Count ?? 0;
+            SetFanStatus($"Virtual fan session stopped; {writes} simulated protocol writes; safety frame restored.");
+        }
+        finally
+        {
+            _virtualFanSession = null;
+            _virtualFanTransport = null;
+            this.FindControl<Button>("FanVirtualStart")!.IsEnabled = true;
+            this.FindControl<Button>("FanVirtualStop")!.IsEnabled = false;
+        }
     }
 
     private async Task RunFanMonitorAsync(IReadOnlyList<LIS2.Fans.FanChannelConfiguration> channels, CancellationToken token)

@@ -81,6 +81,7 @@ public partial class MainWindow : Window
         await _haUiTimer.StopAndDrainAsync();
         if (_virtualSequence is not null) await _virtualSequence.StopAndDrainAsync();
         await StopFanMonitorAsync();
+        await StopVirtualFanSessionAsync();
         await CloseSerialDisplayAsync();
         await _virtualDevice.DisposeAsync();
         await _runtime.DisposeAsync();

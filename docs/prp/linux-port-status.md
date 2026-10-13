@@ -165,3 +165,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Virtual fault-injection regression tests (2026-10-13)
 - Added simulated one-shot serial write failures to verify fan authorization is revoked and the previously established safety frame is still written during both explicit disconnect and disposal. No physical device is required. Owner has explicitly deferred physical-hardware validation; virtual transport, CI and platform builds are the current verification scope.
+
+## End-to-end virtual fan control in Avalonia (2026-10-13)
+- Fan editor now offers a separate virtual LIS2 four-channel runtime: explicit start, safe 100% frame before first regulation, simulated sensor inputs, periodic regulation, stop/drain and restored safety frame. Dedicated VirtualLis2Transport never opens a physical port. The virtual session is disposed on window close. Added missing-sensor fail-safe + safety-restoration integration test. Physical fan UI authorization remains disabled and is not claimed complete; owner deferred physical validation, not safety implementation.
