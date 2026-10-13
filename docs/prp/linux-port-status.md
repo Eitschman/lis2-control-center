@@ -66,6 +66,8 @@ Status: **Active incremental port; CG Builder and Pages editor available in virt
 
 - 2026-10-13 migration hardening: partial Windows JSON imports now merge with a copied current portable workspace instead of resetting omitted fields; page definitions are prevalidated before UI state changes; explicit import propagates persistence failures rather than reporting success. Added partial-import regression test. Physical UI and runtime validation remain outstanding; CI for this change must be checked.
 
+- 2026-10-13 follow-up: Windows settings import now captures the current workspace once, validates the candidate, persists it before modifying the UI, and attempts disk/UI rollback if application fails. This avoids partial UI changes on save errors; rollback itself can still fail on underlying I/O errors. CI and real desktop behavior pending verification.
+
 ## Verification and limitations
 - Static scan of the three library trees found no direct WPF, WinForms, Registry, WinRT, or P/Invoke usage.
 - The `System.IO.Ports` dependency remains and actual serial device behavior on Linux is **not** verified.
