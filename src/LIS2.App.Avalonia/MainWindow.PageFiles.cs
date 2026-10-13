@@ -9,8 +9,6 @@ public partial class MainWindow
 {
     private void InitializePageTools()
     {
-        var keys = this.FindControl<ComboBox>("PageConditionKey")!;
-        keys.ItemsSource = new[] { "Winamp.State", "Winamp.Title", "HA.sensor.temperature", "Cpu.Load", "Clock.Time" };
         this.FindControl<ComboBox>("PageConditionOperator")!.SelectedIndex = 0;
         this.FindControl<Button>("PageApplyCondition")!.Click += (_, _) => ApplyPageCondition();
         this.FindControl<TextBox>("PageVisibility")!.TextChanged += (_, _) => UpdateConditionStatus();
@@ -20,8 +18,7 @@ public partial class MainWindow
 
     private void ApplyPageCondition()
     {
-        var keyBox = this.FindControl<ComboBox>("PageConditionKey")!;
-        var key = keyBox.SelectedItem?.ToString() ?? keyBox.Text ?? "";
+        var key = this.FindControl<TextBox>("PageConditionKey")!.Text ?? "";
         var op = (this.FindControl<ComboBox>("PageConditionOperator")!.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "=";
         var value = this.FindControl<TextBox>("PageConditionValue")!.Text?.Trim() ?? "";
         if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
