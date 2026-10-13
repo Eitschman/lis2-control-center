@@ -9,7 +9,16 @@ public partial class MainWindow
     private readonly DispatcherTimer _serialPlaybackTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private bool _serialPlaybackActive;
     private bool _serialPlaybackBusy;
-    private string? _lastSerialFrame;
+    private PageFrameDispatcher? _serialFrameDispatcher;
+
+    private PageFrameDispatcher CreateSerialFrameDispatcher() => new(
+        async (frame, cancellationToken) =>
+        {
+            var session = _serialDisplay ?? throw new InvalidOperationException("Serial LIS2 disconnected.");
+            await session.RenderBothAsync(frame.Line1, frame.Line2, cancellationToken);
+        },
+        cancellationToken => (_serialDisplay ?? throw new InvalidOperationException("Serial LIS2 disconnected."))
+            .ClearAsync(cancellationToken));
 
     private void InitializeSerialPlayback()
     {
@@ -19,7 +28,7 @@ public partial class MainWindow
             if (_serialDisplay?.IsConnected != true || _serialBusy || _serialPlaybackActive) return;
             if (SelectedPageIndex is not null && !SavePageEditor()) return;
             _serialPlayback.Reload(_pages.Pages);
-            _lastSerialFrame = null;
+            _serialFrameDispatcher = CreateSerialFrameDispatcher();
             _serialPlaybackActive = true;
             _serialPlaybackTimer.Start();
             UpdateSerialControls();
@@ -33,7 +42,6 @@ public partial class MainWindow
     {
         _serialPlaybackTimer.Stop();
         _serialPlaybackActive = false;
-        _lastSerialFrame = null;
         UpdateSerialControls();
     }
 
@@ -58,20 +66,7 @@ public partial class MainWindow
         try
         {
             var frame = _serialPlayback.Tick(DateTimeOffset.UtcNow, PagePreviewValues());
-            if (frame is null && _lastSerialFrame is not null)
-            {
-                await _serialDisplay.ClearAsync();
-                _lastSerialFrame = null;
-            }
-            if (frame is not null)
-            {
-                var signature = frame.Line1 + "\n" + frame.Line2;
-                if (signature != _lastSerialFrame)
-                {
-                    await _serialDisplay.RenderBothAsync(frame.Line1, frame.Line2);
-                    _lastSerialFrame = signature;
-                }
-            }
+            await (_serialFrameDispatcher ?? throw new InvalidOperationException("Serial playback not initialized.")).DispatchAsync(frame);
             UpdateSerialPlaybackStatus();
         }
         catch (Exception ex)
