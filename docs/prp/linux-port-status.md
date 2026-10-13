@@ -119,3 +119,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Added four-channel Fan Control screen for modes, sensor keys, fixed/limits/fail-safe/hysteresis, stop permissions, curve points, persisted automatic preference and safe simulated sensor temperature preview using headless FanRuntime.
 - Physical fan output stays DISABLED; no SetFans serial command is wired, no real sensor provider is assumed. Actual sensor/serial integration and hardware validation remain open.
 - This commit needs Windows and Linux CI before acceptance.
+
+## Hardware integration groundwork — 2026-10-13
+- Added Linux hwmon temperature snapshots with stable device/index and optional label aliases; absent/invalid sensor readings omitted for runtime fail-safe.
+- Added explicit-authorization serial fan sink: validated four-channel safety frame is first write after connect, no automatic reconnect, failed write revokes authorization, disconnect blocks output; virtual transport regression tests.
+- IMPORTANT: SafeSerialFanSession is NOT wired into SerialDisplaySession or UI. No physical output is enabled; WPF parity, combined serial arbitration, automatic regulation lifecycle and real hardware tests remain OPEN. Package 1B must not be called complete yet.
