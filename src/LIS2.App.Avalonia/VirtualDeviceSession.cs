@@ -29,6 +29,20 @@ public sealed class VirtualDeviceSession : IAsyncDisposable
         await _device.WriteLineAsync(1, line2, cancellationToken);
     }
 
+    public Task SendSpecialCharacterTestAsync(CancellationToken cancellationToken = default) =>
+        RenderBothAsync("ÄÖÜ äöü ß ° µ ± £", "← → Ω π Σ √ ∞ × ÷", cancellationToken);
+
+    public async Task SendCharacterRomRangeAsync(int start, CancellationToken cancellationToken = default)
+    {
+        if (start is < 0x20 or > 0xD8)
+            throw new ArgumentOutOfRangeException(nameof(start), "ROM start byte must be hexadecimal 20 through D8.");
+
+        var firstLine = Enumerable.Range(start, 20).Select(value => (byte)value).ToArray();
+        var secondLine = Enumerable.Range(start + 20, 20).Select(value => (byte)value).ToArray();
+        await _device.WriteRawDisplayBytesAsync(1, 0, firstLine, cancellationToken);
+        await _device.WriteRawDisplayBytesAsync(2, 0, secondLine, cancellationToken);
+    }
+
     public Task ClearAsync(CancellationToken cancellationToken = default) =>
         _device.ClearAsync(cancellationToken);
 
