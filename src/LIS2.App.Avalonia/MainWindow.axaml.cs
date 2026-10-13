@@ -72,6 +72,7 @@ public partial class MainWindow : Window
     private async void OnWindowClosed(object? sender, EventArgs e)
     {
         StopPagePlayback();
+        StopHomeAssistantUi();
         await _virtualDevice.DisposeAsync();
         await _pageSources.DisposeAsync();
     }
