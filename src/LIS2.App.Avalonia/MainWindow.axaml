@@ -2,34 +2,36 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="LIS2.App.Avalonia.MainWindow"
         Title="LIS2 Control Center"
-        Width="1320" Height="900" MinWidth="1120" MinHeight="760">
-  <Grid ColumnDefinitions="220,*" RowDefinitions="*">
-    <Border Grid.Column="0" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" Padding="20">
-      <StackPanel Spacing="12">
-        <TextBlock Text="LIS2 Control Center" FontSize="20" FontWeight="Bold" TextWrapping="Wrap" />
-        <TextBlock Text="Windows / Linux" Opacity="0.65" />
-        <Separator />
-        <TextBlock Text="Dashboard" FontWeight="SemiBold" />
-        <TextBlock Text="Display" />
-        <TextBlock Text="Pages" />
-        <TextBlock Text="Media" />
-        <TextBlock Text="Events" />
-        <TextBlock Text="Hardware" />
-        <TextBlock Text="Fan Control" />
-        <TextBlock Text="Settings" />
-        <TextBlock Text="Diagnostics" />
-        <TextBlock Text="Home Assistant" />
-      </StackPanel>
+        Width="1320" Height="900" MinWidth="900" MinHeight="650">
+  <Grid ColumnDefinitions="230,*">
+    <Border Grid.Column="0" Background="#182431" Padding="16">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="4,4,4,20">
+          <TextBlock Text="LIS2 Control Center" FontSize="20" FontWeight="Bold" Foreground="White" TextWrapping="Wrap" />
+          <TextBlock Text="Windows / Linux" Foreground="#A7BBCB" />
+        </StackPanel>
+        <ListBox Name="Navigation" SelectedIndex="0" SelectionChanged="OnNavigationChanged">
+          <ListBoxItem Content="Dashboard" />
+          <ListBoxItem Content="Display" />
+          <ListBoxItem Content="Pages" />
+          <ListBoxItem Content="Media" />
+          <ListBoxItem Content="Events" />
+          <ListBoxItem Content="Hardware" />
+          <ListBoxItem Content="Fan Control" />
+          <ListBoxItem Content="Settings" />
+          <ListBoxItem Content="Diagnostics" />
+          <ListBoxItem Content="Home Assistant" />
+        </ListBox>
+      </DockPanel>
     </Border>
     <StackPanel Grid.Column="1" Margin="32" Spacing="16">
-      <TextBlock Text="LIS2 Control Center" FontSize="28" FontWeight="Bold" />
-      <TextBlock Text="Cross-platform Avalonia migration" FontSize="18" />
-      <TextBlock Text="This is an initial UI shell, not a connected device controller." TextWrapping="Wrap" />
+      <TextBlock Name="SectionTitle" Text="Dashboard" FontSize="28" FontWeight="Bold" />
+      <TextBlock Text="Cross-platform Avalonia migration" FontSize="16" />
       <Border Padding="18" BorderThickness="1" BorderBrush="Gray" CornerRadius="8">
         <StackPanel Spacing="8">
           <TextBlock Text="Migration status" FontWeight="SemiBold" />
-          <TextBlock Text="Shared protocol, display and fan libraries are referenced." />
-          <TextBlock Text="Virtual LIS2, navigation, settings and hardware control are not connected yet." TextWrapping="Wrap" />
+          <TextBlock Name="SectionDescription" Text="Dashboard is not connected to the LIS2 runtime yet." TextWrapping="Wrap" />
+          <TextBlock Text="No hardware commands are sent by this preview shell." Opacity="0.7" />
         </StackPanel>
       </Border>
     </StackPanel>
