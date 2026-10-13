@@ -18,6 +18,7 @@ public partial class MainWindow
                     this.FindControl<TextBox>("HaUrl")!.Text,
                     this.FindControl<TextBox>("HaToken")!.Text);
                 this.FindControl<TextBox>("HaToken")!.Text = string.Empty;
+                await SavePortableWorkspaceAsync();
             });
         this.FindControl<Button>("HaDisconnect")!.Click += async (_, _) =>
             await RunHaActionAsync(async () =>
