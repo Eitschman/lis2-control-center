@@ -124,3 +124,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Added Linux hwmon temperature snapshots with stable device/index and optional label aliases; absent/invalid sensor readings omitted for runtime fail-safe.
 - Added explicit-authorization serial fan sink: validated four-channel safety frame is first write after connect, no automatic reconnect, failed write revokes authorization, disconnect blocks output; virtual transport regression tests.
 - IMPORTANT: SafeSerialFanSession is NOT wired into SerialDisplaySession or UI. No physical output is enabled; WPF parity, combined serial arbitration, automatic regulation lifecycle and real hardware tests remain OPEN. Package 1B must not be called complete yet.
+
+## Single-owner serial integration contract (2026-10-13)
+- Introduced UnifiedLis2Session with one Lis2Device and one session semaphore for fan/display command ordering; explicit display-only or safe-frame-first fan connection, fan write revocation on errors, no automatic reconnect, serialized disconnect/dispose. Virtual protocol regression tests cover ordering and authorization.
+- IMPORTANT: This is a tested integration building block, not yet the live Avalonia session. UI still uses display-only SerialDisplaySession. Real sensors, periodic fan loop, UI lifecycle and hardware verification remain outstanding; phase 2 remains OPEN.
