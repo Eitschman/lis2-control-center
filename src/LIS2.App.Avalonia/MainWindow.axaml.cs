@@ -63,6 +63,7 @@ public partial class MainWindow : Window
                 GlyphBitmap.Parse(this.FindControl<TextBox>("GlyphBitmapEditor")!.Text)));
 
         InitializeGlyphEditor();
+        InitializePagesEditor();
         Closed += OnWindowClosed;
         UpdateSection();
         UpdateVirtualControls();
@@ -192,12 +193,15 @@ public partial class MainWindow : Window
 
         this.FindControl<ScrollViewer>("DashboardView")!.IsVisible = section == "Dashboard";
         this.FindControl<ScrollViewer>("DisplayView")!.IsVisible = section == "Display";
+        this.FindControl<ScrollViewer>("PagesView")!.IsVisible = section == "Pages";
 
         if (description is not null)
             description.Text = section == "Dashboard"
                 ? "Overview and quick access to the most important functions."
                 : section == "Display"
                     ? "Quick display tests, custom characters and brightness."
+                : section == "Pages"
+                    ? "Manage display pages, templates, conditions and live preview."
                     : $"{section} is not connected to the LIS2 runtime yet.";
     }
 }

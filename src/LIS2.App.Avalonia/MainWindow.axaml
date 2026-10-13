@@ -199,6 +199,70 @@
         </Border>
       </StackPanel>
     </ScrollViewer>
+    <ScrollViewer Name="PagesView" Grid.Row="1" IsVisible="False">
+      <StackPanel Spacing="12">
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Grid ColumnDefinitions="230,16,*">
+            <StackPanel Grid.Column="0" Spacing="9">
+              <TextBlock Text="Pages" FontWeight="SemiBold" FontSize="16" />
+              <ListBox Name="PagesList" Height="380" />
+              <WrapPanel>
+                <Button Name="PageAdd" Content="Add" Margin="0,0,7,7" />
+                <Button Name="PageDuplicate" Content="Duplicate" Margin="0,0,7,7" />
+                <Button Name="PageDelete" Content="Delete" />
+              </WrapPanel>
+              <StackPanel Orientation="Horizontal" Spacing="7">
+                <Button Name="PageUp" Content="↑  Move up" />
+                <Button Name="PageDown" Content="↓  Move down" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Spacing="9">
+              <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                <TextBlock Grid.Row="0" Text="Name" />
+                <TextBox Name="PageName" Grid.Row="0" Grid.Column="1" />
+                <TextBlock Grid.Row="1" Text="Line 1" />
+                <TextBox Name="PageLine1" Grid.Row="1" Grid.Column="1" />
+                <TextBlock Grid.Row="2" Text="Line 2" />
+                <TextBox Name="PageLine2" Grid.Row="2" Grid.Column="1" />
+                <TextBlock Grid.Row="3" Text="Duration (s)" />
+                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                  <TextBox Name="PageDuration" Width="90" />
+                  <TextBlock Text="Refresh (ms)" VerticalAlignment="Center" />
+                  <TextBox Name="PageRefresh" Width="90" />
+                </StackPanel>
+                <TextBlock Grid.Row="4" Text="Visible when" />
+                <TextBox Name="PageVisibility" Grid.Row="4" Grid.Column="1" />
+                <TextBlock Grid.Row="5" Text="Overflow" />
+                <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                  <ComboBox Name="PageOverflow1" Width="135"><ComboBoxItem Content="PingPong" /><ComboBoxItem Content="Truncate" /><ComboBoxItem Content="Marquee" /></ComboBox>
+                  <ComboBox Name="PageOverflow2" Width="135"><ComboBoxItem Content="PingPong" /><ComboBoxItem Content="Truncate" /><ComboBoxItem Content="Marquee" /></ComboBox>
+                </StackPanel>
+                <TextBlock Grid.Row="6" Text="Scroll timing" />
+                <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="Step (ms)" VerticalAlignment="Center" />
+                  <TextBox Name="PageScrollStep" Width="75" />
+                  <TextBlock Text="Edge pause (ms)" VerticalAlignment="Center" />
+                  <TextBox Name="PageScrollPause" Width="75" />
+                </StackPanel>
+                <TextBlock Grid.Row="7" Text="Enabled" />
+                <CheckBox Name="PageEnabled" Grid.Row="7" Grid.Column="1" />
+              </Grid>
+              <TextBlock Text="Live preview" FontWeight="SemiBold" />
+              <Border Background="#07190E" BorderBrush="#33523D" BorderThickness="1" CornerRadius="6" Padding="18,12" HorizontalAlignment="Left">
+                <StackPanel>
+                  <TextBlock Name="PagePreview1" FontFamily="Consolas" FontSize="26" Foreground="#70EF86" />
+                  <TextBlock Name="PagePreview2" FontFamily="Consolas" FontSize="26" Foreground="#70EF86" />
+                </StackPanel>
+              </Border>
+              <StackPanel Orientation="Horizontal" Spacing="7">
+                <Button Name="PageSave" Content="Save page" />
+                <Button Name="PageTest" Content="Send page to virtual LIS2" />
+              </StackPanel>
+            </StackPanel>
+          </Grid>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
     </Grid>
   </Grid>
 </Window>

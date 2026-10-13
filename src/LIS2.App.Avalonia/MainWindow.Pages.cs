@@ -1,0 +1,152 @@
+using Avalonia.Controls;
+using System.Globalization;
+
+namespace LIS2.App.Avalonia;
+
+public partial class MainWindow
+{
+    private readonly PageWorkspace _pages = new();
+    private bool _loadingPage;
+
+    private void InitializePagesEditor()
+    {
+        this.FindControl<ListBox>("PagesList")!.SelectionChanged += (_, _) => LoadPageEditor();
+        this.FindControl<Button>("PageAdd")!.Click += (_, _) =>
+        {
+            _pages.Add();
+            RefreshPageList(_pages.Pages.Count - 1);
+        };
+        this.FindControl<Button>("PageDuplicate")!.Click += (_, _) =>
+        {
+            if (SelectedPageIndex is int i)
+            {
+                _pages.Duplicate(i);
+                RefreshPageList(i + 1);
+            }
+        };
+        this.FindControl<Button>("PageDelete")!.Click += (_, _) =>
+        {
+            if (SelectedPageIndex is int i)
+            {
+                _pages.Delete(i);
+                RefreshPageList(Math.Min(i, _pages.Pages.Count - 1));
+            }
+        };
+        this.FindControl<Button>("PageUp")!.Click += (_, _) => MovePage(-1);
+        this.FindControl<Button>("PageDown")!.Click += (_, _) => MovePage(1);
+        this.FindControl<Button>("PageSave")!.Click += (_, _) => SavePageEditor();
+        this.FindControl<Button>("PageTest")!.Click += async (_, _) =>
+        {
+            if (SelectedPageIndex is not int i) return;
+            SavePageEditor();
+            var frame = _pages.Preview(i, PagePreviewValues());
+            await RunVirtualActionAsync(() => _virtualDevice.RenderBothAsync(frame.Line1, frame.Line2));
+        };
+        foreach (var name in new[] { "PageLine1", "PageLine2" })
+            this.FindControl<TextBox>(name)!.TextChanged += (_, _) => RefreshPagePreview();
+        _pages.Add();
+        RefreshPageList(0);
+    }
+
+    private int? SelectedPageIndex =>
+        this.FindControl<ListBox>("PagesList")!.SelectedIndex is int i && i >= 0 && i < _pages.Pages.Count ? i : null;
+
+    private void RefreshPageList(int selection)
+    {
+        _loadingPage = true;
+        var list = this.FindControl<ListBox>("PagesList")!;
+        list.ItemsSource = null;
+        list.ItemsSource = _pages.Pages.Select(p => p.Enabled ? p.Name : $"(off) {p.Name}").ToArray();
+        list.SelectedIndex = selection;
+        _loadingPage = false;
+        LoadPageEditor();
+    }
+
+    private void MovePage(int offset)
+    {
+        if (SelectedPageIndex is not int i) return;
+        RefreshPageList(_pages.Move(i, offset));
+    }
+
+    private void LoadPageEditor()
+    {
+        if (_loadingPage || SelectedPageIndex is not int i) return;
+        var p = _pages.Get(i);
+        _loadingPage = true;
+        this.FindControl<TextBox>("PageName")!.Text = p.Name;
+        this.FindControl<TextBox>("PageLine1")!.Text = p.Line1Template;
+        this.FindControl<TextBox>("PageLine2")!.Text = p.Line2Template;
+        this.FindControl<TextBox>("PageDuration")!.Text = p.DurationSeconds.ToString(CultureInfo.InvariantCulture);
+        this.FindControl<TextBox>("PageRefresh")!.Text = p.RefreshIntervalMilliseconds.ToString(CultureInfo.InvariantCulture);
+        this.FindControl<TextBox>("PageVisibility")!.Text = p.VisibilityExpression;
+        this.FindControl<ComboBox>("PageOverflow1")!.SelectedIndex = OverflowIndex(p.Line1OverflowMode);
+        this.FindControl<ComboBox>("PageOverflow2")!.SelectedIndex = OverflowIndex(p.Line2OverflowMode);
+        this.FindControl<TextBox>("PageScrollStep")!.Text = p.ScrollStepMilliseconds.ToString(CultureInfo.InvariantCulture);
+        this.FindControl<TextBox>("PageScrollPause")!.Text = p.ScrollEdgePauseMilliseconds.ToString(CultureInfo.InvariantCulture);
+        this.FindControl<CheckBox>("PageEnabled")!.IsChecked = p.Enabled;
+        _loadingPage = false;
+        RefreshPagePreview();
+    }
+
+    private static int OverflowIndex(string mode) => mode switch
+    {
+        "Truncate" => 1, "Marquee" => 2, _ => 0
+    };
+
+    private static string OverflowName(int index) => index switch
+    {
+        1 => "Truncate", 2 => "Marquee", _ => "PingPong"
+    };
+
+    private IReadOnlyDictionary<string, object?> PagePreviewValues()
+    {
+        var values = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+        for (var slot = 1; slot <= 8; slot++)
+            values[$"Glyph.{slot}"] = LIS2.Core.Lis2Protocol.CustomGlyph(slot).ToString();
+        return values;
+    }
+
+    private void RefreshPagePreview()
+    {
+        if (_loadingPage || SelectedPageIndex is not int i) return;
+        var original = _pages.Get(i);
+        var frame = new LIS2.Display.TemplateRenderer().RenderFrame(
+            this.FindControl<TextBox>("PageLine1")!.Text ?? original.Line1Template,
+            this.FindControl<TextBox>("PageLine2")!.Text ?? original.Line2Template,
+            PagePreviewValues());
+        this.FindControl<TextBlock>("PagePreview1")!.Text = frame.Line1;
+        this.FindControl<TextBlock>("PagePreview2")!.Text = frame.Line2;
+    }
+
+    private void SavePageEditor()
+    {
+        if (SelectedPageIndex is not int i) return;
+        try
+        {
+            var duration = int.Parse(this.FindControl<TextBox>("PageDuration")!.Text ?? "", CultureInfo.InvariantCulture);
+            var refresh = int.Parse(this.FindControl<TextBox>("PageRefresh")!.Text ?? "", CultureInfo.InvariantCulture);
+            var step = int.Parse(this.FindControl<TextBox>("PageScrollStep")!.Text ?? "", CultureInfo.InvariantCulture);
+            var pause = int.Parse(this.FindControl<TextBox>("PageScrollPause")!.Text ?? "", CultureInfo.InvariantCulture);
+            if (duration <= 0 || refresh is < 100 or > 60000 || step <= 0 || pause < 0)
+                throw new ArgumentOutOfRangeException(nameof(duration), "Invalid page timing values.");
+            var p = _pages.Get(i);
+            p.Name = this.FindControl<TextBox>("PageName")!.Text ?? "";
+            p.Line1Template = this.FindControl<TextBox>("PageLine1")!.Text ?? "";
+            p.Line2Template = this.FindControl<TextBox>("PageLine2")!.Text ?? "";
+            p.DurationSeconds = duration;
+            p.RefreshIntervalMilliseconds = refresh;
+            p.ScrollStepMilliseconds = step;
+            p.ScrollEdgePauseMilliseconds = pause;
+            p.VisibilityExpression = this.FindControl<TextBox>("PageVisibility")!.Text;
+            p.Line1OverflowMode = OverflowName(this.FindControl<ComboBox>("PageOverflow1")!.SelectedIndex);
+            p.Line2OverflowMode = OverflowName(this.FindControl<ComboBox>("PageOverflow2")!.SelectedIndex);
+            p.Enabled = this.FindControl<CheckBox>("PageEnabled")!.IsChecked == true;
+            RefreshPageList(i);
+            SetVirtualStatus($"Saved page '{p.Name}' in editor workspace.");
+        }
+        catch (Exception ex)
+        {
+            SetVirtualStatus($"Page validation error: {ex.Message}");
+        }
+    }
+}
