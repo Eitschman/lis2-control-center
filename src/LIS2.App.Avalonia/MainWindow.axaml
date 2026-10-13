@@ -2,44 +2,79 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="LIS2.App.Avalonia.MainWindow"
         Title="LIS2 Control Center"
-        Width="1320" Height="900" MinWidth="900" MinHeight="650">
-  <Grid ColumnDefinitions="230,*">
-    <Border Grid.Column="0" Background="#182431" Padding="16">
-      <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="4,4,4,20">
-          <TextBlock Text="LIS2 Control Center" FontSize="20" FontWeight="Bold" Foreground="White" TextWrapping="Wrap" />
-          <TextBlock Text="Windows / Linux" Foreground="#A7BBCB" />
+        Width="1320" Height="900" MinWidth="1120" MinHeight="760"
+        WindowStartupLocation="CenterScreen">
+  <Grid ColumnDefinitions="250,*">
+    <Border Grid.Column="0" Background="#182431" BorderBrush="#354351" BorderThickness="0,0,1,0">
+      <Grid Margin="18" RowDefinitions="Auto,*,Auto">
+        <TextBlock Grid.Row="0" Text="LIS2 CONTROL CENTER" FontSize="16" FontWeight="Bold" Margin="4,18,0,24" Foreground="White" />
+        <StackPanel Grid.Row="1" Spacing="8">
+          <ListBox Name="Navigation" SelectedIndex="0">
+            <ListBoxItem Content="⌂    Dashboard" />
+            <ListBoxItem Content="▣    Display" />
+            <ListBoxItem Content="▤    Pages" />
+            <ListBoxItem Content="♫    Media" />
+            <ListBoxItem Content="⚠    Events" />
+            <ListBoxItem Content="▦    Hardware" />
+            <ListBoxItem Content="✽    Fan Control" />
+            <ListBoxItem Content="⚙    Settings" />
+            <ListBoxItem Content="∿    Diagnostics" />
+            <ListBoxItem Content="⌂    Home Assistant" />
+          </ListBox>
+          <Separator Margin="4,18,4,16" />
+          <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
+          <TextBlock Name="TransportSummaryText" Text="Virtual LIS2" TextWrapping="Wrap" Margin="4,0,0,0" />
+          <TextBlock Name="VirtualStatus" Text="Disconnected" Margin="4,4,0,0" />
+          <Button Name="VirtualConnect" Content="Connect virtual LIS2" HorizontalAlignment="Left" />
+          <Button Name="VirtualDisconnect" Content="Disconnect" IsEnabled="False" HorizontalAlignment="Left" />
         </StackPanel>
-        <ListBox Name="Navigation" SelectedIndex="0">
-          <ListBoxItem Content="Dashboard" />
-          <ListBoxItem Content="Display" />
-          <ListBoxItem Content="Pages" />
-          <ListBoxItem Content="Media" />
-          <ListBoxItem Content="Events" />
-          <ListBoxItem Content="Hardware" />
-          <ListBoxItem Content="Fan Control" />
-          <ListBoxItem Content="Settings" />
-          <ListBoxItem Content="Diagnostics" />
-          <ListBoxItem Content="Home Assistant" />
-        </ListBox>
-      </DockPanel>
+        <StackPanel Grid.Row="2" Margin="4,12,0,10" Spacing="7">
+          <Separator />
+          <TextBlock Text="ⓘ  LIS2 Control Center" />
+          <TextBlock Text="◉  GitHub" Opacity="0.65" />
+          <TextBlock Text="ⓘ  About" Opacity="0.65" />
+        </StackPanel>
+      </Grid>
     </Border>
-    <StackPanel Grid.Column="1" Margin="32" Spacing="16">
-      <TextBlock Name="SectionTitle" Text="Dashboard" FontSize="28" FontWeight="Bold" />
-      <TextBlock Text="Cross-platform Avalonia migration" FontSize="16" />
-      <Border Padding="18" BorderThickness="1" BorderBrush="Gray" CornerRadius="8">
-        <StackPanel Spacing="8">
-          <TextBlock Text="Migration status" FontWeight="SemiBold" />
-          <TextBlock Name="SectionDescription" Text="Dashboard is not connected to the LIS2 runtime yet." TextWrapping="Wrap" />
-          <TextBlock Text="Virtual mode only: no physical hardware or fans are accessed." Opacity="0.7" />
-          <TextBlock Name="VirtualStatus" Text="Virtual LIS2: disconnected" />
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Name="VirtualConnect" Content="Connect virtual LIS2" />
-            <Button Name="VirtualDemo" Content="Send demo display" IsEnabled="False" />
-            <Button Name="VirtualDisconnect" Content="Disconnect" IsEnabled="False" />
+    <Grid Grid.Column="1" Margin="20" RowDefinitions="Auto,*">
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,18">
+        <StackPanel Grid.Column="0" Spacing="5">
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <TextBlock Name="SectionTitle" Text="Dashboard" FontSize="30" FontWeight="SemiBold" />
+            <Button Content="?" Width="32" Height="32" ToolTip.Tip="Help for this page" />
           </StackPanel>
+          <TextBlock Name="SectionDescription" Text="Overview and quick access to the most important functions." Opacity="0.65" TextWrapping="Wrap" />
         </StackPanel>
-      </Border>
-    </StackPanel>
+        <Border Grid.Column="1" Background="#354351" CornerRadius="14" Padding="14,9" VerticalAlignment="Top">
+          <TextBlock Name="ConnectionText" Text="Disconnected" FontWeight="SemiBold" />
+        </Border>
+      </Grid>
+      <ScrollViewer Grid.Row="1">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="3*,14,2*">
+            <Border Grid.Column="0" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+              <StackPanel Spacing="12">
+                <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
+                <Border Background="#07190E" BorderBrush="#33523D" BorderThickness="1" CornerRadius="6" Padding="24,20">
+                  <StackPanel>
+                    <TextBlock Name="PreviewLine1" Text="                    " FontFamily="Consolas" FontSize="25" Foreground="#70EF86" />
+                    <TextBlock Name="PreviewLine2" Text="                    " FontFamily="Consolas" FontSize="25" Foreground="#70EF86" />
+                  </StackPanel>
+                </Border>
+                <TextBlock Text="Virtual LIS2 preview (hardware-free)" Opacity="0.65" />
+                <Button Name="VirtualDemo" Content="Send demo display" IsEnabled="False" HorizontalAlignment="Left" />
+              </StackPanel>
+            </Border>
+            <Border Grid.Column="2" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Connection" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock Text="Virtual transport during migration" TextWrapping="Wrap" />
+                <TextBlock Text="Physical LIS2 and fan control are not connected." Opacity="0.7" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </Grid>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
   </Grid>
 </Window>
