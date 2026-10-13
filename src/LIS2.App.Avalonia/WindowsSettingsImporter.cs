@@ -5,14 +5,14 @@ namespace LIS2.App.Avalonia;
 /// <summary>Reads the original Windows settings.json without modifying it or interpreting DPAPI secrets.</summary>
 public static class WindowsSettingsImporter
 {
-    public static PortableWorkspace Import(string json)
+    public static PortableWorkspace Import(string json, PortableWorkspace? existing = null)
     {
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
         if (root.ValueKind != JsonValueKind.Object)
             throw new InvalidOperationException("Windows settings must be a JSON object.");
 
-        var result = new PortableWorkspace();
+        var result = existing is null ? new PortableWorkspace() : JsonSerializer.Deserialize<PortableWorkspace>(JsonSerializer.Serialize(existing))!;
         if (root.TryGetProperty("BrightnessPercent", out var brightness) &&
             brightness.ValueKind == JsonValueKind.Number &&
             brightness.TryGetInt32(out var percent) &&
@@ -67,6 +67,10 @@ public static class WindowsSettingsImporter
                 result.HomeAssistantEntityPreferences =
                     JsonSerializer.Deserialize<List<PortableHaEntityPreference>>(preferences.GetRawText())
                     ?? new();
+                result.HomeAssistantEntityPreferences = result.HomeAssistantEntityPreferences
+                    .Where(p => p is not null && !string.IsNullOrWhiteSpace(p.EntityId))
+                    .GroupBy(p => p.EntityId, StringComparer.OrdinalIgnoreCase)
+                    .Select(g => g.Last()).ToList();
             }
         }
 
