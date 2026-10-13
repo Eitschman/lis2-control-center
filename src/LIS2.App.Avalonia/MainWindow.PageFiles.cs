@@ -74,6 +74,7 @@ public partial class MainWindow
         using var reader = new StreamReader(stream);
         _pages.ImportJson(await reader.ReadToEndAsync());
         RefreshPageList(_pages.Pages.Count > 0 ? 0 : -1);
+        await SavePortableWorkspaceAsync();
         SetVirtualStatus("Page definitions imported.");
     }
 }
