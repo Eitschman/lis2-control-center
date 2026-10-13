@@ -16,7 +16,7 @@ public sealed class SerialDisplaySessionTests
         await session.SetBrightnessAsync(Lis2Brightness.Percent50);
         await session.ClearAsync();
         Assert.NotEmpty(transport.Writes);
-        Assert.False(transport.Writes.Any(w => w.SequenceEqual(Lis2Protocol.SetFans(0, 0, 0, 0))));
+        Assert.DoesNotContain(transport.Writes, w => w.SequenceEqual(Lis2Protocol.SetFans(0, 0, 0, 0)));
     }
 
     [Fact]
