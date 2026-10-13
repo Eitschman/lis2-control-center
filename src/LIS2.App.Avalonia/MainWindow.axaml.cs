@@ -23,7 +23,7 @@ public partial class MainWindow : Window
         this.FindControl<Button>("VirtualDemo")!.Click += async (_, _) =>
             await RunVirtualActionAsync(() => _virtualDevice.WriteDemoAsync());
         this.FindControl<Button>("VirtualDisconnect")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.DisconnectAsync());
+            await RunVirtualActionAsync(async () => { StopPagePlayback(); await _virtualDevice.DisconnectAsync(); });
 
         this.FindControl<Button>("OpenDisplayControls")!.Click += (_, _) => NavigateTo(1);
         this.FindControl<Button>("OpenFanControl")!.Click += (_, _) => NavigateTo(6);
@@ -71,6 +71,7 @@ public partial class MainWindow : Window
 
     private async void OnWindowClosed(object? sender, EventArgs e)
     {
+        StopPagePlayback();
         await _virtualDevice.DisposeAsync();
     }
 
