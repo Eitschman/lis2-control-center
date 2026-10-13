@@ -212,6 +212,10 @@
                 <Button Name="PageDelete" Content="Delete" />
               </WrapPanel>
               <StackPanel Orientation="Horizontal" Spacing="7">
+                <Button Name="PageImport" Content="Load pages..." />
+                <Button Name="PageExport" Content="Save pages..." />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="7">
                 <Button Name="PageUp" Content="↑  Move up" />
                 <Button Name="PageDown" Content="↓  Move down" />
               </StackPanel>
@@ -231,7 +235,20 @@
                   <TextBox Name="PageRefresh" Width="90" />
                 </StackPanel>
                 <TextBlock Grid.Row="4" Text="Visible when" />
-                <TextBox Name="PageVisibility" Grid.Row="4" Grid.Column="1" />
+                <StackPanel Grid.Row="4" Grid.Column="1" Spacing="5">
+                  <StackPanel Orientation="Horizontal" Spacing="7">
+                    <ComboBox Name="PageConditionKey" Width="185" IsEditable="True" />
+                    <ComboBox Name="PageConditionOperator" Width="85">
+                      <ComboBoxItem Content="=" /><ComboBoxItem Content="!=" />
+                      <ComboBoxItem Content="&gt;" /><ComboBoxItem Content="&gt;=" />
+                      <ComboBoxItem Content="&lt;" /><ComboBoxItem Content="&lt;=" />
+                    </ComboBox>
+                    <TextBox Name="PageConditionValue" Width="110" Watermark="Value" />
+                    <Button Name="PageApplyCondition" Content="Apply condition" />
+                  </StackPanel>
+                  <TextBox Name="PageVisibility" Watermark="Raw visibility expression" />
+                  <TextBlock Name="PageConditionStatus" Opacity="0.65" />
+                </StackPanel>
                 <TextBlock Grid.Row="5" Text="Overflow" />
                 <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Spacing="8">
                   <ComboBox Name="PageOverflow1" Width="135"><ComboBoxItem Content="PingPong" /><ComboBoxItem Content="Truncate" /><ComboBoxItem Content="Marquee" /></ComboBox>
