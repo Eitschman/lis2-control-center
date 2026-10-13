@@ -378,6 +378,10 @@
               <Button Name="FanReadSensors" Content="List detected sensors" />
               <Button Name="FanLivePreview" Content="Preview with real sensor values (dry run)" />
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Name="FanMonitorStart" Content="Start continuous sensor preview (dry run)" />
+              <Button Name="FanMonitorStop" Content="Stop preview" IsEnabled="False" />
+            </StackPanel>
             <TextBlock Name="FanSensorStatus" Text="Sensor discovery has not run." TextWrapping="Wrap" />
             <TextBlock Name="FanPreviewStatus" Text="Physical fan output disabled." TextWrapping="Wrap" />
           </StackPanel>

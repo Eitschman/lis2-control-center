@@ -153,3 +153,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Fault containment and disconnect attempt (2026-10-13)
 - Background fan-loop errors now preserve the original fault even if output disable or event subscribers throw. Ordered stop attempts output disable and serial disconnect even when loop draining fails. Actual physical output state still requires hardware validation.
+
+## Continuous read-only fan monitoring (2026-10-13)
+- Avalonia fan editor now supports start/stop of a 2-second continuous four-channel sensor-driven dry-run, with fail-safe indications, cancellation, and shutdown drain. The monitoring output uses SimulatedFanOutput exclusively; it never opens a serial port or authorizes hardware fans. Live physical fan activation remains gated pending complete safety review.

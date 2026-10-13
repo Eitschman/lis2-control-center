@@ -1,5 +1,6 @@
 using System.Globalization;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using LIS2.Runtime;
 
 namespace LIS2.App.Avalonia;
@@ -11,6 +12,8 @@ public partial class MainWindow
     private readonly IFanSensorSource _liveFanSensors = OperatingSystem.IsLinux()
         ? new LinuxHwmonFanSensors()
         : new SnapshotFanSensors(() => new Dictionary<string, object?>());
+    private CancellationTokenSource? _fanMonitorStop;
+    private Task? _fanMonitorTask;
     private bool _fanEditorLoading;
     private int _fanEditingChannelIndex;
 
@@ -88,7 +91,64 @@ public partial class MainWindow
             }
             catch (Exception ex) { SetFanStatus("Live sensor preview failed: " + ex.Message); }
         };
+        this.FindControl<Button>("FanMonitorStart")!.Click += async (_, _) =>
+        {
+            if (_fanMonitorTask is not null) return;
+            try
+            {
+                SaveFanEditor();
+                var channels = _fanSettings.ToRuntimeChannels();
+                var stop = new CancellationTokenSource();
+                _fanMonitorStop = stop;
+                this.FindControl<Button>("FanMonitorStart")!.IsEnabled = false;
+                this.FindControl<Button>("FanMonitorStop")!.IsEnabled = true;
+                _fanMonitorTask = RunFanMonitorAsync(channels, stop.Token);
+                await Task.Yield();
+            }
+            catch (Exception ex) { SetFanStatus("Monitor start failed: " + ex.Message); }
+        };
+        this.FindControl<Button>("FanMonitorStop")!.Click += async (_, _) => await StopFanMonitorAsync();
         RefreshFanEditor();
+    }
+
+    private async Task RunFanMonitorAsync(IReadOnlyList<LIS2.Fans.FanChannelConfiguration> channels, CancellationToken token)
+    {
+        try
+        {
+            await using var runtime = new FanRuntime(_liveFanSensors, new SimulatedFanOutput(), channels);
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
+            do
+            {
+                var state = await runtime.TickAsync(token);
+                await Dispatcher.UIThread.InvokeAsync(() => SetFanStatus(
+                    "CONTINUOUS DRY RUN (hardware disabled): " + string.Join(" / ",
+                    state.Channels.Select((c, i) => $"Fan {i + 1}: {c.OutputPercent}%{(c.SensorValid ? "" : " (fail-safe)")}"))));
+            } while (await timer.WaitForNextTickAsync(token));
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+        catch (Exception ex)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() => SetFanStatus("Fan monitor failed: " + ex.Message));
+        }
+        finally
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                this.FindControl<Button>("FanMonitorStart")!.IsEnabled = true;
+                this.FindControl<Button>("FanMonitorStop")!.IsEnabled = false;
+            });
+        }
+    }
+
+    private async Task StopFanMonitorAsync()
+    {
+        var stop = _fanMonitorStop;
+        var task = _fanMonitorTask;
+        _fanMonitorStop = null;
+        _fanMonitorTask = null;
+        stop?.Cancel();
+        try { if (task is not null) await task; }
+        finally { stop?.Dispose(); }
     }
 
     private void RefreshFanEditor()
