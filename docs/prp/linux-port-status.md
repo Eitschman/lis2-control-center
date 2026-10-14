@@ -312,3 +312,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware grouping and metadata parity (2026-10-14)
 - Hardware list now shows hardware group headers with favorites first within each group; the selected sensor key survives refresh and group headers cannot be assigned to fans.
 - Excluded .Unit metadata rows, displayed human-readable sensor name below alias, retained full template key. Added headless grouping/metadata regressions. Avalonia typed templates replace WPF GroupStyle. No hardware writes or fan authorization. Latest CI pending; desktop validation deferred.
+
+## CI repair for hardware grouping (2026-10-14)
+- Run 38533080462 on d409087 failed both Avalonia builds with CS0117: HardwareSensorEntry.GroupForDisplay missing. The UI call was correct, but the implementation was accidentally omitted from HardwareSensorEntry.
+- Implemented the missing grouping method in HardwareSensorEntry with case-insensitive hardware group headers and favorites-first ordering. Shared-library jobs had passed; CI for repair HEAD pending. No device commands or authorization changes.

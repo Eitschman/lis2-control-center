@@ -87,6 +87,20 @@ public sealed record HardwareSensorEntry(string Key, object? Value, string Alias
     public string SensorType => HardwareSensorCatalog.GetSensorType(Key);
     public string DisplayValue => IsAvailable ? Convert.ToString(Value, CultureInfo.InvariantCulture) ?? "" : "Unavailable";
 
+    public static IReadOnlyList<object> GroupForDisplay(IEnumerable<HardwareSensorEntry> entries)
+    {
+        ArgumentNullException.ThrowIfNull(entries);
+        var result = new List<object>();
+        foreach (var group in entries.GroupBy(entry => entry.HardwareName, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(group => group.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            result.Add(new HardwareSensorGroupHeader(group.Key));
+            result.AddRange(group.OrderByDescending(entry => entry.IsFavorite)
+                .ThenBy(entry => entry.Key, StringComparer.OrdinalIgnoreCase));
+        }
+        return result;
+    }
+
     public override string ToString()
     {
         var name = string.IsNullOrWhiteSpace(Alias) ? Key : Alias + " (" + Key + ")";
