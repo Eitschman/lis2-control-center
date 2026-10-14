@@ -431,3 +431,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## Settings sidebar cleanup (2026-10-14)
 - User screenshot revealed Windows settings import and page-save status incorrectly placed inside left navigation. Moved import button/status into SettingsView; moved VirtualStatus to SettingsView, leaving transport shortcut in sidebar. No changes to import event wiring or storage. CI pending.
+
+## Linux comprehensive system sensors (2026-10-14)
+- Added LinuxSystemSensors combining existing hwmon temperature keys with hwmon fan RPM, /proc/stat CPU utilization (aggregate and per-core delta), CPU cpufreq MHz, /proc/meminfo RAM/swap, /proc/diskstats per-block-device read/write B/s, /proc/net/dev per-interface receive/send B/s, and DriveInfo mounted fixed filesystem capacity/usage. Hardware catalog groups by stable Hardware.<device>.<type>.<metric> keys; template source and continuous sampling reuse the same source. No physical fan outputs authorized. CI and real Pi verification pending.

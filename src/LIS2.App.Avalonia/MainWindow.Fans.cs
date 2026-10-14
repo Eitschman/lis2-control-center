@@ -11,7 +11,7 @@ public partial class MainWindow
     private readonly SimulatedFanSensors _fanPreviewSensors = new();
     private readonly SimulatedFanOutput _fanPreviewSink = new();
     private readonly IFanSensorSource _liveFanSensors = OperatingSystem.IsLinux()
-        ? new LinuxHwmonFanSensors()
+        ? new LinuxSystemSensors()
         : OperatingSystem.IsWindows() ? new WindowsHardwareFanSensors()
         : new SnapshotFanSensors(() => new Dictionary<string, object?>());
     private AuthorizedFanRuntimeSession? _virtualFanSession;
