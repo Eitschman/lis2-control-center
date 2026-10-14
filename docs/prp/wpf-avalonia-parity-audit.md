@@ -384,3 +384,6 @@ Status: verified placement requirements only; implementation NOT yet corrected. 
 
 ## Diagnostics data parity pass (2026-10-14)
 - Virtual LIS2 state and decoded command history now sourced from VirtualLis2Transport and formatted following WPF RefreshVirtualDiagnostics. Real protocol log remains outstanding. Diagnostics not yet full parity.
+
+## User-prioritized virtual LIS2 and VFD color pass (2026-10-14)
+- WPF VfdBackgroundBrush/VfdBorderBrush/VfdTextBrush are identical in Dark/Light (#123B8A/#5D8FE8/#F7FBFF). Avalonia Dashboard and Pages previews now use these exact colors. Hardware-free virtual LIS2 connects at window Opened to allow immediate display testing; serial transport remains explicit. UI smoke test still required.

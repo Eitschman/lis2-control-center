@@ -57,10 +57,10 @@
             <Border Grid.Column="0" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
               <StackPanel Spacing="12">
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
-                <Border Background="#07190E" BorderBrush="#33523D" BorderThickness="1" CornerRadius="6" Padding="24,20">
+                <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6" Padding="24,20">
                   <StackPanel>
-                    <TextBlock Name="PreviewLine1" Text="                    " FontFamily="Consolas" FontSize="31" Foreground="#70EF86" />
-                    <TextBlock Name="PreviewLine2" Text="                    " FontFamily="Consolas" FontSize="31" Foreground="#70EF86" />
+                    <TextBlock Name="PreviewLine1" Text="                    " FontFamily="Consolas" FontSize="31" Foreground="#F7FBFF" />
+                    <TextBlock Name="PreviewLine2" Text="                    " FontFamily="Consolas" FontSize="31" Foreground="#F7FBFF" />
                   </StackPanel>
                 </Border>
                 <Button Name="VirtualDemo" Content="Send demo display" IsEnabled="False" HorizontalAlignment="Left" />
@@ -172,7 +172,7 @@
               </StackPanel>
               <Border Grid.Column="3" Background="#07190E" CornerRadius="5" Padding="16">
                 <StackPanel Spacing="10">
-                  <TextBlock Name="GlyphPixelPreview" Text="·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····" FontFamily="Consolas" FontSize="22" Foreground="#70EF86" />
+                  <TextBlock Name="GlyphPixelPreview" Text="·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····" FontFamily="Consolas" FontSize="22" Foreground="#F7FBFF" />
                   <TextBlock Text="20x2 template preview" />
                 </StackPanel>
               </Border>
@@ -275,10 +275,10 @@
               <TextBlock Name="PageVariableStatus" Opacity="0.65" />
               <TextBlock Name="PagePlaybackStatus" Text="Sequence stopped" Opacity="0.75" />
               <TextBlock Text="Live preview" FontWeight="SemiBold" />
-              <Border Background="#07190E" BorderBrush="#33523D" BorderThickness="1" CornerRadius="6" Padding="18,12" HorizontalAlignment="Left">
+              <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6" Padding="18,12" HorizontalAlignment="Left">
                 <StackPanel>
-                  <TextBlock Name="PagePreview1" FontFamily="Consolas" FontSize="26" Foreground="#70EF86" />
-                  <TextBlock Name="PagePreview2" FontFamily="Consolas" FontSize="26" Foreground="#70EF86" />
+                  <TextBlock Name="PagePreview1" FontFamily="Consolas" FontSize="26" Foreground="#F7FBFF" />
+                  <TextBlock Name="PagePreview2" FontFamily="Consolas" FontSize="26" Foreground="#F7FBFF" />
                 </StackPanel>
               </Border>
               <StackPanel Orientation="Horizontal" Spacing="7">

@@ -416,3 +416,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## Virtual LIS2 diagnostics port (2026-10-14)
 - Real virtual state and last 200 decoded commands now use existing LIS2.Core transport/state/protocol API, following WPF formatting. Protocol Log remains unported; no fabricated entries. CI pending.
+
+## Virtual first test milestone (2026-10-14)
+- Auto-connect hardware-free virtual LIS2 on window Opened using existing session initialization; dashboard/pages VFD colors copied from WPF theme brushes (#123B8A/#5D8FE8/#F7FBFF). Test manual Send/Render/Clear and sequence playback with published build. CI pending.

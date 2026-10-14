@@ -271,3 +271,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## WPF virtual diagnostics data port (2026-10-14)
 - Ported WPF RefreshVirtualDiagnostics state lines, eight glyph rows, and last-200 decoded command history using existing VirtualLis2Transport.Writes and Lis2Protocol.DescribeCommand. Read-only data only. Protocol Log still awaits genuine application event logging. CI pending.
+
+## Virtual LIS2 first test priority (2026-10-14)
+- User reprioritized immediately testable virtual LIS2 and WPF VFD colors. Virtual LIS2 now connects on window Opened via existing ConnectWithGlyphsAsync (hardware-free); existing Settings virtual connect/disconnect remains available. Dashboard and Pages VFD preview colors match WPF Dark.xaml and Light.xaml: background #123B8A, border #5D8FE8, text #F7FBFF. Diagnostics refresh follows virtual preview updates. CI and interactive smoke test pending.

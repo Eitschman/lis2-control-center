@@ -73,6 +73,13 @@ public partial class MainWindow : Window
         InitializePagesEditor();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
         Closed += OnWindowClosed;
+        // The virtual transport is hardware-free: make the WPF-style preview
+        // immediately testable without requiring an experimental serial connection.
+        Opened += async (_, _) =>
+        {
+            if (!_virtualDevice.IsConnected)
+                await RunVirtualActionAsync(ConnectWithGlyphsAsync);
+        };
         UpdateSection();
         UpdateVirtualControls();
     }
@@ -162,6 +169,7 @@ public partial class MainWindow : Window
 
         first.Text = _virtualDevice.IsConnected ? _virtualDevice.State.Line1 : new string(' ', 20);
         second.Text = _virtualDevice.IsConnected ? _virtualDevice.State.Line2 : new string(' ', 20);
+        RefreshDiagnostics();
     }
 
     private void SetVirtualStatus(string message)
