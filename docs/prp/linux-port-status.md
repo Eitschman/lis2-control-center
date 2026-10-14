@@ -284,3 +284,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware sensor column parity (2026-10-14)
 - Replaced plain-text hardware list with WPF-inspired five-column rows: markers, sensor alias/name, type, value and template key; header and row data projections added.
 - Centralized sensor type detection for filtering and row rendering, with headless tests. WPF grouping and full visual parity remain open. Current HEAD CI pending.
+
+## Hardware column layout CI repair (2026-10-14)
+- Commit `06bbb20`, run `38524643627`: both Avalonia jobs failed AVLN2000 at `MainWindow.axaml:403`, because WPF's `HorizontalContentAlignment` is not a supported Avalonia ListBox property. Both shared-library jobs passed.
+- Removed the invalid ListBox property; the row Grid keeps explicit five-column layout. CI for the repair commit is pending; no hardware behavior or fan authorization changed.
