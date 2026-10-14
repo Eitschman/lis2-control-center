@@ -375,3 +375,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Pi 5 preview screenshot confirms window sizing, contrast and sidebar overlap significantly improved. Final WPF parity and full desktop acceptance remain pending.
 - Dashboard System Status now exposes explicit Connect virtual LIS2 / Disconnect controls using the existing glyph-aware virtual connection and existing safe disconnect logic. Buttons share the same busy/playback gating as Settings transport controls, and display state/command count comes from a tested pure presentation helper. No serial or physical fan commands added.
 - Added headless tests for connected/disconnected virtual dashboard presentation. CI pending for this commit; no new manual desktop acceptance required.
+
+## Strict WPF reference correction (2026-10-14)
+- Owner explicitly rejected invented Avalonia functionality. Direct comparison against src/LIS2.App/MainWindow.xaml confirms WPF Dashboard System Status has only a status TextBlock, not virtual Connect/Disconnect buttons. Removed those buttons, their event handlers and enable-state code. Restored original WPF disconnected text and inline status formatting. Virtual transport controls remain in Settings, as before.
+- Do not introduce convenience UI or workflows absent from WPF. All future changes must cite the corresponding WPF source control/handler and reproduce its behavior; distinguish platform adapters from new user-facing features. Headless tests and CI remain required. Current CI pending.

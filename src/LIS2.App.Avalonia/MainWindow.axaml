@@ -66,11 +66,7 @@
               <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
                 <StackPanel Spacing="10">
                   <TextBlock Text="System Status" FontSize="16" FontWeight="SemiBold" />
-                  <TextBlock Name="VirtualStateText" Text="Virtual LIS2 is disconnected. Connect to preview display commands without hardware." TextWrapping="Wrap" />
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button Name="DashboardConnectVirtual" Content="Connect virtual LIS2" />
-                    <Button Name="DashboardDisconnectVirtual" Content="Disconnect" IsEnabled="False" />
-                  </StackPanel>
+                  <TextBlock Name="VirtualStateText" Text="State available when Virtual transport is active." TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
               <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">

@@ -238,3 +238,6 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 
 ## Dashboard transport parity package (2026-10-14)
 - Dashboard can now connect/disconnect the existing virtual LIS2 session directly; synchronized enabled states and explicit hardware-free disconnected guidance reduce the dead-end visible on the Pi 5 first-launch screenshot. Automated presentation tests added; CI and final UI acceptance pending. Does not enable physical fan outputs.
+
+## WPF is the sole functional/UI reference (2026-10-14, reaffirmed)
+- Do not invent Avalonia controls, dashboard shortcuts or user workflows. Map each user-facing control and handler to src/LIS2.App/MainWindow.xaml and MainWindow.xaml.cs first. The temporary dashboard virtual Connect/Disconnect controls from 50665f7 were confirmed absent in WPF and reverted. Platform-specific implementation may differ internally but must preserve user-facing WPF behavior and layout. Any parity exception requires explicit owner approval.
