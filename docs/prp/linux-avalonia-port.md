@@ -256,3 +256,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## WPF layout ownership audit for all ten menus (2026-10-14)
 - Verified WPF card/section ownership against Avalonia XAML for Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics and Home Assistant. Per-tab grouping matrix and required corrections in docs/prp/wpf-avalonia-parity-audit.md. Do not implement new features until incorrect placements are corrected or explicitly tracked. Source-level review only; no UI acceptance.
+
+## Initial placement correction (2026-10-14)
+- HA URL/token/test/connect and entity picker moved out of PagesView into HomeAssistantView, with WPF Connection / Home Assistant entities card ownership. This is NOT full WPF HA parity: entity details, aliases, favorites, attribute browser and correct enable/save semantics still require implementation. Existing backend controls retained to avoid breaking handlers; no new functions introduced.

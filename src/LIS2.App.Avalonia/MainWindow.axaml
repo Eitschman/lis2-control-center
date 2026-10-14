@@ -266,21 +266,6 @@
                 <Button Name="ImportWindowsSettings" Content="Import Windows settings.json..." />
                 <TextBlock Name="WindowsImportStatus" Text="Existing Windows settings remain unchanged." VerticalAlignment="Center" Opacity="0.7" />
               </StackPanel>
-              <TextBlock Text="Home Assistant (read-only WebSocket source)" FontWeight="SemiBold" />
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBox Name="HaUrl" Width="310" Watermark="http://homeassistant.local:8123" />
-                <TextBox Name="HaToken" Width="240" PasswordChar="*" Watermark="Long-lived access token" />
-                <Button Name="HaConnect" Content="Connect HA" />
-                <Button Name="HaDisconnect" Content="Disconnect HA" />
-                <Button Name="HaTest" Content="Test" />
-              </StackPanel>
-              <TextBlock Name="HaStatus" Text="Home Assistant not configured" Opacity="0.75" />
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBox Name="HaEntityFilter" Width="240" Watermark="Filter entities" />
-                <ComboBox Name="HaEntityPicker" Width="370" />
-                <Button Name="HaInsertLine1" Content="Insert state into line 1" />
-                <Button Name="HaInsertLine2" Content="Insert state into line 2" />
-              </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <ComboBox Name="PageVariablePicker" Width="220" />
                 <Button Name="PageInsertLine1" Content="Insert into line 1" />
@@ -304,6 +289,41 @@
               </StackPanel>
             </StackPanel>
           </Grid>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer Name="HomeAssistantView" Grid.Row="1" IsVisible="False">
+      <StackPanel Spacing="12">
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Connection" FontWeight="SemiBold" FontSize="18" />
+            <CheckBox Name="HaEnabled" Content="Enable Home Assistant" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="URL" VerticalAlignment="Center" />
+              <TextBox Name="HaUrl" Width="310" Watermark="http://homeassistant.local:8123" />
+              <TextBlock Text="Token" VerticalAlignment="Center" />
+              <TextBox Name="HaToken" Width="240" PasswordChar="*" Watermark="Long-lived access token" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Name="HaTest" Content="Test connection" />
+              <Button Name="HaConnect" Content="Save / reconnect" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Home Assistant entities" FontWeight="SemiBold" FontSize="18" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBox Name="HaEntityFilter" Width="240" Watermark="Search entity ID, friendly name or alias" />
+              <ComboBox Name="HaEntityPicker" Width="370" />
+            </StackPanel>
+            <TextBlock Name="HaStatus" Text="Not configured" TextWrapping="Wrap" />
+            <TextBlock Text="Selected entity" FontWeight="SemiBold" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Name="HaInsertLine1" Content="Insert state into line 1" />
+              <Button Name="HaInsertLine2" Content="Insert state into line 2" />
+            </StackPanel>
+          </StackPanel>
         </Border>
       </StackPanel>
     </ScrollViewer>

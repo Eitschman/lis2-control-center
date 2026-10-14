@@ -369,3 +369,6 @@ Status: verified placement requirements only; implementation NOT yet corrected. 
 - Fan output safety remains an explicit exception to literal WPF physical behavior: keep hardware outputs disabled without authorization and test proof.
 - The Media, Events and Home Assistant tabs must have dedicated views, not placeholders or a generic not-connected message.
 - Validate WPF default values, control visibility, enabled state, user-visible wording, grouping, persistence, and navigation for each menu. No menu is approved by this source-level placement audit alone.
+
+## Post-change placement recheck (2026-10-14)
+- HA URL/token/test/save-connect and entity picker are now owned by HomeAssistantView rather than PagesView. This corrects the most obvious ownership violation, but **does not finish** WPF Home Assistant: enable checkbox is not yet wired; entity detail, alias, favorite, domain filter, attributes and WPF copy/create-page actions are absent. Pages still has extra import/playback controls. Other tab corrections remain open. Do not mark the overall requested correction pass complete.

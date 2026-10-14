@@ -222,6 +222,7 @@ public partial class MainWindow : Window
         this.FindControl<ScrollViewer>("DashboardView")!.IsVisible = section == "Dashboard";
         this.FindControl<ScrollViewer>("DisplayView")!.IsVisible = section == "Display";
         this.FindControl<ScrollViewer>("PagesView")!.IsVisible = section == "Pages";
+        this.FindControl<ScrollViewer>("HomeAssistantView")!.IsVisible = section == "Home Assistant";
         this.FindControl<ScrollViewer>("FanControlView")!.IsVisible = section == "Fan Control";
         this.FindControl<ScrollViewer>("SettingsView")!.IsVisible = section == "Settings";
         this.FindControl<ScrollViewer>("HardwareView")!.IsVisible = section == "Hardware";
