@@ -328,3 +328,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware sensor filtering and grouping WPF parity (2026-10-14)
 - Compared WPF RefreshHardwareSensors: untracked nonnumeric snapshot fields must not appear as phantom unavailable sensors; explicitly tracked/saved sensor keys remain unavailable when missing or invalid. Search now matches hardware name, sensor name, display name, type, alias and full key.
 - Within each hardware group rows are ordered favorites first, then available first, then type/display name/key, matching WPF semantics. Added headless regressions for nonnumeric tracked/untracked sensors and multi-field search. No fan output changes; desktop checks deferred; current HEAD CI pending.
+
+## Hardware sensor display-name parity (2026-10-14)
+- Compared WPF ParseHardwareSensorKey/HumanizeSensorName: Avalonia hardware and sensor labels now separate camel-case/acronym boundaries and underscores/dashes (e.g. GraphicsCard -> Graphics Card; GPUHotSpot -> GPU Hot Spot). Stable raw keys remain unchanged for templates, saved aliases, favorites and fan references.
+- Added headless display-name regressions; no physical device operations. CI on latest HEAD pending; final desktop checks deferred.

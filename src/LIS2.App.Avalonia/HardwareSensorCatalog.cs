@@ -88,8 +88,25 @@ public static class HardwareSensorCatalog
 public sealed record HardwareSensorEntry(string Key, object? Value, string Alias, bool IsFavorite, bool IsAvailable, string Unit = "")
 {
     public string DisplayName => string.IsNullOrWhiteSpace(Alias) ? SensorName : Alias;
-    public string HardwareName => Key.Split('.').Length > 1 ? Key.Split('.')[1] : "Hardware";
-    public string SensorName => Key.Split('.').Length > 3 ? string.Join(" ", Key.Split('.').Skip(3)) : Key;
+    public string HardwareName => Key.Split('.').Length > 1 ? Humanize(Key.Split('.')[1]) : "Hardware";
+    public string SensorName => Key.Split('.').Length > 3 ? Humanize(string.Join(" ", Key.Split('.').Skip(3))) : Key;
+
+    private static string Humanize(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return value;
+        var result = new System.Text.StringBuilder();
+        for (var index = 0; index < value.Length; index++)
+        {
+            var character = value[index];
+            if (character is '_' or '-') { if (result.Length > 0 && result[^1] != ' ') result.Append(' '); continue; }
+            if (index > 0 && char.IsUpper(character) && result.Length > 0 && result[^1] != ' ' &&
+                (char.IsLower(value[index - 1]) ||
+                 (char.IsUpper(value[index - 1]) && index + 1 < value.Length && char.IsLower(value[index + 1]))))
+                result.Append(' ');
+            result.Append(character);
+        }
+        return result.ToString();
+    }
     public string Markers => (IsFavorite ? "★" : "") + (!IsAvailable ? " !" : "");
     public string SensorType => HardwareSensorCatalog.GetSensorType(Key);
     public string DisplayValue => IsAvailable

@@ -20,6 +20,17 @@ public sealed class HardwareSensorCatalogTests
     }
 
     [Fact]
+    public void HardwareAndSensorNamesAreHumanReadable()
+    {
+        var entry = new HardwareSensorEntry("Hardware.GraphicsCard.Temperature.GPUHotSpot", 80d, "", false, true);
+        Assert.Equal("Graphics Card", entry.HardwareName);
+        Assert.Equal("GPU Hot Spot", entry.SensorName);
+        Assert.Equal("GPU Hot Spot", entry.DisplayName);
+        var underscored = new HardwareSensorEntry("Hardware.CPU.Load.Core_Usage", 15d, "", false, true);
+        Assert.Equal("Core Usage", underscored.SensorName);
+    }
+
+    [Fact]
     public void SensorWithoutUnitDoesNotInventCelsius()
     {
         var entry = new HardwareSensorEntry("Hardware.CPU.Power.Package", 30d, "", false, true);
