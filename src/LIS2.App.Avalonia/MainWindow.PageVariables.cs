@@ -20,7 +20,7 @@ public partial class MainWindow
         picker.ItemsSource = names;
         picker.SelectedItem = selected is not null && names.Contains(selected) ? selected : names.FirstOrDefault();
         this.FindControl<TextBlock>("PageVariableStatus")!.Text =
-            $"{names.Length} variables available (Clock from original Windows source; other providers pending).";
+            $"{names.Length} variables available (Clock, Home Assistant and detected hardware sensors).";
         RefreshPagePreview();
     }
 

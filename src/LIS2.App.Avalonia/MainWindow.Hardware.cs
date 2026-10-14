@@ -136,12 +136,16 @@ public partial class MainWindow
             var snapshot = _liveFanSensors.Snapshot();
             _hardwareSensors.Clear();
             foreach (var item in snapshot) _hardwareSensors[item.Key] = item.Value;
+            _pageSources.UpdateHardware(_hardwareSensors);
+            RefreshPageVariables();
             _hardwareSourceError = null;
             FilterHardwareSensors();
         }
         catch (Exception ex)
         {
             _hardwareSensors.Clear();
+            _pageSources.UpdateHardware(_hardwareSensors);
+            RefreshPageVariables();
             _hardwareSourceError = ex.Message;
             FilterHardwareSensors();
         }

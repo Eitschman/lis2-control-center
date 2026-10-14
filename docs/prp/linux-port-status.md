@@ -422,3 +422,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## User test: pages not rendered automatically (2026-10-14)
 - User observed manual Display Quick Test works, saved Page 1 ('Hallo'/'Welt') not shown. Root cause: Avalonia sequence only started via explicit Start sequence, whereas WPF starts runtime page rendering and page timer on startup. Fixed by starting existing virtual sequence after auto-connect; Start sequence button reuses same routine. Manual Display actions still stop sequence intentionally. CI pending; real Linux smoke test pending.
+
+## Hardware template values (2026-10-14)
+- User test: `Temp {Hardware.cpu_thermal.Temperature.temp1}` rendered only `Temp` although Hardware view detected sensors. Cause: hardware snapshot was not merged into PageSourceValues used by preview and PageSequenceController. Now update the page source snapshot on hardware refresh and clear stale values on failure; refresh variable picker. Real Pi test and CI pending.
