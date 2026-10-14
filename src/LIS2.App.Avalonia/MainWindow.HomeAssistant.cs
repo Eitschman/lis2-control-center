@@ -15,16 +15,10 @@ public partial class MainWindow
             await RunHaActionAsync(async () =>
             {
                 await _pageSources.ConfigureHomeAssistantAsync(
-                    this.FindControl<TextBox>("HaUrl")!.Text,
-                    this.FindControl<TextBox>("HaToken")!.Text);
+                    this.FindControl<CheckBox>("HaEnabled")!.IsChecked == true ? this.FindControl<TextBox>("HaUrl")!.Text : null,
+                    this.FindControl<CheckBox>("HaEnabled")!.IsChecked == true ? this.FindControl<TextBox>("HaToken")!.Text : null);
                 this.FindControl<TextBox>("HaToken")!.Text = string.Empty;
                 await SavePortableWorkspaceAsync();
-            });
-        this.FindControl<Button>("HaDisconnect")!.Click += async (_, _) =>
-            await RunHaActionAsync(async () =>
-            {
-                await _pageSources.ConfigureHomeAssistantAsync(null, null);
-                this.FindControl<TextBox>("HaToken")!.Text = string.Empty;
             });
         this.FindControl<Button>("HaTest")!.Click += async (_, _) =>
             await RunHaActionAsync(async () =>

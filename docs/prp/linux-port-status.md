@@ -398,3 +398,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## HA placement correction, partial (2026-10-14)
 - Avalonia HomeAssistantView added and existing HA controls moved out of PagesView. Navigation wired. WPF Connection / Home Assistant entities groupings used. Still missing WPF HA enable/save semantics and full entity/attribute management; no claim of parity. Other tab layout discrepancies remain. CI pending.
+
+## HA navigation startup defect fixed (2026-10-14)
+- After HA controls moved, InitializeHomeAssistant still attempted to bind a removed HaDisconnect button, causing a null dereference at startup. Removed the obsolete binding and made Save/reconnect respect the WPF Enable Home Assistant checkbox. This is a partial correction, not full HA feature parity. CI pending.
