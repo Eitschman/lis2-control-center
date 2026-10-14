@@ -6,8 +6,8 @@
         Width="1200" Height="700" MinWidth="850" MinHeight="480"
         WindowStartupLocation="CenterScreen">
   <Grid ColumnDefinitions="250,*">
-    <Border Grid.Column="0" Background="#182431" BorderBrush="#354351" BorderThickness="0,0,1,0" Foreground="#F1F5F9">
-      <Grid Margin="14" RowDefinitions="Auto,*,Auto">
+    <Border Grid.Column="0" Background="#182431" BorderBrush="#354351" BorderThickness="0,0,1,0">
+      <Grid Margin="14" RowDefinitions="Auto,*,Auto"><Grid.Styles><Style Selector="TextBlock"><Setter Property="Foreground" Value="#F1F5F9"/></Style><Style Selector="Button"><Setter Property="Foreground" Value="#F1F5F9"/></Style></Grid.Styles>
         <TextBlock Grid.Row="0" Text="LIS2 CONTROL CENTER" FontSize="16" FontWeight="Bold" Margin="4,18,0,24" Foreground="White" />
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="8">
           <StackPanel Name="NavigationPanel" Spacing="2">
