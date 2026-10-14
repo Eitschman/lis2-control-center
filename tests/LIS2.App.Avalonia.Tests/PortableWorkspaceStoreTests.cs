@@ -26,6 +26,26 @@ public sealed class PortableWorkspaceStoreTests
     }
 
     [Fact]
+    public async Task HardwarePreferencesRoundTripAndLegacyDefaults()
+    {
+        var path = Path.Combine(Path.GetTempPath(), "lis2-hardware-" + Guid.NewGuid().ToString("N") + ".json");
+        try
+        {
+            var store = new PortableWorkspaceStore(path);
+            await store.SaveAsync(new PortableWorkspace { HardwareSensorPreferences = new()
+            {
+                new() { Key = "Hardware.cpu.Temperature.temp1", Alias = "CPU", IsFavorite = true }
+            } });
+            var saved = Assert.Single(store.Load().HardwareSensorPreferences);
+            Assert.Equal("CPU", saved.Alias);
+            Assert.True(saved.IsFavorite);
+            await File.WriteAllTextAsync(path, "{\"Pages\":[]}");
+            Assert.Empty(store.Load().HardwareSensorPreferences);
+        }
+        finally { if (File.Exists(path)) File.Delete(path); }
+    }
+
+    [Fact]
     public async Task CorruptJsonIsQuarantinedInsteadOfOverwritten()
     {
         var path = Path.Combine(Path.GetTempPath(), "lis2-portable-" + Guid.NewGuid().ToString("N") + ".json");
