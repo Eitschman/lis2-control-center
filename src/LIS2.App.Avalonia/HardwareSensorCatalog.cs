@@ -35,15 +35,23 @@ public static class HardwareSensorCatalog
         if (string.IsNullOrWhiteSpace(typeFilter) || typeFilter == "All types") return true;
         if (typeFilter == "Favorites") return entry.IsFavorite;
         if (typeFilter == "Unavailable") return !entry.IsAvailable;
+        return string.Equals(typeFilter, GetSensorType(entry.Key), StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static string GetSensorType(string key)
+    {
         var types = new[] { "Temperature", "Load", "Fan", "Clock", "Voltage", "Power", "Data", "Throughput" };
-        var detected = types.FirstOrDefault(type => entry.Key.Split('.', '/', ':')
-            .Any(part => string.Equals(part, type, StringComparison.OrdinalIgnoreCase)));
-        return typeFilter == "Other" ? detected is null :
-            string.Equals(typeFilter, detected, StringComparison.OrdinalIgnoreCase);
+        return types.FirstOrDefault(type => key.Split('.', '/', ':')
+            .Any(part => string.Equals(part, type, StringComparison.OrdinalIgnoreCase))) ?? "Other";
     }
 }
 public sealed record HardwareSensorEntry(string Key, object? Value, string Alias, bool IsFavorite, bool IsAvailable)
 {
+    public string DisplayName => string.IsNullOrWhiteSpace(Alias) ? Key : Alias;
+    public string Markers => (IsFavorite ? "★" : "") + (!IsAvailable ? " !" : "");
+    public string SensorType => HardwareSensorCatalog.GetSensorType(Key);
+    public string DisplayValue => IsAvailable ? Convert.ToString(Value, CultureInfo.InvariantCulture) ?? "" : "Unavailable";
+
     public override string ToString()
     {
         var name = string.IsNullOrWhiteSpace(Alias) ? Key : Alias + " (" + Key + ")";

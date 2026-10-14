@@ -280,3 +280,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Restored the original WPF Hardware type filter categories (All types, Favorites, Unavailable, Temperature, Load, Fan, Clock, Voltage, Power, Data, Throughput, Other) alongside existing text and favorites filters.
 - Categorization uses explicit sensor-key path segments, not guessed hardware values; unavailable saved sensor keys remain filterable. This is a partial WPF parity slice; WPF grouped rows and full monitoring details remain pending.
 - Added headless filter regressions. No fan authorization or hardware write path added. Current-HEAD CI pending.
+
+## Hardware sensor column parity (2026-10-14)
+- Replaced plain-text hardware list with WPF-inspired five-column rows: markers, sensor alias/name, type, value and template key; header and row data projections added.
+- Centralized sensor type detection for filtering and row rendering, with headless tests. WPF grouping and full visual parity remain open. Current HEAD CI pending.

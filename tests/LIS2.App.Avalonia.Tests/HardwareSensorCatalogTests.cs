@@ -24,6 +24,18 @@ public sealed class HardwareSensorCatalogTests
     }
 
     [Fact]
+    public void SensorRowsExposeWpfColumnData()
+    {
+        var entry = new HardwareSensorEntry("Hardware.cpu.Temperature.temp1", 42.5d, "CPU Package", true, true);
+        Assert.Equal("CPU Package", entry.DisplayName);
+        Assert.Equal("Temperature", entry.SensorType);
+        Assert.Equal("42.5", entry.DisplayValue);
+        Assert.Contains("★", entry.Markers);
+        Assert.Equal("Unavailable", (entry with { IsAvailable = false }).DisplayValue);
+        Assert.Equal("Other", HardwareSensorCatalog.GetSensorType("Hardware.cpu.Unknown.value"));
+    }
+
+    [Fact]
     public void MissingFavoritesRemainUnavailable()
     {
         var snapshot = new Dictionary<string, object?> { ["Hardware.cpu.Temperature.temp1"] = 47d };
