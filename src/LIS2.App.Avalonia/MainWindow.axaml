@@ -23,6 +23,10 @@
             <Button Name="NavButton9" Tag="9" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="⌂" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Home Assistant" VerticalAlignment="Center"/></Grid></Button>
           </StackPanel>
           <Separator Margin="4,18,4,16" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Name="ImportWindowsSettings" Content="Import Windows settings.json..." />
+                <TextBlock Name="WindowsImportStatus" Text="Existing Windows settings remain unchanged." VerticalAlignment="Center" Opacity="0.7" />
+              </StackPanel>
           <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
           <TextBlock Name="TransportSummaryText" Text="Virtual LIS2" TextWrapping="Wrap" Margin="4,0,0,4" />
           <TextBlock Name="VirtualStatus" Text="Disconnected" TextWrapping="Wrap" Margin="4,0,0,8" />
@@ -263,10 +267,6 @@
                 <CheckBox Name="PageEnabled" Grid.Row="7" Grid.Column="1" />
               </Grid>
               <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Name="ImportWindowsSettings" Content="Import Windows settings.json..." />
-                <TextBlock Name="WindowsImportStatus" Text="Existing Windows settings remain unchanged." VerticalAlignment="Center" Opacity="0.7" />
-              </StackPanel>
-              <StackPanel Orientation="Horizontal" Spacing="8">
                 <ComboBox Name="PageVariablePicker" Width="220" />
                 <Button Name="PageInsertLine1" Content="Insert into line 1" />
                 <Button Name="PageInsertLine2" Content="Insert into line 2" />
@@ -283,7 +283,7 @@
               </Border>
               <StackPanel Orientation="Horizontal" Spacing="7">
                 <Button Name="PageSave" Content="Save page" />
-                <Button Name="PageTest" Content="Send page to virtual LIS2" />
+                <Button Name="PageTest" Content="Test event (5 s)" />
                 <Button Name="PagePlaybackStart" Content="Start sequence" />
                 <Button Name="PagePlaybackStop" Content="Stop sequence" IsEnabled="False" />
               </StackPanel>
@@ -335,9 +335,9 @@
       <StackPanel Spacing="12">
         <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
-            <TextBlock Text="Four-channel fan configuration" FontSize="17" FontWeight="SemiBold" />
-            <TextBlock Text="Configuration and preview only. Physical fan output is disabled. Preview uses simulated sensor values." TextWrapping="Wrap" />
-            <CheckBox Name="FanAutomatic" Content="Automatic control preference (saved only)" />
+            <TextBlock Text="Fan Outputs" FontSize="17" FontWeight="SemiBold" />
+            <TextBlock Text="Physical fan outputs require explicit authorization. Configuration and previews do not send hardware commands." TextWrapping="Wrap" />
+            <CheckBox Name="FanAutomatic" Content="Automatic control" />
             <StackPanel Orientation="Horizontal" Spacing="8">
               <TextBlock Text="Channel" VerticalAlignment="Center" />
               <ComboBox Name="FanChannelPicker" Width="140" SelectedIndex="0">
@@ -368,7 +368,7 @@
             <StackPanel Orientation="Horizontal" Spacing="8">
               <TextBlock Text="Simulated sensor temperature" VerticalAlignment="Center" />
               <TextBox Name="FanSimulatedTemperature" Width="90" Text="50" />
-              <Button Name="FanSave" Content="Save configuration" />
+              <Button Name="FanSave" Content="Save fan channel" />
               <Button Name="FanPreview" Content="Simulate all four channels" />
             </StackPanel>
             <TextBlock Text="System temperature sensors (Linux hwmon, read-only)" FontWeight="SemiBold" />
@@ -471,19 +471,19 @@
       </ScrollViewer>
       <ScrollViewer Name="DiagnosticsView" Grid.Row="1" IsVisible="False">
         <StackPanel Spacing="12">
-          <TextBlock Text="Runtime diagnostics" FontSize="18" FontWeight="SemiBold" />
+          <TextBlock Text="Diagnostics Snapshot" FontSize="18" FontWeight="SemiBold" />
           <TextBlock Text="Read-only snapshot of transport, playback, and fan state. Refresh never sends device commands or enables fan output." TextWrapping="Wrap" />
-          <Button Name="DiagnosticsRefresh" Content="Refresh diagnostics" HorizontalAlignment="Left" />
+          <Button Name="DiagnosticsRefresh" Content="Refresh" HorizontalAlignment="Left" />
           <TextBlock Name="DiagnosticsSnapshot" FontFamily="Consolas,Monospace" TextWrapping="Wrap" />
           <TextBlock Text="For transport changes use Settings. Diagnostics are intentionally read-only." TextWrapping="Wrap" />
         </StackPanel>
       </ScrollViewer>
-      <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="12"><TextBlock Text="Transport controls" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Experimental serial and virtual transport diagnostics. No hardware fan authorization is implied." TextWrapping="Wrap"/>          <Separator Margin="4,18,4,16" />
+      <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="12"><TextBlock Text="Device / Transport" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Experimental serial and virtual transport diagnostics. No hardware fan authorization is implied." TextWrapping="Wrap"/>          <Separator Margin="4,18,4,16" />
           <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
 
 
           <Separator Margin="0,12,0,4" />
-          <TextBlock Text="Serial display (experimental)" FontWeight="SemiBold" />
+          <TextBlock Text="Serial display" FontWeight="SemiBold" />
           <ComboBox Name="SerialPortPicker" MinWidth="180" />
           <Button Name="SerialRefreshPorts" Content="Refresh serial ports" HorizontalAlignment="Left" />
           <Button Name="SerialConnect" Content="Connect serial display" HorizontalAlignment="Left" />

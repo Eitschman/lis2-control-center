@@ -262,3 +262,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## HA entity management WPF correction (2026-10-14)
 - Entity/domain search, selected entity, alias/favorite persistence, clipboard key actions, attribute selection and create-page actions wired inside HomeAssistantView; invented HA insert-into-line buttons removed. WPF remains authoritative; compare attribute template-key syntax and actual data semantics in subsequent parity tests. No physical hardware changes.
+
+## Menu placement correction batch (2026-10-14)
+- Moved Windows settings import control from PagesView to SettingsView without changing existing handler. Corrected WPF section/action labels for Fan Control, Diagnostics, Settings and Pages; physical fan safety stays gated. Remaining extra playback/serial diagnostic controls and missing WPF functionality are still tracked. Do not declare menu parity.

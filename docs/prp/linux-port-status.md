@@ -407,3 +407,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## HA WPF actions wired (2026-10-14)
 - Implemented domain filter, alias-aware entity search, favorite-first entity order, selected entity details and attributes, persistent alias/favorite save, entity/attribute clipboard key actions, WPF-style display-page creation. Removed extra HA insert-into-line buttons. Static review complete; CI pending; full WPF parity still open.
+
+## WPF menu ownership batch (2026-10-14)
+- Windows settings import no longer lives inside Pages; moved to Settings, preserving its existing handler. Fan Control, Settings, Diagnostics and Pages titles/action labels aligned to WPF where possible. Further per-menu layout/behavior gaps remain; CI pending.

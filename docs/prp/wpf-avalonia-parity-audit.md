@@ -375,3 +375,6 @@ Status: verified placement requirements only; implementation NOT yet corrected. 
 
 ## HA correction pass (2026-10-14)
 - HomeAssistantView now wires domain filter, alias/favorite persistence, selected entity and attribute browsing, copy key and create display page actions. Extra insert-line buttons removed. Source-level comparison still flags WPF entity list presentation and attribute key semantics as needing automated parity tests; do not claim completion.
+
+## Follow-up menu ownership check (2026-10-14)
+- Pages no longer owns Windows settings import. Import UI relocated to Settings (platform migration action, not native WPF Settings feature); it remains a cross-platform migration exception pending owner decision. WPF labels now used for Fan Outputs, Automatic control, Save fan channel, Device / Transport, Diagnostics Snapshot, Refresh and Test event (5 s). Missing/extra actions and WPF semantics remain open.
