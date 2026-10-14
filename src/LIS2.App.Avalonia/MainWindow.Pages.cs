@@ -121,6 +121,25 @@ public partial class MainWindow
         try
         {
             await _runtime.StartSourcesAsync();
+            // Workspace credentials are restored before this startup task runs.
+            // Configure the actual HA source, not only the URL/token controls.
+            if (this.FindControl<CheckBox>("HaEnabled")!.IsChecked == true)
+            {
+                var url = this.FindControl<TextBox>("HaUrl")!.Text;
+                var token = this.FindControl<TextBox>("HaToken")!.Text;
+                if (!string.IsNullOrWhiteSpace(url) && !string.IsNullOrWhiteSpace(token))
+                {
+                    try
+                    {
+                        await _pageSources.ConfigureHomeAssistantAsync(url, token);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.FindControl<TextBlock>("HaStatus")!.Text = $"Home Assistant startup failed: {ex.Message}";
+                    }
+                }
+            }
+            RefreshHaEntities();
             RefreshPageVariables();
         }
         catch (Exception ex)
