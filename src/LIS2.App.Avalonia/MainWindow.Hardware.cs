@@ -73,6 +73,31 @@ public partial class MainWindow
             var buttonName = channelIndex == 0 ? "HardwareUseForFan" : "HardwareUseForFan" + (channelIndex + 1);
             this.FindControl<Button>(buttonName)!.Click += (_, _) => AssignHardwareSensorToFan(selectedChannel);
         }
+        foreach (var preset in new[] { "CPU", "GPU", "Memory", "Temperatures", "Fans" })
+        {
+            var selectedPreset = preset;
+            this.FindControl<Button>("HardwarePreset" + preset)!.Click += async (_, _) =>
+            {
+                var candidates = HardwareDisplayPresetBuilder.SelectKeys(_hardwareSensors, selectedPreset);
+                if (candidates.Count == 0)
+                {
+                    this.FindControl<TextBlock>("HardwareSensorStatus")!.Text =
+                        "No available sensors for " + selectedPreset + " preset.";
+                    return;
+                }
+                foreach (var page in HardwareDisplayPresetBuilder.Build(selectedPreset, candidates))
+                {
+                    var added = _pages.Add();
+                    added.Name = page.Name;
+                    added.Line1Template = page.Line1Template;
+                    added.Line2Template = page.Line2Template;
+                }
+                RefreshPageList(_pages.Pages.Count - 1);
+                await SavePortableWorkspaceAsync();
+                NavigateTo(3);
+                SetVirtualStatus("Created " + candidates.Count + " " + selectedPreset + " sensor display pages.");
+            };
+        }
         RefreshHardwareSensors();
     }
 

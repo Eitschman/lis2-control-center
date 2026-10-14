@@ -414,6 +414,15 @@
             <Button Name="HardwareUseForFan4" Content="Fan 4" IsEnabled="False" />
           </StackPanel>
           <TextBlock Text="Sensor assignment updates the fan editor but is not saved until you explicitly save fan configuration. Physical fan output remains disabled unless separately authorized." TextWrapping="Wrap" />
+          <TextBlock Text="Display presets" FontSize="16" FontWeight="SemiBold" />
+          <TextBlock Text="Create editable display pages from available hardware sensor keys. Pages are saved to the portable workspace; no LIS2 device commands are sent." TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Name="HardwarePresetCPU" Content="CPU" />
+            <Button Name="HardwarePresetGPU" Content="GPU" />
+            <Button Name="HardwarePresetMemory" Content="Memory" />
+            <Button Name="HardwarePresetTemperatures" Content="Temperatures" />
+            <Button Name="HardwarePresetFans" Content="Fans" />
+          </StackPanel>
         </StackPanel>
       </ScrollViewer>
       <ScrollViewer Name="DiagnosticsView" Grid.Row="1" IsVisible="False">

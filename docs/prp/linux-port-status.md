@@ -292,3 +292,9 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware four-channel fan assignment parity (2026-10-14)
 - Replaced the single current-channel assignment action with WPF-matching Fan 1, Fan 2, Fan 3, Fan 4 buttons. The selected available sensor is copied into the explicitly chosen fan editor channel; selection and assignment never persist settings or authorize hardware output.
 - All four buttons share availability gating. Display-preset generation and remaining WPF hardware grouping are still open. Current HEAD CI pending; desktop checks deferred until complete port.
+
+## Hardware display preset editor workflow (2026-10-14)
+- Added WPF-named CPU/GPU/Memory/Temperatures/Fans preset actions to Avalonia Hardware.
+- Pure preset builder selects available snapshot keys by explicit key segments, and creates editable display pages with sensor placeholders; pages are persisted to portable workspace and editor navigation opens afterward.
+- Added headless preset selection/template tests. WPF preset page composition and placeholder compatibility require further source comparison; full parity is NOT claimed. No device commands or fan authorization.
+- Current HEAD CI pending; no manual desktop checks until full port.
