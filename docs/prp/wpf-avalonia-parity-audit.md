@@ -372,3 +372,6 @@ Status: verified placement requirements only; implementation NOT yet corrected. 
 
 ## Post-change placement recheck (2026-10-14)
 - HA URL/token/test/save-connect and entity picker are now owned by HomeAssistantView rather than PagesView. This corrects the most obvious ownership violation, but **does not finish** WPF Home Assistant: enable checkbox is not yet wired; entity detail, alias, favorite, domain filter, attributes and WPF copy/create-page actions are absent. Pages still has extra import/playback controls. Other tab corrections remain open. Do not mark the overall requested correction pass complete.
+
+## HA correction pass (2026-10-14)
+- HomeAssistantView now wires domain filter, alias/favorite persistence, selected entity and attribute browsing, copy key and create display page actions. Extra insert-line buttons removed. Source-level comparison still flags WPF entity list presentation and attribute key semantics as needing automated parity tests; do not claim completion.

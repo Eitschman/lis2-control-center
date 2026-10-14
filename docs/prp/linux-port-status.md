@@ -404,3 +404,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## HA WPF UI group correction continued (2026-10-14)
 - Added WPF-named entity-detail and Attributes UI group controls in HomeAssistantView, plus domain selector. Their WPF action semantics are not yet implemented; UI scaffolding is not feature parity. CI pending.
+
+## HA WPF actions wired (2026-10-14)
+- Implemented domain filter, alias-aware entity search, favorite-first entity order, selected entity details and attributes, persistent alias/favorite save, entity/attribute clipboard key actions, WPF-style display-page creation. Removed extra HA insert-into-line buttons. Static review complete; CI pending; full WPF parity still open.

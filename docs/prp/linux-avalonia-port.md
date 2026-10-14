@@ -259,3 +259,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Initial placement correction (2026-10-14)
 - HA URL/token/test/connect and entity picker moved out of PagesView into HomeAssistantView, with WPF Connection / Home Assistant entities card ownership. This is NOT full WPF HA parity: entity details, aliases, favorites, attribute browser and correct enable/save semantics still require implementation. Existing backend controls retained to avoid breaking handlers; no new functions introduced.
+
+## HA entity management WPF correction (2026-10-14)
+- Entity/domain search, selected entity, alias/favorite persistence, clipboard key actions, attribute selection and create-page actions wired inside HomeAssistantView; invented HA insert-into-line buttons removed. WPF remains authoritative; compare attribute template-key syntax and actual data semantics in subsequent parity tests. No physical hardware changes.
