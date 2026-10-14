@@ -25,6 +25,32 @@ public sealed class HardwareSensorCatalogTests
     }
 
     [Fact]
+    public void HardwareGroupsAreOrderedWithFavoritesFirst()
+    {
+        var rows = new[]
+        {
+            new HardwareSensorEntry("Hardware.GPU.Load.Core", 20d, "", false, true),
+            new HardwareSensorEntry("Hardware.CPU.Temperature.Package", 40d, "", false, true),
+            new HardwareSensorEntry("Hardware.GPU.Temperature.Core", 50d, "Favorite GPU", true, true)
+        };
+        var grouped = HardwareSensorEntry.GroupForDisplay(rows);
+        Assert.Equal("CPU", Assert.IsType<HardwareSensorGroupHeader>(grouped[0]).Name);
+        Assert.Equal("GPU", Assert.IsType<HardwareSensorGroupHeader>(grouped[2]).Name);
+        Assert.Equal("Favorite GPU", Assert.IsType<HardwareSensorEntry>(grouped[3]).DisplayName);
+    }
+
+    [Fact]
+    public void UnitMetadataIsNotASensor()
+    {
+        var snapshot = new Dictionary<string, object?>
+        {
+            ["Hardware.CPU.Temperature.Package"] = 45d,
+            ["Hardware.CPU.Temperature.Package.Unit"] = "°C"
+        };
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, Array.Empty<PortableHardwareSensorPreference>()));
+    }
+
+    [Fact]
     public void WpfTypeFilterIncludesUnavailableAndFavoriteEntries()
     {
         var snapshot = new Dictionary<string, object?>

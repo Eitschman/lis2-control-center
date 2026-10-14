@@ -60,6 +60,11 @@ public partial class MainWindow
         this.FindControl<ListBox>("HardwareSensorList")!.SelectionChanged += (_, _) =>
         {
             if (_hardwareListRebinding) return;
+            if (this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem is HardwareSensorGroupHeader)
+            {
+                this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem = null;
+                return;
+            }
             var selected = this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem as HardwareSensorEntry;
             SetHardwareFanAssignmentEnabled(selected?.IsAvailable == true);
             this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = selected is not null;
@@ -152,7 +157,7 @@ public partial class MainWindow
         _hardwareListRebinding = true;
         try
         {
-            list.ItemsSource = options;
+            list.ItemsSource = HardwareSensorEntry.GroupForDisplay(options);
             if (previousKey is not null)
                 list.SelectedItem = options.FirstOrDefault(option => string.Equals(option.Key, previousKey, StringComparison.OrdinalIgnoreCase));
         }

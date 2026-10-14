@@ -12,8 +12,8 @@ public static class HardwareSensorCatalog
             .ToDictionary(g => g.Key, g => g.Last(), StringComparer.OrdinalIgnoreCase);
         var current = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
         foreach (var pair in snapshot) current[pair.Key] = pair.Value;
-        var keys = new HashSet<string>(current.Keys, StringComparer.OrdinalIgnoreCase);
-        keys.UnionWith(saved.Keys);
+        var keys = new HashSet<string>(current.Keys.Where(IsSensorKey), StringComparer.OrdinalIgnoreCase);
+        keys.UnionWith(saved.Keys.Where(IsSensorKey));
         if (trackedKeys is not null) keys.UnionWith(trackedKeys.Where(IsSensorKey));
         var filter = search?.Trim() ?? "";
         return keys.Select(key =>
@@ -94,3 +94,5 @@ public sealed record HardwareSensorEntry(string Key, object? Value, string Alias
             (IsAvailable ? Convert.ToString(Value, CultureInfo.InvariantCulture) + " °C" : "Unavailable");
     }
 }
+
+public sealed record HardwareSensorGroupHeader(string Name);

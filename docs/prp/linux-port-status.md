@@ -308,3 +308,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Compared WPF tracked-key behavior: referenced Hardware.* placeholders from display pages and fan channel sensor keys now remain visible when disconnected, marked unavailable. Availability requires a numeric reading; assignment remains disabled for missing sensors.
 - Exposes separate hardware and sensor display names in the catalog. Added headless regressions for disconnected references and nonnumeric values. Metadata filtering and WPF grouping remain open; no hardware output or authorization change.
 - CI acceptance pending for this HEAD; final desktop testing deferred.
+
+## Hardware grouping and metadata parity (2026-10-14)
+- Hardware list now shows hardware group headers with favorites first within each group; the selected sensor key survives refresh and group headers cannot be assigned to fans.
+- Excluded .Unit metadata rows, displayed human-readable sensor name below alias, retained full template key. Added headless grouping/metadata regressions. Avalonia typed templates replace WPF GroupStyle. No hardware writes or fan authorization. Latest CI pending; desktop validation deferred.
