@@ -4,9 +4,14 @@ Date: 2026-10-13
 Branch: `feature/linux-avalonia`
 Status: **Active incremental port; CG Builder and Pages editor available in virtual transport; latest CI must be verified**
 
+## Binding validation clarification (owner, 2026-10-14)
+- No real LIS2 hardware is available, including during the WPF era. Physical tests are not a technical package acceptance gate. Keep virtual protocol and fan safety regression tests; hardware remains unverified.
+- Owner desktop tests and visual screenshot acceptance are deferred until the complete Avalonia port is implemented. Do not require interim manual testing or desktop screenshots for intermediate package acceptance.
+- Each package is accepted by completed code scope, WPF source parity audit, automated regression tests, and successful latest-HEAD CI. Final product acceptance and WPF removal remain gated on owner desktop testing of the completed port.
+
 ## Binding UI acceptance criterion
 - User confirmed 2026-10-13: The existing Windows WPF UI is the authoritative reference for **layout, placement, interactions, workflows and visual appearance** on BOTH Windows and Linux. The Avalonia sidebar/virtual buttons are temporary engineering scaffolding, not a proposed redesign.
-- Before marking a screen done, compare against the WPF screen at matching resolution/DPI and document any unavoidable Avalonia differences; no arbitrary reorganization or missing controls.
+- Before marking a screen implementation complete, compare controls and behavior against WPF source and document differences. Matching-resolution/DPI desktop screenshot acceptance is deferred until the complete port is implemented.
 
 ## Target architecture
 - ONE Avalonia UI and application runtime for Windows x64 and Linux x64/ARM64.
@@ -208,7 +213,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 | Visual and interactive screenshot parity | No matched-resolution WPF/Avalonia screenshots or interactive desktop acceptance evidence | NOT TESTED |
 | Physical LIS2 hardware | Explicitly excluded by owner | EXCLUDED |
 
-**Blocking work:** port the WPF layout and screen interactions to Avalonia without redesign; create per-screen parity matrix, automate interaction/screenshot comparisons and run desktop smoke checks; close outstanding sensor-key compatibility and error-path coverage. The existing four green CI jobs prove compilation/tests, not visual/functional UI parity. Do not mark package 1 done until these gates pass. WPF stays read-only reference and main remains unchanged.
+**Blocking work:** port the WPF layout and screen interactions to Avalonia without redesign; create per-screen parity matrix, automate interaction/screenshot comparisons and run desktop smoke checks; close outstanding sensor-key compatibility and error-path coverage. The existing four green CI jobs prove compilation/tests, not visual/functional UI parity. Do not mark package 1 technically done until implementation and automated regression gates pass; owner desktop screenshots are deferred until the full port is complete. WPF stays read-only reference and main remains unchanged.
 
 ## Navigation and transport parity package (2026-10-14)
 - Replaced the Avalonia ListBox navigation with ten WPF-order button entries and explicit selected-button styling.
@@ -240,3 +245,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Corrected case-insensitive preference matching, blocked unavailable sensor assignment in the click handler (not only button state), improved unavailable counts, and added save-failure handling to avoid leaving modified preferences in memory when persistence fails.
 - Added catalog regression assertions for case-insensitive deduplication and unavailable favorite alias search.
 - CI for this commit pending; visual parity, WPF grouping, full hardware sensor coverage and physical verification remain open.
+
+## Owner validation clarification and latest CI (2026-10-14)
+- Confirmed latest HEAD `caf703f` green on Windows/Ubuntu (Actions run for `caf703f`; four jobs passed).
+- Physical LIS2 hardware testing is unavailable, as it was for WPF. Do not use it as a package gate; retain virtual transport and simulated fan safety tests.
+- Manual desktop and screenshot checks are postponed until the complete Avalonia port is implemented. Technical package acceptance relies on code parity audits, headless tests, and CI. WPF retirement awaits final owner desktop acceptance.

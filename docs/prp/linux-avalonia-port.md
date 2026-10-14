@@ -2,6 +2,13 @@
 
 Status: **IMPLEMENTATION STARTED ON feature/linux-avalonia** (2026-10-13). Preserve existing Windows release behavior throughout. See [implementation status](linux-port-status.md).
 
+## Binding verification policy — owner clarification 2026-10-14
+
+- **No physical LIS2 device is available.** This was already true during the original WPF development. Do not block implementation packages, automated acceptance, or port completion on physical-device testing; do not claim physical verification. Preserve serialized 19200/8N1 protocol, explicit nonpersistent fan authorization, fail-safe, simulated fault injection and virtual-transport regression tests.
+- **No manual desktop or screenshot acceptance until the complete port is implemented.** The owner will perform desktop testing only after the application reaches full functional and UI parity in code and the target platform builds are ready. During implementation, use source-based WPF comparison, screen/control inventories, headless tests, simulated interactions where automatable, and CI; defer actual desktop visual checks and mark them pending rather than failed.
+- **Automated technical package acceptance** requires all agreed implementation scope, headless regression tests, current HEAD CI, and updated PRP/status documentation. Missing physical hardware or deferred manual desktop checks are not package blockers. Full product release and WPF retirement still require the owner's final desktop acceptance.
+- **Do not repeatedly ask the owner to test unfinished builds.** Continue autonomously through coherent packages, and clearly distinguish automated verification from eventual manual desktop sign-off.
+
 ## Active execution protocol — binding update 2026-10-13
 
 This section supersedes the earlier immutable two-commit Phase 1 packaging plan and any obsolete next-work lists. The owner explicitly approved splitting **fan Integration & Safety** into two independently testable, cohesive packages. The strict no-partial-package rule still applies **within** each agreed package. Never reinterpret an unfinished package as done.
