@@ -382,3 +382,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## All-ten-menu WPF parity baseline (2026-10-14)
 - Compared WPF MainWindow.xaml tabs with Avalonia MainWindow.axaml view declarations. Three WPF menu screens (Media, Events, Home Assistant) lack Avalonia views; the seven existing screens still require detailed behavioral parity verification. Recorded WPF named-control counts, scope and strict no-invention acceptance rules in `docs/prp/wpf-avalonia-parity-audit.md`. Dashboard invented transport buttons already reverted in 2cb3141. This is an audit baseline, not full parity. CI pending.
+
+## Detailed all-menu WPF XAML inventory (2026-10-14)
+- Enumerated WPF named controls and XAML event handler names for every menu and checked exact Avalonia identifier presence. Added source-grounded per-control tables to `docs/prp/wpf-avalonia-parity-audit.md`. Identifiers alone do not establish functional parity; renamed Avalonia controls require semantic handler review. No UI code changes; CI not a substitute for this review.

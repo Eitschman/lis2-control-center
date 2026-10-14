@@ -244,3 +244,5 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 
 ## Binding WPF UI parity inventory (2026-10-14)
 - Source-based overview of **all ten WPF menu tabs** and Avalonia gaps: `docs/prp/wpf-avalonia-parity-audit.md`. The WPF XAML and code-behind are the binding target; no invented features or dashboard controls. Every tab needs detailed control/handler parity mapping and tests before completion. The erroneous Dashboard connection actions from 50665f7 were reverted in 2cb3141.
+
+- Detailed XAML-level WPF control/event inventory now appended to `wpf-avalonia-parity-audit.md` for all ten menus; identifier differences are explicitly not treated as functional gaps. Semantic control/handler parity still open.
