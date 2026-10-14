@@ -356,3 +356,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Extended cross-platform CI with gated self-contained, untrimmed single-file Avalonia publishes for linux-arm64 (Pi 5), linux-x64 and win-x64. Each runtime-specific package is uploaded as a GitHub Actions artifact for 14 days, only after both shared-library and Avalonia test matrices succeed. Linux archives preserve executable permissions; Windows uses ZIP.
 - Preview distribution only: no production release, no WPF removal, no claim of physical LIS2 or desktop acceptance. On Pi 5 extract the downloaded linux-arm64 tar.gz and run ./LIS2.App.Avalonia; .NET SDK is not required. GitHub artifact download may itself be wrapped in a ZIP by GitHub Actions.
 - Current HEAD CI pending; publish/runtime compatibility and ARM64 native dependencies must be confirmed by the CI publish job and eventually owner desktop validation.
+
+## Preview publish sanity gates (2026-10-14)
+- Added per-RID CI verification that the expected platform executable exists and is not suspiciously small before packaging/upload. Linux archives retain executable mode; the existing shared/Avalonia tests remain prerequisites. This is static artifact sanity checking, not execution on ARM64 or UI acceptance.
+- Prior preview publish commit 2649022 succeeded all seven jobs in run 38542030053. New HEAD CI pending.

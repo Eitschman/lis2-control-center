@@ -227,3 +227,5 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 
 ## Preview artifact workflow (2026-10-14)
 - `.github/workflows/linux-portable.yml` now publishes gated downloadable self-contained Avalonia preview packages for `linux-arm64`, `linux-x64` and `win-x64` using `dotnet publish`, and uploads them with a 14-day retention. This is a preview build distribution facility, not a release or final platform acceptance. See `linux-port-status.md` for CI status.
+
+- Follow-up preview packaging hardening: verify executable existence and nontrivial size in each runtime-specific publish directory before uploading. Cross-architecture execution and final desktop acceptance remain pending.

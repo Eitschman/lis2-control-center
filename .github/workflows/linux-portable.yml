@@ -75,6 +75,16 @@ jobs:
           dotnet-version: 8.0.x
       - name: Publish self-contained executable
         run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false --output publish/${{ matrix.rid }}
+      - name: Verify published executable and runtime assets
+        shell: pwsh
+        run: |
+          $folder = "publish/${{ matrix.rid }}"
+          $exe = if ("${{ runner.os }}" -eq "Windows") { "LIS2.App.Avalonia.exe" } else { "LIS2.App.Avalonia" }
+          if (-not (Test-Path "$folder/$exe")) { throw "Missing executable: $folder/$exe" }
+          if (-not (Test-Path "$folder/LIS2.App.Avalonia.pdb")) { Write-Host "No separate PDB (allowed for single-file preview)" }
+          $size = (Get-Item "$folder/$exe").Length
+          if ($size -lt 1000000) { throw "Unexpectedly small self-contained executable ($size bytes)" }
+          Write-Host "Verified ${{ matrix.rid }} executable: $size bytes"
       - name: Package Linux executable
         if: runner.os == 'Linux'
         shell: bash
