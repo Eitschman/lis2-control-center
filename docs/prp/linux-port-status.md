@@ -379,3 +379,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Strict WPF reference correction (2026-10-14)
 - Owner explicitly rejected invented Avalonia functionality. Direct comparison against src/LIS2.App/MainWindow.xaml confirms WPF Dashboard System Status has only a status TextBlock, not virtual Connect/Disconnect buttons. Removed those buttons, their event handlers and enable-state code. Restored original WPF disconnected text and inline status formatting. Virtual transport controls remain in Settings, as before.
 - Do not introduce convenience UI or workflows absent from WPF. All future changes must cite the corresponding WPF source control/handler and reproduce its behavior; distinguish platform adapters from new user-facing features. Headless tests and CI remain required. Current CI pending.
+
+## All-ten-menu WPF parity baseline (2026-10-14)
+- Compared WPF MainWindow.xaml tabs with Avalonia MainWindow.axaml view declarations. Three WPF menu screens (Media, Events, Home Assistant) lack Avalonia views; the seven existing screens still require detailed behavioral parity verification. Recorded WPF named-control counts, scope and strict no-invention acceptance rules in `docs/prp/wpf-avalonia-parity-audit.md`. Dashboard invented transport buttons already reverted in 2cb3141. This is an audit baseline, not full parity. CI pending.

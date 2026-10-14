@@ -241,3 +241,6 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 
 ## WPF is the sole functional/UI reference (2026-10-14, reaffirmed)
 - Do not invent Avalonia controls, dashboard shortcuts or user workflows. Map each user-facing control and handler to src/LIS2.App/MainWindow.xaml and MainWindow.xaml.cs first. The temporary dashboard virtual Connect/Disconnect controls from 50665f7 were confirmed absent in WPF and reverted. Platform-specific implementation may differ internally but must preserve user-facing WPF behavior and layout. Any parity exception requires explicit owner approval.
+
+## Binding WPF UI parity inventory (2026-10-14)
+- Source-based overview of **all ten WPF menu tabs** and Avalonia gaps: `docs/prp/wpf-avalonia-parity-audit.md`. The WPF XAML and code-behind are the binding target; no invented features or dashboard controls. Every tab needs detailed control/handler parity mapping and tests before completion. The erroneous Dashboard connection actions from 50665f7 were reverted in 2cb3141.
