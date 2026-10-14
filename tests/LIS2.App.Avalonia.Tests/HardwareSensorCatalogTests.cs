@@ -34,7 +34,7 @@ public sealed class HardwareSensorCatalogTests
         var entries = HardwareSensorCatalog.Build(snapshot,
             Array.Empty<PortableHardwareSensorPreference>(), trackedKeys: tracked);
         Assert.Equal(5, entries.Count);
-        Assert.Single(entries.Where(entry => entry.IsAvailable));
+        Assert.Single(entries, entry => entry.IsAvailable);
         Assert.All(entries.Where(entry => entry.Key != "Hardware.CPU.Temperature.Valid"),
             entry => Assert.False(entry.IsAvailable));
         Assert.Single(HardwareSensorCatalog.Build(snapshot,

@@ -348,3 +348,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware sensor invalid-value isolation (2026-10-14)
 - Prevented NaN and positive/negative infinity from appearing as live available hardware sensors. Such values are omitted from untracked discovery, but tracked references remain explicitly unavailable, preserving fan/editor and page reference visibility. Malformed nonnumeric values behave identically. No physical fan writes are affected.
 - Added headless regression coverage for NaN, infinities, malformed values, and valid numeric snapshots. CI pending for current HEAD; manual desktop checks deferred.
+
+## CI repair after 95a74f1 (2026-10-14)
+- GitHub Actions run 38539648454: shared Windows/Linux green, Avalonia Windows/Linux red during test-project build due to xUnit2031 at HardwareSensorCatalogTests.cs:37. Corrected Assert.Single(entries.Where(...)) to Assert.Single(entries, predicate). This is a test analyzer fix only; nonfinite sensor behavior unchanged. CI pending on repair commit.
