@@ -215,3 +215,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Restored the WPF-like sidebar transport summary and Change action to Settings; moved experimental serial/virtual transport buttons to the Settings view without removing their existing event handlers.
 - This is structural navigation parity only: theme, localization, desktop screenshot and full Settings-screen parity remain unverified. Physical hardware remains excluded.
 - CI validation must be recorded against the new HEAD; no claim of desktop visual parity.
+
+## Hardware sensor browser (2026-10-14)
+- Added a dedicated Avalonia Hardware view with read-only platform sensor discovery, key filtering, snapshot refresh and selected-key transfer into the current fan editor.
+- Assignment does not persist automatically or authorize physical fan output; the user must explicitly save fan configuration.
+- This is a first functional Hardware slice, not WPF Hardware-screen parity (aliases, favorites, availability, live updates, grouping and visual QA remain open).

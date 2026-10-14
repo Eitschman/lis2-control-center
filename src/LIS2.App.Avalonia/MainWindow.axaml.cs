@@ -67,6 +67,7 @@ public partial class MainWindow : Window
 
         InitializeSerialDisplay();
         InitializeFanEditor();
+        InitializeHardwareBrowser();
         InitializeGlyphEditor();
         InitializePagesEditor();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
@@ -220,6 +221,7 @@ public partial class MainWindow : Window
         this.FindControl<ScrollViewer>("PagesView")!.IsVisible = section == "Pages";
         this.FindControl<ScrollViewer>("FanControlView")!.IsVisible = section == "Fan Control";
         this.FindControl<ScrollViewer>("SettingsView")!.IsVisible = section == "Settings";
+        this.FindControl<ScrollViewer>("HardwareView")!.IsVisible = section == "Hardware";
 
         if (description is not null)
             description.Text = section == "Dashboard"
@@ -228,6 +230,8 @@ public partial class MainWindow : Window
                     ? "Quick display tests, custom characters and brightness."
                 : section == "Pages"
                     ? "Manage display pages, templates, conditions and live preview."
+                    : section == "Hardware"
+                    ? "Browse platform temperature sensors and assign a sensor to a fan channel."
                     : section == "Settings"
                     ? "Configure transport and inspect experimental connection controls."
                     : section == "Fan Control"
