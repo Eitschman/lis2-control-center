@@ -51,3 +51,53 @@ jobs:
       - name: Test Avalonia virtual session
         run: dotnet test tests/LIS2.App.Avalonia.Tests/LIS2.App.Avalonia.Tests.csproj --configuration Release
 
+
+  portable-app:
+    name: Portable Avalonia app (${{ matrix.rid }})
+    needs: [portable, avalonia-shell]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-arm64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: windows-latest
+            rid: win-x64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Publish self-contained executable
+        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false --output publish/${{ matrix.rid }}
+      - name: Package Linux executable
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          chmod +x publish/${{ matrix.rid }}/LIS2.App.Avalonia
+          tar -czf LIS2-Avalonia-${{ matrix.rid }}.tar.gz -C publish/${{ matrix.rid }} .
+      - name: Package Windows executable
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path "publish/${{ matrix.rid }}/*" -DestinationPath "LIS2-Avalonia-${{ matrix.rid }}.zip"
+      - name: Upload Linux package
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: LIS2-Avalonia-${{ matrix.rid }}
+          path: LIS2-Avalonia-${{ matrix.rid }}.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload Windows package
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: LIS2-Avalonia-${{ matrix.rid }}
+          path: LIS2-Avalonia-${{ matrix.rid }}.zip
+          if-no-files-found: error
+          retention-days: 14

@@ -351,3 +351,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## CI repair after 95a74f1 (2026-10-14)
 - GitHub Actions run 38539648454: shared Windows/Linux green, Avalonia Windows/Linux red during test-project build due to xUnit2031 at HardwareSensorCatalogTests.cs:37. Corrected Assert.Single(entries.Where(...)) to Assert.Single(entries, predicate). This is a test analyzer fix only; nonfinite sensor behavior unchanged. CI pending on repair commit.
+
+## Downloadable preview builds for Pi 5 and desktop (2026-10-14)
+- Extended cross-platform CI with gated self-contained, untrimmed single-file Avalonia publishes for linux-arm64 (Pi 5), linux-x64 and win-x64. Each runtime-specific package is uploaded as a GitHub Actions artifact for 14 days, only after both shared-library and Avalonia test matrices succeed. Linux archives preserve executable permissions; Windows uses ZIP.
+- Preview distribution only: no production release, no WPF removal, no claim of physical LIS2 or desktop acceptance. On Pi 5 extract the downloaded linux-arm64 tar.gz and run ./LIS2.App.Avalonia; .NET SDK is not required. GitHub artifact download may itself be wrapped in a ZIP by GitHub Actions.
+- Current HEAD CI pending; publish/runtime compatibility and ARM64 native dependencies must be confirmed by the CI publish job and eventually owner desktop validation.
