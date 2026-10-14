@@ -269,3 +269,9 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Extended read-only diagnostics with serial busy state, hardware sensor live-refresh state, and count of fan channels with assigned sensor keys (not a claim that sensors are currently available).
 - Expanded headless tests for active and inactive snapshots; no serial writes, hardware access, or authorization transitions introduced.
 - WPF diagnostics feature parity is still pending; current-HEAD CI must pass. Manual desktop acceptance remains deferred until complete port.
+
+## Hardware sensor live-refresh editor preservation (2026-10-14)
+- Suppressed selection-change form resets while the sensor list is rebound during manual and two-second live refresh; unsaved alias/favorite edits are preserved when the same sensor remains selected.
+- On a filtered-out or missing selection, clear the editor and disable preference save to avoid accidentally applying stale edits to another sensor.
+- Normalize case-insensitive sensor snapshot keys in one dictionary pass (including duplicate keys with different case); added headless regression coverage.
+- No hardware writes or fan authorization changes. Full WPF visual parity remains pending; current-HEAD CI required for technical acceptance.

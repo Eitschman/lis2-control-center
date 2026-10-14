@@ -10,18 +10,15 @@ public static class HardwareSensorCatalog
         var saved = preferences.Where(p => !string.IsNullOrWhiteSpace(p.Key))
             .GroupBy(p => p.Key, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(g => g.Key, g => g.Last(), StringComparer.OrdinalIgnoreCase);
-        var keys = new HashSet<string>(snapshot.Keys, StringComparer.OrdinalIgnoreCase);
+        var current = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in snapshot) current[pair.Key] = pair.Value;
+        var keys = new HashSet<string>(current.Keys, StringComparer.OrdinalIgnoreCase);
         keys.UnionWith(saved.Keys);
         var filter = search?.Trim() ?? "";
         return keys.Select(key =>
             {
                 saved.TryGetValue(key, out var preference);
-                var available = snapshot.TryGetValue(key, out var value);
-                if (!available)
-                {
-                    var match = snapshot.FirstOrDefault(pair => string.Equals(pair.Key, key, StringComparison.OrdinalIgnoreCase));
-                    if (match.Key is not null) { available = true; value = match.Value; }
-                }
+                var available = current.TryGetValue(key, out var value);
                 return new HardwareSensorEntry(key, available ? value : null,
                     preference?.Alias ?? "", preference?.IsFavorite == true, available);
             })

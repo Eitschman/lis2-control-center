@@ -26,6 +26,21 @@ public sealed class HardwareSensorCatalogTests
         Assert.Single(HardwareSensorCatalog.Build(snapshot, prefs));
     }
     [Fact]
+    public void CaseInsensitiveSnapshotKeysDoNotDuplicateEntries()
+    {
+        var snapshot = new Dictionary<string, object?>(StringComparer.Ordinal)
+        {
+            ["CPU.TEMP1"] = 40d,
+            ["cpu.temp1"] = 43d
+        };
+        var entry = Assert.Single(HardwareSensorCatalog.Build(snapshot,
+            new[] { new PortableHardwareSensorPreference { Key = "Cpu.Temp1", Alias = "CPU" } }));
+        Assert.True(entry.IsAvailable);
+        Assert.Equal(43d, entry.Value);
+        Assert.Equal("CPU", entry.Alias);
+    }
+
+    [Fact]
     public void UnavailableFavoriteCanBeFilteredByAlias()
     {
         var prefs = new[] { new PortableHardwareSensorPreference { Key = "Hardware.gpu.temp1", Alias = "Graphics", IsFavorite = true } };

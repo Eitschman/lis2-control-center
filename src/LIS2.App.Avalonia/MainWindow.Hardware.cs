@@ -7,6 +7,7 @@ public partial class MainWindow
 {
     private readonly Dictionary<string, object?> _hardwareSensors = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<PortableHardwareSensorPreference> _hardwarePreferences = new();
+    private bool _hardwareListRebinding;
     private readonly DispatcherTimer _hardwareRefreshTimer = new() { Interval = TimeSpan.FromSeconds(2) };
 
     private void InitializeHardwareBrowser()
@@ -57,6 +58,7 @@ public partial class MainWindow
         };
         this.FindControl<ListBox>("HardwareSensorList")!.SelectionChanged += (_, _) =>
         {
+            if (_hardwareListRebinding) return;
             var selected = this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem as HardwareSensorEntry;
             this.FindControl<Button>("HardwareUseForFan")!.IsEnabled = selected?.IsAvailable == true;
             this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = selected is not null;
@@ -99,9 +101,20 @@ public partial class MainWindow
             this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsChecked == true);
         var list = this.FindControl<ListBox>("HardwareSensorList")!;
         var previousKey = (list.SelectedItem as HardwareSensorEntry)?.Key;
-        list.ItemsSource = options;
-        if (previousKey is not null)
-            list.SelectedItem = options.FirstOrDefault(option => option.Key == previousKey);
+        _hardwareListRebinding = true;
+        try
+        {
+            list.ItemsSource = options;
+            if (previousKey is not null)
+                list.SelectedItem = options.FirstOrDefault(option => string.Equals(option.Key, previousKey, StringComparison.OrdinalIgnoreCase));
+        }
+        finally { _hardwareListRebinding = false; }
+        if (list.SelectedItem is null)
+        {
+            this.FindControl<TextBox>("HardwareAlias")!.Text = "";
+            this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked = false;
+        }
+        this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = list.SelectedItem is not null;
         this.FindControl<Button>("HardwareUseForFan")!.IsEnabled = list.SelectedItem is HardwareSensorEntry { IsAvailable: true };
         var unavailable = options.Count(item => !item.IsAvailable);
         this.FindControl<TextBlock>("HardwareSensorStatus")!.Text =
