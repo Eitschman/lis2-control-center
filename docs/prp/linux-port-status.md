@@ -260,3 +260,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Preference-save failure rollback now distinguishes newly created entries from existing empty preferences, so failed persistence cannot delete a previously saved blank preference.
 - Sensor transfer navigates before writing the fan editor key; no fan configuration is persisted or physical output authorized by the transfer.
 - No manual desktop or physical hardware tests required during port implementation under the binding 2026-10-14 owner clarification.
+
+## Diagnostics build repair (2026-10-14)
+- Run `38522848177` failed both Avalonia jobs with CS1061 in `MainWindow.Diagnostics.cs`: missing `using Avalonia.Controls;` for `FindControl` extension method. Shared .NET jobs passed.
+- Applied minimal namespace import repair; CI for repair commit pending. No changes to WPF or fan safety.
