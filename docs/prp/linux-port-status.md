@@ -251,6 +251,11 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Physical LIS2 hardware testing is unavailable, as it was for WPF. Do not use it as a package gate; retain virtual transport and simulated fan safety tests.
 - Manual desktop and screenshot checks are postponed until the complete Avalonia port is implemented. Technical package acceptance relies on code parity audits, headless tests, and CI. WPF retirement awaits final owner desktop acceptance.
 
+## Diagnostics navigation and read-only runtime state (2026-10-14)
+- Connected the previously placeholder-only Diagnostics navigation item to an actual read-only Avalonia view.
+- Added manual refresh of platform, virtual and serial connection state, page playback, fan dry-run monitoring and virtual command count; no device commands or fan authorization are issued.
+- Extracted a pure diagnostics formatter with headless regression tests. This is a first Diagnostics slice, not complete WPF diagnostics parity. Current-HEAD CI must pass before technical acceptance; owner desktop checks remain deferred.
+
 ## Hardware preference transaction correction (2026-10-14)
 - Preference-save failure rollback now distinguishes newly created entries from existing empty preferences, so failed persistence cannot delete a previously saved blank preference.
 - Sensor transfer navigates before writing the fan editor key; no fan configuration is persisted or physical output authorized by the transfer.

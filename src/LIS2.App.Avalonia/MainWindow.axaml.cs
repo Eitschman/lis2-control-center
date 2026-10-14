@@ -68,6 +68,7 @@ public partial class MainWindow : Window
         InitializeSerialDisplay();
         InitializeFanEditor();
         InitializeHardwareBrowser();
+        InitializeDiagnostics();
         InitializeGlyphEditor();
         InitializePagesEditor();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
@@ -223,6 +224,8 @@ public partial class MainWindow : Window
         this.FindControl<ScrollViewer>("FanControlView")!.IsVisible = section == "Fan Control";
         this.FindControl<ScrollViewer>("SettingsView")!.IsVisible = section == "Settings";
         this.FindControl<ScrollViewer>("HardwareView")!.IsVisible = section == "Hardware";
+        this.FindControl<ScrollViewer>("DiagnosticsView")!.IsVisible = section == "Diagnostics";
+        if (section == "Diagnostics") RefreshDiagnostics();
 
         if (description is not null)
             description.Text = section == "Dashboard"

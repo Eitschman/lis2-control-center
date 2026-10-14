@@ -396,6 +396,15 @@
           <TextBlock Text="Sensor assignment updates the fan editor but is not saved until you explicitly save fan configuration. Physical fan output remains disabled unless separately authorized." TextWrapping="Wrap" />
         </StackPanel>
       </ScrollViewer>
+      <ScrollViewer Name="DiagnosticsView" Grid.Row="1" IsVisible="False">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Runtime diagnostics" FontSize="18" FontWeight="SemiBold" />
+          <TextBlock Text="Read-only snapshot of transport, playback, and fan state. Refresh never sends device commands or enables fan output." TextWrapping="Wrap" />
+          <Button Name="DiagnosticsRefresh" Content="Refresh diagnostics" HorizontalAlignment="Left" />
+          <TextBlock Name="DiagnosticsSnapshot" FontFamily="Consolas,Monospace" TextWrapping="Wrap" />
+          <TextBlock Text="For transport changes use Settings. Diagnostics are intentionally read-only." TextWrapping="Wrap" />
+        </StackPanel>
+      </ScrollViewer>
       <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="12"><TextBlock Text="Transport controls" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Experimental serial and virtual transport diagnostics. No hardware fan authorization is implied." TextWrapping="Wrap"/>          <Separator Margin="4,18,4,16" />
           <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
 
