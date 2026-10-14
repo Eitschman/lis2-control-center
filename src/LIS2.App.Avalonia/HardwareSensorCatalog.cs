@@ -17,6 +17,11 @@ public static class HardwareSensorCatalog
             {
                 saved.TryGetValue(key, out var preference);
                 var available = snapshot.TryGetValue(key, out var value);
+                if (!available)
+                {
+                    var match = snapshot.FirstOrDefault(pair => string.Equals(pair.Key, key, StringComparison.OrdinalIgnoreCase));
+                    if (match.Key is not null) { available = true; value = match.Value; }
+                }
                 return new HardwareSensorEntry(key, available ? value : null,
                     preference?.Alias ?? "", preference?.IsFavorite == true, available);
             })

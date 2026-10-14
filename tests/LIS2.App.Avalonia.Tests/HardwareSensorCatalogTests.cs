@@ -23,5 +23,14 @@ public sealed class HardwareSensorCatalogTests
         Assert.Equal(51d, entry.Value);
         Assert.True(entry.IsAvailable);
         Assert.True(entry.IsFavorite);
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, prefs));
+    }
+    [Fact]
+    public void UnavailableFavoriteCanBeFilteredByAlias()
+    {
+        var prefs = new[] { new PortableHardwareSensorPreference { Key = "Hardware.gpu.temp1", Alias = "Graphics", IsFavorite = true } };
+        var result = Assert.Single(HardwareSensorCatalog.Build(new Dictionary<string, object?>(), prefs, "GRAPH", true));
+        Assert.False(result.IsAvailable);
+        Assert.Equal("Hardware.gpu.temp1", result.Key);
     }
 }

@@ -234,4 +234,9 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware sensor availability and tests (2026-10-14)
 - Deterministic read-only catalog projection with case-insensitive keys, favorite-first sorting, alias/key filtering and unavailable placeholders for saved missing sensors.
 - Missing sensors cannot be assigned to fans. Added catalog and portable-workspace regression tests. No hardware write path introduced.
-- Full WPF visual parity and hardware validation remain open. CI for this commit pending.
+- Full WPF visual parity and hardware validation remain open. CI: commit `5e2bf7c` passed all Windows/Ubuntu jobs (run `38521151712`).
+
+## Hardware preference safety and availability refinement (2026-10-14)
+- Corrected case-insensitive preference matching, blocked unavailable sensor assignment in the click handler (not only button state), improved unavailable counts, and added save-failure handling to avoid leaving modified preferences in memory when persistence fails.
+- Added catalog regression assertions for case-insensitive deduplication and unavailable favorite alias search.
+- CI for this commit pending; visual parity, WPF grouping, full hardware sensor coverage and physical verification remain open.

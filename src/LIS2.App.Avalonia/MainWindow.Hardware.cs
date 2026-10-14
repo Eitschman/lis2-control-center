@@ -30,29 +30,42 @@ public partial class MainWindow
         this.FindControl<Button>("HardwareSavePreference")!.Click += async (_, _) =>
         {
             if (this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem is not HardwareSensorEntry selected) return;
-            var preference = _hardwarePreferences.FirstOrDefault(p => p.Key == selected.Key);
+            var preference = _hardwarePreferences.FirstOrDefault(p => string.Equals(p.Key, selected.Key, StringComparison.OrdinalIgnoreCase));
             if (preference is null)
             {
                 preference = new PortableHardwareSensorPreference { Key = selected.Key };
                 _hardwarePreferences.Add(preference);
             }
+            var oldAlias = preference.Alias;
+            var oldFavorite = preference.IsFavorite;
             preference.Alias = this.FindControl<TextBox>("HardwareAlias")!.Text?.Trim() ?? "";
             preference.IsFavorite = this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked == true;
-            await SavePortableWorkspaceAsync(true);
-            FilterHardwareSensors();
+            try
+            {
+                await SavePortableWorkspaceAsync(true);
+                FilterHardwareSensors();
+            }
+            catch (Exception ex)
+            {
+                preference.Alias = oldAlias;
+                preference.IsFavorite = oldFavorite;
+                if (oldAlias.Length == 0 && !oldFavorite)
+                    _hardwarePreferences.Remove(preference);
+                this.FindControl<TextBlock>("HardwareSensorStatus")!.Text = "Preference save failed: " + ex.Message;
+            }
         };
         this.FindControl<ListBox>("HardwareSensorList")!.SelectionChanged += (_, _) =>
         {
             var selected = this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem as HardwareSensorEntry;
             this.FindControl<Button>("HardwareUseForFan")!.IsEnabled = selected?.IsAvailable == true;
             this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = selected is not null;
-            var preference = _hardwarePreferences.FirstOrDefault(p => p.Key == selected?.Key);
+            var preference = _hardwarePreferences.FirstOrDefault(p => string.Equals(p.Key, selected?.Key, StringComparison.OrdinalIgnoreCase));
             this.FindControl<TextBox>("HardwareAlias")!.Text = preference?.Alias ?? "";
             this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked = preference?.IsFavorite == true;
         };
         this.FindControl<Button>("HardwareUseForFan")!.Click += (_, _) =>
         {
-            if (this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem is not HardwareSensorEntry selected)
+            if (this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem is not HardwareSensorEntry { IsAvailable: true } selected)
                 return;
             this.FindControl<TextBox>("FanSensorKey")!.Text = selected.Key;
             NavigateTo(6);
@@ -89,8 +102,9 @@ public partial class MainWindow
         if (previousKey is not null)
             list.SelectedItem = options.FirstOrDefault(option => option.Key == previousKey);
         this.FindControl<Button>("HardwareUseForFan")!.IsEnabled = list.SelectedItem is HardwareSensorEntry { IsAvailable: true };
+        var unavailable = options.Count(item => !item.IsAvailable);
         this.FindControl<TextBlock>("HardwareSensorStatus")!.Text =
-            $"{options.Count} of {_hardwareSensors.Count} temperature sensor keys shown. Select one to assign it.";
+            $"{options.Count} sensor keys shown ({unavailable} unavailable). Select an available sensor to assign it.";
     }
 
 }
