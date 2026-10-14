@@ -111,11 +111,11 @@ public sealed class HardwareSensorCatalogTests
     {
         var snapshot = new Dictionary<string, object?>(StringComparer.Ordinal)
         {
-            ["CPU.TEMP1"] = 40d,
-            ["cpu.temp1"] = 43d
+            ["Hardware.CPU.Temperature.TEMP1"] = 40d,
+            ["hardware.cpu.temperature.temp1"] = 43d
         };
         var entry = Assert.Single(HardwareSensorCatalog.Build(snapshot,
-            new[] { new PortableHardwareSensorPreference { Key = "Cpu.Temp1", Alias = "CPU" } }));
+            new[] { new PortableHardwareSensorPreference { Key = "Hardware.Cpu.Temperature.Temp1", Alias = "CPU" } }));
         Assert.True(entry.IsAvailable);
         Assert.Equal(43d, entry.Value);
         Assert.Equal("CPU", entry.Alias);

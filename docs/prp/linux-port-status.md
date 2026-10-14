@@ -316,3 +316,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## CI repair for hardware grouping (2026-10-14)
 - Run 38533080462 on d409087 failed both Avalonia builds with CS0117: HardwareSensorEntry.GroupForDisplay missing. The UI call was correct, but the implementation was accidentally omitted from HardwareSensorEntry.
 - Implemented the missing grouping method in HardwareSensorEntry with case-insensitive hardware group headers and favorites-first ordering. Shared-library jobs had passed; CI for repair HEAD pending. No device commands or authorization changes.
+
+## CI repair: sensor-key test fixture (2026-10-14)
+- Run 38533392908 built both Avalonia targets successfully; one headless test failed on both OSes: CaseInsensitiveSnapshotKeysDoNotDuplicateEntries expected legacy non-Hardware key names to appear after WPF-style sensor-key filtering was introduced.
+- Updated the test fixture to realistic Hardware.CPU.Temperature.* keys with mixed casing, retaining its original purpose of checking case-insensitive snapshot merging and saved preferences. No runtime behavior or safety changes; new HEAD CI pending.
