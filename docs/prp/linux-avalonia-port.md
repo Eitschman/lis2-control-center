@@ -265,3 +265,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Menu placement correction batch (2026-10-14)
 - Moved Windows settings import control from PagesView to SettingsView without changing existing handler. Corrected WPF section/action labels for Fan Control, Diagnostics, Settings and Pages; physical fan safety stays gated. Remaining extra playback/serial diagnostic controls and missing WPF functionality are still tracked. Do not declare menu parity.
+
+## Diagnostics WPF layout and export correction (2026-10-14)
+- Replaced single Avalonia diagnostic text with four WPF-owned read-only panels and implemented text report export using native Avalonia save picker. Virtual state is shown from VirtualDeviceSession.State; decoded command history and protocol log are explicitly marked unavailable until their real runtime data sources are ported. Do not fabricate logs. Tests/CI required.

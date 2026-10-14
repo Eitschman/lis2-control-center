@@ -470,13 +470,36 @@
         </StackPanel>
       </ScrollViewer>
       <ScrollViewer Name="DiagnosticsView" Grid.Row="1" IsVisible="False">
-        <StackPanel Spacing="12">
-          <TextBlock Text="Diagnostics Snapshot" FontSize="18" FontWeight="SemiBold" />
-          <TextBlock Text="Read-only snapshot of transport, playback, and fan state. Refresh never sends device commands or enables fan output." TextWrapping="Wrap" />
-          <Button Name="DiagnosticsRefresh" Content="Refresh" HorizontalAlignment="Left" />
-          <TextBlock Name="DiagnosticsSnapshot" FontFamily="Consolas,Monospace" TextWrapping="Wrap" />
-          <TextBlock Text="For transport changes use Settings. Diagnostics are intentionally read-only." TextWrapping="Wrap" />
-        </StackPanel>
+        <Grid ColumnDefinitions="*,12,*" RowDefinitions="Auto,12,Auto" Margin="0,0,8,8">
+          <Border Grid.Row="0" Grid.Column="0" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="12">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Diagnostics Snapshot" FontSize="18" FontWeight="SemiBold" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Name="DiagnosticsExport" Content="Export report..." />
+                <Button Name="DiagnosticsRefresh" Content="Refresh" />
+              </StackPanel>
+              <TextBox Name="DiagnosticsSnapshot" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="210" FontFamily="Consolas" />
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="0" Grid.Column="2" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="12">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Virtual LIS2 state" FontSize="18" FontWeight="SemiBold" />
+              <TextBox Name="DiagnosticsVirtualState" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="2" Grid.Column="0" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="12">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Decoded command history" FontSize="18" FontWeight="SemiBold" />
+              <TextBox Name="DiagnosticsCommandHistory" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="2" Grid.Column="2" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="12">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Protocol Log" FontSize="18" FontWeight="SemiBold" />
+              <TextBox Name="DiagnosticsProtocolLog" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
+            </StackPanel>
+          </Border>
+        </Grid>
       </ScrollViewer>
       <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="12"><TextBlock Text="Device / Transport" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Experimental serial and virtual transport diagnostics. No hardware fan authorization is implied." TextWrapping="Wrap"/>          <Separator Margin="4,18,4,16" />
           <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />

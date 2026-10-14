@@ -378,3 +378,6 @@ Status: verified placement requirements only; implementation NOT yet corrected. 
 
 ## Follow-up menu ownership check (2026-10-14)
 - Pages no longer owns Windows settings import. Import UI relocated to Settings (platform migration action, not native WPF Settings feature); it remains a cross-platform migration exception pending owner decision. WPF labels now used for Fan Outputs, Automatic control, Save fan channel, Device / Transport, Diagnostics Snapshot, Refresh and Test event (5 s). Missing/extra actions and WPF semantics remain open.
+
+## Diagnostics post-correction audit (2026-10-14)
+- Four WPF diagnostics groups and Export report/Refresh actions now present. Snapshot and virtual state use actual available data. History and protocol log have honest unavailable labels pending real data source port, so diagnostics is structurally aligned but functionally incomplete.

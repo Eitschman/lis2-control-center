@@ -410,3 +410,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## WPF menu ownership batch (2026-10-14)
 - Windows settings import no longer lives inside Pages; moved to Settings, preserving its existing handler. Fan Control, Settings, Diagnostics and Pages titles/action labels aligned to WPF where possible. Further per-menu layout/behavior gaps remain; CI pending.
+
+## Diagnostics four-panel correction (2026-10-14)
+- WPF four panels restored: Diagnostics Snapshot, Virtual LIS2 state, Decoded command history, Protocol Log; native report export implemented. Command history and protocol log are explicit not-yet-ported placeholders, not fake telemetry. CI pending; WPF behavioral parity incomplete.
