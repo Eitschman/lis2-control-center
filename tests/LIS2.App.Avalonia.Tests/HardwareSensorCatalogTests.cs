@@ -3,6 +3,27 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class HardwareSensorCatalogTests
 {
     [Fact]
+    public void WpfTypeFilterIncludesUnavailableAndFavoriteEntries()
+    {
+        var snapshot = new Dictionary<string, object?>
+        {
+            ["Hardware.cpu.Temperature.temp1"] = 48d,
+            ["Hardware.cpu.Load.total"] = 21d,
+            ["Hardware.cpu.Unknown.foo"] = 1d
+        };
+        var prefs = new[]
+        {
+            new PortableHardwareSensorPreference { Key = "Hardware.gpu.Temperature.temp1", IsFavorite = true }
+        };
+        Assert.Equal(2, HardwareSensorCatalog.Build(snapshot, prefs, typeFilter: "Temperature").Count);
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, prefs, typeFilter: "Unavailable"));
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, prefs, typeFilter: "Favorites"));
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, prefs, typeFilter: "Other"));
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, prefs, typeFilter: "Load"));
+        Assert.Empty(HardwareSensorCatalog.Build(snapshot, prefs, typeFilter: "Fan"));
+    }
+
+    [Fact]
     public void MissingFavoritesRemainUnavailable()
     {
         var snapshot = new Dictionary<string, object?> { ["Hardware.cpu.Temperature.temp1"] = 47d };

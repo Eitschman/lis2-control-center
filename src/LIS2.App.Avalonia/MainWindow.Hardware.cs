@@ -27,6 +27,7 @@ public partial class MainWindow
                 _hardwareRefreshTimer.IsEnabled ? "Stop live updates" : "Start live updates";
         };
         this.FindControl<TextBox>("HardwareSearch")!.TextChanged += (_, _) => FilterHardwareSensors();
+        this.FindControl<ComboBox>("HardwareTypeFilter")!.SelectionChanged += (_, _) => FilterHardwareSensors();
         this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsCheckedChanged += (_, _) => FilterHardwareSensors();
         this.FindControl<Button>("HardwareSavePreference")!.Click += async (_, _) =>
         {
@@ -97,8 +98,9 @@ public partial class MainWindow
     private void FilterHardwareSensors()
     {
         var search = this.FindControl<TextBox>("HardwareSearch")!.Text?.Trim() ?? "";
+        var typeFilter = (this.FindControl<ComboBox>("HardwareTypeFilter")!.SelectedItem as ComboBoxItem)?.Content?.ToString();
         var options = HardwareSensorCatalog.Build(_hardwareSensors, _hardwarePreferences, search,
-            this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsChecked == true);
+            this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsChecked == true, typeFilter);
         var list = this.FindControl<ListBox>("HardwareSensorList")!;
         var previousKey = (list.SelectedItem as HardwareSensorEntry)?.Key;
         _hardwareListRebinding = true;

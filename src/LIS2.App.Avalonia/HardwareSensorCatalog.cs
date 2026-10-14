@@ -3,7 +3,7 @@ namespace LIS2.App.Avalonia;
 public static class HardwareSensorCatalog
 {
     public static IReadOnlyList<HardwareSensorEntry> Build(IReadOnlyDictionary<string, object?> snapshot,
-        IEnumerable<PortableHardwareSensorPreference> preferences, string? search = null, bool favoritesOnly = false)
+        IEnumerable<PortableHardwareSensorPreference> preferences, string? search = null, bool favoritesOnly = false, string? typeFilter = null)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(preferences);
@@ -22,12 +22,24 @@ public static class HardwareSensorCatalog
                 return new HardwareSensorEntry(key, available ? value : null,
                     preference?.Alias ?? "", preference?.IsFavorite == true, available);
             })
-            .Where(entry => (!favoritesOnly || entry.IsFavorite) &&
+            .Where(entry => MatchesType(entry, typeFilter) && (!favoritesOnly || entry.IsFavorite) &&
                 (entry.Key.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
                  entry.Alias.Contains(filter, StringComparison.OrdinalIgnoreCase)))
             .OrderByDescending(entry => entry.IsFavorite)
             .ThenBy(entry => entry.Key, StringComparer.OrdinalIgnoreCase)
             .ToArray();
+    }
+
+    public static bool MatchesType(HardwareSensorEntry entry, string? typeFilter)
+    {
+        if (string.IsNullOrWhiteSpace(typeFilter) || typeFilter == "All types") return true;
+        if (typeFilter == "Favorites") return entry.IsFavorite;
+        if (typeFilter == "Unavailable") return !entry.IsAvailable;
+        var types = new[] { "Temperature", "Load", "Fan", "Clock", "Voltage", "Power", "Data", "Throughput" };
+        var detected = types.FirstOrDefault(type => entry.Key.Split('.', '/', ':')
+            .Any(part => string.Equals(part, type, StringComparison.OrdinalIgnoreCase)));
+        return typeFilter == "Other" ? detected is null :
+            string.Equals(typeFilter, detected, StringComparison.OrdinalIgnoreCase);
     }
 }
 public sealed record HardwareSensorEntry(string Key, object? Value, string Alias, bool IsFavorite, bool IsAvailable)

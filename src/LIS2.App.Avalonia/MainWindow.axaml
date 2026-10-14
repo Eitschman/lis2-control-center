@@ -382,7 +382,21 @@
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Name="HardwareRefresh" Content="Refresh sensors" />
             <Button Name="HardwareAutoRefresh" Content="Start live updates" />
-            <TextBox Name="HardwareSearch" Width="300" Watermark="Filter sensor keys" />
+            <TextBox Name="HardwareSearch" Width="220" Watermark="Search alias or sensor key" />
+            <ComboBox Name="HardwareTypeFilter" Width="160" SelectedIndex="0">
+              <ComboBoxItem Content="All types" />
+              <ComboBoxItem Content="Favorites" />
+              <ComboBoxItem Content="Unavailable" />
+              <ComboBoxItem Content="Temperature" />
+              <ComboBoxItem Content="Load" />
+              <ComboBoxItem Content="Fan" />
+              <ComboBoxItem Content="Clock" />
+              <ComboBoxItem Content="Voltage" />
+              <ComboBoxItem Content="Power" />
+              <ComboBoxItem Content="Data" />
+              <ComboBoxItem Content="Throughput" />
+              <ComboBoxItem Content="Other" />
+            </ComboBox>
           </StackPanel>
           <CheckBox Name="HardwareFavoritesOnly" Content="Favorites only" />
           <ListBox Name="HardwareSensorList" MinHeight="260" MaxHeight="450" />

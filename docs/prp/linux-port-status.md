@@ -275,3 +275,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - On a filtered-out or missing selection, clear the editor and disable preference save to avoid accidentally applying stale edits to another sensor.
 - Normalize case-insensitive sensor snapshot keys in one dictionary pass (including duplicate keys with different case); added headless regression coverage.
 - No hardware writes or fan authorization changes. Full WPF visual parity remains pending; current-HEAD CI required for technical acceptance.
+
+## Hardware WPF type-filter parity (2026-10-14)
+- Restored the original WPF Hardware type filter categories (All types, Favorites, Unavailable, Temperature, Load, Fan, Clock, Voltage, Power, Data, Throughput, Other) alongside existing text and favorites filters.
+- Categorization uses explicit sensor-key path segments, not guessed hardware values; unavailable saved sensor keys remain filterable. This is a partial WPF parity slice; WPF grouped rows and full monitoring details remain pending.
+- Added headless filter regressions. No fan authorization or hardware write path added. Current-HEAD CI pending.
