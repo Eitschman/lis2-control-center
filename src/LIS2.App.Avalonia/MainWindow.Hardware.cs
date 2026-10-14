@@ -31,6 +31,7 @@ public partial class MainWindow
         {
             if (this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem is not HardwareSensorEntry selected) return;
             var preference = _hardwarePreferences.FirstOrDefault(p => string.Equals(p.Key, selected.Key, StringComparison.OrdinalIgnoreCase));
+            var created = preference is null;
             if (preference is null)
             {
                 preference = new PortableHardwareSensorPreference { Key = selected.Key };
@@ -49,7 +50,7 @@ public partial class MainWindow
             {
                 preference.Alias = oldAlias;
                 preference.IsFavorite = oldFavorite;
-                if (oldAlias.Length == 0 && !oldFavorite)
+                if (created)
                     _hardwarePreferences.Remove(preference);
                 this.FindControl<TextBlock>("HardwareSensorStatus")!.Text = "Preference save failed: " + ex.Message;
             }
@@ -67,8 +68,8 @@ public partial class MainWindow
         {
             if (this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem is not HardwareSensorEntry { IsAvailable: true } selected)
                 return;
-            this.FindControl<TextBox>("FanSensorKey")!.Text = selected.Key;
             NavigateTo(6);
+            this.FindControl<TextBox>("FanSensorKey")!.Text = selected.Key;
             SetFanStatus($"Sensor {selected.Key} assigned to the fan editor. Save configuration to persist it.");
         };
         RefreshHardwareSensors();

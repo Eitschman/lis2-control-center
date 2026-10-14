@@ -250,3 +250,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Confirmed latest HEAD `caf703f` green on Windows/Ubuntu (Actions run for `caf703f`; four jobs passed).
 - Physical LIS2 hardware testing is unavailable, as it was for WPF. Do not use it as a package gate; retain virtual transport and simulated fan safety tests.
 - Manual desktop and screenshot checks are postponed until the complete Avalonia port is implemented. Technical package acceptance relies on code parity audits, headless tests, and CI. WPF retirement awaits final owner desktop acceptance.
+
+## Hardware preference transaction correction (2026-10-14)
+- Preference-save failure rollback now distinguishes newly created entries from existing empty preferences, so failed persistence cannot delete a previously saved blank preference.
+- Sensor transfer navigates before writing the fan editor key; no fan configuration is persisted or physical output authorized by the transfer.
+- No manual desktop or physical hardware tests required during port implementation under the binding 2026-10-14 owner clarification.
