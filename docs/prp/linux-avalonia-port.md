@@ -232,3 +232,6 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 
 ## Pi 5 first-launch UI feedback (2026-10-14)
 - Real Pi 5 screenshot revealed window minimum height and sidebar legibility/layout defects. Addressed window sizing, sidebar scrolling/footer separation and explicit high-contrast text in the Avalonia shell. This is an exception to deferred desktop testing because the owner voluntarily supplied a first-launch screenshot; do not interpret it as final desktop acceptance. New-build validation pending.
+
+## Preview artifact download warning (2026-10-14)
+- Chrome classified the automatically wrapped GitHub Actions linux-arm64 artifact ZIP as dangerous. CI now packages a conventional self-contained, untrimmed multi-file application rather than a self-extracting single-file binary and provides SHA256 checksums. The outer Actions ZIP remains platform-generated; Chrome acceptance is not guaranteed and requires a new user download attempt. No release/tag, main branch changes, or security bypass. See linux-port-status.md for CI outcome.
