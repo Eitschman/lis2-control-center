@@ -20,6 +20,28 @@ public sealed class HardwareSensorCatalogTests
     }
 
     [Fact]
+    public void HardwareSummaryCountsRawValuesAndConfiguredUnavailableSensors()
+    {
+        var snapshot = new Dictionary<string, object?>
+        {
+            ["Hardware.CPU.Temperature.Core"] = 45d,
+            ["Hardware.CPU.Temperature.Core.Unit"] = "°C",
+            ["Hardware.CPU.Load.Total"] = 30d
+        };
+        var tracked = new[] { "Hardware.GPU.Fan.Missing" };
+        var visible = HardwareSensorCatalog.Build(snapshot,
+            Array.Empty<PortableHardwareSensorPreference>(), trackedKeys: tracked);
+        Assert.Equal("3 visible sensor(s) / 2 total values · 1 unavailable configured sensor(s)",
+            HardwareSensorCatalog.BuildSummary(snapshot, visible));
+        Assert.Equal("Hardware source error: sensor offline",
+            HardwareSensorCatalog.BuildSummary(snapshot, visible, "sensor offline"));
+        Assert.Equal("1 visible sensor(s) / 2 total values",
+            HardwareSensorCatalog.BuildSummary(snapshot,
+                HardwareSensorCatalog.Build(snapshot, Array.Empty<PortableHardwareSensorPreference>(),
+                    typeFilter: "Temperature")));
+    }
+
+    [Fact]
     public void TypeFilterSupportsWpfAllAndCaseInsensitiveSpecialValues()
     {
         var snapshot = new Dictionary<string, object?>

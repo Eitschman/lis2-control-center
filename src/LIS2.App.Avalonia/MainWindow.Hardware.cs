@@ -8,6 +8,7 @@ public partial class MainWindow
     private readonly Dictionary<string, object?> _hardwareSensors = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<PortableHardwareSensorPreference> _hardwarePreferences = new();
     private bool _hardwareListRebinding;
+    private string? _hardwareSourceError;
     private readonly DispatcherTimer _hardwareRefreshTimer = new() { Interval = TimeSpan.FromSeconds(2) };
 
     private void InitializeHardwareBrowser()
@@ -133,13 +134,14 @@ public partial class MainWindow
             var snapshot = _liveFanSensors.Snapshot();
             _hardwareSensors.Clear();
             foreach (var item in snapshot) _hardwareSensors[item.Key] = item.Value;
+            _hardwareSourceError = null;
             FilterHardwareSensors();
         }
         catch (Exception ex)
         {
             _hardwareSensors.Clear();
+            _hardwareSourceError = ex.Message;
             FilterHardwareSensors();
-            this.FindControl<TextBlock>("HardwareSensorStatus")!.Text = "Sensor discovery failed: " + ex.Message;
         }
     }
 
@@ -169,9 +171,8 @@ public partial class MainWindow
         }
         this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = list.SelectedItem is not null;
         SetHardwareFanAssignmentEnabled(list.SelectedItem is HardwareSensorEntry { IsAvailable: true });
-        var unavailable = options.Count(item => !item.IsAvailable);
         this.FindControl<TextBlock>("HardwareSensorStatus")!.Text =
-            $"{options.Count} sensor keys shown ({unavailable} unavailable). Select an available sensor to assign it.";
+            HardwareSensorCatalog.BuildSummary(_hardwareSensors, options, _hardwareSourceError);
     }
 
 }

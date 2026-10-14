@@ -336,3 +336,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware type-filter WPF parity (2026-10-14)
 - Fixed an actual WPF/Avalonia filter mismatch: WPF uses 'All', while Avalonia catalog previously only accepted 'All types'. Both are now accepted, and Favorites/Unavailable special filters match case-insensitively. Unknown sensor categories still fall under Other.
 - Added headless regression tests for All, Other, Favorites and Unavailable; no hardware or fan-write changes. Latest HEAD CI pending.
+
+## Hardware monitoring summary and source error parity (2026-10-14)
+- WPF-style hardware monitoring summary now shows visible sensors, total non-unit snapshot values, and unavailable configured sensor count; source errors take precedence and persist across filter changes until the next successful refresh. Snapshot metadata is excluded from the total. Headless regression tests cover filtered counts, unavailable tracked sensors and source errors.
+- Hardware writes and fan authorization unchanged. CI pending for this HEAD; manual desktop verification remains deferred until full port.

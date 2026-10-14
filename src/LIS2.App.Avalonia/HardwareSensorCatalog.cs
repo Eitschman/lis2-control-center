@@ -38,6 +38,20 @@ public static class HardwareSensorCatalog
             .ToArray();
     }
 
+    public static string BuildSummary(IReadOnlyDictionary<string, object?> snapshot,
+        IReadOnlyCollection<HardwareSensorEntry> visible, string? sourceError = null)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        ArgumentNullException.ThrowIfNull(visible);
+        if (!string.IsNullOrWhiteSpace(sourceError))
+            return "Hardware source error: " + sourceError;
+        var total = snapshot.Count(pair => IsSensorKey(pair.Key));
+        var unavailable = visible.Count(entry => !entry.IsAvailable);
+        return unavailable > 0
+            ? $"{visible.Count} visible sensor(s) / {total} total values · {unavailable} unavailable configured sensor(s)"
+            : $"{visible.Count} visible sensor(s) / {total} total values";
+    }
+
     public static bool IsSensorKey(string key) =>
         key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase) &&
         !key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase);
