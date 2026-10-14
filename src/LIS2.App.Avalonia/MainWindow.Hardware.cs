@@ -142,8 +142,11 @@ public partial class MainWindow
     {
         var search = this.FindControl<TextBox>("HardwareSearch")!.Text?.Trim() ?? "";
         var typeFilter = (this.FindControl<ComboBox>("HardwareTypeFilter")!.SelectedItem as ComboBoxItem)?.Content?.ToString();
+        var tracked = HardwareSensorCatalog.ExtractTrackedKeys(
+            _pages.Pages.SelectMany(page => new[] { page.Line1Template, page.Line2Template }),
+            _fanSettings.Channels.Select(channel => channel.SensorKey));
         var options = HardwareSensorCatalog.Build(_hardwareSensors, _hardwarePreferences, search,
-            this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsChecked == true, typeFilter);
+            this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsChecked == true, typeFilter, tracked);
         var list = this.FindControl<ListBox>("HardwareSensorList")!;
         var previousKey = (list.SelectedItem as HardwareSensorEntry)?.Key;
         _hardwareListRebinding = true;

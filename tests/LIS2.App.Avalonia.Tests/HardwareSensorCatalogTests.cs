@@ -3,6 +3,28 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class HardwareSensorCatalogTests
 {
     [Fact]
+    public void TrackedDisconnectedSensorKeysRemainUnavailable()
+    {
+        var tracked = HardwareSensorCatalog.ExtractTrackedKeys(
+            new[] { "CPU {Hardware.CPU.Temperature.Core}°C", "Fan {Hardware.CPU.Fan.1}" },
+            new[] { "hardware.cpu.temperature.core", "Hardware.GPU.Fan.2" });
+        Assert.Equal(3, tracked.Count);
+        var rows = HardwareSensorCatalog.Build(new Dictionary<string, object?>(),
+            Array.Empty<PortableHardwareSensorPreference>(), trackedKeys: tracked);
+        Assert.Equal(3, rows.Count);
+        Assert.All(rows, entry => Assert.False(entry.IsAvailable));
+    }
+
+    [Fact]
+    public void NonNumericSensorIsUnavailable()
+    {
+        var rows = HardwareSensorCatalog.Build(
+            new Dictionary<string, object?> { ["Hardware.CPU.Temperature.Core"] = "bad" },
+            Array.Empty<PortableHardwareSensorPreference>());
+        Assert.False(Assert.Single(rows).IsAvailable);
+    }
+
+    [Fact]
     public void WpfTypeFilterIncludesUnavailableAndFavoriteEntries()
     {
         var snapshot = new Dictionary<string, object?>

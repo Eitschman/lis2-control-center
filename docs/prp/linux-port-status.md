@@ -303,3 +303,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Compared actual WPF `CreateHardwarePresetPage`: each preset creates **one** page, not one page per sensor. Replaced the initial Avalonia per-sensor implementation with WPF-like CPU/GPU Load+Temperature, Memory Load+Data, and first-two Temperatures/Fans selection, with favorite priority.
 - Numeric live sensors only; exclude .Unit metadata; append per-sensor .Unit when available. Empty preset selection creates no page. Created pages have 5-second duration and PingPong overflow, matching WPF.
 - Replaced initial preset tests with exact template/favorites/empty-case regressions. Physical device writes remain untouched; current HEAD CI pending. This is source-level behavior parity, not final desktop acceptance.
+
+## Hardware tracked sensor references (2026-10-14)
+- Compared WPF tracked-key behavior: referenced Hardware.* placeholders from display pages and fan channel sensor keys now remain visible when disconnected, marked unavailable. Availability requires a numeric reading; assignment remains disabled for missing sensors.
+- Exposes separate hardware and sensor display names in the catalog. Added headless regressions for disconnected references and nonnumeric values. Metadata filtering and WPF grouping remain open; no hardware output or authorization change.
+- CI acceptance pending for this HEAD; final desktop testing deferred.
