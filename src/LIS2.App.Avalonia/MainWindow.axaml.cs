@@ -206,8 +206,8 @@ public partial class MainWindow : Window
         for (var i = 0; i < SectionNames.Length; i++)
         {
             var button = this.FindControl<Button>($"NavButton{i}")!;
-            button.Background = i == _selectedSection ? new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#354351")) : Avalonia.Media.Brushes.Transparent;
-            button.FontWeight = i == _selectedSection ? Avalonia.Media.FontWeight.SemiBold : Avalonia.Media.FontWeight.Normal;
+            button.Background = i == _selectedSection ? new global::Avalonia.Media.SolidColorBrush(global::Avalonia.Media.Color.Parse("#354351")) : global::Avalonia.Media.Brushes.Transparent;
+            button.FontWeight = i == _selectedSection ? global::Avalonia.Media.FontWeight.SemiBold : global::Avalonia.Media.FontWeight.Normal;
         }
         var title = this.FindControl<TextBlock>("SectionTitle");
         var description = this.FindControl<TextBlock>("SectionDescription");
