@@ -268,3 +268,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Diagnostics WPF layout and export correction (2026-10-14)
 - Replaced single Avalonia diagnostic text with four WPF-owned read-only panels and implemented text report export using native Avalonia save picker. Virtual state is shown from VirtualDeviceSession.State; decoded command history and protocol log are explicitly marked unavailable until their real runtime data sources are ported. Do not fabricate logs. Tests/CI required.
+
+## WPF virtual diagnostics data port (2026-10-14)
+- Ported WPF RefreshVirtualDiagnostics state lines, eight glyph rows, and last-200 decoded command history using existing VirtualLis2Transport.Writes and Lis2Protocol.DescribeCommand. Read-only data only. Protocol Log still awaits genuine application event logging. CI pending.

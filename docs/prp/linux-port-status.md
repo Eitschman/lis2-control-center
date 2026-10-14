@@ -413,3 +413,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## Diagnostics four-panel correction (2026-10-14)
 - WPF four panels restored: Diagnostics Snapshot, Virtual LIS2 state, Decoded command history, Protocol Log; native report export implemented. Command history and protocol log are explicit not-yet-ported placeholders, not fake telemetry. CI pending; WPF behavioral parity incomplete.
+
+## Virtual LIS2 diagnostics port (2026-10-14)
+- Real virtual state and last 200 decoded commands now use existing LIS2.Core transport/state/protocol API, following WPF formatting. Protocol Log remains unported; no fabricated entries. CI pending.

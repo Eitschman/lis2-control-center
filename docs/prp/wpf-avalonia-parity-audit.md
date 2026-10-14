@@ -381,3 +381,6 @@ Status: verified placement requirements only; implementation NOT yet corrected. 
 
 ## Diagnostics post-correction audit (2026-10-14)
 - Four WPF diagnostics groups and Export report/Refresh actions now present. Snapshot and virtual state use actual available data. History and protocol log have honest unavailable labels pending real data source port, so diagnostics is structurally aligned but functionally incomplete.
+
+## Diagnostics data parity pass (2026-10-14)
+- Virtual LIS2 state and decoded command history now sourced from VirtualLis2Transport and formatted following WPF RefreshVirtualDiagnostics. Real protocol log remains outstanding. Diagnostics not yet full parity.

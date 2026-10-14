@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using LIS2.Core;
+using System.Globalization;
 
 namespace LIS2.App.Avalonia;
 
@@ -54,9 +56,29 @@ public partial class MainWindow
             virtualConnected, serial, playback, fanMonitor, _virtualDevice.CommandCount,
             _serialBusy, sensorRefresh, fanPreviewConfigured);
         this.FindControl<TextBox>("DiagnosticsSnapshot")!.Text = summary;
-        this.FindControl<TextBox>("DiagnosticsVirtualState")!.Text = _virtualDevice.State.ToString() ?? "";
-        this.FindControl<TextBox>("DiagnosticsCommandHistory")!.Text =
-            "Decoded command history is not yet available in the Avalonia runtime.";
+        var state = _virtualDevice.State;
+        var stateLines = new List<string>
+        {
+            $"Line 1: [{state.Line1}]",
+            $"Line 2: [{state.Line2}]",
+            $"Brightness: {state.Brightness}",
+            $"Fans: {state.Fan1}% / {state.Fan2}% / {state.Fan3}% / {state.Fan4}%",
+            $"Rejected commands: {state.RejectedCommandCount}",
+            $"Last protocol error: {state.LastProtocolError ?? "-"}",
+            ""
+        };
+        for (var slot = 0; slot < state.CustomCharacters.Length; slot++)
+            stateLines.Add($"Glyph {slot + 1}: " + string.Join(" ", state.CustomCharacters[slot].Select(value => value.ToString("X2", CultureInfo.InvariantCulture))));
+        this.FindControl<TextBox>("DiagnosticsVirtualState")!.Text = string.Join(Environment.NewLine, stateLines);
+
+        var history = _virtualDevice.CommandHistory;
+        var firstHistoryNumber = Math.Max(1, history.Count - 199);
+        this.FindControl<TextBox>("DiagnosticsCommandHistory")!.Text = string.Join(
+            Environment.NewLine,
+            history.TakeLast(200).Select((data, index) =>
+                $"{firstHistoryNumber + index,4}: " +
+                string.Join(" ", data.Select(value => value.ToString("X2", CultureInfo.InvariantCulture))) +
+                Environment.NewLine + "      " + Lis2Protocol.DescribeCommand(data)));
         this.FindControl<TextBox>("DiagnosticsProtocolLog")!.Text =
             "Protocol log capture is not yet available in the Avalonia runtime.";
     }

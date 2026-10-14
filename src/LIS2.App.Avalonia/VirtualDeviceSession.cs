@@ -18,6 +18,7 @@ public sealed class VirtualDeviceSession : IAsyncDisposable
 
     public bool IsConnected => _device.IsConnected;
     public int CommandCount => _transport.Writes.Count;
+    public IReadOnlyList<byte[]> CommandHistory => _transport.Writes;
     public VirtualLis2State State => _transport.State;
 
     public Task WriteLineAsync(int line, string text, CancellationToken cancellationToken = default) =>
