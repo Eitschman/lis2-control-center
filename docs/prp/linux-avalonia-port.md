@@ -246,3 +246,6 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 - Source-based overview of **all ten WPF menu tabs** and Avalonia gaps: `docs/prp/wpf-avalonia-parity-audit.md`. The WPF XAML and code-behind are the binding target; no invented features or dashboard controls. Every tab needs detailed control/handler parity mapping and tests before completion. The erroneous Dashboard connection actions from 50665f7 were reverted in 2cb3141.
 
 - Detailed XAML-level WPF control/event inventory now appended to `wpf-avalonia-parity-audit.md` for all ten menus; identifier differences are explicitly not treated as functional gaps. Semantic control/handler parity still open.
+
+## Source-level all-menu functional traceability (2026-10-14)
+- `docs/prp/wpf-avalonia-parity-audit.md` now traces every named WPF control (126) and XAML-declared tab event handler (71 tab-scoped occurrences) to Avalonia UI/code evidence, or explicitly records no reliable mapping. Each handler row records actual calls found in WPF code-behind. WPF remains authoritative. UI-name evidence is not functional equivalence. Full dynamic/background/implicit semantic audit and automated parity tests remain open; no tab marked complete solely on this traceability.

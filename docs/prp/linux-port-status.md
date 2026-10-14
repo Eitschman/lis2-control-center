@@ -385,3 +385,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Detailed all-menu WPF XAML inventory (2026-10-14)
 - Enumerated WPF named controls and XAML event handler names for every menu and checked exact Avalonia identifier presence. Added source-grounded per-control tables to `docs/prp/wpf-avalonia-parity-audit.md`. Identifiers alone do not establish functional parity; renamed Avalonia controls require semantic handler review. No UI code changes; CI not a substitute for this review.
+
+## WPF per-control and handler traceability expanded (2026-10-14)
+- Completed named-control and XAML-declared event-handler source traceability for all ten WPF menus (126 named controls, 71 per-tab handlers) with WPF code call evidence and Avalonia candidate mappings in `docs/prp/wpf-avalonia-parity-audit.md` (~25 KB). Three missing views remain Media, Events, Home Assistant; HA has partial embedded Pages functionality. Identified functional deviations in manual fan output, diagnostics history/export, theme/language/startup. This is not yet full semantic parity: unnamed controls, background handlers/timers, validation, persistence and localization still require code-level mapping and regression tests. No runtime changes in this audit commit.
