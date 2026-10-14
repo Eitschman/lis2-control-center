@@ -61,21 +61,39 @@ public partial class MainWindow
         {
             if (_hardwareListRebinding) return;
             var selected = this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem as HardwareSensorEntry;
-            this.FindControl<Button>("HardwareUseForFan")!.IsEnabled = selected?.IsAvailable == true;
+            SetHardwareFanAssignmentEnabled(selected?.IsAvailable == true);
             this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = selected is not null;
             var preference = _hardwarePreferences.FirstOrDefault(p => string.Equals(p.Key, selected?.Key, StringComparison.OrdinalIgnoreCase));
             this.FindControl<TextBox>("HardwareAlias")!.Text = preference?.Alias ?? "";
             this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked = preference?.IsFavorite == true;
         };
-        this.FindControl<Button>("HardwareUseForFan")!.Click += (_, _) =>
+        for (var channelIndex = 0; channelIndex < 4; channelIndex++)
         {
-            if (this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem is not HardwareSensorEntry { IsAvailable: true } selected)
-                return;
-            NavigateTo(6);
-            this.FindControl<TextBox>("FanSensorKey")!.Text = selected.Key;
-            SetFanStatus($"Sensor {selected.Key} assigned to the fan editor. Save configuration to persist it.");
-        };
+            var selectedChannel = channelIndex;
+            var buttonName = channelIndex == 0 ? "HardwareUseForFan" : "HardwareUseForFan" + (channelIndex + 1);
+            this.FindControl<Button>(buttonName)!.Click += (_, _) => AssignHardwareSensorToFan(selectedChannel);
+        }
         RefreshHardwareSensors();
+    }
+
+    private void SetHardwareFanAssignmentEnabled(bool enabled)
+    {
+        for (var index = 0; index < 4; index++)
+        {
+            var name = index == 0 ? "HardwareUseForFan" : "HardwareUseForFan" + (index + 1);
+            this.FindControl<Button>(name)!.IsEnabled = enabled;
+        }
+    }
+
+    private void AssignHardwareSensorToFan(int channelIndex)
+    {
+        if (channelIndex is < 0 or > 3 ||
+            this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem is not HardwareSensorEntry { IsAvailable: true } selected)
+            return;
+        NavigateTo(6);
+        this.FindControl<ComboBox>("FanChannelPicker")!.SelectedIndex = channelIndex;
+        this.FindControl<TextBox>("FanSensorKey")!.Text = selected.Key;
+        SetFanStatus($"Sensor {selected.Key} assigned to Fan {channelIndex + 1} editor. Save configuration to persist it.");
     }
 
     private void RefreshHardwareSensors()
@@ -117,7 +135,7 @@ public partial class MainWindow
             this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked = false;
         }
         this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = list.SelectedItem is not null;
-        this.FindControl<Button>("HardwareUseForFan")!.IsEnabled = list.SelectedItem is HardwareSensorEntry { IsAvailable: true };
+        SetHardwareFanAssignmentEnabled(list.SelectedItem is HardwareSensorEntry { IsAvailable: true });
         var unavailable = options.Count(item => !item.IsAvailable);
         this.FindControl<TextBlock>("HardwareSensorStatus")!.Text =
             $"{options.Count} sensor keys shown ({unavailable} unavailable). Select an available sensor to assign it.";

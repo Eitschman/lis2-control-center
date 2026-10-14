@@ -288,3 +288,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware column layout CI repair (2026-10-14)
 - Commit `06bbb20`, run `38524643627`: both Avalonia jobs failed AVLN2000 at `MainWindow.axaml:403`, because WPF's `HorizontalContentAlignment` is not a supported Avalonia ListBox property. Both shared-library jobs passed.
 - Removed the invalid ListBox property; the row Grid keeps explicit five-column layout. CI for the repair commit is pending; no hardware behavior or fan authorization changed.
+
+## Hardware four-channel fan assignment parity (2026-10-14)
+- Replaced the single current-channel assignment action with WPF-matching Fan 1, Fan 2, Fan 3, Fan 4 buttons. The selected available sensor is copied into the explicitly chosen fan editor channel; selection and assignment never persist settings or authorize hardware output.
+- All four buttons share availability gating. Display-preset generation and remaining WPF hardware grouping are still open. Current HEAD CI pending; desktop checks deferred until complete port.

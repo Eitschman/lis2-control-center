@@ -407,7 +407,12 @@
             <Button Name="HardwareSavePreference" Content="Save sensor preference" />
           </StackPanel>
           <TextBlock Name="HardwareSensorStatus" Text="Refresh to discover available sensors." TextWrapping="Wrap" />
-          <Button Name="HardwareUseForFan" Content="Use selected sensor for current fan channel" HorizontalAlignment="Left" IsEnabled="False" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Name="HardwareUseForFan" Content="Use for Fan 1" IsEnabled="False" />
+            <Button Name="HardwareUseForFan2" Content="Fan 2" IsEnabled="False" />
+            <Button Name="HardwareUseForFan3" Content="Fan 3" IsEnabled="False" />
+            <Button Name="HardwareUseForFan4" Content="Fan 4" IsEnabled="False" />
+          </StackPanel>
           <TextBlock Text="Sensor assignment updates the fan editor but is not saved until you explicitly save fan configuration. Physical fan output remains disabled unless separately authorized." TextWrapping="Wrap" />
         </StackPanel>
       </ScrollViewer>
