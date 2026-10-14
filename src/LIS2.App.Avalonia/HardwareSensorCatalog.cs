@@ -72,9 +72,11 @@ public static class HardwareSensorCatalog
 
     public static bool MatchesType(HardwareSensorEntry entry, string? typeFilter)
     {
-        if (string.IsNullOrWhiteSpace(typeFilter) || typeFilter == "All types") return true;
-        if (typeFilter == "Favorites") return entry.IsFavorite;
-        if (typeFilter == "Unavailable") return !entry.IsAvailable;
+        if (string.IsNullOrWhiteSpace(typeFilter) ||
+            string.Equals(typeFilter, "All types", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(typeFilter, "All", StringComparison.OrdinalIgnoreCase)) return true;
+        if (string.Equals(typeFilter, "Favorites", StringComparison.OrdinalIgnoreCase)) return entry.IsFavorite;
+        if (string.Equals(typeFilter, "Unavailable", StringComparison.OrdinalIgnoreCase)) return !entry.IsAvailable;
         return string.Equals(typeFilter, GetSensorType(entry.Key), StringComparison.OrdinalIgnoreCase);
     }
 

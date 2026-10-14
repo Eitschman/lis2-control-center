@@ -332,3 +332,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware sensor display-name parity (2026-10-14)
 - Compared WPF ParseHardwareSensorKey/HumanizeSensorName: Avalonia hardware and sensor labels now separate camel-case/acronym boundaries and underscores/dashes (e.g. GraphicsCard -> Graphics Card; GPUHotSpot -> GPU Hot Spot). Stable raw keys remain unchanged for templates, saved aliases, favorites and fan references.
 - Added headless display-name regressions; no physical device operations. CI on latest HEAD pending; final desktop checks deferred.
+
+## Hardware type-filter WPF parity (2026-10-14)
+- Fixed an actual WPF/Avalonia filter mismatch: WPF uses 'All', while Avalonia catalog previously only accepted 'All types'. Both are now accepted, and Favorites/Unavailable special filters match case-insensitively. Unknown sensor categories still fall under Other.
+- Added headless regression tests for All, Other, Favorites and Unavailable; no hardware or fan-write changes. Latest HEAD CI pending.

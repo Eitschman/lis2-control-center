@@ -20,6 +20,24 @@ public sealed class HardwareSensorCatalogTests
     }
 
     [Fact]
+    public void TypeFilterSupportsWpfAllAndCaseInsensitiveSpecialValues()
+    {
+        var snapshot = new Dictionary<string, object?>
+        {
+            ["Hardware.CPU.Temperature.Package"] = 42d,
+            ["Hardware.CPU.Mystery.Value"] = 10d
+        };
+        var preferences = new[] { new PortableHardwareSensorPreference
+        {
+            Key = "Hardware.CPU.Temperature.Package", IsFavorite = true
+        } };
+        Assert.Equal(2, HardwareSensorCatalog.Build(snapshot, preferences, typeFilter: "All").Count);
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, preferences, typeFilter: "other"));
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, preferences, typeFilter: "favorites"));
+        Assert.Empty(HardwareSensorCatalog.Build(snapshot, preferences, typeFilter: "unavailable"));
+    }
+
+    [Fact]
     public void HardwareAndSensorNamesAreHumanReadable()
     {
         var entry = new HardwareSensorEntry("Hardware.GraphicsCard.Temperature.GPUHotSpot", 80d, "", false, true);
