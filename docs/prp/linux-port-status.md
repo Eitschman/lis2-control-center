@@ -209,3 +209,9 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 | Physical LIS2 hardware | Explicitly excluded by owner | EXCLUDED |
 
 **Blocking work:** port the WPF layout and screen interactions to Avalonia without redesign; create per-screen parity matrix, automate interaction/screenshot comparisons and run desktop smoke checks; close outstanding sensor-key compatibility and error-path coverage. The existing four green CI jobs prove compilation/tests, not visual/functional UI parity. Do not mark package 1 done until these gates pass. WPF stays read-only reference and main remains unchanged.
+
+## Navigation and transport parity package (2026-10-14)
+- Replaced the Avalonia ListBox navigation with ten WPF-order button entries and explicit selected-button styling.
+- Restored the WPF-like sidebar transport summary and Change action to Settings; moved experimental serial/virtual transport buttons to the Settings view without removing their existing event handlers.
+- This is structural navigation parity only: theme, localization, desktop screenshot and full Settings-screen parity remain unverified. Physical hardware remains excluded.
+- CI validation must be recorded against the new HEAD; no claim of desktop visual parity.

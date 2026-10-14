@@ -9,48 +9,23 @@
       <Grid Margin="18" RowDefinitions="Auto,*,Auto">
         <TextBlock Grid.Row="0" Text="LIS2 CONTROL CENTER" FontSize="16" FontWeight="Bold" Margin="4,18,0,24" Foreground="White" />
         <StackPanel Grid.Row="1" Spacing="8">
-          <ListBox Name="Navigation" SelectedIndex="0">
-            <ListBoxItem Content="⌂    Dashboard" />
-            <ListBoxItem Content="▣    Display" />
-            <ListBoxItem Content="▤    Pages" />
-            <ListBoxItem Content="♫    Media" />
-            <ListBoxItem Content="⚠    Events" />
-            <ListBoxItem Content="▦    Hardware" />
-            <ListBoxItem Content="✽    Fan Control" />
-            <ListBoxItem Content="⚙    Settings" />
-            <ListBoxItem Content="∿    Diagnostics" />
-            <ListBoxItem Content="⌂    Home Assistant" />
-          </ListBox>
+          <StackPanel Name="NavigationPanel" Spacing="2">
+            <Button Name="NavButton0" Tag="0" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="⌂" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Dashboard" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton1" Tag="1" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="▣" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Display" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton2" Tag="2" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="▤" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Pages" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton3" Tag="3" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="♫" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Media" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton4" Tag="4" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="⚠" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Events" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton5" Tag="5" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="▦" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Hardware" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton6" Tag="6" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="✽" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Fan Control" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton7" Tag="7" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="⚙" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Settings" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton8" Tag="8" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="∿" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Diagnostics" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton9" Tag="9" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="⌂" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Home Assistant" VerticalAlignment="Center"/></Grid></Button>
+          </StackPanel>
           <Separator Margin="4,18,4,16" />
           <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
-          <TextBlock Name="TransportSummaryText" Text="Virtual LIS2" TextWrapping="Wrap" Margin="4,0,0,0" />
-          <TextBlock Name="VirtualStatus" Text="Disconnected" Margin="4,4,0,0" />
-          <Separator Margin="0,12,0,4" />
-          <TextBlock Text="Serial display (experimental)" FontWeight="SemiBold" />
-          <ComboBox Name="SerialPortPicker" MinWidth="180" />
-          <Button Name="SerialRefreshPorts" Content="Refresh serial ports" HorizontalAlignment="Left" />
-          <Button Name="SerialConnect" Content="Connect serial display" HorizontalAlignment="Left" />
-          <Button Name="SerialDisconnect" Content="Disconnect serial" HorizontalAlignment="Left" IsEnabled="False" />
-          <Button Name="SerialSendLines" Content="Send display lines" HorizontalAlignment="Left" IsEnabled="False" />
-          <Button Name="SerialPlaybackStart" Content="Start serial page sequence" HorizontalAlignment="Left" IsEnabled="False" />
-          <Button Name="SerialPlaybackStop" Content="Stop serial page sequence" HorizontalAlignment="Left" IsEnabled="False" />
-          <TextBlock Name="SerialPlaybackStatus" Text="Serial sequence stopped" TextWrapping="Wrap" />
-          <Button Name="SerialSendPage" Content="Send selected page" HorizontalAlignment="Left" IsEnabled="False" />
-          <Button Name="SerialSendGlyphs" Content="Program 8 glyphs" HorizontalAlignment="Left" IsEnabled="False" />
-          <StackPanel Orientation="Horizontal" Spacing="5">
-            <TextBlock Text="Brightness" VerticalAlignment="Center" />
-            <ComboBox Name="SerialBrightness" SelectedIndex="0" Width="75">
-              <ComboBoxItem Content="100%" />
-              <ComboBoxItem Content="75%" />
-              <ComboBoxItem Content="50%" />
-              <ComboBoxItem Content="25%" />
-            </ComboBox>
-            <Button Name="SerialApplyBrightness" Content="Apply" IsEnabled="False" />
-          </StackPanel>
-          <Button Name="SerialClear" Content="Clear serial display" HorizontalAlignment="Left" IsEnabled="False" />
-          <TextBlock Name="SerialStatus" Text="Serial display disconnected; fan control unavailable." TextWrapping="Wrap" />
-          <Button Name="VirtualConnect" Content="Connect virtual LIS2" HorizontalAlignment="Left" />
-          <Button Name="VirtualDisconnect" Content="Disconnect" IsEnabled="False" HorizontalAlignment="Left" />
+          <TextBlock Name="TransportSummaryText" Text="Virtual LIS2" TextWrapping="Wrap" Margin="4,0,0,4" />
+          <TextBlock Name="VirtualStatus" Text="Disconnected" TextWrapping="Wrap" Margin="4,0,0,8" />
+          <Button Name="OpenTransportSettings" Content="Change..." HorizontalAlignment="Left" MinWidth="110" />
         </StackPanel>
         <StackPanel Grid.Row="2" Margin="4,12,0,10" Spacing="7">
           <Separator />
@@ -400,6 +375,37 @@
         </Border>
       </StackPanel>
     </ScrollViewer>
+      <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="12"><TextBlock Text="Transport controls" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Experimental serial and virtual transport diagnostics. No hardware fan authorization is implied." TextWrapping="Wrap"/>          <Separator Margin="4,18,4,16" />
+          <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
+
+
+          <Separator Margin="0,12,0,4" />
+          <TextBlock Text="Serial display (experimental)" FontWeight="SemiBold" />
+          <ComboBox Name="SerialPortPicker" MinWidth="180" />
+          <Button Name="SerialRefreshPorts" Content="Refresh serial ports" HorizontalAlignment="Left" />
+          <Button Name="SerialConnect" Content="Connect serial display" HorizontalAlignment="Left" />
+          <Button Name="SerialDisconnect" Content="Disconnect serial" HorizontalAlignment="Left" IsEnabled="False" />
+          <Button Name="SerialSendLines" Content="Send display lines" HorizontalAlignment="Left" IsEnabled="False" />
+          <Button Name="SerialPlaybackStart" Content="Start serial page sequence" HorizontalAlignment="Left" IsEnabled="False" />
+          <Button Name="SerialPlaybackStop" Content="Stop serial page sequence" HorizontalAlignment="Left" IsEnabled="False" />
+          <TextBlock Name="SerialPlaybackStatus" Text="Serial sequence stopped" TextWrapping="Wrap" />
+          <Button Name="SerialSendPage" Content="Send selected page" HorizontalAlignment="Left" IsEnabled="False" />
+          <Button Name="SerialSendGlyphs" Content="Program 8 glyphs" HorizontalAlignment="Left" IsEnabled="False" />
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBlock Text="Brightness" VerticalAlignment="Center" />
+            <ComboBox Name="SerialBrightness" SelectedIndex="0" Width="75">
+              <ComboBoxItem Content="100%" />
+              <ComboBoxItem Content="75%" />
+              <ComboBoxItem Content="50%" />
+              <ComboBoxItem Content="25%" />
+            </ComboBox>
+            <Button Name="SerialApplyBrightness" Content="Apply" IsEnabled="False" />
+          </StackPanel>
+          <Button Name="SerialClear" Content="Clear serial display" HorizontalAlignment="Left" IsEnabled="False" />
+          <TextBlock Name="SerialStatus" Text="Serial display disconnected; fan control unavailable." TextWrapping="Wrap" />
+          <Button Name="VirtualConnect" Content="Connect virtual LIS2" HorizontalAlignment="Left" />
+          <Button Name="VirtualDisconnect" Content="Disconnect" IsEnabled="False" HorizontalAlignment="Left" />
+      </StackPanel></ScrollViewer>
     </Grid>
   </Grid>
 </Window>

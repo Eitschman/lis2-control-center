@@ -14,9 +14,12 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        var navigation = this.FindControl<ListBox>("Navigation");
-        if (navigation is not null)
-            navigation.SelectionChanged += OnNavigationChanged;
+        for (var i = 0; i < SectionNames.Length; i++)
+        {
+            var index = i;
+            this.FindControl<Button>($"NavButton{index}")!.Click += (_, _) => NavigateTo(index);
+        }
+        this.FindControl<Button>("OpenTransportSettings")!.Click += (_, _) => NavigateTo(7);
 
         this.FindControl<Button>("VirtualConnect")!.Click += async (_, _) =>
             await RunVirtualActionAsync(ConnectWithGlyphsAsync);
@@ -187,23 +190,25 @@ public partial class MainWindow : Window
                 : "State available when Virtual transport is active.";
     }
 
+    private static readonly string[] SectionNames = { "Dashboard", "Display", "Pages", "Media", "Events", "Hardware", "Fan Control", "Settings", "Diagnostics", "Home Assistant" };
+    private int _selectedSection;
+
     private void NavigateTo(int index)
     {
-        var navigation = this.FindControl<ListBox>("Navigation");
-        if (navigation is not null)
-            navigation.SelectedIndex = index;
-    }
-
-    private void OnNavigationChanged(object? sender, SelectionChangedEventArgs e) =>
+        if (index < 0 || index >= SectionNames.Length) return;
+        _selectedSection = index;
         UpdateSection();
+    }
 
     private void UpdateSection()
     {
-        if (this.FindControl<ListBox>("Navigation") is not { SelectedItem: ListBoxItem item })
-            return;
-
-        var rawLabel = item.Content?.ToString() ?? "Dashboard";
-        var section = rawLabel.Length > 5 ? rawLabel[5..].Trim() : rawLabel;
+        var section = SectionNames[_selectedSection];
+        for (var i = 0; i < SectionNames.Length; i++)
+        {
+            var button = this.FindControl<Button>($"NavButton{i}")!;
+            button.Background = i == _selectedSection ? new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#354351")) : Avalonia.Media.Brushes.Transparent;
+            button.FontWeight = i == _selectedSection ? Avalonia.Media.FontWeight.SemiBold : Avalonia.Media.FontWeight.Normal;
+        }
         var title = this.FindControl<TextBlock>("SectionTitle");
         var description = this.FindControl<TextBlock>("SectionDescription");
 
@@ -214,6 +219,7 @@ public partial class MainWindow : Window
         this.FindControl<ScrollViewer>("DisplayView")!.IsVisible = section == "Display";
         this.FindControl<ScrollViewer>("PagesView")!.IsVisible = section == "Pages";
         this.FindControl<ScrollViewer>("FanControlView")!.IsVisible = section == "Fan Control";
+        this.FindControl<ScrollViewer>("SettingsView")!.IsVisible = section == "Settings";
 
         if (description is not null)
             description.Text = section == "Dashboard"
@@ -222,6 +228,8 @@ public partial class MainWindow : Window
                     ? "Quick display tests, custom characters and brightness."
                 : section == "Pages"
                     ? "Manage display pages, templates, conditions and live preview."
+                    : section == "Settings"
+                    ? "Configure transport and inspect experimental connection controls."
                     : section == "Fan Control"
                     ? "Configure four fan channels and test the regulation in a safe simulation."
                     : $"{section} is not connected to the LIS2 runtime yet.";
