@@ -365,3 +365,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Owner confirmed ARM64 preview starts on Raspberry Pi 5 KDE/Wayland. Screenshot exposed too-tall minimum window, dark-on-dark sidebar/navigation and status text, and footer overlapping transport controls.
 - Reduced default/minimum window geometry to 1200x700 / 850x480, placed sidebar navigation/transport inside a vertically scrolling region with a separate footer, explicitly set light foreground on sidebar/navigation and connection badge, and removed inert help/GitHub/About affordances in favor of a passive preview label. This is a source-based corrective package; new ARM64 screenshot acceptance is pending and no hardware/fan behavior changes.
 - CI pending on this HEAD. Existing package workflow continues publishing self-contained ARM64/x64 previews.
+
+## Chrome warning on Actions ZIP preview (2026-10-14)
+- Owner reports Chrome flags the GitHub Actions auto-generated artifact ZIP for linux-arm64 as dangerous. The exact Safe Browsing verdict is unknown; a green build is not evidence of browser reputation. No security feature was disabled and no GitHub Release was created.
+- Preview packaging changed from self-extracting single-file bundles to conventional untrimmed self-contained multi-file .NET publish for linux-arm64/linux-x64/win-x64. Linux tar.gz and Windows ZIP now include SHA256 checksum files in the Actions artifact; Linux checksum is verified in CI. Artifact download still has GitHub's outer ZIP wrapper, which cannot be disabled with upload-artifact. Chrome warning resolution remains unverified pending owner download test.
+- Prior Pi shell CI repair 2f092cc passed all seven jobs; current packaging CI pending.
