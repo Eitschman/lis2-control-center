@@ -425,3 +425,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## Hardware template values (2026-10-14)
 - User test: `Temp {Hardware.cpu_thermal.Temperature.temp1}` rendered only `Temp` although Hardware view detected sensors. Cause: hardware snapshot was not merged into PageSourceValues used by preview and PageSequenceController. Now update the page source snapshot on hardware refresh and clear stale values on failure; refresh variable picker. Real Pi test and CI pending.
+
+## Continuous hardware sampling (2026-10-14)
+- Hardware snapshot timer now starts during initialization and samples every two seconds regardless of selected menu, supplying PageSourceValues for virtual/serial template rendering. The Hardware live-updates button controls only list refreshing, not the sampling pipeline. The timer is stopped during window shutdown. WPF hardware-view timer is view-gated, but WPF hardware source updates are separately owned by the source runtime; Avalonia uses the existing cross-platform live sensor adapter. CI and real Pi verification pending.

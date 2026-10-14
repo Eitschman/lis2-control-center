@@ -9,7 +9,9 @@ public partial class MainWindow
     private readonly List<PortableHardwareSensorPreference> _hardwarePreferences = new();
     private bool _hardwareListRebinding;
     private string? _hardwareSourceError;
+    // Hardware values feed display templates even when the Hardware view is not selected.
     private readonly DispatcherTimer _hardwareRefreshTimer = new() { Interval = TimeSpan.FromSeconds(2) };
+    private bool _hardwareListLiveUpdates;
 
     private void InitializeHardwareBrowser()
     {
@@ -17,15 +19,12 @@ public partial class MainWindow
         _hardwareRefreshTimer.Tick += (_, _) => RefreshHardwareSensors();
         this.FindControl<Button>("HardwareAutoRefresh")!.Click += (_, _) =>
         {
-            if (_hardwareRefreshTimer.IsEnabled)
-                _hardwareRefreshTimer.Stop();
-            else
-            {
-                RefreshHardwareSensors();
-                _hardwareRefreshTimer.Start();
-            }
+            // The button controls Hardware-view live updates, not the sensor
+            // sampling required by page templates throughout the application.
+            _hardwareListLiveUpdates = !_hardwareListLiveUpdates;
+            if (_hardwareListLiveUpdates) RefreshHardwareSensors();
             this.FindControl<Button>("HardwareAutoRefresh")!.Content =
-                _hardwareRefreshTimer.IsEnabled ? "Stop live updates" : "Start live updates";
+                _hardwareListLiveUpdates ? "Stop live updates" : "Start live updates";
         };
         this.FindControl<TextBox>("HardwareSearch")!.TextChanged += (_, _) => FilterHardwareSensors();
         this.FindControl<ComboBox>("HardwareTypeFilter")!.SelectionChanged += (_, _) => FilterHardwareSensors();
@@ -107,6 +106,7 @@ public partial class MainWindow
             };
         }
         RefreshHardwareSensors();
+        _hardwareRefreshTimer.Start();
     }
 
     private void SetHardwareFanAssignmentEnabled(bool enabled)
@@ -139,7 +139,7 @@ public partial class MainWindow
             _pageSources.UpdateHardware(_hardwareSensors);
             RefreshPageVariables();
             _hardwareSourceError = null;
-            FilterHardwareSensors();
+            if (_hardwareListLiveUpdates || _selectedSection == 5) FilterHardwareSensors();
         }
         catch (Exception ex)
         {
@@ -147,7 +147,7 @@ public partial class MainWindow
             _pageSources.UpdateHardware(_hardwareSensors);
             RefreshPageVariables();
             _hardwareSourceError = ex.Message;
-            FilterHardwareSensors();
+            if (_hardwareListLiveUpdates || _selectedSection == 5) FilterHardwareSensors();
         }
     }
 
