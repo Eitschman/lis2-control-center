@@ -392,3 +392,6 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## WPF tab placement regression identified (2026-10-14)
 
 Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, entity/domain filtering, alias/favorites and attribute/page actions. WPF Pages has no HA connection setup. Avalonia currently embeds HA configuration in Pages and lacks HomeAssistantView. Detailed blocking gap recorded in audit and PRP; implementation remains outstanding.
+
+## All-ten-menu WPF placement review (2026-10-14)
+- Verified WPF tab headings/actions against Avalonia XAML. Besides HA connection wrongly under Pages, Pages also has non-WPF Windows settings import and playback actions; Fan Control uses additional experimental sections instead of WPF Fan Outputs/Channels; Settings lacks WPF Appearance/Windows startup group; Diagnostics lacks WPF's four-section layout; Media, Events and Home Assistant views are absent. Dashboard/Display/Hardware have similar major sections but require semantic parity review. Findings and corrective requirements recorded in parity audit. No application code changes in this review.

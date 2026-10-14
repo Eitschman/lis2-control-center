@@ -253,3 +253,6 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 ## WPF per-menu ownership is mandatory (2026-10-14)
 
 Owner explicitly requires WPF-equivalent location and behavior for every menu, no extra or relocated functionality. Detailed HA/Pages/Settings ownership and existing Avalonia violation documented in docs/prp/wpf-avalonia-parity-audit.md. HA connection and entity management must be under a WPF-equivalent HomeAssistantView, not Pages. This update is documentation, not an implementation fix.
+
+## WPF layout ownership audit for all ten menus (2026-10-14)
+- Verified WPF card/section ownership against Avalonia XAML for Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics and Home Assistant. Per-tab grouping matrix and required corrections in docs/prp/wpf-avalonia-parity-audit.md. Do not implement new features until incorrect placements are corrected or explicitly tracked. Source-level review only; no UI acceptance.
