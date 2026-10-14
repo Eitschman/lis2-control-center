@@ -46,7 +46,27 @@ public sealed class HardwareSensorCatalogTests
         var rows = HardwareSensorCatalog.Build(
             new Dictionary<string, object?> { ["Hardware.CPU.Temperature.Core"] = "bad" },
             Array.Empty<PortableHardwareSensorPreference>());
+        Assert.Empty(rows);
+    }
+
+    [Fact]
+    public void NonNumericTrackedSensorRemainsUnavailable()
+    {
+        const string key = "Hardware.CPU.Temperature.Core";
+        var rows = HardwareSensorCatalog.Build(new Dictionary<string, object?> { [key] = "bad" },
+            Array.Empty<PortableHardwareSensorPreference>(), trackedKeys: new[] { key });
         Assert.False(Assert.Single(rows).IsAvailable);
+    }
+
+    [Fact]
+    public void SearchMatchesHardwareSensorNameAndType()
+    {
+        var snapshot = new Dictionary<string, object?> { ["Hardware.GraphicsCard.Temperature.HotSpot"] = 80d };
+        var prefs = Array.Empty<PortableHardwareSensorPreference>();
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, prefs, search: "graphics"));
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, prefs, search: "hotspot"));
+        Assert.Single(HardwareSensorCatalog.Build(snapshot, prefs, search: "temperature"));
+        Assert.Empty(HardwareSensorCatalog.Build(snapshot, prefs, search: "memory"));
     }
 
     [Fact]

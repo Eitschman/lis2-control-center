@@ -12,7 +12,8 @@ public static class HardwareSensorCatalog
             .ToDictionary(g => g.Key, g => g.Last(), StringComparer.OrdinalIgnoreCase);
         var current = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
         foreach (var pair in snapshot) current[pair.Key] = pair.Value;
-        var keys = new HashSet<string>(current.Keys.Where(IsSensorKey), StringComparer.OrdinalIgnoreCase);
+        var keys = new HashSet<string>(current.Where(pair => IsSensorKey(pair.Key) && IsNumeric(pair.Value))
+            .Select(pair => pair.Key), StringComparer.OrdinalIgnoreCase);
         keys.UnionWith(saved.Keys.Where(IsSensorKey));
         if (trackedKeys is not null) keys.UnionWith(trackedKeys.Where(IsSensorKey));
         var filter = search?.Trim() ?? "";
@@ -27,7 +28,11 @@ public static class HardwareSensorCatalog
             })
             .Where(entry => MatchesType(entry, typeFilter) && (!favoritesOnly || entry.IsFavorite) &&
                 (entry.Key.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
-                 entry.Alias.Contains(filter, StringComparison.OrdinalIgnoreCase)))
+                 entry.Alias.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
+                 entry.HardwareName.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
+                 entry.SensorName.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
+                 entry.DisplayName.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
+                 entry.SensorType.Contains(filter, StringComparison.OrdinalIgnoreCase)))
             .OrderByDescending(entry => entry.IsFavorite)
             .ThenBy(entry => entry.Key, StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -101,6 +106,9 @@ public sealed record HardwareSensorEntry(string Key, object? Value, string Alias
         {
             result.Add(new HardwareSensorGroupHeader(group.Key));
             result.AddRange(group.OrderByDescending(entry => entry.IsFavorite)
+                .ThenByDescending(entry => entry.IsAvailable)
+                .ThenBy(entry => entry.SensorType, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(entry => entry.DisplayName, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(entry => entry.Key, StringComparer.OrdinalIgnoreCase));
         }
         return result;
