@@ -20,6 +20,28 @@ public sealed class HardwareSensorCatalogTests
     }
 
     [Fact]
+    public void InvalidAndNonfiniteSensorValuesDoNotBecomeAvailable()
+    {
+        var snapshot = new Dictionary<string, object?>
+        {
+            ["Hardware.CPU.Temperature.NaN"] = double.NaN,
+            ["Hardware.CPU.Temperature.PositiveInfinity"] = double.PositiveInfinity,
+            ["Hardware.CPU.Temperature.NegativeInfinity"] = double.NegativeInfinity,
+            ["Hardware.CPU.Temperature.Invalid"] = "broken",
+            ["Hardware.CPU.Temperature.Valid"] = 40d
+        };
+        var tracked = snapshot.Keys.ToArray();
+        var entries = HardwareSensorCatalog.Build(snapshot,
+            Array.Empty<PortableHardwareSensorPreference>(), trackedKeys: tracked);
+        Assert.Equal(5, entries.Count);
+        Assert.Single(entries.Where(entry => entry.IsAvailable));
+        Assert.All(entries.Where(entry => entry.Key != "Hardware.CPU.Temperature.Valid"),
+            entry => Assert.False(entry.IsAvailable));
+        Assert.Single(HardwareSensorCatalog.Build(snapshot,
+            Array.Empty<PortableHardwareSensorPreference>()));
+    }
+
+    [Fact]
     public void SelectedSensorDetailsMatchWpfSelectionPanel()
     {
         var available = new HardwareSensorEntry("Hardware.CPU.Temperature.Package", 45d,

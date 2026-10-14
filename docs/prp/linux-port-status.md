@@ -344,3 +344,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware selected-sensor detail panel (2026-10-14)
 - Restored WPF's selected-sensor detail readout in Avalonia: selected display name, current value with unit or unavailable state, and the exact stable template key. Details refresh with the sensor list, clear on deselection and follow alias/favorite edits; selection is read-only and never sends device commands.
 - Added headless projection regressions, wired selection and refresh handling, and added the view element. Current HEAD CI pending; desktop visual acceptance deferred.
+
+## Hardware sensor invalid-value isolation (2026-10-14)
+- Prevented NaN and positive/negative infinity from appearing as live available hardware sensors. Such values are omitted from untracked discovery, but tracked references remain explicitly unavailable, preserving fan/editor and page reference visibility. Malformed nonnumeric values behave identically. No physical fan writes are affected.
+- Added headless regression coverage for NaN, infinities, malformed values, and valid numeric snapshots. CI pending for current HEAD; manual desktop checks deferred.

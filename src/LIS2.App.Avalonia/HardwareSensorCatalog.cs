@@ -58,7 +58,7 @@ public static class HardwareSensorCatalog
 
     private static bool IsNumeric(object? value) =>
         value is not null && double.TryParse(Convert.ToString(value, CultureInfo.InvariantCulture),
-            NumberStyles.Float, CultureInfo.InvariantCulture, out _);
+            NumberStyles.Float, CultureInfo.InvariantCulture, out var number) && double.IsFinite(number);
 
     public static IReadOnlyList<string> ExtractTrackedKeys(IEnumerable<string?> templates,
         IEnumerable<string?> fanSensorKeys)
