@@ -42,6 +42,9 @@ public partial class MainWindow
             LoadGlyphEditor();
         }
         _haPreferences = saved.HomeAssistantEntityPreferences.ToList();
+        _hardwarePreferences.Clear();
+        _hardwarePreferences.AddRange(saved.HardwareSensorPreferences.Where(p => !string.IsNullOrWhiteSpace(p.Key)));
+        FilterHardwareSensors();
         _preferredBrightness = saved.BrightnessPercent;
         _preferredTheme = saved.ThemeMode;
         _preferredLanguage = saved.LanguageMode;
@@ -62,6 +65,10 @@ public partial class MainWindow
         CustomGlyphs = _glyphs.Glyphs.Select(g => new CustomGlyphSettings
         {
             Name = g.Name, Rows = g.Rows.ToArray()
+        }).ToList(),
+        HardwareSensorPreferences = _hardwarePreferences.Select(p => new PortableHardwareSensorPreference
+        {
+            Key = p.Key, Alias = p.Alias, IsFavorite = p.IsFavorite
         }).ToList(),
         HomeAssistantEntityPreferences = _haPreferences.Select(p => new PortableHaEntityPreference
         {

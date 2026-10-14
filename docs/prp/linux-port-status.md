@@ -220,3 +220,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Added a dedicated Avalonia Hardware view with read-only platform sensor discovery, key filtering, snapshot refresh and selected-key transfer into the current fan editor.
 - Assignment does not persist automatically or authorize physical fan output; the user must explicitly save fan configuration.
 - This is a first functional Hardware slice, not WPF Hardware-screen parity (aliases, favorites, availability, live updates, grouping and visual QA remain open).
+
+## Hardware sensor preferences (2026-10-14)
+- Added editable aliases, favorite flags and favorites-only filtering to Avalonia Hardware sensor browser.
+- Preferences persist in the non-secret portable workspace and are loaded with backward-compatible empty defaults; selected sensor assignment remains explicit and non-activating.
+- Remaining: WPF hardware grouping/availability/live polling parity, automated UI testing and real-device verification. CI validation pending on commit.

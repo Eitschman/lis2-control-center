@@ -26,6 +26,7 @@ public sealed class PortableWorkspaceStore
             result.Pages ??= new List<PageDefinition>();
             result.CustomGlyphs ??= new List<CustomGlyphSettings>();
             result.HomeAssistantEntityPreferences ??= new List<PortableHaEntityPreference>();
+            result.HardwareSensorPreferences ??= new List<PortableHardwareSensorPreference>();
             result.HomeAssistantUrl ??= string.Empty;
             result.Fans = PortableFanSettings.Normalize(result.Fans);
             return result;
@@ -61,8 +62,16 @@ public sealed class PortableWorkspace
     public string HomeAssistantUrl { get; set; } = string.Empty;
     public List<CustomGlyphSettings> CustomGlyphs { get; set; } = new();
     public List<PortableHaEntityPreference> HomeAssistantEntityPreferences { get; set; } = new();
+    public List<PortableHardwareSensorPreference> HardwareSensorPreferences { get; set; } = new();
     public int BrightnessPercent { get; set; } = 100;
     public bool ProgramCustomGlyphsOnConnect { get; set; }
     public string ThemeMode { get; set; } = "System";
     public string LanguageMode { get; set; } = "System";
+}
+
+public sealed class PortableHardwareSensorPreference
+{
+    public string Key { get; set; } = string.Empty;
+    public string Alias { get; set; } = string.Empty;
+    public bool IsFavorite { get; set; }
 }

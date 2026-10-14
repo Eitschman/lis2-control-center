@@ -383,7 +383,13 @@
             <Button Name="HardwareRefresh" Content="Refresh sensors" />
             <TextBox Name="HardwareSearch" Width="300" Watermark="Filter sensor keys" />
           </StackPanel>
+          <CheckBox Name="HardwareFavoritesOnly" Content="Favorites only" />
           <ListBox Name="HardwareSensorList" MinHeight="260" MaxHeight="450" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBox Name="HardwareAlias" Width="260" Watermark="Alias for selected sensor" />
+            <CheckBox Name="HardwareFavorite" Content="Favorite" VerticalAlignment="Center" />
+            <Button Name="HardwareSavePreference" Content="Save sensor preference" />
+          </StackPanel>
           <TextBlock Name="HardwareSensorStatus" Text="Refresh to discover available sensors." TextWrapping="Wrap" />
           <Button Name="HardwareUseForFan" Content="Use selected sensor for current fan channel" HorizontalAlignment="Left" IsEnabled="False" />
           <TextBlock Text="Sensor assignment updates the fan editor but is not saved until you explicitly save fan configuration. Physical fan output remains disabled unless separately authorized." TextWrapping="Wrap" />
