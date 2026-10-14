@@ -1,5 +1,6 @@
 using System.Globalization;
 using Avalonia.Controls;
+using Avalonia.Threading;
 
 namespace LIS2.App.Avalonia;
 
@@ -7,10 +8,24 @@ public partial class MainWindow
 {
     private readonly List<KeyValuePair<string, object?>> _hardwareSensors = new();
     private readonly List<PortableHardwareSensorPreference> _hardwarePreferences = new();
+    private readonly DispatcherTimer _hardwareRefreshTimer = new() { Interval = TimeSpan.FromSeconds(2) };
 
     private void InitializeHardwareBrowser()
     {
         this.FindControl<Button>("HardwareRefresh")!.Click += (_, _) => RefreshHardwareSensors();
+        _hardwareRefreshTimer.Tick += (_, _) => RefreshHardwareSensors();
+        this.FindControl<Button>("HardwareAutoRefresh")!.Click += (_, _) =>
+        {
+            if (_hardwareRefreshTimer.IsEnabled)
+                _hardwareRefreshTimer.Stop();
+            else
+            {
+                RefreshHardwareSensors();
+                _hardwareRefreshTimer.Start();
+            }
+            this.FindControl<Button>("HardwareAutoRefresh")!.Content =
+                _hardwareRefreshTimer.IsEnabled ? "Stop live updates" : "Start live updates";
+        };
         this.FindControl<TextBox>("HardwareSearch")!.TextChanged += (_, _) => FilterHardwareSensors();
         this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsCheckedChanged += (_, _) => FilterHardwareSensors();
         this.FindControl<Button>("HardwareSavePreference")!.Click += async (_, _) =>
@@ -86,7 +101,7 @@ public partial class MainWindow
         list.ItemsSource = options;
         if (previousKey is not null)
             list.SelectedItem = options.FirstOrDefault(option => option.Key == previousKey);
-        this.FindControl<Button>("HardwareUseForFan")!.IsEnabled = false;
+        this.FindControl<Button>("HardwareUseForFan")!.IsEnabled = list.SelectedItem is HardwareSensorOption;
         this.FindControl<TextBlock>("HardwareSensorStatus")!.Text =
             $"{options.Count} of {_hardwareSensors.Count} temperature sensor keys shown. Select one to assign it.";
     }

@@ -224,4 +224,9 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware sensor preferences (2026-10-14)
 - Added editable aliases, favorite flags and favorites-only filtering to Avalonia Hardware sensor browser.
 - Preferences persist in the non-secret portable workspace and are loaded with backward-compatible empty defaults; selected sensor assignment remains explicit and non-activating.
-- Remaining: WPF hardware grouping/availability/live polling parity, automated UI testing and real-device verification. CI validation pending on commit.
+- Remaining: WPF hardware grouping/availability/live polling parity, automated UI testing and real-device verification. CI validation: commit `7cbae9a` passed all four Windows/Ubuntu jobs (run `38519777968`).
+
+## Hardware live snapshot refresh (2026-10-14)
+- Hardware sensor browser now offers explicit 2-second live snapshot refresh, stop/start controls, and stops its UI timer during window shutdown.
+- Existing alias/favorite filtering and selection are retained across refreshes by stable sensor key. No serial writes or physical fan activation.
+- Remaining WPF parity: sensor grouping/availability, full hardware source coverage and desktop visual/interaction verification. CI for this commit is pending.

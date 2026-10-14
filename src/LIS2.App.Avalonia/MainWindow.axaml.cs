@@ -79,6 +79,7 @@ public partial class MainWindow : Window
     private async void OnWindowClosed(object? sender, EventArgs e)
     {
         StopPagePlayback();
+        _hardwareRefreshTimer.Stop();
         StopHomeAssistantUi();
         await _pageTimer.StopAndDrainAsync();
         await _serialPlaybackTimer.StopAndDrainAsync();
