@@ -249,3 +249,7 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 
 ## Source-level all-menu functional traceability (2026-10-14)
 - `docs/prp/wpf-avalonia-parity-audit.md` now traces every named WPF control (126) and XAML-declared tab event handler (71 tab-scoped occurrences) to Avalonia UI/code evidence, or explicitly records no reliable mapping. Each handler row records actual calls found in WPF code-behind. WPF remains authoritative. UI-name evidence is not functional equivalence. Full dynamic/background/implicit semantic audit and automated parity tests remain open; no tab marked complete solely on this traceability.
+
+## WPF per-menu ownership is mandatory (2026-10-14)
+
+Owner explicitly requires WPF-equivalent location and behavior for every menu, no extra or relocated functionality. Detailed HA/Pages/Settings ownership and existing Avalonia violation documented in docs/prp/wpf-avalonia-parity-audit.md. HA connection and entity management must be under a WPF-equivalent HomeAssistantView, not Pages. This update is documentation, not an implementation fix.

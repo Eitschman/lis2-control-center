@@ -330,3 +330,17 @@ WPF: Enable, URL, Token, Test/Save, Entity-/Domain-Filter, Detail, Alias/Favorit
 - Tests: automatisierte Windows-/Linux-Paritätstests und CI; keine Hardware verfügbar; manuelle Desktop-Endabnahme erst nach vollständiger Portierung.
 
 **Offener Befund:** Die 126 benannten Controls und 71 pro Tab referenzierten Handler sind erfasst; ein vollständiger semantischer 1:1-Funktionsabgleich aller dynamischen und impliziten WPF-Codepfade ist damit **noch nicht abgeschlossen**. Fehlende Views: Media, Events, Home Assistant. Keine erfundenen Funktionen implementieren.
+
+## WPF-authoritative tab ownership: Home Assistant versus Pages (2026-10-14)
+
+Owner requirement: every Avalonia menu must contain exactly the functions and controls owned by its WPF TabItem, with equivalent behavior. No extra functions, no moving source configuration into the Pages editor.
+
+WPF Home Assistant / Connection: HomeAssistantEnabledCheckBox; HomeAssistantUrlTextBox; HomeAssistantTokenPasswordBox; Test connection; Save / reconnect. WPF does NOT expose separate Connect HA and Disconnect HA actions here.
+
+WPF Home Assistant / Entity browser: HomeAssistantSearchTextBox; HomeAssistantDomainComboBox; HomeAssistantStatusText; HomeAssistantEntitiesListBox with favorite, entity, domain, state, template key; HomeAssistantDetailBorder; SelectedHomeAssistantEntityText; HomeAssistantAliasTextBox; HomeAssistantFavoriteCheckBox; entity save/copy/create-page actions. HomeAssistantAttributesListBox with attribute copy/create-page actions. WPF double-click copies entity/attribute keys.
+
+WPF Pages: presets, page CRUD/reorder, editor, visibility builder, overflow, scroll timing, live preview, save and event test. NO Home Assistant connection configuration. WPF Settings: transport, theme/language, startup; NO HA connection configuration.
+
+Avalonia defect: HaUrl, HaToken, HaConnect, HaDisconnect, HaTest, HaStatus, HaEntityFilter, HaEntityPicker, HaInsertLine1, HaInsertLine2 are currently inside PagesView. HomeAssistantView does not exist. These are not HA-tab parity. Replace the misplaced inline setup with a complete WPF-equivalent HA tab; do not simply move controls and declare completion. Every other tab requires the same parent-tab ownership audit, defaults, labels, validation, persistence and handler semantics.
+
+Status: verified placement requirements only; implementation NOT yet corrected. Safety restrictions and final deferred manual desktop testing remain in force.
