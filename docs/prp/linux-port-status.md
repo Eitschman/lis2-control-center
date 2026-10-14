@@ -401,3 +401,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## HA navigation startup defect fixed (2026-10-14)
 - After HA controls moved, InitializeHomeAssistant still attempted to bind a removed HaDisconnect button, causing a null dereference at startup. Removed the obsolete binding and made Save/reconnect respect the WPF Enable Home Assistant checkbox. This is a partial correction, not full HA feature parity. CI pending.
+
+## HA WPF UI group correction continued (2026-10-14)
+- Added WPF-named entity-detail and Attributes UI group controls in HomeAssistantView, plus domain selector. Their WPF action semantics are not yet implemented; UI scaffolding is not feature parity. CI pending.

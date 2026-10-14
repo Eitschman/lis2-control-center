@@ -316,9 +316,16 @@
             <StackPanel Orientation="Horizontal" Spacing="8">
               <TextBox Name="HaEntityFilter" Width="240" Watermark="Search entity ID, friendly name or alias" />
               <ComboBox Name="HaEntityPicker" Width="370" />
+              <ComboBox Name="HaDomainFilter" Width="140" />
             </StackPanel>
             <TextBlock Name="HaStatus" Text="Not configured" TextWrapping="Wrap" />
             <TextBlock Text="Selected entity" FontWeight="SemiBold" />
+            <TextBlock Name="HaSelectedEntity" Text="Select an entity above." />
+            <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="Alias" VerticalAlignment="Center" /><TextBox Name="HaAlias" Width="220" /><CheckBox Name="HaFavorite" Content="Favorite" /><Button Name="HaSaveEntity" Content="Save entity" /></StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8"><Button Name="HaCopyKey" Content="Copy key" /><Button Name="HaCreatePage" Content="Create display page" /></StackPanel>
+            <TextBlock Text="Attributes" FontWeight="SemiBold" />
+            <ListBox Name="HaAttributes" Height="150" />
+            <StackPanel Orientation="Horizontal" Spacing="8"><Button Name="HaCopyAttributeKey" Content="Copy key" /><Button Name="HaCreateAttributePage" Content="Create attribute page" /></StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8">
               <Button Name="HaInsertLine1" Content="Insert state into line 1" />
               <Button Name="HaInsertLine2" Content="Insert state into line 2" />
