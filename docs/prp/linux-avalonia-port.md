@@ -235,3 +235,6 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 
 ## Preview artifact download warning (2026-10-14)
 - Chrome classified the automatically wrapped GitHub Actions linux-arm64 artifact ZIP as dangerous. CI now packages a conventional self-contained, untrimmed multi-file application rather than a self-extracting single-file binary and provides SHA256 checksums. The outer Actions ZIP remains platform-generated; Chrome acceptance is not guaranteed and requires a new user download attempt. No release/tag, main branch changes, or security bypass. See linux-port-status.md for CI outcome.
+
+## Dashboard transport parity package (2026-10-14)
+- Dashboard can now connect/disconnect the existing virtual LIS2 session directly; synchronized enabled states and explicit hardware-free disconnected guidance reduce the dead-end visible on the Pi 5 first-launch screenshot. Automated presentation tests added; CI and final UI acceptance pending. Does not enable physical fan outputs.

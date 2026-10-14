@@ -370,3 +370,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Owner reports Chrome flags the GitHub Actions auto-generated artifact ZIP for linux-arm64 as dangerous. The exact Safe Browsing verdict is unknown; a green build is not evidence of browser reputation. No security feature was disabled and no GitHub Release was created.
 - Preview packaging changed from self-extracting single-file bundles to conventional untrimmed self-contained multi-file .NET publish for linux-arm64/linux-x64/win-x64. Linux tar.gz and Windows ZIP now include SHA256 checksum files in the Actions artifact; Linux checksum is verified in CI. Artifact download still has GitHub's outer ZIP wrapper, which cannot be disabled with upload-artifact. Chrome warning resolution remains unverified pending owner download test.
 - Prior Pi shell CI repair 2f092cc passed all seven jobs; current packaging CI pending.
+
+## Pi 5 dashboard virtual connection flow (2026-10-14)
+- Pi 5 preview screenshot confirms window sizing, contrast and sidebar overlap significantly improved. Final WPF parity and full desktop acceptance remain pending.
+- Dashboard System Status now exposes explicit Connect virtual LIS2 / Disconnect controls using the existing glyph-aware virtual connection and existing safe disconnect logic. Buttons share the same busy/playback gating as Settings transport controls, and display state/command count comes from a tested pure presentation helper. No serial or physical fan commands added.
+- Added headless tests for connected/disconnected virtual dashboard presentation. CI pending for this commit; no new manual desktop acceptance required.

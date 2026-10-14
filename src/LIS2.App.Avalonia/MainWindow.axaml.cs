@@ -30,6 +30,10 @@ public partial class MainWindow : Window
 
         this.FindControl<Button>("OpenDisplayControls")!.Click += (_, _) => NavigateTo(1);
         this.FindControl<Button>("OpenFanControl")!.Click += (_, _) => NavigateTo(6);
+        this.FindControl<Button>("DashboardConnectVirtual")!.Click += async (_, _) =>
+            await RunVirtualActionAsync(ConnectWithGlyphsAsync);
+        this.FindControl<Button>("DashboardDisconnectVirtual")!.Click += async (_, _) =>
+            await RunVirtualActionAsync(async () => { StopPagePlayback(); await _virtualDevice.DisconnectAsync(); });
 
         this.FindControl<Button>("SendLine1")!.Click += async (_, _) =>
             await RunVirtualActionAsync(() => _virtualDevice.WriteLineAsync(1, this.FindControl<TextBox>("Line1TextBox")!.Text ?? ""));
@@ -179,18 +183,18 @@ public partial class MainWindow : Window
         this.FindControl<Button>("VirtualConnect")!.IsEnabled = !_busy && !playbackBusy && !connected;
         this.FindControl<Button>("VirtualDemo")!.IsEnabled = !_busy && !playbackBusy && !playbackRunning && connected;
         this.FindControl<Button>("VirtualDisconnect")!.IsEnabled = !_busy && !playbackBusy && connected;
+        this.FindControl<Button>("DashboardConnectVirtual")!.IsEnabled = !_busy && !playbackBusy && !connected;
+        this.FindControl<Button>("DashboardDisconnectVirtual")!.IsEnabled = !_busy && !playbackBusy && connected;
         foreach (var name in new[] { "SendLine1", "SendLine2", "RenderBoth", "ClearDisplay",
                                     "Brightness100", "Brightness75", "Brightness50", "Brightness25",
                                     "SendSpecialCharacterTest", "SendCharacterRomRange", "SendGlyphSlot", "SendAllGlyphs" })
             this.FindControl<Button>(name)!.IsEnabled = !_busy && !playbackBusy && !playbackRunning && connected;
         var badge = this.FindControl<TextBlock>("ConnectionText");
         if (badge is not null)
-            badge.Text = connected ? "Connected (Virtual)" : "Disconnected";
+            badge.Text = DashboardConnectionState.Badge(connected);
         var virtualState = this.FindControl<TextBlock>("VirtualStateText");
         if (virtualState is not null)
-            virtualState.Text = connected
-                ? $"Virtual LIS2 connected. Commands: {_virtualDevice.CommandCount}."
-                : "State available when Virtual transport is active.";
+            virtualState.Text = DashboardConnectionState.Description(connected, _virtualDevice.CommandCount);
     }
 
     private static readonly string[] SectionNames = { "Dashboard", "Display", "Pages", "Media", "Events", "Hardware", "Fan Control", "Settings", "Diagnostics", "Home Assistant" };
