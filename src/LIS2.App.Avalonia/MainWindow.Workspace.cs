@@ -5,6 +5,7 @@ namespace LIS2.App.Avalonia;
 public partial class MainWindow
 {
     private readonly PortableWorkspaceStore _workspaceStore = new();
+    private readonly PortableHaTokenStore _haTokenStore = new();
     private bool _workspaceLoaded;
     private List<PortableHaEntityPreference> _haPreferences = new();
     private int _preferredBrightness = 100;
@@ -36,6 +37,19 @@ public partial class MainWindow
             validation.ImportJson(System.Text.Json.JsonSerializer.Serialize(saved.Pages));
         }
         this.FindControl<TextBox>("HaUrl")!.Text = saved.HomeAssistantUrl;
+        try
+        {
+            var token = _haTokenStore.Load();
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                this.FindControl<TextBox>("HaToken")!.Text = token;
+                this.FindControl<CheckBox>("HaEnabled")!.IsChecked = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            SetVirtualStatus($"Home Assistant credential load failed: {ex.Message}");
+        }
         if (saved.CustomGlyphs.Count == 8)
         {
             _glyphs.Replace(saved.CustomGlyphs);

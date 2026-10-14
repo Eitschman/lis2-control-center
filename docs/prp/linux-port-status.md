@@ -434,3 +434,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## Linux comprehensive system sensors (2026-10-14)
 - Added LinuxSystemSensors combining existing hwmon temperature keys with hwmon fan RPM, /proc/stat CPU utilization (aggregate and per-core delta), CPU cpufreq MHz, /proc/meminfo RAM/swap, /proc/diskstats per-block-device read/write B/s, /proc/net/dev per-interface receive/send B/s, and DriveInfo mounted fixed filesystem capacity/usage. Hardware catalog groups by stable Hardware.<device>.<type>.<metric> keys; template source and continuous sampling reuse the same source. No physical fan outputs authorized. CI and real Pi verification pending.
+
+## HA token persistence (2026-10-14)
+- User reported token lost on restart. Existing workspace intentionally did not persist secrets and Connect cleared token input. Added separate AES-256-GCM encrypted credential storage with owner-only Unix key/ciphertext files; never export token to workspace JSON. Rehydrate token input and enabled flag on load; persist only after successful configure, delete on explicit disable. Security limitation: local key is stored alongside ciphertext (not OS keyring), so compromise of user account defeats protection. CI and Pi restart test pending.

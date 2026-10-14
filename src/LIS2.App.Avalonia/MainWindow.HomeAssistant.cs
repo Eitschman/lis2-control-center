@@ -14,11 +14,16 @@ public partial class MainWindow
         this.FindControl<Button>("HaConnect")!.Click += async (_, _) =>
             await RunHaActionAsync(async () =>
             {
+                var enabled = this.FindControl<CheckBox>("HaEnabled")!.IsChecked == true;
+                var token = this.FindControl<TextBox>("HaToken")!.Text;
                 await _pageSources.ConfigureHomeAssistantAsync(
-                    this.FindControl<CheckBox>("HaEnabled")!.IsChecked == true ? this.FindControl<TextBox>("HaUrl")!.Text : null,
-                    this.FindControl<CheckBox>("HaEnabled")!.IsChecked == true ? this.FindControl<TextBox>("HaToken")!.Text : null);
-                this.FindControl<TextBox>("HaToken")!.Text = string.Empty;
-                await SavePortableWorkspaceAsync();
+                    enabled ? this.FindControl<TextBox>("HaUrl")!.Text : null,
+                    enabled ? token : null);
+                if (enabled && !string.IsNullOrWhiteSpace(token))
+                    _haTokenStore.Save(token);
+                else if (!enabled)
+                    _haTokenStore.Delete();
+                await SavePortableWorkspaceAsync(true);
             });
         this.FindControl<Button>("HaTest")!.Click += async (_, _) =>
             await RunHaActionAsync(async () =>
