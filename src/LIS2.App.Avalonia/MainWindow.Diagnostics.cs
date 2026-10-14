@@ -16,9 +16,13 @@ public partial class MainWindow
         var virtualConnected = _virtualDevice.IsConnected;
         var playback = _virtualSequence?.IsRunning == true;
         var fanMonitor = _fanMonitorTask is { IsCompleted: false };
+        var sensorRefresh = _hardwareRefreshTimer.IsEnabled;
+        var serialBusy = _serialBusy;
+        var fanPreviewConfigured = _fanSettings.Channels.Count(channel => !string.IsNullOrWhiteSpace(channel.SensorKey));
         var summary = RuntimeDiagnosticsSnapshot.Format(
             OperatingSystem.IsWindows() ? "Windows" : OperatingSystem.IsLinux() ? "Linux" : "Other",
-            virtualConnected, serial, playback, fanMonitor, _virtualDevice.CommandCount);
+            virtualConnected, serial, playback, fanMonitor, _virtualDevice.CommandCount,
+            serialBusy, sensorRefresh, fanPreviewConfigured);
         this.FindControl<global::Avalonia.Controls.TextBlock>("DiagnosticsSnapshot")!.Text = summary;
     }
 }

@@ -263,4 +263,9 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 
 ## Diagnostics build repair (2026-10-14)
 - Run `38522848177` failed both Avalonia jobs with CS1061 in `MainWindow.Diagnostics.cs`: missing `using Avalonia.Controls;` for `FindControl` extension method. Shared .NET jobs passed.
-- Applied minimal namespace import repair; CI for repair commit pending. No changes to WPF or fan safety.
+- Applied minimal namespace import repair; Repair commit `cffa3a8` passed all CI jobs. No changes to WPF or fan safety.
+
+## Diagnostics runtime snapshot expansion (2026-10-14)
+- Extended read-only diagnostics with serial busy state, hardware sensor live-refresh state, and count of fan channels with assigned sensor keys (not a claim that sensors are currently available).
+- Expanded headless tests for active and inactive snapshots; no serial writes, hardware access, or authorization transitions introduced.
+- WPF diagnostics feature parity is still pending; current-HEAD CI must pass. Manual desktop acceptance remains deferred until complete port.
