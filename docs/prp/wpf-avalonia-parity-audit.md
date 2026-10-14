@@ -1,254 +1,332 @@
-# WPF-to-Avalonia parity audit — all ten menus
+# WPF → Avalonia: vollständige XAML-Control-/Handler-Traceability
 
-2026-10-14. **Authority:** `src/LIS2.App/MainWindow.xaml` and `MainWindow.xaml.cs` (WPF). **Target:** `src/LIS2.App.Avalonia/MainWindow.axaml` and `MainWindow.*.cs`. Counts are named WPF controls per tab, not completion percentages. Source-level inventory only; no final manual UI acceptance.
+Stand 2026-10-14. **WPF ist führend**. Quellen: WPF `MainWindow.xaml`, `MainWindow.xaml.cs`; Avalonia `MainWindow.axaml`, `MainWindow.axaml.cs` und die partiellen Dateien für Pages, Fans, Hardware, Home Assistant und Diagnostics. **Dies ist eine vollständige Erfassung der benannten WPF-Tab-Controls und direkt im XAML referenzierten Event-Handler, nicht der Nachweis vollständiger Funktionsparität.** Unbenannte Controls, implizite Bindings, Timer, Hintergrundquellen, Lokalisierung und weitere Codepfade benötigen gesonderte semantische Prüfung.
 
-| WPF menu | Named WPF controls | Source-based findings | Gap |
-|---|---:|---|---|
-| Dashboard | 7 | VFD preview, system status, quick links, four fan outputs. No connect/disconnect actions in WPF Dashboard; invented buttons reverted in 2cb3141. WPF manual fan actions differ from disabled Avalonia sliders. | Partial / requires control-by-control verification |
-| Display | 11 | Quick display, glyph editor, ROM, brightness. Partial Avalonia implementation; interaction parity pending. | Partial / requires control-by-control verification |
-| Pages | 17 | Page editor, presets, conditions, durations, overflow, scrolling, previews. Partial Avalonia implementation; behavioral parity pending. | Partial / requires control-by-control verification |
-| Media | 36 | WPF Windows Media Player, Winamp, WMP Legacy, VU/spectrum and presets. No Avalonia MediaView. | Missing view |
-| Events | 7 | WPF event editor, priority/duration, queue, warning test, clear and cancel. No Avalonia EventsView. | Missing view |
-| Hardware | 7 | WPF sensor filter, aliases, favorites, assignment and presets. Substantial Avalonia work; not fully verified. | Partial / requires control-by-control verification |
-| Fan Control | 18 | WPF manual and automatic fans, channel editor and curve preview. Avalonia has editor/simulation; safety and parity pending. | Partial / requires control-by-control verification |
-| Settings | 5 | WPF transport, serial, theme, language, Windows startup. Avalonia transport settings; remainder pending. | Partial / requires control-by-control verification |
-| Diagnostics | 4 | WPF diagnostic text, virtual state, history, logs, export. Avalonia partially implemented. | Partial / requires control-by-control verification |
-| Home Assistant | 14 | WPF HA connection, entities/attributes, aliases, favorites and page creation. No Avalonia HomeAssistantView. | Missing view |
+**Bewertung:** Exakt/umbenannt bedeutet UI-Nachweis, nicht gleiches Verhalten. 'Anderer Menüpunkt' bedeutet keine WPF-Menüparität. 'Keine Zuordnung' ist eine offene oder fehlende Funktion, keine Vermutung.
 
-## Binding rules and acceptance
+## Dashboard
 
-- No speculative UI, new shortcuts, features or alternative flows. WPF is the functional and visual target. Platform differences must be documented and approved, not silently invented.
-- Before implementation in each tab, map every WPF control, handler, binding, default, state, validation, persistence and localization string to Avalonia. The initial inventory above is **not** the complete per-control mapping.
-- Add automated regression tests for ported behavior and safety; require all shared and Avalonia Windows/Linux CI jobs green. Preserve serialized hardware writes, disabled physical fan output by default, and explicit authorization.
-- No physical device tests available. No manual desktop acceptance until the full port; owner-supplied Pi screenshots are feedback only.
-- Implement the three entirely missing views (Events, Home Assistant, Media) according to WPF source, then reconcile remaining seven views. Do not mark a menu complete without parity evidence.
+WPF VFD-Preview, Status, Navigation und vier **aktive** manuelle Fan-Slider mit Apply. Avalonia-Slider read-only: funktionale Abweichung; keine WPF-Dashboard-Connect-Buttons.
 
-## Corrected regression
+**WPF:** 7 benannte Controls, 2 XAML-Handler. Avalonia-View vorhanden, Parität offen.
 
-The Dashboard Connect/Disconnect buttons from commit `50665f7` were not present in WPF and were reverted in `2cb3141`. Existing virtual connection actions in Settings are unchanged.
-
-## Detailed WPF XAML control/event inventory (2026-10-14)
-
-This is an **exact-name inventory**, not a feature parity verdict. Avalonia often renames equivalent controls and binds handlers through code; a `different name` entry **does not prove missing functionality**. The three entirely missing views are separately established by the absence of MediaView, EventsView and HomeAssistantView. Every entry below must subsequently be mapped semantically to Avalonia code-behind and verified with tests. Source: WPF `MainWindow.xaml`, target Avalonia `MainWindow.axaml`.
-
-### Dashboard
-
-WPF named controls: **7**; exact-name matches in Avalonia XAML: **7**; distinct WPF event handler names: **2**. Different names require semantic mapping, not automatic classification.
-
-| WPF control | Avalonia exact name | Mapping/verification |
+| WPF-Control | Tatsächlicher Avalonia-UI-Beleg | Bewertung |
 |---|---|---|
-| `PreviewLine1` | Exact name exists | Requires handler and behavior review |
-| `PreviewLine2` | Exact name exists | Requires handler and behavior review |
-| `VirtualStateText` | Exact name exists | Requires handler and behavior review |
-| `DashboardFan1Slider` | Exact name exists | Requires handler and behavior review |
-| `DashboardFan2Slider` | Exact name exists | Requires handler and behavior review |
-| `DashboardFan3Slider` | Exact name exists | Requires handler and behavior review |
-| `DashboardFan4Slider` | Exact name exists | Requires handler and behavior review |
+| `PreviewLine1` | `PreviewLine1` | Exakter UI-Name |
+| `PreviewLine2` | `PreviewLine2` | Exakter UI-Name |
+| `VirtualStateText` | `VirtualStateText` | Exakter UI-Name |
+| `DashboardFan1Slider` | `DashboardFan1Slider` | Exakter UI-Name |
+| `DashboardFan2Slider` | `DashboardFan2Slider` | Exakter UI-Name |
+| `DashboardFan3Slider` | `DashboardFan3Slider` | Exakter UI-Name |
+| `DashboardFan4Slider` | `DashboardFan4Slider` | Exakter UI-Name |
 
-**WPF XAML event handlers:** `Navigation_Click`, `DashboardFans_Click`.
-
-### Display
-
-WPF named controls: **11**; exact-name matches in Avalonia XAML: **4**; distinct WPF event handler names: **19**. Different names require semantic mapping, not automatic classification.
-
-| WPF control | Avalonia exact name | Mapping/verification |
+| WPF-Ereignishandler | WPF-Code: beobachtete Aufrufe | Avalonia-Anknüpfung |
 |---|---|---|
-| `Line1TextBox` | Exact name exists | Requires handler and behavior review |
-| `Line2TextBox` | Exact name exists | Requires handler and behavior review |
-| `CharacterRomStartTextBox` | Exact name exists | Requires handler and behavior review |
-| `CharacterRomRangeText` | Exact name exists | Requires handler and behavior review |
-| `ProgramCustomGlyphsOnConnectCheckBox` | Different name / not found | Requires handler and behavior review |
-| `CustomGlyphSlotComboBox` | Different name / not found | Requires handler and behavior review |
-| `CustomGlyphNameTextBox` | Different name / not found | Requires handler and behavior review |
-| `CustomGlyphTemplateKeyText` | Different name / not found | Requires handler and behavior review |
-| `CustomGlyphRowsTextBox` | Different name / not found | Requires handler and behavior review |
-| `CustomGlyphPreview` | Different name / not found | Requires handler and behavior review |
-| `CustomGlyphLinePreview` | Different name / not found | Requires handler and behavior review |
+| `Navigation_Click` | `TryParse`, `UpdateNavigationSelection` | `NavigateTo` – Codebeleg, Verhaltensgleichheit offen |
+| `DashboardFans_Click` | `ApplyManualFanValuesAsync`, `GetSliderPercent` | Keine gesicherte 1:1-Implementierung |
 
-**WPF XAML event handlers:** `SendLine1_Click`, `SendLine2_Click`, `RenderBoth_Click`, `Clear_Click`, `SendSpecialCharacterTest_Click`, `CharacterRomPrevious_Click`, `SendCharacterRomRange_Click`, `CharacterRomNext_Click`, `ProgramCustomGlyphsOnConnectChanged`, `CustomGlyphSlotChanged`, `CustomGlyphNameChanged`, `CustomGlyphRowsChanged`, `SaveCustomGlyph_Click`, `SendCustomGlyph_Click`, `SendAllCustomGlyphs_Click`, `LoadCustomGlyphSet_Click`, `SaveCustomGlyphSet_Click`, `LoadExampleGlyphSet_Click`, `Brightness_Click`.
+## Display
 
-### Pages
+WPF: Send 1/2/both, Clear, Sonderzeichen, ROM-Blöcke, Glyph-Slot/Name/Bitmap, automatische Programmierung, Import/Export, Helligkeit. Avalonia-UI teilweise vorhanden, Fehler-/Persistenzpfade prüfen.
 
-WPF named controls: **17**; exact-name matches in Avalonia XAML: **0**; distinct WPF event handler names: **12**. Different names require semantic mapping, not automatic classification.
+**WPF:** 11 benannte Controls, 19 XAML-Handler. Avalonia-View vorhanden, Parität offen.
 
-| WPF control | Avalonia exact name | Mapping/verification |
+| WPF-Control | Tatsächlicher Avalonia-UI-Beleg | Bewertung |
 |---|---|---|
-| `PagePresetComboBox` | Different name / not found | Requires handler and behavior review |
-| `PagesListBox` | Different name / not found | Requires handler and behavior review |
-| `PageNameTextBox` | Different name / not found | Requires handler and behavior review |
-| `PageLine1TextBox` | Different name / not found | Requires handler and behavior review |
-| `PageLine2TextBox` | Different name / not found | Requires handler and behavior review |
-| `PageDurationTextBox` | Different name / not found | Requires handler and behavior review |
-| `PageRefreshIntervalTextBox` | Different name / not found | Requires handler and behavior review |
-| `PageVisibilityKeyComboBox` | Different name / not found | Requires handler and behavior review |
-| `PageVisibilityOperatorComboBox` | Different name / not found | Requires handler and behavior review |
-| `PageVisibilityValueTextBox` | Different name / not found | Requires handler and behavior review |
-| `PageVisibilityTextBox` | Different name / not found | Requires handler and behavior review |
-| `PageLine1OverflowComboBox` | Different name / not found | Requires handler and behavior review |
-| `PageLine2OverflowComboBox` | Different name / not found | Requires handler and behavior review |
-| `PageScrollSpeedTextBox` | Different name / not found | Requires handler and behavior review |
-| `PageEdgePauseTextBox` | Different name / not found | Requires handler and behavior review |
-| `PageEditorPreviewLine1` | Different name / not found | Requires handler and behavior review |
-| `PageEditorPreviewLine2` | Different name / not found | Requires handler and behavior review |
+| `Line1TextBox` | `Line1TextBox` | Exakter UI-Name |
+| `Line2TextBox` | `Line2TextBox` | Exakter UI-Name |
+| `CharacterRomStartTextBox` | `CharacterRomStartTextBox` | Exakter UI-Name |
+| `CharacterRomRangeText` | `CharacterRomRangeText` | Exakter UI-Name |
+| `ProgramCustomGlyphsOnConnectCheckBox` | `ProgramGlyphsOnConnect` | Umbenanntes UI; Semantik offen |
+| `CustomGlyphSlotComboBox` | `GlyphSlot` | Umbenanntes UI; Semantik offen |
+| `CustomGlyphNameTextBox` | `GlyphName` | Umbenanntes UI; Semantik offen |
+| `CustomGlyphTemplateKeyText` | `GlyphTemplateKey` | Umbenanntes UI; Semantik offen |
+| `CustomGlyphRowsTextBox` | `GlyphBitmapEditor` | Umbenanntes UI; Semantik offen |
+| `CustomGlyphPreview` | `GlyphPixelPreview` | Umbenanntes UI; Semantik offen |
+| `CustomGlyphLinePreview` | `GlyphPixelPreview` | Umbenanntes UI; Semantik offen |
 
-**WPF XAML event handlers:** `CreatePagePreset_Click`, `PagesListBox_SelectionChanged`, `PageEnabledChanged`, `AddPage_Click`, `DuplicatePage_Click`, `DeletePage_Click`, `MovePageUp_Click`, `MovePageDown_Click`, `PageEditorChanged`, `BuildVisibilityExpression_Click`, `SavePage_Click`, `TestEvent_Click`.
-
-### Media
-
-WPF named controls: **36**; exact-name matches in Avalonia XAML: **0**; distinct WPF event handler names: **2**. **Avalonia view absent.**
-
-| WPF control | Avalonia exact name | Mapping/verification |
+| WPF-Ereignishandler | WPF-Code: beobachtete Aufrufe | Avalonia-Anknüpfung |
 |---|---|---|
-| `WindowsMediaStatusText` | Different name / not found | Requires handler and behavior review |
-| `WindowsMediaTitleText` | Different name / not found | Requires handler and behavior review |
-| `WindowsMediaArtistText` | Different name / not found | Requires handler and behavior review |
-| `WindowsMediaAlbumText` | Different name / not found | Requires handler and behavior review |
-| `WindowsMediaPlaybackText` | Different name / not found | Requires handler and behavior review |
-| `WindowsMediaSourceText` | Different name / not found | Requires handler and behavior review |
-| `WindowsMediaTimeText` | Different name / not found | Requires handler and behavior review |
-| `WinampStatusText` | Different name / not found | Requires handler and behavior review |
-| `WinampTitleText` | Different name / not found | Requires handler and behavior review |
-| `WinampArtistText` | Different name / not found | Requires handler and behavior review |
-| `WinampAlbumText` | Different name / not found | Requires handler and behavior review |
-| `WinampPlaybackText` | Different name / not found | Requires handler and behavior review |
-| `WinampTimeText` | Different name / not found | Requires handler and behavior review |
-| `WinampPlaylistText` | Different name / not found | Requires handler and behavior review |
-| `WinampAudioText` | Different name / not found | Requires handler and behavior review |
-| `WinampTelemetryStatusText` | Different name / not found | Requires handler and behavior review |
-| `WinampVuLeftBar` | Different name / not found | Requires handler and behavior review |
-| `WinampVuLeftText` | Different name / not found | Requires handler and behavior review |
-| `WinampVuRightBar` | Different name / not found | Requires handler and behavior review |
-| `WinampVuRightText` | Different name / not found | Requires handler and behavior review |
-| `WinampSpectrumText` | Different name / not found | Requires handler and behavior review |
-| `WinampConnectionDetailText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyStatusText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyTitleText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyArtistText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyAlbumText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyPlaybackText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyTimeText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyPlaylistText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyVisualizationStatusText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyVuLeftBar` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyVuLeftText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyVuRightBar` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyVuRightText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacySpectrumText` | Different name / not found | Requires handler and behavior review |
-| `WmpLegacyConnectionDetailText` | Different name / not found | Requires handler and behavior review |
+| `SendLine1_Click` | `Create`, `WriteFrameAsync`, `RefreshPreview` | `SendLine1` – Codebeleg, Verhaltensgleichheit offen |
+| `SendLine2_Click` | `Create`, `WriteFrameAsync`, `RefreshPreview` | `SendLine2` – Codebeleg, Verhaltensgleichheit offen |
+| `RenderBoth_Click` | `Create`, `WriteFrameAsync`, `RefreshPreview` | `RenderBoth` – Codebeleg, Verhaltensgleichheit offen |
+| `Clear_Click` | `RequireDevice`, `ClearAsync`, `Reset`, `Create`, `RefreshPreview` | `ClearDisplay` – Codebeleg, Verhaltensgleichheit offen |
+| `SendSpecialCharacterTest_Click` | `Create`, `WriteFrameAsync`, `RefreshPreview` | `SendSpecialCharacterTest` – Codebeleg, Verhaltensgleichheit offen |
+| `CharacterRomPrevious_Click` | `ParseCharacterRomStart`, `SetCharacterRomStart`, `Max` | `CharacterRomPrevious` – Codebeleg, Verhaltensgleichheit offen |
+| `SendCharacterRomRange_Click` | `ParseCharacterRomStart`, `Range`, `Select`, `ToArray`, `RequireDevice`, `WriteRawDisplayBytesAsync` | `SendCharacterRomRange` – Codebeleg, Verhaltensgleichheit offen |
+| `CharacterRomNext_Click` | `ParseCharacterRomStart`, `SetCharacterRomStart`, `Min` | `CharacterRomNext` – Codebeleg, Verhaltensgleichheit offen |
+| `ProgramCustomGlyphsOnConnectChanged` | `SaveAsync` | `ProgramGlyphsOnConnect` – Codebeleg, Verhaltensgleichheit offen |
+| `CustomGlyphSlotChanged` | `LoadSelectedGlyphIntoEditor` | `GlyphSlot` – Codebeleg, Verhaltensgleichheit offen |
+| `CustomGlyphNameChanged` | `RefreshCustomGlyphTemplateKey`, `RefreshGlyphPreview`, `ReadGlyphEditor` | Keine gesicherte 1:1-Implementierung |
+| `CustomGlyphRowsChanged` | `RefreshGlyphPreview`, `ReadGlyphEditor` | `GlyphBitmapEditor` – Codebeleg, Verhaltensgleichheit offen |
+| `SaveCustomGlyph_Click` | `ReadGlyphEditor`, `Trim`, `SaveAsync`, `RefreshCustomGlyphTemplateKey`, `RefreshGlyphPreview` | Keine gesicherte 1:1-Implementierung |
+| `SendCustomGlyph_Click` | `ReadGlyphEditor`, `InvalidOperationException`, `ProgramSlotAsync`, `RefreshGlyphPreview` | `SendGlyphSlot` – Codebeleg, Verhaltensgleichheit offen |
+| `SendAllCustomGlyphs_Click` | `InvalidOperationException`, `ProgramAllAsync`, `Select`, `ToArray` | `SendAllGlyphs` – Codebeleg, Verhaltensgleichheit offen |
+| `LoadCustomGlyphSet_Click` | `sets`, `JSON`, `files`, `ShowDialog`, `ReadAllTextAsync`, `InvalidOperationException` | Keine gesicherte 1:1-Implementierung |
+| `SaveCustomGlyphSet_Click` | `sets`, `JSON`, `files`, `ShowDialog`, `GetFileNameWithoutExtension`, `CloneGlyphs` | Keine gesicherte 1:1-Implementierung |
+| `LoadExampleGlyphSet_Click` | `ApplyGlyphSetAsync`, `CreateExampleSet` | Keine gesicherte 1:1-Implementierung |
+| `Brightness_Click` | `InvalidOperationException`, `Parse`, `SaveAsync`, `RequireDevice`, `SetBrightnessAsync` | `Brightness100` – Codebeleg, Verhaltensgleichheit offen |
 
-**WPF XAML event handlers:** `CreateWindowsMediaPreset_Click`, `CreateWinampPreset_Click`.
+## Pages
 
-### Events
+WPF: Presets, CRUD, Reihenfolge, Aktivierung, Bedingungen, Timing, Overflow, Vorschau, Event-Test. Avalonia-Äquivalente umbenannt; Detailzustände prüfen.
 
-WPF named controls: **7**; exact-name matches in Avalonia XAML: **0**; distinct WPF event handler names: **5**. **Avalonia view absent.**
+**WPF:** 17 benannte Controls, 12 XAML-Handler. Avalonia-View vorhanden, Parität offen.
 
-| WPF control | Avalonia exact name | Mapping/verification |
+| WPF-Control | Tatsächlicher Avalonia-UI-Beleg | Bewertung |
 |---|---|---|
-| `EventLine1TextBox` | Different name / not found | Requires handler and behavior review |
-| `EventLine2TextBox` | Different name / not found | Requires handler and behavior review |
-| `EventPriorityComboBox` | Different name / not found | Requires handler and behavior review |
-| `EventDurationTextBox` | Different name / not found | Requires handler and behavior review |
-| `EventQueueSummaryText` | Different name / not found | Requires handler and behavior review |
-| `EventQueueListBox` | Different name / not found | Requires handler and behavior review |
-| `SelectedEventText` | Different name / not found | Requires handler and behavior review |
+| `PagePresetComboBox` | — | Keine gesicherte Zuordnung |
+| `PagesListBox` | `PagesList` | Umbenanntes UI; Semantik offen |
+| `PageNameTextBox` | `PageName` | Umbenanntes UI; Semantik offen |
+| `PageLine1TextBox` | `PageLine1` | Umbenanntes UI; Semantik offen |
+| `PageLine2TextBox` | `PageLine2` | Umbenanntes UI; Semantik offen |
+| `PageDurationTextBox` | `PageDuration` | Umbenanntes UI; Semantik offen |
+| `PageRefreshIntervalTextBox` | `PageRefresh` | Umbenanntes UI; Semantik offen |
+| `PageVisibilityKeyComboBox` | `PageConditionKey` | Umbenanntes UI; Semantik offen |
+| `PageVisibilityOperatorComboBox` | `PageConditionOperator` | Umbenanntes UI; Semantik offen |
+| `PageVisibilityValueTextBox` | `PageConditionValue` | Umbenanntes UI; Semantik offen |
+| `PageVisibilityTextBox` | `PageVisibility` | Umbenanntes UI; Semantik offen |
+| `PageLine1OverflowComboBox` | `PageOverflow1` | Umbenanntes UI; Semantik offen |
+| `PageLine2OverflowComboBox` | `PageOverflow2` | Umbenanntes UI; Semantik offen |
+| `PageScrollSpeedTextBox` | `PageScrollStep` | Umbenanntes UI; Semantik offen |
+| `PageEdgePauseTextBox` | `PageScrollPause` | Umbenanntes UI; Semantik offen |
+| `PageEditorPreviewLine1` | `PagePreview1` | Umbenanntes UI; Semantik offen |
+| `PageEditorPreviewLine2` | `PagePreview2` | Umbenanntes UI; Semantik offen |
 
-**WPF XAML event handlers:** `AddEvent_Click`, `TestWarningEvent_Click`, `ClearEvents_Click`, `EventQueueListBox_SelectionChanged`, `CancelSelectedEvent_Click`.
-
-### Hardware
-
-WPF named controls: **7**; exact-name matches in Avalonia XAML: **0**; distinct WPF event handler names: **6**. Different names require semantic mapping, not automatic classification.
-
-| WPF control | Avalonia exact name | Mapping/verification |
+| WPF-Ereignishandler | WPF-Code: beobachtete Aufrufe | Avalonia-Anknüpfung |
 |---|---|---|
-| `HardwareSummaryText` | Different name / not found | Requires handler and behavior review |
-| `HardwareSearchTextBox` | Different name / not found | Requires handler and behavior review |
-| `HardwareTypeComboBox` | Different name / not found | Requires handler and behavior review |
-| `HardwareSensorsListBox` | Different name / not found | Requires handler and behavior review |
-| `SelectedHardwareSensorText` | Different name / not found | Requires handler and behavior review |
-| `HardwareAliasTextBox` | Different name / not found | Requires handler and behavior review |
-| `HardwareFavoriteCheckBox` | Different name / not found | Requires handler and behavior review |
+| `CreatePagePreset_Click` | `CreatePageFromPresetAsync` | Keine gesicherte 1:1-Implementierung |
+| `PagesListBox_SelectionChanged` | `ApplyVisibilityExpressionToBuilder`, `SelectComboBoxTag`, `RefreshPageEditorPreview` | `PagesList` – Codebeleg, Verhaltensgleichheit offen |
+| `PageEnabledChanged` | `PersistPagesAsync`, `LoadPagesIntoRuntime`, `RenderRuntimePageAsync` | `PageEnabled` – Codebeleg, Verhaltensgleichheit offen |
+| `AddPage_Click` | `Add`, `PersistPagesAsync`, `BindPages` | `PageAdd` – Codebeleg, Verhaltensgleichheit offen |
+| `DuplicatePage_Click` | `NewGuid`, `IndexOf`, `Insert`, `PersistPagesAsync`, `BindPages`, `LoadPagesIntoRuntime` | `PageDuplicate` – Codebeleg, Verhaltensgleichheit offen |
+| `DeletePage_Click` | `Remove`, `EnsureDefaults`, `PersistPagesAsync`, `BindPages`, `LoadPagesIntoRuntime` | `PageDelete` – Codebeleg, Verhaltensgleichheit offen |
+| `MovePageUp_Click` | `RemoveAt`, `Insert`, `PersistPagesAsync`, `BindPages`, `LoadPagesIntoRuntime` | `PageUp` – Codebeleg, Verhaltensgleichheit offen |
+| `MovePageDown_Click` | `RemoveAt`, `Insert`, `PersistPagesAsync`, `BindPages`, `LoadPagesIntoRuntime` | `PageDown` – Codebeleg, Verhaltensgleichheit offen |
+| `PageEditorChanged` | `RefreshPageEditorPreview` | `RefreshPagePreview` – Codebeleg, Verhaltensgleichheit offen |
+| `BuildVisibilityExpression_Click` | `Trim`, `GetComboBoxTag` | Keine gesicherte 1:1-Implementierung |
+| `SavePage_Click` | `InvalidOperationException`, `TryParse`, `Trim`, `operator`, `GetComboBoxTag`, `PersistPagesAsync` | `PageSave` – Codebeleg, Verhaltensgleichheit offen |
+| `TestEvent_Click` | `QueueDisplayEventAsync`, `NewGuid`, `FromSeconds` | `PageTest` – Codebeleg, Verhaltensgleichheit offen |
 
-**WPF XAML event handlers:** `HardwareFilterChanged`, `RefreshHardware_Click`, `HardwareSensorsListBox_SelectionChanged`, `SaveHardwarePreference_Click`, `AssignHardwareSensorToFan_Click`, `CreateHardwarePreset_Click`.
+## Media
 
-### Fan Control
+WPF: Windows Media, Winamp und WMP Legacy; Metadaten, Playback, VU/Spectrum, Presets. Avalonia hat keine MediaView.
 
-WPF named controls: **18**; exact-name matches in Avalonia XAML: **0**; distinct WPF event handler names: **6**. Different names require semantic mapping, not automatic classification.
+**WPF:** 36 benannte Controls, 2 XAML-Handler. **Keine eigenständige Avalonia-View.**
 
-| WPF control | Avalonia exact name | Mapping/verification |
+| WPF-Control | Tatsächlicher Avalonia-UI-Beleg | Bewertung |
 |---|---|---|
-| `AutomaticFanControlCheckBox` | Different name / not found | Requires handler and behavior review |
-| `Fan1Slider` | Different name / not found | Requires handler and behavior review |
-| `Fan2Slider` | Different name / not found | Requires handler and behavior review |
-| `Fan3Slider` | Different name / not found | Requires handler and behavior review |
-| `Fan4Slider` | Different name / not found | Requires handler and behavior review |
-| `FanChannelsListBox` | Different name / not found | Requires handler and behavior review |
-| `FanNameTextBox` | Different name / not found | Requires handler and behavior review |
-| `FanModeComboBox` | Different name / not found | Requires handler and behavior review |
-| `FanSensorComboBox` | Different name / not found | Requires handler and behavior review |
-| `FanFixedTextBox` | Different name / not found | Requires handler and behavior review |
-| `FanMinimumTextBox` | Different name / not found | Requires handler and behavior review |
-| `FanMaximumTextBox` | Different name / not found | Requires handler and behavior review |
-| `FanFailSafeTextBox` | Different name / not found | Requires handler and behavior review |
-| `FanCurveTextBox` | Different name / not found | Requires handler and behavior review |
-| `FanHysteresisTextBox` | Different name / not found | Requires handler and behavior review |
-| `FanAllowStopCheckBox` | Different name / not found | Requires handler and behavior review |
-| `FanLiveStatusText` | Different name / not found | Requires handler and behavior review |
-| `FanCurvePreviewCanvas` | Different name / not found | Requires handler and behavior review |
+| `WindowsMediaStatusText` | — | Keine gesicherte Zuordnung |
+| `WindowsMediaTitleText` | — | Keine gesicherte Zuordnung |
+| `WindowsMediaArtistText` | — | Keine gesicherte Zuordnung |
+| `WindowsMediaAlbumText` | — | Keine gesicherte Zuordnung |
+| `WindowsMediaPlaybackText` | — | Keine gesicherte Zuordnung |
+| `WindowsMediaSourceText` | — | Keine gesicherte Zuordnung |
+| `WindowsMediaTimeText` | — | Keine gesicherte Zuordnung |
+| `WinampStatusText` | — | Keine gesicherte Zuordnung |
+| `WinampTitleText` | — | Keine gesicherte Zuordnung |
+| `WinampArtistText` | — | Keine gesicherte Zuordnung |
+| `WinampAlbumText` | — | Keine gesicherte Zuordnung |
+| `WinampPlaybackText` | — | Keine gesicherte Zuordnung |
+| `WinampTimeText` | — | Keine gesicherte Zuordnung |
+| `WinampPlaylistText` | — | Keine gesicherte Zuordnung |
+| `WinampAudioText` | — | Keine gesicherte Zuordnung |
+| `WinampTelemetryStatusText` | — | Keine gesicherte Zuordnung |
+| `WinampVuLeftBar` | — | Keine gesicherte Zuordnung |
+| `WinampVuLeftText` | — | Keine gesicherte Zuordnung |
+| `WinampVuRightBar` | — | Keine gesicherte Zuordnung |
+| `WinampVuRightText` | — | Keine gesicherte Zuordnung |
+| `WinampSpectrumText` | — | Keine gesicherte Zuordnung |
+| `WinampConnectionDetailText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyStatusText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyTitleText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyArtistText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyAlbumText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyPlaybackText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyTimeText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyPlaylistText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyVisualizationStatusText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyVuLeftBar` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyVuLeftText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyVuRightBar` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyVuRightText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacySpectrumText` | — | Keine gesicherte Zuordnung |
+| `WmpLegacyConnectionDetailText` | — | Keine gesicherte Zuordnung |
 
-**WPF XAML event handlers:** `AutomaticFanControlChanged`, `Fans_Click`, `FanChannelsListBox_SelectionChanged`, `RefreshFanSensors_Click`, `FanCurveTextChanged`, `SaveFanChannel_Click`.
-
-### Settings
-
-WPF named controls: **5**; exact-name matches in Avalonia XAML: **0**; distinct WPF event handler names: **6**. Different names require semantic mapping, not automatic classification.
-
-| WPF control | Avalonia exact name | Mapping/verification |
+| WPF-Ereignishandler | WPF-Code: beobachtete Aufrufe | Avalonia-Anknüpfung |
 |---|---|---|
-| `TransportModeComboBox` | Different name / not found | Requires handler and behavior review |
-| `PortComboBox` | Different name / not found | Requires handler and behavior review |
-| `ThemeModeComboBox` | Different name / not found | Requires handler and behavior review |
-| `LanguageModeComboBox` | Different name / not found | Requires handler and behavior review |
-| `StartWithWindowsCheckBox` | Different name / not found | Requires handler and behavior review |
+| `CreateWindowsMediaPreset_Click` | `CreatePageFromPresetAsync` | Keine gesicherte 1:1-Implementierung |
+| `CreateWinampPreset_Click` | `CreatePageFromPresetAsync` | Keine gesicherte 1:1-Implementierung |
 
-**WPF XAML event handlers:** `TransportModeChanged`, `RefreshPorts_Click`, `ApplyDeviceSettings_Click`, `ThemeModeChanged`, `LanguageModeChanged`, `StartWithWindowsChanged`.
+## Events
 
-### Diagnostics
+WPF: Event-Overlay (Zeilen, Priorität, Dauer), Queue, Auswahl, Warn-Test, Clear, Cancel. Avalonia hat keine EventsView.
 
-WPF named controls: **4**; exact-name matches in Avalonia XAML: **0**; distinct WPF event handler names: **2**. Different names require semantic mapping, not automatic classification.
+**WPF:** 7 benannte Controls, 5 XAML-Handler. **Keine eigenständige Avalonia-View.**
 
-| WPF control | Avalonia exact name | Mapping/verification |
+| WPF-Control | Tatsächlicher Avalonia-UI-Beleg | Bewertung |
 |---|---|---|
-| `DiagnosticsTextBox` | Different name / not found | Requires handler and behavior review |
-| `VirtualLis2StateTextBox` | Different name / not found | Requires handler and behavior review |
-| `CommandHistoryTextBox` | Different name / not found | Requires handler and behavior review |
-| `LogTextBox` | Different name / not found | Requires handler and behavior review |
+| `EventLine1TextBox` | — | Keine gesicherte Zuordnung |
+| `EventLine2TextBox` | — | Keine gesicherte Zuordnung |
+| `EventPriorityComboBox` | — | Keine gesicherte Zuordnung |
+| `EventDurationTextBox` | — | Keine gesicherte Zuordnung |
+| `EventQueueSummaryText` | — | Keine gesicherte Zuordnung |
+| `EventQueueListBox` | — | Keine gesicherte Zuordnung |
+| `SelectedEventText` | — | Keine gesicherte Zuordnung |
 
-**WPF XAML event handlers:** `ExportDiagnostics_Click`, `RefreshDiagnostics_Click`.
-
-### Home Assistant
-
-WPF named controls: **14**; exact-name matches in Avalonia XAML: **0**; distinct WPF event handler names: **11**. **Avalonia view absent.**
-
-| WPF control | Avalonia exact name | Mapping/verification |
+| WPF-Ereignishandler | WPF-Code: beobachtete Aufrufe | Avalonia-Anknüpfung |
 |---|---|---|
-| `HomeAssistantEnabledCheckBox` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantUrlTextBox` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantTokenPasswordBox` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantSearchTextBox` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantDomainComboBox` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantStatusText` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantEntitiesListBox` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantDetailBorder` | Different name / not found | Requires handler and behavior review |
-| `SelectedHomeAssistantEntityText` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantAliasTextBox` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantFavoriteCheckBox` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantEntityActionsPanel` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantAttributeActionsPanel` | Different name / not found | Requires handler and behavior review |
-| `HomeAssistantAttributesListBox` | Different name / not found | Requires handler and behavior review |
+| `AddEvent_Click` | `GetSelectedEventPriority`, `TryParse`, `InvalidOperationException`, `QueueDisplayEventAsync`, `NewGuid`, `FromSeconds` | Keine gesicherte 1:1-Implementierung |
+| `TestWarningEvent_Click` | `QueueDisplayEventAsync`, `NewGuid`, `FromSeconds` | Keine gesicherte 1:1-Implementierung |
+| `ClearEvents_Click` | `Clear`, `RenderRuntimePageAsync`, `RefreshEventsView` | Keine gesicherte 1:1-Implementierung |
+| `EventQueueListBox_SelectionChanged` | `ToLocalTime` | Keine gesicherte 1:1-Implementierung |
+| `CancelSelectedEvent_Click` | `Remove`, `RenderRuntimePageAsync`, `RefreshEventsView` | Keine gesicherte 1:1-Implementierung |
 
-**WPF XAML event handlers:** `TestHomeAssistant_Click`, `SaveHomeAssistant_Click`, `HomeAssistantFilterChanged`, `HomeAssistantEntitiesListBox_SelectionChanged`, `HomeAssistantEntitiesListBox_MouseDoubleClick`, `CopyHomeAssistantEntityKey_Click`, `SaveHomeAssistantEntity_Click`, `CreateHomeAssistantPage_Click`, `CopyHomeAssistantAttributeKey_Click`, `CreateHomeAssistantAttributePage_Click`, `HomeAssistantAttributesListBox_MouseDoubleClick`.
+## Hardware
 
-## Interpretation and next audit gate
+WPF: Sensor-Filter/Typ/Suche, Detail, Alias/Favorit, Fan-Zuweisung, Presets. Avalonia implementiert vieles; genaue Fehler-/Persistenzparität offen.
 
-- The tables record actual WPF control identifiers and XAML-wired event handlers, not all unnamed buttons, bindings, implicit events, timers or code-behind actions.
-- Follow-up must map each WPF item to an actual Avalonia control/handler (including renamed equivalents), compare defaults, persistence, validation, localization and states, and provide tests. Do not claim feature absence merely because names differ.
-- No WPF source changes; no invented UI. Hardware behavior and owner deferred manual testing restrictions remain binding.
+**WPF:** 7 benannte Controls, 6 XAML-Handler. Avalonia-View vorhanden, Parität offen.
+
+| WPF-Control | Tatsächlicher Avalonia-UI-Beleg | Bewertung |
+|---|---|---|
+| `HardwareSummaryText` | `HardwareSensorStatus` | Umbenanntes UI; Semantik offen |
+| `HardwareSearchTextBox` | `HardwareSearch` | Umbenanntes UI; Semantik offen |
+| `HardwareTypeComboBox` | `HardwareTypeFilter` | Umbenanntes UI; Semantik offen |
+| `HardwareSensorsListBox` | `HardwareSensorList` | Umbenanntes UI; Semantik offen |
+| `SelectedHardwareSensorText` | `HardwareSelectedSensor` | Umbenanntes UI; Semantik offen |
+| `HardwareAliasTextBox` | `HardwareAlias` | Umbenanntes UI; Semantik offen |
+| `HardwareFavoriteCheckBox` | `HardwareFavorite` | Umbenanntes UI; Semantik offen |
+
+| WPF-Ereignishandler | WPF-Code: beobachtete Aufrufe | Avalonia-Anknüpfung |
+|---|---|---|
+| `HardwareFilterChanged` | `RefreshHardwareSensors` | `FilterHardwareSensors` – Codebeleg, Verhaltensgleichheit offen |
+| `RefreshHardware_Click` | `RefreshHardwareSensors`, `RefreshFanSensorChoices` | `HardwareRefresh` – Codebeleg, Verhaltensgleichheit offen |
+| `HardwareSensorsListBox_SelectionChanged` | Handler prüfen | `HardwareSensorList` – Codebeleg, Verhaltensgleichheit offen |
+| `SaveHardwarePreference_Click` | `InvalidOperationException`, `FirstOrDefault`, `Equals`, `Trim`, `Add`, `Remove` | `HardwareSavePreference` – Codebeleg, Verhaltensgleichheit offen |
+| `AssignHardwareSensorToFan_Click` | `InvalidOperationException`, `TryParse`, `SaveAsync`, `RefreshFanSensorChoices` | `AssignHardwareSensor` – Codebeleg, Verhaltensgleichheit offen |
+| `CreateHardwarePreset_Click` | `CreatePageFromPresetAsync` | `HardwarePreset` – Codebeleg, Verhaltensgleichheit offen |
+
+## Fan Control
+
+WPF: automatische und manuelle Fan-Ausgabe, Kurve, Fail-safe, Sensor, Hysterese, Live-Status. Avalonia-Konfiguration/Simulation ≠ nachgewiesene physische Ausgabefunktion; Sicherheitsabweichung dokumentieren.
+
+**WPF:** 18 benannte Controls, 6 XAML-Handler. Avalonia-View vorhanden, Parität offen.
+
+| WPF-Control | Tatsächlicher Avalonia-UI-Beleg | Bewertung |
+|---|---|---|
+| `AutomaticFanControlCheckBox` | `FanAutomatic` | Umbenanntes UI; Semantik offen |
+| `Fan1Slider` | `DashboardFan1Slider` | Nur Dashboard-Element, nicht Fan-Tab |
+| `Fan2Slider` | `DashboardFan2Slider` | Nur Dashboard-Element, nicht Fan-Tab |
+| `Fan3Slider` | `DashboardFan3Slider` | Nur Dashboard-Element, nicht Fan-Tab |
+| `Fan4Slider` | `DashboardFan4Slider` | Nur Dashboard-Element, nicht Fan-Tab |
+| `FanChannelsListBox` | `FanChannelPicker` | Umbenanntes UI; Semantik offen |
+| `FanNameTextBox` | `FanName` | Umbenanntes UI; Semantik offen |
+| `FanModeComboBox` | `FanModePicker` | Umbenanntes UI; Semantik offen |
+| `FanSensorComboBox` | `FanSensorKey` | Umbenanntes UI; Semantik offen |
+| `FanFixedTextBox` | `FanFixed` | Umbenanntes UI; Semantik offen |
+| `FanMinimumTextBox` | `FanMinimum` | Umbenanntes UI; Semantik offen |
+| `FanMaximumTextBox` | `FanMaximum` | Umbenanntes UI; Semantik offen |
+| `FanFailSafeTextBox` | `FanFailSafe` | Umbenanntes UI; Semantik offen |
+| `FanCurveTextBox` | `FanCurve` | Umbenanntes UI; Semantik offen |
+| `FanHysteresisTextBox` | `FanHysteresis` | Umbenanntes UI; Semantik offen |
+| `FanAllowStopCheckBox` | `FanAllowStop` | Umbenanntes UI; Semantik offen |
+| `FanLiveStatusText` | `FanLivePreview` | Umbenanntes UI; Semantik offen |
+| `FanCurvePreviewCanvas` | `FanPreviewStatus` | Umbenanntes UI; Semantik offen |
+
+| WPF-Ereignishandler | WPF-Code: beobachtete Aufrufe | Avalonia-Anknüpfung |
+|---|---|---|
+| `AutomaticFanControlChanged` | `Clear`, `SaveAsync`, `ApplyAutomaticFanControlAsync` | `FanAutomatic` – Codebeleg, Verhaltensgleichheit offen |
+| `Fans_Click` | `ApplyManualFanValuesAsync`, `GetSliderPercent` | Keine gesicherte 1:1-Implementierung |
+| `FanChannelsListBox_SelectionChanged` | `SelectFanMode`, `FormatFanCurve`, `RefreshFanCurvePreview`, `RefreshFanLiveStatus` | `FanChannelPicker` – Codebeleg, Verhaltensgleichheit offen |
+| `RefreshFanSensors_Click` | `BeginInvoke`, `async`, `RefreshWinampView`, `RenderRuntimePageAsync` | `FanReadSensors` – Codebeleg, Verhaltensgleichheit offen |
+| `FanCurveTextChanged` | `RefreshFanCurvePreview`, `ParseFanCurve`, `Clear` | `FanCurve` – Codebeleg, Verhaltensgleichheit offen |
+| `SaveFanChannel_Click` | `InvalidOperationException`, `ParsePercent`, `TryParse`, `Show`, `GetSelectedFanMode`, `Format` | `FanSave` – Codebeleg, Verhaltensgleichheit offen |
+
+## Settings
+
+WPF: Virtual/Serial, Port, Theme, Sprache, Windows-Startup. Avalonia-Transport vorhanden; Theme/Sprache/Startup nicht nachgewiesen.
+
+**WPF:** 5 benannte Controls, 6 XAML-Handler. Avalonia-View vorhanden, Parität offen.
+
+| WPF-Control | Tatsächlicher Avalonia-UI-Beleg | Bewertung |
+|---|---|---|
+| `TransportModeComboBox` | `SerialPortPicker` | Umbenanntes UI; Semantik offen |
+| `PortComboBox` | `SerialPortPicker` | Umbenanntes UI; Semantik offen |
+| `ThemeModeComboBox` | — | Keine gesicherte Zuordnung |
+| `LanguageModeComboBox` | — | Keine gesicherte Zuordnung |
+| `StartWithWindowsCheckBox` | — | Keine gesicherte Zuordnung |
+
+| WPF-Ereignishandler | WPF-Code: beobachtete Aufrufe | Avalonia-Anknüpfung |
+|---|---|---|
+| `TransportModeChanged` | `UpdateTransportUi` | Keine gesicherte 1:1-Implementierung |
+| `RefreshPorts_Click` | `Equals`, `InvalidOperationException`, `SaveAsync`, `ReconnectAsync`, `WriteFrameAsync` | Keine gesicherte 1:1-Implementierung |
+| `ApplyDeviceSettings_Click` | `Equals`, `InvalidOperationException`, `SaveAsync`, `ReconnectAsync`, `WriteFrameAsync` | Keine gesicherte 1:1-Implementierung |
+| `ThemeModeChanged` | `Apply`, `UpdateNavigationSelection`, `SaveAsync`, `default` | Keine gesicherte 1:1-Implementierung |
+| `LanguageModeChanged` | `Apply`, `RefreshAppearanceChoices`, `ApplyTo`, `RefreshPagePresetChoices`, `RefreshLocalizedSectionHeader`, `RefreshWinampView` | Keine gesicherte 1:1-Implementierung |
+| `StartWithWindowsChanged` | `SetEnabled`, `IsEnabled` | Keine gesicherte 1:1-Implementierung |
+
+## Diagnostics
+
+WPF: Snapshot, Virtual-State, Command History, Log und Export. Avalonia-Snapshot/Refresh vorhanden, übrige Ansichten/Export fehlen.
+
+**WPF:** 4 benannte Controls, 2 XAML-Handler. Avalonia-View vorhanden, Parität offen.
+
+| WPF-Control | Tatsächlicher Avalonia-UI-Beleg | Bewertung |
+|---|---|---|
+| `DiagnosticsTextBox` | `DiagnosticsSnapshot` | Umbenanntes UI; Semantik offen |
+| `VirtualLis2StateTextBox` | — | Keine gesicherte Zuordnung |
+| `CommandHistoryTextBox` | — | Keine gesicherte Zuordnung |
+| `LogTextBox` | — | Keine gesicherte Zuordnung |
+
+| WPF-Ereignishandler | WPF-Code: beobachtete Aufrufe | Avalonia-Anknüpfung |
+|---|---|---|
+| `ExportDiagnostics_Click` | `RefreshDiagnostics`, `files`, `ShowDialog`, `Join`, `string`, `WriteAllText` | Keine gesicherte 1:1-Implementierung |
+| `RefreshDiagnostics_Click` | `BuildDiagnosticsSnapshot`, `RefreshVirtualDiagnostics` | `DiagnosticsRefresh` – Codebeleg, Verhaltensgleichheit offen |
+
+## Home Assistant
+
+WPF: Enable, URL, Token, Test/Save, Entity-/Domain-Filter, Detail, Alias/Favorit, Attribute, Copy Keys, Seiten erzeugen. Avalonia hat HA-Test/Connect/Picker im Pages-Editor, aber keine eigene Verwaltungsansicht.
+
+**WPF:** 14 benannte Controls, 11 XAML-Handler. **Keine eigenständige Avalonia-View.**
+
+| WPF-Control | Tatsächlicher Avalonia-UI-Beleg | Bewertung |
+|---|---|---|
+| `HomeAssistantEnabledCheckBox` | — | Keine gesicherte Zuordnung |
+| `HomeAssistantUrlTextBox` | `HaUrl` | Umbenanntes UI; Semantik offen |
+| `HomeAssistantTokenPasswordBox` | `HaToken` | Umbenanntes UI; Semantik offen |
+| `HomeAssistantSearchTextBox` | `HaEntityFilter` | Umbenanntes UI; Semantik offen |
+| `HomeAssistantDomainComboBox` | — | Keine gesicherte Zuordnung |
+| `HomeAssistantStatusText` | `HaStatus` | Umbenanntes UI; Semantik offen |
+| `HomeAssistantEntitiesListBox` | `HaEntityPicker` | Umbenanntes UI; Semantik offen |
+| `HomeAssistantDetailBorder` | — | Keine gesicherte Zuordnung |
+| `SelectedHomeAssistantEntityText` | — | Keine gesicherte Zuordnung |
+| `HomeAssistantAliasTextBox` | — | Keine gesicherte Zuordnung |
+| `HomeAssistantFavoriteCheckBox` | — | Keine gesicherte Zuordnung |
+| `HomeAssistantEntityActionsPanel` | — | Keine gesicherte Zuordnung |
+| `HomeAssistantAttributeActionsPanel` | — | Keine gesicherte Zuordnung |
+| `HomeAssistantAttributesListBox` | — | Keine gesicherte Zuordnung |
+
+| WPF-Ereignishandler | WPF-Code: beobachtete Aufrufe | Avalonia-Anknüpfung |
+|---|---|---|
+| `TestHomeAssistant_Click` | `HomeAssistantDataSource`, `Configure`, `TestConnectionAsync`, `Show` | `HaTest` – Codebeleg, Verhaltensgleichheit offen |
+| `SaveHomeAssistant_Click` | `Trim`, `TryCreate`, `not`, `InvalidOperationException`, `SaveAsync`, `ConfigureHomeAssistantSource` | `HaConnect` – Codebeleg, Verhaltensgleichheit offen |
+| `HomeAssistantFilterChanged` | `RefreshHomeAssistantView` | `HaEntityFilter` – Codebeleg, Verhaltensgleichheit offen |
+| `HomeAssistantEntitiesListBox_SelectionChanged` | `FirstOrDefault`, `Equals`, `NormalizeHomeAssistantAlias`, `OrderBy`, `Select`, `HomeAssistantAttributeRow` | `HaEntityPicker` – Codebeleg, Verhaltensgleichheit offen |
+| `HomeAssistantEntitiesListBox_MouseDoubleClick` | Handler prüfen | Keine gesicherte 1:1-Implementierung |
+| `CopyHomeAssistantEntityKey_Click` | `SetText` | Keine gesicherte 1:1-Implementierung |
+| `SaveHomeAssistantEntity_Click` | `InvalidOperationException`, `FirstOrDefault`, `Equals`, `Trim`, `Add`, `Remove` | Keine gesicherte 1:1-Implementierung |
+| `CreateHomeAssistantPage_Click` | `InvalidOperationException`, `NormalizeHomeAssistantAlias`, `NewGuid`, `Add`, `PersistPagesAsync`, `LoadPagesIntoRuntime` | Keine gesicherte 1:1-Implementierung |
+| `CopyHomeAssistantAttributeKey_Click` | `SetText` | Keine gesicherte 1:1-Implementierung |
+| `CreateHomeAssistantAttributePage_Click` | `InvalidOperationException`, `Trim`, `NewGuid`, `Add`, `PersistPagesAsync`, `LoadPagesIntoRuntime` | Keine gesicherte 1:1-Implementierung |
+| `HomeAssistantAttributesListBox_MouseDoubleClick` | Handler prüfen | Keine gesicherte 1:1-Implementierung |
+
+## Querschnittliche zwingende Prüfungen
+
+- WPF-Codepfade außerhalb XAML: Timer, Event-Queue, Serial/Virtual-Verbindung, Medienquellen, Home-Assistant-Sync, Tray, Help/About, Presets, Startup und Fehlerbehandlung. Diese sind mit obiger XAML-Traceability **noch nicht vollständig semantisch auditiert**.
+- Persistenz: WPF `AppSettings`/`SettingsStore` gegen Avalonia `PortableWorkspaceStore` und Import; Defaults, Migration, Geheimnisse, Fehlerrücknahme, Favoriten, Seiten, Lüfter.
+- Darstellung: Texte, Tooltips, Tastatur, Enabled-State, Theme, Sprache, Fenster, Dialoge, WPF-Anordnung je Menü.
+- Sicherheit: Physische Fan-Ausgabe bleibt deaktiviert bis zur sicherheitsgeprüften Portierung; WPF-Verhalten nicht blind übernehmen.
+- Tests: automatisierte Windows-/Linux-Paritätstests und CI; keine Hardware verfügbar; manuelle Desktop-Endabnahme erst nach vollständiger Portierung.
+
+**Offener Befund:** Die 126 benannten Controls und 71 pro Tab referenzierten Handler sind erfasst; ein vollständiger semantischer 1:1-Funktionsabgleich aller dynamischen und impliziten WPF-Codepfade ist damit **noch nicht abgeschlossen**. Fehlende Views: Media, Events, Home Assistant. Keine erfundenen Funktionen implementieren.
