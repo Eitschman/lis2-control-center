@@ -94,7 +94,7 @@ public partial class MainWindow
                 }
                 RefreshPageList(_pages.Pages.Count - 1);
                 await SavePortableWorkspaceAsync();
-                NavigateTo(3);
+                NavigateTo(2);
                 SetVirtualStatus("Created " + candidates.Count + " " + selectedPreset + " sensor display pages.");
             };
         }
