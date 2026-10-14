@@ -419,3 +419,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## Virtual first test milestone (2026-10-14)
 - Auto-connect hardware-free virtual LIS2 on window Opened using existing session initialization; dashboard/pages VFD colors copied from WPF theme brushes (#123B8A/#5D8FE8/#F7FBFF). Test manual Send/Render/Clear and sequence playback with published build. CI pending.
+
+## User test: pages not rendered automatically (2026-10-14)
+- User observed manual Display Quick Test works, saved Page 1 ('Hallo'/'Welt') not shown. Root cause: Avalonia sequence only started via explicit Start sequence, whereas WPF starts runtime page rendering and page timer on startup. Fixed by starting existing virtual sequence after auto-connect; Start sequence button reuses same routine. Manual Display actions still stop sequence intentionally. CI pending; real Linux smoke test pending.

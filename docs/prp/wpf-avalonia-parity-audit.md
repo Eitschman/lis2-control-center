@@ -387,3 +387,6 @@ Status: verified placement requirements only; implementation NOT yet corrected. 
 
 ## User-prioritized virtual LIS2 and VFD color pass (2026-10-14)
 - WPF VfdBackgroundBrush/VfdBorderBrush/VfdTextBrush are identical in Dark/Light (#123B8A/#5D8FE8/#F7FBFF). Avalonia Dashboard and Pages previews now use these exact colors. Hardware-free virtual LIS2 connects at window Opened to allow immediate display testing; serial transport remains explicit. UI smoke test still required.
+
+## WPF automatic page rendering parity (2026-10-14)
+- WPF startup calls RenderRuntimePageAsync and starts _pageTimer. Avalonia previously required explicit Start sequence. Avalonia now starts its existing PageSequenceController on successful virtual auto-connect; manual display actions still interrupt sequence. Linux runtime verification pending.

@@ -79,6 +79,9 @@ public partial class MainWindow : Window
         {
             if (!_virtualDevice.IsConnected)
                 await RunVirtualActionAsync(ConnectWithGlyphsAsync);
+            // WPF starts page rendering automatically after transport connection.
+            if (_virtualDevice.IsConnected)
+                await StartPagePlaybackAsync();
         };
         UpdateSection();
         UpdateVirtualControls();

@@ -29,24 +29,26 @@ public partial class MainWindow
         _pageTimer = CreatePageTimer();
         // The timer runs headlessly; UI and source snapshots stay on the UI thread.
 
-        this.FindControl<Button>("PagePlaybackStart")!.Click += async (_, _) =>
-        {
-            if (_virtualSequence?.IsRunning == true || _virtualSequence?.IsBusy == true) return;
-            if (!_virtualDevice.IsConnected)
-            {
-                SetVirtualStatus("Connect the virtual LIS2 before starting the sequence.");
-                return;
-            }
-            if (SelectedPageIndex is not null && !SavePageEditor()) return;
-            _virtualSequence ??= CreateVirtualSequence();
-            if (!_virtualSequence.Start(_pages.Pages)) return;
-            await _pageTimer.StopAndDrainAsync();
-            _pageTimer.Start();
-            UpdatePagePlaybackControls();
-            await TickPagePlaybackAsync();
-        };
+        this.FindControl<Button>("PagePlaybackStart")!.Click += async (_, _) => await StartPagePlaybackAsync();
         this.FindControl<Button>("PagePlaybackStop")!.Click += (_, _) => StopPagePlayback();
         UpdatePagePlaybackControls();
+    }
+
+    private async Task StartPagePlaybackAsync()
+    {
+        if (_virtualSequence?.IsRunning == true || _virtualSequence?.IsBusy == true) return;
+        if (!_virtualDevice.IsConnected)
+        {
+            SetVirtualStatus("Connect the virtual LIS2 before starting the sequence.");
+            return;
+        }
+        if (SelectedPageIndex is not null && !SavePageEditor()) return;
+        _virtualSequence ??= CreateVirtualSequence();
+        if (!_virtualSequence.Start(_pages.Pages)) return;
+        await _pageTimer.StopAndDrainAsync();
+        _pageTimer.Start();
+        UpdatePagePlaybackControls();
+        await TickPagePlaybackAsync();
     }
 
     private void StopPagePlayback()
