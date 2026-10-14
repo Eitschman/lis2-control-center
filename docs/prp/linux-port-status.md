@@ -298,3 +298,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 - Pure preset builder selects available snapshot keys by explicit key segments, and creates editable display pages with sensor placeholders; pages are persisted to portable workspace and editor navigation opens afterward.
 - Added headless preset selection/template tests. WPF preset page composition and placeholder compatibility require further source comparison; full parity is NOT claimed. No device commands or fan authorization.
 - Current HEAD CI pending; no manual desktop checks until full port.
+
+## Hardware display presets: WPF source parity correction (2026-10-14)
+- Compared actual WPF `CreateHardwarePresetPage`: each preset creates **one** page, not one page per sensor. Replaced the initial Avalonia per-sensor implementation with WPF-like CPU/GPU Load+Temperature, Memory Load+Data, and first-two Temperatures/Fans selection, with favorite priority.
+- Numeric live sensors only; exclude .Unit metadata; append per-sensor .Unit when available. Empty preset selection creates no page. Created pages have 5-second duration and PingPong overflow, matching WPF.
+- Replaced initial preset tests with exact template/favorites/empty-case regressions. Physical device writes remain untouched; current HEAD CI pending. This is source-level behavior parity, not final desktop acceptance.

@@ -78,24 +78,24 @@ public partial class MainWindow
             var selectedPreset = preset;
             this.FindControl<Button>("HardwarePreset" + preset)!.Click += async (_, _) =>
             {
-                var candidates = HardwareDisplayPresetBuilder.SelectKeys(_hardwareSensors, selectedPreset);
-                if (candidates.Count == 0)
+                var page = HardwareDisplayPresetBuilder.Build(selectedPreset, _hardwareSensors, _hardwarePreferences);
+                if (page is null)
                 {
                     this.FindControl<TextBlock>("HardwareSensorStatus")!.Text =
-                        "No available sensors for " + selectedPreset + " preset.";
+                        "No matching available sensors for " + selectedPreset + " preset.";
                     return;
                 }
-                foreach (var page in HardwareDisplayPresetBuilder.Build(selectedPreset, candidates))
-                {
-                    var added = _pages.Add();
-                    added.Name = page.Name;
-                    added.Line1Template = page.Line1Template;
-                    added.Line2Template = page.Line2Template;
-                }
+                var added = _pages.Add();
+                added.Name = page.Name;
+                added.Line1Template = page.Line1Template;
+                added.Line2Template = page.Line2Template;
+                added.DurationSeconds = 5;
+                added.Line1OverflowMode = "PingPong";
+                added.Line2OverflowMode = "PingPong";
                 RefreshPageList(_pages.Pages.Count - 1);
                 await SavePortableWorkspaceAsync();
                 NavigateTo(2);
-                SetVirtualStatus("Created " + candidates.Count + " " + selectedPreset + " sensor display pages.");
+                SetVirtualStatus("Created " + selectedPreset + " display preset.");
             };
         }
         RefreshHardwareSensors();
