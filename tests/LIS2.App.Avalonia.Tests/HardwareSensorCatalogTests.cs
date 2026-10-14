@@ -20,6 +20,18 @@ public sealed class HardwareSensorCatalogTests
     }
 
     [Fact]
+    public void SelectedSensorDetailsMatchWpfSelectionPanel()
+    {
+        var available = new HardwareSensorEntry("Hardware.CPU.Temperature.Package", 45d,
+            "Processor", true, true, "°C");
+        Assert.Equal("Processor — 45 °C" + Environment.NewLine +
+            "Hardware.CPU.Temperature.Package", available.SelectionDetails);
+        var unavailable = available with { IsAvailable = false };
+        Assert.Contains("Unavailable", unavailable.SelectionDetails);
+        Assert.Contains("Hardware.CPU.Temperature.Package", unavailable.SelectionDetails);
+    }
+
+    [Fact]
     public void HardwareSummaryCountsRawValuesAndConfiguredUnavailableSensors()
     {
         var snapshot = new Dictionary<string, object?>

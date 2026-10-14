@@ -72,6 +72,8 @@ public partial class MainWindow
             var preference = _hardwarePreferences.FirstOrDefault(p => string.Equals(p.Key, selected?.Key, StringComparison.OrdinalIgnoreCase));
             this.FindControl<TextBox>("HardwareAlias")!.Text = preference?.Alias ?? "";
             this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked = preference?.IsFavorite == true;
+            this.FindControl<TextBlock>("HardwareSelectedSensor")!.Text =
+                selected?.SelectionDetails ?? "Select a sensor above.";
         };
         for (var channelIndex = 0; channelIndex < 4; channelIndex++)
         {
@@ -168,6 +170,12 @@ public partial class MainWindow
         {
             this.FindControl<TextBox>("HardwareAlias")!.Text = "";
             this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked = false;
+            this.FindControl<TextBlock>("HardwareSelectedSensor")!.Text = "Select a sensor above.";
+        }
+        else
+        {
+            this.FindControl<TextBlock>("HardwareSelectedSensor")!.Text =
+                (list.SelectedItem as HardwareSensorEntry)?.SelectionDetails ?? "Select a sensor above.";
         }
         this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = list.SelectedItem is not null;
         SetHardwareFanAssignmentEnabled(list.SelectedItem is HardwareSensorEntry { IsAvailable: true });

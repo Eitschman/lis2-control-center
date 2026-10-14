@@ -123,6 +123,8 @@ public sealed record HardwareSensorEntry(string Key, object? Value, string Alias
         }
         return result.ToString();
     }
+    public string SelectionDetails => DisplayName + " — " + DisplayValue +
+        Environment.NewLine + Key;
     public string Markers => (IsFavorite ? "★" : "") + (!IsAvailable ? " !" : "");
     public string SensorType => HardwareSensorCatalog.GetSensorType(Key);
     public string DisplayValue => IsAvailable

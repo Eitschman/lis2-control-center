@@ -422,6 +422,7 @@
               </DataTemplate>
             </ListBox.DataTemplates>
           </ListBox>
+          <TextBlock Name="HardwareSelectedSensor" Text="Select a sensor above." TextWrapping="Wrap" />
           <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBox Name="HardwareAlias" Width="260" Watermark="Alias for selected sensor" />
             <CheckBox Name="HardwareFavorite" Content="Favorite" VerticalAlignment="Center" />

@@ -340,3 +340,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Hardware monitoring summary and source error parity (2026-10-14)
 - WPF-style hardware monitoring summary now shows visible sensors, total non-unit snapshot values, and unavailable configured sensor count; source errors take precedence and persist across filter changes until the next successful refresh. Snapshot metadata is excluded from the total. Headless regression tests cover filtered counts, unavailable tracked sensors and source errors.
 - Hardware writes and fan authorization unchanged. CI pending for this HEAD; manual desktop verification remains deferred until full port.
+
+## Hardware selected-sensor detail panel (2026-10-14)
+- Restored WPF's selected-sensor detail readout in Avalonia: selected display name, current value with unit or unavailable state, and the exact stable template key. Details refresh with the sensor list, clear on deselection and follow alias/favorite edits; selection is read-only and never sends device commands.
+- Added headless projection regressions, wired selection and refresh handling, and added the view element. Current HEAD CI pending; desktop visual acceptance deferred.
