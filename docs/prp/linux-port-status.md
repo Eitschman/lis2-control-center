@@ -360,3 +360,8 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## Preview publish sanity gates (2026-10-14)
 - Added per-RID CI verification that the expected platform executable exists and is not suspiciously small before packaging/upload. Linux archives retain executable mode; the existing shared/Avalonia tests remain prerequisites. This is static artifact sanity checking, not execution on ARM64 or UI acceptance.
 - Prior preview publish commit 2649022 succeeded all seven jobs in run 38542030053. New HEAD CI pending.
+
+## First Raspberry Pi 5 screenshot: usability fixes (2026-10-14)
+- Owner confirmed ARM64 preview starts on Raspberry Pi 5 KDE/Wayland. Screenshot exposed too-tall minimum window, dark-on-dark sidebar/navigation and status text, and footer overlapping transport controls.
+- Reduced default/minimum window geometry to 1200x700 / 850x480, placed sidebar navigation/transport inside a vertically scrolling region with a separate footer, explicitly set light foreground on sidebar/navigation and connection badge, and removed inert help/GitHub/About affordances in favor of a passive preview label. This is a source-based corrective package; new ARM64 screenshot acceptance is pending and no hardware/fan behavior changes.
+- CI pending on this HEAD. Existing package workflow continues publishing self-contained ARM64/x64 previews.

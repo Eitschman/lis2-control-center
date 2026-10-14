@@ -3,13 +3,13 @@
         xmlns:local="clr-namespace:LIS2.App.Avalonia"
         x:Class="LIS2.App.Avalonia.MainWindow"
         Title="LIS2 Control Center"
-        Width="1320" Height="900" MinWidth="1120" MinHeight="760"
+        Width="1200" Height="700" MinWidth="850" MinHeight="480"
         WindowStartupLocation="CenterScreen">
   <Grid ColumnDefinitions="250,*">
-    <Border Grid.Column="0" Background="#182431" BorderBrush="#354351" BorderThickness="0,0,1,0">
-      <Grid Margin="18" RowDefinitions="Auto,*,Auto">
+    <Border Grid.Column="0" Background="#182431" BorderBrush="#354351" BorderThickness="0,0,1,0" Foreground="#F1F5F9">
+      <Grid Margin="14" RowDefinitions="Auto,*,Auto">
         <TextBlock Grid.Row="0" Text="LIS2 CONTROL CENTER" FontSize="16" FontWeight="Bold" Margin="4,18,0,24" Foreground="White" />
-        <StackPanel Grid.Row="1" Spacing="8">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="8">
           <StackPanel Name="NavigationPanel" Spacing="2">
             <Button Name="NavButton0" Tag="0" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="⌂" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Dashboard" VerticalAlignment="Center"/></Grid></Button>
             <Button Name="NavButton1" Tag="1" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="▣" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Display" VerticalAlignment="Center"/></Grid></Button>
@@ -27,12 +27,10 @@
           <TextBlock Name="TransportSummaryText" Text="Virtual LIS2" TextWrapping="Wrap" Margin="4,0,0,4" />
           <TextBlock Name="VirtualStatus" Text="Disconnected" TextWrapping="Wrap" Margin="4,0,0,8" />
           <Button Name="OpenTransportSettings" Content="Change..." HorizontalAlignment="Left" MinWidth="110" />
-        </StackPanel>
+        </StackPanel></ScrollViewer>
         <StackPanel Grid.Row="2" Margin="4,12,0,10" Spacing="7">
           <Separator />
-          <TextBlock Text="ⓘ  LIS2 Control Center" />
-          <TextBlock Text="◉  GitHub" Opacity="0.65" />
-          <TextBlock Text="ⓘ  About" Opacity="0.65" />
+          <TextBlock Text="LIS2 Control Center · Preview" TextWrapping="Wrap" FontSize="11" Opacity="0.8" />
         </StackPanel>
       </Grid>
     </Border>
@@ -41,12 +39,12 @@
         <StackPanel Grid.Column="0" Spacing="5">
           <StackPanel Orientation="Horizontal" Spacing="12">
             <TextBlock Name="SectionTitle" Text="Dashboard" FontSize="30" FontWeight="SemiBold" />
-            <Button Content="?" Width="32" Height="32" ToolTip.Tip="Help for this page" />
+            <TextBlock Text="Preview" FontSize="12" Foreground="#64748B" VerticalAlignment="Center" />
           </StackPanel>
           <TextBlock Name="SectionDescription" Text="Overview and quick access to the most important functions." Opacity="0.65" TextWrapping="Wrap" />
         </StackPanel>
         <Border Grid.Column="1" Background="#354351" CornerRadius="14" Padding="14,9" VerticalAlignment="Top">
-          <TextBlock Name="ConnectionText" Text="Disconnected" FontWeight="SemiBold" />
+          <TextBlock Name="ConnectionText" Text="Disconnected" FontWeight="SemiBold" Foreground="White" />
         </Border>
       </Grid>
       <ScrollViewer Name="DashboardView" Grid.Row="1">

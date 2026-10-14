@@ -229,3 +229,6 @@ The existing Windows WPF application is the **authoritative UI/UX specification*
 - `.github/workflows/linux-portable.yml` now publishes gated downloadable self-contained Avalonia preview packages for `linux-arm64`, `linux-x64` and `win-x64` using `dotnet publish`, and uploads them with a 14-day retention. This is a preview build distribution facility, not a release or final platform acceptance. See `linux-port-status.md` for CI status.
 
 - Follow-up preview packaging hardening: verify executable existence and nontrivial size in each runtime-specific publish directory before uploading. Cross-architecture execution and final desktop acceptance remain pending.
+
+## Pi 5 first-launch UI feedback (2026-10-14)
+- Real Pi 5 screenshot revealed window minimum height and sidebar legibility/layout defects. Addressed window sizing, sidebar scrolling/footer separation and explicit high-contrast text in the Avalonia shell. This is an exception to deferred desktop testing because the owner voluntarily supplied a first-launch screenshot; do not interpret it as final desktop acceptance. New-build validation pending.
