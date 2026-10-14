@@ -428,3 +428,6 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 
 ## Continuous hardware sampling (2026-10-14)
 - Hardware snapshot timer now starts during initialization and samples every two seconds regardless of selected menu, supplying PageSourceValues for virtual/serial template rendering. The Hardware live-updates button controls only list refreshing, not the sampling pipeline. The timer is stopped during window shutdown. WPF hardware-view timer is view-gated, but WPF hardware source updates are separately owned by the source runtime; Avalonia uses the existing cross-platform live sensor adapter. CI and real Pi verification pending.
+
+## Settings sidebar cleanup (2026-10-14)
+- User screenshot revealed Windows settings import and page-save status incorrectly placed inside left navigation. Moved import button/status into SettingsView; moved VirtualStatus to SettingsView, leaving transport shortcut in sidebar. No changes to import event wiring or storage. CI pending.

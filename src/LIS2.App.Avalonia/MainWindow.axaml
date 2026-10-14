@@ -23,13 +23,8 @@
             <Button Name="NavButton9" Tag="9" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><TextBlock Grid.Column="0" Text="⌂" HorizontalAlignment="Center"/><TextBlock Grid.Column="1" Text="Home Assistant" VerticalAlignment="Center"/></Grid></Button>
           </StackPanel>
           <Separator Margin="4,18,4,16" />
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Name="ImportWindowsSettings" Content="Import Windows settings.json..." />
-                <TextBlock Name="WindowsImportStatus" Text="Existing Windows settings remain unchanged." VerticalAlignment="Center" Opacity="0.7" />
-              </StackPanel>
           <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
           <TextBlock Name="TransportSummaryText" Text="Virtual LIS2" TextWrapping="Wrap" Margin="4,0,0,4" />
-          <TextBlock Name="VirtualStatus" Text="Disconnected" TextWrapping="Wrap" Margin="4,0,0,8" />
           <Button Name="OpenTransportSettings" Content="Change..." HorizontalAlignment="Left" MinWidth="110" />
         </StackPanel></ScrollViewer>
         <StackPanel Grid.Row="2" Margin="4,12,0,10" Spacing="7">
@@ -501,7 +496,14 @@
           </Border>
         </Grid>
       </ScrollViewer>
-      <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="12"><TextBlock Text="Device / Transport" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Experimental serial and virtual transport diagnostics. No hardware fan authorization is implied." TextWrapping="Wrap"/>          <Separator Margin="4,18,4,16" />
+      <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="12"><TextBlock Text="Windows settings import" FontSize="18" FontWeight="SemiBold"/>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Name="ImportWindowsSettings" Content="Import Windows settings.json..." />
+            <TextBlock Name="WindowsImportStatus" Text="Existing Windows settings remain unchanged." VerticalAlignment="Center" Opacity="0.7" TextWrapping="Wrap" />
+          </StackPanel>
+          <TextBlock Name="VirtualStatus" Text="Disconnected" TextWrapping="Wrap" Opacity="0.75"/>
+          <Separator Margin="0,12,0,4"/>
+          <TextBlock Text="Device / Transport" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Experimental serial and virtual transport diagnostics. No hardware fan authorization is implied." TextWrapping="Wrap"/>          <Separator Margin="4,18,4,16" />
           <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
 
 
