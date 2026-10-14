@@ -102,10 +102,10 @@ public sealed class LinuxSystemSensors : IFanSensorSource
     {
         try
         {
-            foreach (var cpu in Directory.EnumerateDirectories(Path.Combine(_sys, "devices/system/cpu"), "cpu[0-9]*"))
+            foreach (var cpu in Directory.EnumerateDirectories(Path.Combine(_sys, "devices/system/cpu"), "cpu*"))
             {
                 var name = Path.GetFileName(cpu);
-                if (!name.Skip(3).All(char.IsDigit)) continue;
+                if (name.Length <= 3 || !name.StartsWith("cpu", StringComparison.Ordinal) || !name.Skip(3).All(char.IsDigit)) continue;
                 var file = Path.Combine(cpu, "cpufreq/scaling_cur_freq");
                 if (File.Exists(file) && double.TryParse(File.ReadAllText(file).Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var khz))
                     Add(values, "Hardware.CPU.Clock." + name, khz / 1000d, "MHz");
