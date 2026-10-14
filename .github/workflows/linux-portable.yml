@@ -74,16 +74,17 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Publish self-contained executable
-        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false --output publish/${{ matrix.rid }}
+        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false --output publish/${{ matrix.rid }}
       - name: Verify published executable and runtime assets
         shell: pwsh
         run: |
           $folder = "publish/${{ matrix.rid }}"
           $exe = if ("${{ runner.os }}" -eq "Windows") { "LIS2.App.Avalonia.exe" } else { "LIS2.App.Avalonia" }
           if (-not (Test-Path "$folder/$exe")) { throw "Missing executable: $folder/$exe" }
-          if (-not (Test-Path "$folder/LIS2.App.Avalonia.pdb")) { Write-Host "No separate PDB (allowed for single-file preview)" }
           $size = (Get-Item "$folder/$exe").Length
-          if ($size -lt 1000000) { throw "Unexpectedly small self-contained executable ($size bytes)" }
+          if ($size -lt 10000) { throw "Unexpectedly small executable ($size bytes)" }
+          if (-not (Test-Path "$folder/LIS2.App.Avalonia.dll")) { throw "Missing managed application assembly" }
+          if (-not (Test-Path "$folder/LIS2.App.Avalonia.runtimeconfig.json")) { throw "Missing runtime configuration" }
           Write-Host "Verified ${{ matrix.rid }} executable: $size bytes"
       - name: Package Linux executable
         if: runner.os == 'Linux'
@@ -91,16 +92,23 @@ jobs:
         run: |
           chmod +x publish/${{ matrix.rid }}/LIS2.App.Avalonia
           tar -czf LIS2-Avalonia-${{ matrix.rid }}.tar.gz -C publish/${{ matrix.rid }} .
+          sha256sum LIS2-Avalonia-${{ matrix.rid }}.tar.gz > LIS2-Avalonia-${{ matrix.rid }}.sha256
+          sha256sum -c LIS2-Avalonia-${{ matrix.rid }}.sha256
       - name: Package Windows executable
         if: runner.os == 'Windows'
         shell: pwsh
-        run: Compress-Archive -Path "publish/${{ matrix.rid }}/*" -DestinationPath "LIS2-Avalonia-${{ matrix.rid }}.zip"
+        run: |
+          Compress-Archive -Path "publish/${{ matrix.rid }}/*" -DestinationPath "LIS2-Avalonia-${{ matrix.rid }}.zip"
+          $hash = (Get-FileHash "LIS2-Avalonia-${{ matrix.rid }}.zip" -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  LIS2-Avalonia-${{ matrix.rid }}.zip" | Set-Content -Encoding ascii "LIS2-Avalonia-${{ matrix.rid }}.sha256"
       - name: Upload Linux package
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: LIS2-Avalonia-${{ matrix.rid }}
-          path: LIS2-Avalonia-${{ matrix.rid }}.tar.gz
+          path: |
+            LIS2-Avalonia-${{ matrix.rid }}.tar.gz
+            LIS2-Avalonia-${{ matrix.rid }}.sha256
           if-no-files-found: error
           retention-days: 14
       - name: Upload Windows package
@@ -108,6 +116,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: LIS2-Avalonia-${{ matrix.rid }}
-          path: LIS2-Avalonia-${{ matrix.rid }}.zip
+          path: |
+            LIS2-Avalonia-${{ matrix.rid }}.zip
+            LIS2-Avalonia-${{ matrix.rid }}.sha256
           if-no-files-found: error
           retention-days: 14
