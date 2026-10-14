@@ -320,3 +320,7 @@ Open a PR against `main` only when a coherent, tested slice is ready. Keep this 
 ## CI repair: sensor-key test fixture (2026-10-14)
 - Run 38533392908 built both Avalonia targets successfully; one headless test failed on both OSes: CaseInsensitiveSnapshotKeysDoNotDuplicateEntries expected legacy non-Hardware key names to appear after WPF-style sensor-key filtering was introduced.
 - Updated the test fixture to realistic Hardware.CPU.Temperature.* keys with mixed casing, retaining its original purpose of checking case-insensitive snapshot merging and saved preferences. No runtime behavior or safety changes; new HEAD CI pending.
+
+## Hardware sensor unit parity (2026-10-14)
+- Sensor rows now read the per-sensor Hardware.*.Unit metadata and append its unit to displayed values; Celsius is no longer hardcoded in ToString. Missing units remain unitless; disconnected readings remain unavailable. The metadata itself is not listed as a sensor.
+- Added headless regression coverage for temperature, load and fan units, plus unitless power sensors. No hardware write behavior changed; desktop acceptance remains deferred. Latest-HEAD CI pending.

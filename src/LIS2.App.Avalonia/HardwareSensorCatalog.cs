@@ -20,8 +20,10 @@ public static class HardwareSensorCatalog
             {
                 saved.TryGetValue(key, out var preference);
                 var available = current.TryGetValue(key, out var value) && IsNumeric(value);
+                current.TryGetValue(key + ".Unit", out var unitValue);
+                var unit = unitValue as string ?? "";
                 return new HardwareSensorEntry(key, available ? value : null,
-                    preference?.Alias ?? "", preference?.IsFavorite == true, available);
+                    preference?.Alias ?? "", preference?.IsFavorite == true, available, unit);
             })
             .Where(entry => MatchesType(entry, typeFilter) && (!favoritesOnly || entry.IsFavorite) &&
                 (entry.Key.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
@@ -78,14 +80,17 @@ public static class HardwareSensorCatalog
             .Any(part => string.Equals(part, type, StringComparison.OrdinalIgnoreCase))) ?? "Other";
     }
 }
-public sealed record HardwareSensorEntry(string Key, object? Value, string Alias, bool IsFavorite, bool IsAvailable)
+public sealed record HardwareSensorEntry(string Key, object? Value, string Alias, bool IsFavorite, bool IsAvailable, string Unit = "")
 {
     public string DisplayName => string.IsNullOrWhiteSpace(Alias) ? SensorName : Alias;
     public string HardwareName => Key.Split('.').Length > 1 ? Key.Split('.')[1] : "Hardware";
     public string SensorName => Key.Split('.').Length > 3 ? string.Join(" ", Key.Split('.').Skip(3)) : Key;
     public string Markers => (IsFavorite ? "★" : "") + (!IsAvailable ? " !" : "");
     public string SensorType => HardwareSensorCatalog.GetSensorType(Key);
-    public string DisplayValue => IsAvailable ? Convert.ToString(Value, CultureInfo.InvariantCulture) ?? "" : "Unavailable";
+    public string DisplayValue => IsAvailable
+        ? (Convert.ToString(Value, CultureInfo.InvariantCulture) ?? "") +
+          (string.IsNullOrWhiteSpace(Unit) ? "" : " " + Unit.Trim())
+        : "Unavailable";
 
     public static IReadOnlyList<object> GroupForDisplay(IEnumerable<HardwareSensorEntry> entries)
     {
@@ -105,7 +110,7 @@ public sealed record HardwareSensorEntry(string Key, object? Value, string Alias
     {
         var name = string.IsNullOrWhiteSpace(Alias) ? Key : Alias + " (" + Key + ")";
         return (IsFavorite ? "★ " : "") + name + "  =  " +
-            (IsAvailable ? Convert.ToString(Value, CultureInfo.InvariantCulture) + " °C" : "Unavailable");
+            DisplayValue;
     }
 }
 

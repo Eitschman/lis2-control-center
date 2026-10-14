@@ -2,6 +2,31 @@ using LIS2.App.Avalonia;
 namespace LIS2.App.Avalonia.Tests;
 public sealed class HardwareSensorCatalogTests
 {
+    [Theory]
+    [InlineData("Hardware.CPU.Temperature.Package", 45d, "°C", "45 °C")]
+    [InlineData("Hardware.CPU.Load.Total", 25d, "%", "25 %")]
+    [InlineData("Hardware.CPU.Fan.Fan1", 1200d, "RPM", "1200 RPM")]
+    public void DisplayValueUsesSensorSpecificUnit(string key, double value, string unit, string expected)
+    {
+        var snapshot = new Dictionary<string, object?>
+        {
+            [key] = value,
+            [key + ".Unit"] = unit
+        };
+        var entry = Assert.Single(HardwareSensorCatalog.Build(snapshot,
+            Array.Empty<PortableHardwareSensorPreference>()));
+        Assert.Equal(expected, entry.DisplayValue);
+        Assert.Contains(expected, entry.ToString());
+    }
+
+    [Fact]
+    public void SensorWithoutUnitDoesNotInventCelsius()
+    {
+        var entry = new HardwareSensorEntry("Hardware.CPU.Power.Package", 30d, "", false, true);
+        Assert.Equal("30", entry.DisplayValue);
+        Assert.DoesNotContain("°C", entry.ToString());
+    }
+
     [Fact]
     public void TrackedDisconnectedSensorKeysRemainUnavailable()
     {
