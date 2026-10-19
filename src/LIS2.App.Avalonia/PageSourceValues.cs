@@ -8,6 +8,18 @@ public sealed class PageSourceValues : IAsyncDisposable
 {
     private readonly SourceRuntime _runtime = new();
     private readonly Dictionary<string, object?> _hardware = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, object?> _media = new(StringComparer.OrdinalIgnoreCase);
+
+    public void UpdateMedia(string sourceId, IReadOnlyDictionary<string, object?> values)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceId);
+        ArgumentNullException.ThrowIfNull(values);
+        var prefix = sourceId + ".";
+        foreach (var key in _media.Keys.Where(k => k.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToArray())
+            _media.Remove(key);
+        foreach (var pair in values)
+            _media[prefix + pair.Key] = pair.Value;
+    }
 
     public void UpdateHardware(IReadOnlyDictionary<string, object?> snapshot)
     {
@@ -28,6 +40,7 @@ public sealed class PageSourceValues : IAsyncDisposable
     {
         var values = new Dictionary<string, object?>(_runtime.Snapshot(), StringComparer.OrdinalIgnoreCase);
         foreach (var pair in _hardware) values[pair.Key] = pair.Value;
+        foreach (var pair in _media) values[pair.Key] = pair.Value;
         foreach (var pair in PageClockValues.Create(now))
             values.TryAdd(pair.Key, pair.Value);
         for (var slot = 1; slot <= 8; slot++)
