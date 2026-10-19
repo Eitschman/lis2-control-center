@@ -552,20 +552,20 @@
         </Grid>
       </ScrollViewer>
       <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="14">
-          <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Border BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
-              <TextBlock Text="Device / Transport" FontWeight="SemiBold" FontSize="18"/>
+              <TextBlock Text="Gerät / Transport" FontWeight="SemiBold" FontSize="18"/>
               <Grid ColumnDefinitions="100,190,100,180,*" ColumnSpacing="8">
                 <TextBlock Grid.Column="0" Text="Transport" VerticalAlignment="Center"/>
                 <ComboBox Grid.Column="1" Name="TransportModeComboBox" SelectedIndex="0">
-                  <ComboBoxItem Content="Virtual"/>
+                  <ComboBoxItem Content="Virtuell"/>
                   <ComboBoxItem Content="Serial"/>
                 </ComboBox>
-                <TextBlock Grid.Column="2" Text="COM port" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="COM-Port" VerticalAlignment="Center"/>
                 <ComboBox Grid.Column="3" Name="SettingsPortComboBox"/>
                 <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="7">
-                  <Button Name="SettingsRefreshPorts" Content="Refresh"/>
-                  <Button Name="SettingsApplyTransport" Content="Apply / reconnect"/>
+                  <Button Name="SettingsRefreshPorts" Content="Aktualisieren"/>
+                  <Button Name="SettingsApplyTransport" Content="Anwenden / neu verbinden"/>
                 </StackPanel>
               </Grid>
               <TextBlock Name="SettingsTransportStatus" TextWrapping="Wrap" Opacity="0.75"/>
@@ -573,25 +573,25 @@
           </Border>
           <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
-              <TextBlock Text="Appearance" FontWeight="SemiBold" FontSize="18"/>
+              <TextBlock Text="Darstellung" FontWeight="SemiBold" FontSize="18"/>
               <Grid ColumnDefinitions="100,220,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="10">
-                <TextBlock Grid.Row="0" Text="Theme" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="0" Text="Design" VerticalAlignment="Center"/>
                 <ComboBox Grid.Row="0" Grid.Column="1" Name="ThemeModeComboBox">
-                  <ComboBoxItem Content="System default"/>
-                  <ComboBoxItem Content="Light"/>
-                  <ComboBoxItem Content="Dark"/>
+                  <ComboBoxItem Content="Systemstandard"/>
+                  <ComboBoxItem Content="Hell"/>
+                  <ComboBoxItem Content="Dunkel"/>
                 </ComboBox>
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="System default follows the operating system." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
-                <TextBlock Grid.Row="1" Text="Language" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="Systemstandard folgt automatisch dem Betriebssystem-Design." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
+                <TextBlock Grid.Row="1" Text="Sprache" VerticalAlignment="Center"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" Name="LanguageModeComboBox">
-                  <ComboBoxItem Content="System default"/>
-                  <ComboBoxItem Content="English"/>
-                  <ComboBoxItem Content="German"/>
-                  <ComboBoxItem Content="French"/>
-                  <ComboBoxItem Content="Turkish"/>
-                  <ComboBoxItem Content="Russian"/>
+                  <ComboBoxItem Content="Systemstandard"/>
+                  <ComboBoxItem Content="Englisch"/>
+                  <ComboBoxItem Content="Deutsch"/>
+                  <ComboBoxItem Content="Französisch"/>
+                  <ComboBoxItem Content="Türkisch"/>
+                  <ComboBoxItem Content="Russisch"/>
                 </ComboBox>
-                <TextBlock Grid.Row="1" Grid.Column="2" Text="System default uses the operating system language." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="Systemstandard verwendet die Anzeigesprache des Betriebssystems." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
               </Grid>
               <TextBlock Name="SettingsAppearanceStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
@@ -599,10 +599,11 @@
           <Border Name="SettingsWindowsCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Text="Windows" FontWeight="SemiBold" FontSize="18"/>
-              <CheckBox Name="StartWithWindowsCheckBox" Content="Start LIS2 Control Center with Windows (minimized to tray)"/>
+              <CheckBox Name="StartWithWindowsCheckBox" Content="LIS2 Control Center mit Windows starten (minimiert im Infobereich)"/>
               <TextBlock Name="SettingsStartupStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
           </Border>
+          <StackPanel IsVisible="False" Spacing="10">
           <Separator Margin="0,10,0,2"/>
           <TextBlock Text="Advanced / Diagnostics" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Windows settings import" FontSize="18" FontWeight="SemiBold"/>
           <StackPanel Orientation="Horizontal" Spacing="8">
@@ -641,7 +642,9 @@
           <TextBlock Name="SerialStatus" Text="Serial display disconnected; fan control unavailable." TextWrapping="Wrap" />
           <Button Name="VirtualConnect" Content="Connect virtual LIS2" HorizontalAlignment="Left" />
           <Button Name="VirtualDisconnect" Content="Disconnect" IsEnabled="False" HorizontalAlignment="Left" />
-      </StackPanel></ScrollViewer>
+      
+          </StackPanel>
+</StackPanel></ScrollViewer>
     </Grid>
   </Grid>
 </Window>
