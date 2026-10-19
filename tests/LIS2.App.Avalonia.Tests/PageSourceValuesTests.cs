@@ -48,6 +48,16 @@ public sealed class PageSourceValuesTests
     }
 
     [Fact]
+    public void LinuxMprisParsesAlbumDurationAndMissingData()
+    {
+        var values = LinuxMprisSource.Parse("Playing\tSong\tArtist\tAlbum\t123000000");
+        Assert.Equal("Album", values["Album"]);
+        Assert.Equal("00:02:03", values["Duration"]);
+        Assert.Equal("Song", values["Title"]);
+        Assert.Equal(false, LinuxMprisSource.Parse("bad response")["Connected"]);
+    }
+
+    [Fact]
     public async Task SourceLifecycleIsIdempotent()
     {
         await using var sources = new PageSourceValues();
