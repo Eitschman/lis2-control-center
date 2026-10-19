@@ -75,6 +75,15 @@ jobs:
           dotnet-version: 8.0.x
       - name: Publish self-contained executable
         run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false --output publish/${{ matrix.rid }}
+      - name: Build and include Windows GSMTC provider
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          dotnet build src/LIS2.WindowsMedia/LIS2.WindowsMedia.csproj --configuration Release
+          if ($LASTEXITCODE -ne 0) { throw "Windows GSMTC provider build failed" }
+          $dll = "src/LIS2.WindowsMedia/bin/Release/net8.0-windows10.0.19041.0/LIS2.WindowsMedia.dll"
+          if (-not (Test-Path $dll)) { throw "Missing Windows GSMTC provider: $dll" }
+          Copy-Item $dll "publish/${{ matrix.rid }}/LIS2.WindowsMedia.dll"
       - name: Verify published executable and runtime assets
         shell: pwsh
         run: |
