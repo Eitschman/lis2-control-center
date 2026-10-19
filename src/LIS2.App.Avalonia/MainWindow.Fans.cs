@@ -21,6 +21,16 @@ public partial class MainWindow
     private bool _fanEditorLoading;
     private int _fanEditingChannelIndex;
 
+    private void UpdateFanOutputPreview(IReadOnlyList<int> percentages)
+    {
+        for (var i = 0; i < Math.Min(4, percentages.Count); i++)
+        {
+            var percent = Math.Clamp(percentages[i], 0, 100);
+            this.FindControl<ProgressBar>($"FanOutputBar{i + 1}")!.Value = percent;
+            this.FindControl<TextBlock>($"FanOutputText{i + 1}")!.Text = percent + " %";
+        }
+    }
+
     private void InitializeFanEditor()
     {
         this.FindControl<ComboBox>("FanChannelPicker")!.SelectionChanged += (_, _) =>
@@ -65,6 +75,7 @@ public partial class MainWindow
                         _fanPreviewSensors.Set(channel.SensorKey, temperature);
                 await using var runtime = new FanRuntime(_fanPreviewSensors, _fanPreviewSink, _fanSettings.ToRuntimeChannels());
                 var state = await runtime.TickAsync();
+                UpdateFanOutputPreview(state.Channels.Select(channel => channel.OutputPercent).ToArray());
                 SetFanStatus("DRY RUN: " + string.Join(" / ", state.Channels.Select((c, i) =>
                     $"Fan {i + 1}: {c.OutputPercent}%{(c.SensorValid ? "" : " (fail-safe)") }")));
             }
@@ -89,6 +100,7 @@ public partial class MainWindow
                 SaveFanEditor();
                 await using var runtime = new FanRuntime(_liveFanSensors, _fanPreviewSink, _fanSettings.ToRuntimeChannels());
                 var state = await runtime.TickAsync();
+                UpdateFanOutputPreview(state.Channels.Select(channel => channel.OutputPercent).ToArray());
                 SetFanStatus("LIVE SENSOR DRY RUN (no hardware output): " +
                     string.Join(" / ", state.Channels.Select((c, i) =>
                         $"Fan {i + 1}: {c.OutputPercent}%{(c.SensorValid ? "" : " (fail-safe)")}")));
