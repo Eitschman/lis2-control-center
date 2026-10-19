@@ -93,8 +93,8 @@ public partial class MainWindow
         var dark = _preferredTheme.Equals("Dark", StringComparison.OrdinalIgnoreCase) ||
             (_preferredTheme.Equals("System", StringComparison.OrdinalIgnoreCase) &&
              app.ActualThemeVariant == ThemeVariant.Dark);
-        static Avalonia.Media.SolidColorBrush Brush(string hex) =>
-            new(Avalonia.Media.Color.Parse(hex));
+        static global::Avalonia.Media.SolidColorBrush Brush(string hex) =>
+            new(global::Avalonia.Media.Color.Parse(hex));
         app.Resources["Lis2CardBrush"] = Brush(dark ? "#202A35" : "#FFFFFF");
         app.Resources["Lis2SurfaceBrush"] = Brush(dark ? "#141C26" : "#F5F7FA");
         app.Resources["Lis2BorderBrush"] = Brush(dark ? "#455466" : "#D4DCE5");
