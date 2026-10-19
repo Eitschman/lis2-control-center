@@ -67,6 +67,8 @@ public partial class MainWindow
         ["Allow stop"] = "Stillstand erlauben",
         ["Simulated sensor temperature"] = "Simulierte Sensortemperatur",
         ["Hardware monitoring"] = "Hardwareüberwachung",
+        ["Read-only sensors from the current operating system. Refresh to capture a new snapshot; no LIS2 hardware commands are sent."] = "Schreibgeschützte Systemsensoren. Aktualisieren liest neue Werte ein; es werden keine LIS2-Hardwarebefehle gesendet.",
+        ["Select a sensor above."] = "Bitte oben einen Sensor auswählen.",
         ["Read-only sensors from the current operating system. Refresh to capture a new snapshot; no LIS2 hardware commands are sent."] = "Schreibgeschützte Sensorwerte des Betriebssystems. Aktualisieren liest neue Messwerte ein; es werden keine LIS2-Hardwarebefehle gesendet.",
         ["Select a sensor above."] = "Oben einen Sensor auswählen.",
         ["Sensor"] = "Sensor",
@@ -189,6 +191,8 @@ public partial class MainWindow
         ["Automatic control"] = "Automatische Steuerung",
         ["Favorites only"] = "Nur Favoriten",
         ["Favorite"] = "Favorit",
+        ["Favorites only"] = "Nur Favoriten",
+        ["Favorite"] = "Favorit",
         ["Enable or disable this page"] = "Seite aktivieren oder deaktivieren",
         ["I explicitly authorize physical fan output for this connection"] =
             "Ich autorisiere ausdrücklich die physischen Lüfterausgänge für diese Verbindung"
@@ -196,6 +200,8 @@ public partial class MainWindow
 
     private void ApplyPageLocalization()
     {
+        // Logical descendants include controls in inactive/hidden pages and do not
+        // depend on the visual template being attached at the moment of translation.
         // Restrict translations to a known set of static labels. Never overwrite live
         // sensor values, media metadata, Home Assistant states or error messages.
         foreach (var label in this.GetLogicalDescendants().OfType<TextBlock>())
