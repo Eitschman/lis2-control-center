@@ -33,7 +33,7 @@ public partial class MainWindow
 
     private void RefreshFanCurvePreview()
     {
-        var target = this.FindControl<Avalonia.Controls.Shapes.Path>("FanCurvePreviewPath");
+        var target = this.FindControl<global::Avalonia.Controls.Shapes.Path>("FanCurvePreviewPath");
         if (target is null) return;
         var points = new List<(double Temperature, double Percent)>();
         foreach (var line in (this.FindControl<TextBox>("FanCurve")?.Text ?? "").Split('\n'))
@@ -54,7 +54,7 @@ public partial class MainWindow
             (i == 0 ? "M " : "L ") +
             ((point.Temperature - min) / (max - min) * 298).ToString("0.##", CultureInfo.InvariantCulture) + "," +
             (110 - point.Percent * 1.1).ToString("0.##", CultureInfo.InvariantCulture));
-        target.Data = Avalonia.Media.Geometry.Parse(string.Join(" ", segments));
+        target.Data = global::Avalonia.Media.Geometry.Parse(string.Join(" ", segments));
     }
 
     private void InitializeFanEditor()
