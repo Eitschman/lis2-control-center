@@ -478,3 +478,10 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 - Fixed Linux MPRIS `playerctl --format` delimiter/parser mismatch and updated parser regression test to match the real command format.
 - Extended Windows publish packaging to include provider output DLL dependencies. Added GSMTC provider availability signal, hides Windows Media panel when bridge DLL is absent, and stops the media refresh timer on shutdown.
 - New commits `b1ecc5e`, `6b7e0ae`, `ce193ca`, `9bb31ed`, `849104f`. Latest HEAD CI not yet accepted. Real-device and full WPF visual parity remain open.
+
+## Windows Media navigation crash report (2026-10-19)
+
+- User reproduced a full application crash on Windows when clicking the Media menu. The navigation handler immediately calls `RefreshMedia()`; the precise exception/stack trace was not available, so root cause is not confirmed.
+- Hotfix isolates each Windows media provider refresh, contains GSMTC reflection snapshot exceptions, guards Media navigation and Linux MPRIS asynchronous refresh; errors are traced and displayed as provider status instead of propagating through UI event handlers.
+- Commits: `0664a2e`, `fe2806d`, `4221fdf`, `f4e36a4`. CI and Windows interactive reproduction are required before closing this incident; do not infer runtime success from a green build alone.
+- Next: obtain Windows exception diagnostics if crash persists, add a UI navigation smoke test, confirm media page opens with no media players running and with provider DLL missing.
