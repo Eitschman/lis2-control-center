@@ -138,7 +138,9 @@ public partial class MainWindow
             foreach (var item in snapshot) _hardwareSensors[item.Key] = item.Value;
             _pageSources.UpdateHardware(_hardwareSensors);
             RefreshPageVariables();
-            _hardwareSourceError = null;
+            _hardwareSourceError = snapshot.Count == 0 && _liveFanSensors is WindowsHardwareFanSensors windows
+                ? windows.Diagnostic
+                : null;
             if (_hardwareListLiveUpdates || _selectedSection == 5) FilterHardwareSensors();
         }
         catch (Exception ex)
