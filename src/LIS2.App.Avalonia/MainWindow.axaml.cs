@@ -71,6 +71,7 @@ public partial class MainWindow : Window
         InitializeDiagnostics();
         InitializeGlyphEditor();
         InitializePagesEditor();
+        InitializeMedia();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
         Closed += OnWindowClosed;
         // The virtual transport is hardware-free: make the WPF-style preview
@@ -92,6 +93,7 @@ public partial class MainWindow : Window
         StopPagePlayback();
         _hardwareRefreshTimer.Stop();
         StopHomeAssistantUi();
+        await StopMediaAsync();
         await _pageTimer.StopAndDrainAsync();
         await _serialPlaybackTimer.StopAndDrainAsync();
         await _haUiTimer.StopAndDrainAsync();
@@ -233,12 +235,14 @@ public partial class MainWindow : Window
         this.FindControl<ScrollViewer>("DashboardView")!.IsVisible = section == "Dashboard";
         this.FindControl<ScrollViewer>("DisplayView")!.IsVisible = section == "Display";
         this.FindControl<ScrollViewer>("PagesView")!.IsVisible = section == "Pages";
+        this.FindControl<ScrollViewer>("MediaView")!.IsVisible = section == "Media";
         this.FindControl<ScrollViewer>("HomeAssistantView")!.IsVisible = section == "Home Assistant";
         this.FindControl<ScrollViewer>("FanControlView")!.IsVisible = section == "Fan Control";
         this.FindControl<ScrollViewer>("SettingsView")!.IsVisible = section == "Settings";
         this.FindControl<ScrollViewer>("HardwareView")!.IsVisible = section == "Hardware";
         this.FindControl<ScrollViewer>("DiagnosticsView")!.IsVisible = section == "Diagnostics";
         if (section == "Diagnostics") RefreshDiagnostics();
+        if (section == "Media") RefreshMedia();
 
         if (description is not null)
             description.Text = section == "Dashboard"

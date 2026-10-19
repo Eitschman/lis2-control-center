@@ -287,6 +287,42 @@
         </Border>
       </StackPanel>
     </ScrollViewer>
+    <ScrollViewer Name="MediaView" Grid.Row="1" IsVisible="False">
+      <StackPanel Spacing="14">
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="7">
+            <TextBlock Text="Windows Media Player" FontWeight="SemiBold" FontSize="18"/>
+            <TextBlock Text="Windows media session integration is not available in this build." TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="7">
+            <TextBlock Text="Winamp" FontWeight="SemiBold" FontSize="18"/>
+            <TextBlock Name="WinampMediaStatus" Text="Disconnected"/>
+            <TextBlock Name="WinampMediaTitle" Text="Nothing playing" FontSize="22"/>
+            <TextBlock Name="WinampMediaArtist" Text="Waiting for Winamp..."/>
+            <TextBlock Name="WinampMediaAlbum"/>
+            <TextBlock Name="WinampMediaPlayback"/>
+            <TextBlock Name="WinampMediaTime"/>
+            <TextBlock Name="WinampMediaTelemetry"/>
+            <Button Name="WinampMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
+          </StackPanel>
+        </Border>
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="7">
+            <TextBlock Text="Windows Media Player Legacy" FontWeight="SemiBold" FontSize="18"/>
+            <TextBlock Name="WmpLegacyMediaStatus" Text="Disconnected"/>
+            <TextBlock Name="WmpLegacyMediaTitle" Text="Nothing playing" FontSize="22"/>
+            <TextBlock Name="WmpLegacyMediaArtist" Text="Waiting for legacy player..."/>
+            <TextBlock Name="WmpLegacyMediaAlbum"/>
+            <TextBlock Name="WmpLegacyMediaPlayback"/>
+            <TextBlock Name="WmpLegacyMediaTime"/>
+            <TextBlock Name="WmpLegacyMediaTelemetry"/>
+            <Button Name="WmpLegacyMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
     <ScrollViewer Name="HomeAssistantView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
         <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">

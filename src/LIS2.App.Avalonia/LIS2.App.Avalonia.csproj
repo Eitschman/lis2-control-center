@@ -14,6 +14,8 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.6" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.6" />
     <ProjectReference Include="../LIS2.Core/LIS2.Core.csproj" />
+    <ProjectReference Include="../LIS2.Winamp/LIS2.Winamp.csproj" />
+    <ProjectReference Include="../LIS2.WmpLegacy/LIS2.WmpLegacy.csproj" />
     <ProjectReference Include="../LIS2.Display/LIS2.Display.csproj" />
     <ProjectReference Include="../LIS2.Fans/LIS2.Fans.csproj" />
     <ProjectReference Include="../LIS2.Runtime/LIS2.Runtime.csproj" />
