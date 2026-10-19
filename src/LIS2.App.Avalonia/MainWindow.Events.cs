@@ -7,6 +7,8 @@ namespace LIS2.App.Avalonia;
 
 public partial class MainWindow
 {
+    private sealed record EventQueueRow(string PriorityName, string DisplayName, string Remaining);
+
     private readonly EventQueue _eventQueue = new();
     private readonly DispatcherTimer _eventTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private bool _resumePlaybackAfterEvents;
@@ -64,9 +66,17 @@ public partial class MainWindow
         var snapshot = _eventQueue.Snapshot(DateTimeOffset.UtcNow);
         var list = this.FindControl<ListBox>("EventList")!;
         var selected = list.SelectedIndex;
-        list.ItemsSource = snapshot.Select(item =>
-            $"[{item.Priority}] {item.Frame.Line1.Trim()} | {item.Frame.Line2.Trim()} " +
-            $"({Math.Max(0, (int)Math.Ceiling((item.ExpiresAt - DateTimeOffset.UtcNow).TotalSeconds))}s)").ToArray();
+        list.ItemsSource = snapshot.Select(item => new EventQueueRow(
+            item.Priority switch
+            {
+                >= 200 => "Critical",
+                >= 100 => "Warning",
+                >= 50 => "Notice",
+                _ => "Info"
+            },
+            item.Frame.Line1.Trim() + " | " + item.Frame.Line2.Trim(),
+            Math.Max(0, (int)Math.Ceiling((item.ExpiresAt - DateTimeOffset.UtcNow).TotalSeconds)) + "s"
+        )).ToArray();
         list.SelectedIndex = selected >= 0 && selected < snapshot.Count ? selected : -1;
         this.FindControl<TextBlock>("EventCount")!.Text = $"{snapshot.Count} events";
     }
