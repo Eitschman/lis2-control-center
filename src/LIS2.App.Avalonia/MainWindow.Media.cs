@@ -10,6 +10,8 @@ public partial class MainWindow
     private readonly WinampDataSource _mediaWinamp = new();
     private readonly WmpLegacyDataSource _mediaLegacy = new();
     private DispatcherTimer? _mediaTimer;
+    private readonly LinuxMprisSource _mpris = new();
+    private bool _mprisRefreshing;
 
     private void InitializeMedia()
     {
@@ -18,6 +20,7 @@ public partial class MainWindow
         _mediaTimer.Start();
         this.FindControl<Button>("WinampMediaPage")!.Click += (_, _) =>
             CreateMediaPage("Winamp", "Winamp");
+        this.FindControl<Button>("LinuxMediaPage")!.Click += (_, _) => CreateMediaPage("Media", "Linux media");
         this.FindControl<Button>("WmpLegacyMediaPage")!.Click += (_, _) =>
             CreateMediaPage("WmpLegacy", "Windows Media Player Legacy");
         _ = StartMediaAsync();
@@ -40,9 +43,29 @@ public partial class MainWindow
 
     private void RefreshMedia()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows())
+        {
+            _ = RefreshMprisAsync();
+            return;
+        }
         RefreshMediaSource("Winamp", _mediaWinamp.Values);
         RefreshMediaSource("WmpLegacy", _mediaLegacy.Values);
+    }
+
+    private async Task RefreshMprisAsync()
+    {
+        if (_mprisRefreshing) return;
+        _mprisRefreshing = true;
+        try
+        {
+            var values = await _mpris.ReadAsync();
+            _pageSources.UpdateMedia("Media", values);
+            string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
+            this.FindControl<TextBlock>("LinuxMediaStatus")!.Text = Read("Connected") == "True" ? "Connected" : "Disconnected";
+            this.FindControl<TextBlock>("LinuxMediaTitle")!.Text = Read("Title");
+            this.FindControl<TextBlock>("LinuxMediaArtist")!.Text = Read("Artist");
+        }
+        finally { _mprisRefreshing = false; }
     }
 
     private void RefreshMediaSource(string id, IReadOnlyDictionary<string, object?> values)
