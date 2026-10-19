@@ -72,6 +72,7 @@ public partial class MainWindow : Window
         InitializeGlyphEditor();
         InitializePagesEditor();
         InitializeMedia();
+        InitializeSettings();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
         Closed += OnWindowClosed;
         // The virtual transport is hardware-free: make the WPF-style preview
