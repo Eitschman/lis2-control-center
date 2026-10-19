@@ -13,6 +13,30 @@ public partial class MainWindow
     private void InitializePagesEditor()
     {
         this.FindControl<ListBox>("PagesList")!.SelectionChanged += (_, _) => LoadPageEditor();
+        this.FindControl<Button>("PageCreatePreset")!.Click += (_, _) =>
+        {
+            var choice = this.FindControl<ComboBox>("PagePresetPicker")!.SelectedIndex;
+            _pages.Add();
+            var index = _pages.Pages.Count - 1;
+            var page = _pages.Get(index);
+            if (choice == 0)
+            {
+                page.Name = "Clock";
+                page.Line1Template = "{Clock.Time}";
+                page.Line2Template = "{Clock.Date}";
+            }
+            else
+            {
+                page.Name = "LIS2 Status";
+                page.Line1Template = "LIS2 Control Center";
+                page.Line2Template = "Ready";
+            }
+            page.DurationSeconds = 5;
+            page.Line1OverflowMode = "Truncate";
+            page.Line2OverflowMode = "Truncate";
+            RefreshPageList(index);
+            _ = SavePortableWorkspaceAsync();
+        };
         this.FindControl<Button>("PageAdd")!.Click += (_, _) =>
         {
             _pages.Add();
