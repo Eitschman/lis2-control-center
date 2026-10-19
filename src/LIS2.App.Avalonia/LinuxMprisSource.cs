@@ -25,9 +25,10 @@ public sealed class LinuxMprisSource
             process.StartInfo.ArgumentList.Add("{{status}}|{{title}}|{{artist}}");
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
-            process.Start();
-            var output = await process.StandardOutput.ReadToEndAsync();
-            await process.WaitForExitAsync();
+            if (!process.Start()) return Map("", "", "");
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            var output = await process.StandardOutput.ReadToEndAsync(timeout.Token);
+            await process.WaitForExitAsync(timeout.Token);
             if (process.ExitCode == 0)
             {
                 var parts = output.Trim().Split('|');
@@ -35,6 +36,8 @@ public sealed class LinuxMprisSource
             }
         }
         catch (System.ComponentModel.Win32Exception) { }
+        catch (InvalidOperationException) { }
+        catch (OperationCanceledException) { }
         return Map("", "", "");
     }
 }
