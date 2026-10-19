@@ -152,6 +152,14 @@ public partial class MainWindow
         this.FindControl<TextBlock>(prefix + "Album")!.Text = Read("Album");
         this.FindControl<TextBlock>(prefix + "Playback")!.Text = Read("State");
         this.FindControl<TextBlock>(prefix + "Time")!.Text = Read("Elapsed") + " / " + Read("Duration");
+        if (id == "Winamp")
+        {
+            string FormatValue(string key) => string.IsNullOrWhiteSpace(Read(key)) ? "-" : Read(key);
+            this.FindControl<TextBlock>("WinampMediaPlaylist")!.Text =
+                FormatValue("PlaylistPosition") + " / " + FormatValue("PlaylistCount");
+            this.FindControl<TextBlock>("WinampMediaAudio")!.Text =
+                FormatValue("BitrateKbps") + " kbps / " + FormatValue("SampleRateHz") + " Hz";
+        }
         this.FindControl<TextBlock>(prefix + "Telemetry")!.Text = "VU: " + Read("Vu") + "  Spectrum: " + Read("Spectrum");
     }
 
