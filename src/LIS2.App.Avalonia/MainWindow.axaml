@@ -52,10 +52,11 @@
             <Border Grid.Column="0" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
               <StackPanel Spacing="12">
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
-                <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6" Padding="24,20">
-                  <StackPanel>
-                    <TextBlock Name="PreviewLine1" Text="                    " FontFamily="Consolas" FontSize="31" Foreground="#F7FBFF" />
-                    <TextBlock Name="PreviewLine2" Text="                    " FontFamily="Consolas" FontSize="31" Foreground="#F7FBFF" />
+                <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6"
+                        Width="402" Height="112" HorizontalAlignment="Left" ClipToBounds="True" Padding="8,12">
+                  <StackPanel Width="384" HorizontalAlignment="Left" Spacing="0">
+                    <TextBlock Name="PreviewLine1" Text="                    " Width="384" FontFamily="Consolas" FontSize="30" Foreground="#F7FBFF" TextWrapping="NoWrap" />
+                    <TextBlock Name="PreviewLine2" Text="                    " Width="384" FontFamily="Consolas" FontSize="30" Foreground="#F7FBFF" TextWrapping="NoWrap" />
                   </StackPanel>
                 </Border>
                 <Button Name="VirtualDemo" Content="Send demo display" IsEnabled="False" HorizontalAlignment="Left" />
