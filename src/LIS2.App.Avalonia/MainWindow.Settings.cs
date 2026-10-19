@@ -101,6 +101,11 @@ public partial class MainWindow
         app.Resources["Lis2SidebarBrush"] = Brush(dark ? "#192430" : "#FFFFFF");
         app.Resources["Lis2SidebarTextBrush"] = Brush(dark ? "#EDF3FA" : "#10243A");
         app.Resources["Lis2SelectedBrush"] = Brush(dark ? "#26583E" : "#DDF6E7");
+        app.Resources["Lis2IconBrush"] = Brush(dark ? "#C7D7E6" : "#233D55");
+        app.Resources["Lis2MutedCardBrush"] = Brush(dark ? "#263444" : "#F8FAFC");
+        app.Resources["Lis2HeaderBrush"] = Brush(dark ? "#304154" : "#E8EEF3");
+        app.Resources["Lis2StatusBrush"] = Brush(dark ? "#194A32" : "#E8F5EC");
+        app.Resources["Lis2StatusTextBrush"] = Brush(dark ? "#B4F2CD" : "#166534");
         UpdateSection();
 
     }
