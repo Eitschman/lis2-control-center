@@ -582,3 +582,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - After green Actions run #446 (all platform jobs passed), replaced the Pages list's non-WPF `(off)` text convention with a WPF-style checkbox and ellipsized page name for each row. Clicking a row checkbox updates the indexed PageWorkspace entry, refreshes the editor/list and persists the workspace. The checkbox binding is explicitly OneWay to avoid writing to immutable display records; the click handler owns persistence.
 - Moved `FanAutomatic` to the Fan Outputs header on the right, matching the WPF automatic-control position; removed the duplicate header/control from the lower fan configuration card. Existing authorization/physical fan safety logic untouched.
 - Commits `45a62c0`, `66c5978`, `7780fb5`, `2afd39d`. New CI not yet confirmed; WPF full GUI parity remains outstanding.
+
+## Windows owner smoke-test fixes: Dashboard language and hardware sensors (2026-10-19)
+
+- Owner confirmed the latest green Windows preview looks substantially closer to WPF, but Dashboard remained English and Hardware sensors were absent.
+- Root cause for sensors: `WindowsHardwareFanSensors` exposed only Temperature values and emitted unprefixed keys; `PageSourceValues.UpdateHardware` requires `Hardware.` prefix. Now enumerate all finite LibreHardwareMonitor sensor types (Load, Data, Fan, Temperature, etc.) with WPF-compatible `Hardware.<hardware>.<type>.<sensor>` keys and `.Unit` entries. Existing LHM hardware discovery/refresh and read-only fan-safety behavior preserved. Runtime Windows validation remains pending.
+- Dashboard: added missing German static fan names and guidance, checkbox labels, dynamic virtual-device status, and immediate status refresh on language changes. Existing reversible original-label mechanism retained. German is not forced; selected UI language remains authoritative.
+- Commits `6dd2a92`, `b1a6737`, `5e771b7`, `ce84b5d`. Await CI and Windows desktop validation; do not claim all UI languages or 1:1 acceptance.
