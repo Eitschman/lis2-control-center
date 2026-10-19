@@ -77,6 +77,7 @@ public partial class MainWindow
         ["Protocol Log"] = "Protokoll",
         ["Priority"] = "Priorität",
         ["Active / pending events"] = "Aktive / wartende Ereignisse",
+        ["Active / queued events"] = "Aktive / wartende Ereignisse",
         ["Device / Transport"] = "Gerät / Transport",
         ["Appearance"] = "Darstellung",
         ["Language"] = "Sprache",
