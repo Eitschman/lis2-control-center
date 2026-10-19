@@ -375,7 +375,31 @@
               <ComboBox Name="HaDomainFilter" Width="140" />
             </StackPanel>
             <TextBlock Name="HaStatus" Text="Not configured" TextWrapping="Wrap" />
-            <TextBlock Text="Selected entity" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="34,2.4*,1.4*,1*,1.7*" Margin="8,4,8,0">
+              <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
+              <TextBlock Grid.Column="1" Text="Entity" FontWeight="SemiBold"/>
+              <TextBlock Grid.Column="2" Text="Friendly name" FontWeight="SemiBold"/>
+              <TextBlock Grid.Column="3" Text="State" FontWeight="SemiBold"/>
+              <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold"/>
+            </Grid>
+            <ListBox Name="HaEntityList" MinHeight="160" MaxHeight="330">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="34,2.4*,1.4*,1*,1.7*" Margin="2,4">
+                    <TextBlock Grid.Column="0" Text="{Binding Favorite}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding EntityId}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="2" Text="{Binding FriendlyName}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="3" Text="{Binding State}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="4" Text="{Binding TemplateKey}" FontFamily="Consolas" TextTrimming="CharacterEllipsis"/>
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </StackPanel>
+        </Border>
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Selected entity" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="HaSelectedEntity" Text="Select an entity above." />
             <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="Alias" VerticalAlignment="Center" /><TextBox Name="HaAlias" Width="220" /><CheckBox Name="HaFavorite" Content="Favorite" /><Button Name="HaSaveEntity" Content="Save entity" /></StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8"><Button Name="HaCopyKey" Content="Copy key" /><Button Name="HaCreatePage" Content="Create display page" /></StackPanel>
