@@ -62,6 +62,7 @@ public partial class MainWindow
         _preferredBrightness = saved.BrightnessPercent;
         _preferredTheme = saved.ThemeMode;
         _preferredLanguage = saved.LanguageMode;
+        LoadSettingsPreferences();
         _fanSettings = PortableFanSettings.Normalize(saved.Fans);
         RefreshFanEditor();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked = saved.ProgramCustomGlyphsOnConnect;
