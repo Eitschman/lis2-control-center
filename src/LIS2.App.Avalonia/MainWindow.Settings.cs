@@ -90,6 +90,19 @@ public partial class MainWindow
             "Dark" => ThemeVariant.Dark,
             _ => ThemeVariant.Default
         };
+        var dark = _preferredTheme.Equals("Dark", StringComparison.OrdinalIgnoreCase) ||
+            (_preferredTheme.Equals("System", StringComparison.OrdinalIgnoreCase) &&
+             app.ActualThemeVariant == ThemeVariant.Dark);
+        static Avalonia.Media.SolidColorBrush Brush(string hex) =>
+            new(Avalonia.Media.Color.Parse(hex));
+        app.Resources["Lis2CardBrush"] = Brush(dark ? "#202A35" : "#FFFFFF");
+        app.Resources["Lis2SurfaceBrush"] = Brush(dark ? "#141C26" : "#F5F7FA");
+        app.Resources["Lis2BorderBrush"] = Brush(dark ? "#455466" : "#D4DCE5");
+        app.Resources["Lis2SidebarBrush"] = Brush(dark ? "#192430" : "#FFFFFF");
+        app.Resources["Lis2SidebarTextBrush"] = Brush(dark ? "#EDF3FA" : "#10243A");
+        app.Resources["Lis2SelectedBrush"] = Brush(dark ? "#26583E" : "#DDF6E7");
+        UpdateSection();
+
     }
 
     private void RefreshSettingsPorts()
