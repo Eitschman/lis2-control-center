@@ -225,7 +225,7 @@ public partial class MainWindow : Window
         for (var i = 0; i < SectionNames.Length; i++)
         {
             var button = this.FindControl<Button>($"NavButton{i}")!;
-            var dark = Application.Current?.ActualThemeVariant == global::Avalonia.Styling.ThemeVariant.Dark;
+            var dark = global::Avalonia.Application.Current?.ActualThemeVariant == global::Avalonia.Styling.ThemeVariant.Dark;
             button.Background = i == _selectedSection
                 ? new global::Avalonia.Media.SolidColorBrush(global::Avalonia.Media.Color.Parse(dark ? "#26583E" : "#DDF6E7"))
                 : global::Avalonia.Media.Brushes.Transparent;
