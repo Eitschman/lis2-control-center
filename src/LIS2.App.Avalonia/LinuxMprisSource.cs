@@ -15,7 +15,7 @@ public sealed class LinuxMprisSource
 
     public static IReadOnlyDictionary<string, object?> Parse(string output)
     {
-        var parts = output.TrimEnd('\r', '\n').Split('\t');
+        var parts = output.TrimEnd('\r', '\n').Split('|');
         if (parts.Length < 5) return Map("", "", "");
         var values = new Dictionary<string, object?>(Map(parts[0], parts[1], parts[2]), StringComparer.OrdinalIgnoreCase)
         {
@@ -35,7 +35,7 @@ public sealed class LinuxMprisSource
             process.StartInfo.FileName = "playerctl";
             process.StartInfo.ArgumentList.Add("metadata");
             process.StartInfo.ArgumentList.Add("--format");
-            process.StartInfo.ArgumentList.Add("{{status}}\\t{{xesam:title}}\\t{{xesam:artist}}\\t{{xesam:album}}\\t{{mpris:length}}");
+            process.StartInfo.ArgumentList.Add("{{status}}|{{xesam:title}}|{{xesam:artist}}|{{xesam:album}}|{{mpris:length}}");
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
             if (!process.Start()) return Map("", "", "");
