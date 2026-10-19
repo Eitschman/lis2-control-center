@@ -83,6 +83,14 @@ public partial class MainWindow
         ["Appearance"] = "Darstellung",
         ["Language"] = "Sprache",
         ["Theme"] = "Design",
+        ["Manual fan outputs require an authorized LIS2 connection. Use Fan Control to configure and authorize hardware operation."] =
+            "Manuelle Lüfterausgänge erfordern eine autorisierte LIS2-Verbindung. Konfiguration und Freigabe erfolgen unter Lüftersteuerung.",
+        ["💡  Tip: Use the navigation on the left to access display settings, page editor, Winamp integration, hardware and fan control."] =
+            "💡  Tipp: Über die Navigation links erreichst du Anzeigeeinstellungen, Seiteneditor, Winamp, Hardware und Lüftersteuerung.",
+        ["Fan 1"] = "Lüfter 1",
+        ["Fan 2"] = "Lüfter 2",
+        ["Fan 3"] = "Lüfter 3",
+        ["Fan 4"] = "Lüfter 4",
         ["COM port"] = "COM-Port"
     };
 
@@ -172,6 +180,16 @@ public partial class MainWindow
         ["Disconnect"] = "Trennen"
     };
 
+    private readonly Dictionary<CheckBox, string> _originalPageCheckBoxes = new();
+
+    private static readonly Dictionary<string, string> GermanCheckBoxLabels = new(StringComparer.Ordinal)
+    {
+        ["Automatic control"] = "Automatische Steuerung",
+        ["Enable or disable this page"] = "Seite aktivieren oder deaktivieren",
+        ["I explicitly authorize physical fan output for this connection"] =
+            "Ich autorisiere ausdrücklich die physischen Lüfterausgänge für diese Verbindung"
+    };
+
     private void ApplyPageLocalization()
     {
         // Restrict translations to a known set of static labels. Never overwrite live
@@ -186,6 +204,18 @@ public partial class MainWindow
             }
             label.Text = CurrentUiLanguage() == "de" &&
                 GermanPageLabels.TryGetValue(original, out var translated) ? translated : original;
+        }
+        foreach (var checkBox in this.GetVisualDescendants().OfType<CheckBox>())
+        {
+            if (!_originalPageCheckBoxes.TryGetValue(checkBox, out var original))
+            {
+                if (checkBox.Content is not string content || !GermanCheckBoxLabels.ContainsKey(content))
+                    continue;
+                original = content;
+                _originalPageCheckBoxes.Add(checkBox, original);
+            }
+            checkBox.Content = CurrentUiLanguage() == "de" &&
+                GermanCheckBoxLabels.TryGetValue(original, out var translated) ? translated : original;
         }
         foreach (var button in this.GetVisualDescendants().OfType<Button>())
         {
