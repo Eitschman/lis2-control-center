@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using Avalonia.VisualTree;
+using Avalonia.LogicalTree;
 
 namespace LIS2.App.Avalonia;
 
@@ -67,6 +67,8 @@ public partial class MainWindow
         ["Allow stop"] = "Stillstand erlauben",
         ["Simulated sensor temperature"] = "Simulierte Sensortemperatur",
         ["Hardware monitoring"] = "Hardwareüberwachung",
+        ["Read-only sensors from the current operating system. Refresh to capture a new snapshot; no LIS2 hardware commands are sent."] = "Schreibgeschützte Sensorwerte des Betriebssystems. Aktualisieren liest neue Messwerte ein; es werden keine LIS2-Hardwarebefehle gesendet.",
+        ["Select a sensor above."] = "Oben einen Sensor auswählen.",
         ["Sensor"] = "Sensor",
         ["Type"] = "Typ",
         ["Value"] = "Wert",
@@ -185,6 +187,8 @@ public partial class MainWindow
     private static readonly Dictionary<string, string> GermanCheckBoxLabels = new(StringComparer.Ordinal)
     {
         ["Automatic control"] = "Automatische Steuerung",
+        ["Favorites only"] = "Nur Favoriten",
+        ["Favorite"] = "Favorit",
         ["Enable or disable this page"] = "Seite aktivieren oder deaktivieren",
         ["I explicitly authorize physical fan output for this connection"] =
             "Ich autorisiere ausdrücklich die physischen Lüfterausgänge für diese Verbindung"
@@ -194,7 +198,7 @@ public partial class MainWindow
     {
         // Restrict translations to a known set of static labels. Never overwrite live
         // sensor values, media metadata, Home Assistant states or error messages.
-        foreach (var label in this.GetVisualDescendants().OfType<TextBlock>())
+        foreach (var label in this.GetLogicalDescendants().OfType<TextBlock>())
         {
             if (!_originalPageLabels.TryGetValue(label, out var original))
             {
@@ -205,7 +209,7 @@ public partial class MainWindow
             label.Text = CurrentUiLanguage() == "de" &&
                 GermanPageLabels.TryGetValue(original, out var translated) ? translated : original;
         }
-        foreach (var checkBox in this.GetVisualDescendants().OfType<CheckBox>())
+        foreach (var checkBox in this.GetLogicalDescendants().OfType<CheckBox>())
         {
             if (!_originalPageCheckBoxes.TryGetValue(checkBox, out var original))
             {
@@ -217,7 +221,7 @@ public partial class MainWindow
             checkBox.Content = CurrentUiLanguage() == "de" &&
                 GermanCheckBoxLabels.TryGetValue(original, out var translated) ? translated : original;
         }
-        foreach (var button in this.GetVisualDescendants().OfType<Button>())
+        foreach (var button in this.GetLogicalDescendants().OfType<Button>())
         {
             if (!_originalPageButtons.TryGetValue(button, out var original))
             {
