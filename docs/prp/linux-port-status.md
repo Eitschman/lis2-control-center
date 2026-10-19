@@ -485,3 +485,10 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 - Hotfix isolates each Windows media provider refresh, contains GSMTC reflection snapshot exceptions, guards Media navigation and Linux MPRIS asynchronous refresh; errors are traced and displayed as provider status instead of propagating through UI event handlers.
 - Commits: `0664a2e`, `fe2806d`, `4221fdf`, `f4e36a4`. CI and Windows interactive reproduction are required before closing this incident; do not infer runtime success from a green build alone.
 - Next: obtain Windows exception diagnostics if crash persists, add a UI navigation smoke test, confirm media page opens with no media players running and with provider DLL missing.
+
+## Settings WPF parity implementation (2026-10-19)
+
+- WPF Settings source reviewed: three cards Device/Transport (Virtual/Serial, COM, Refresh, Apply/reconnect), Appearance (System/Light/Dark theme; System/English/German/French/Turkish/Russian language), Windows (start minimized to tray).
+- Avalonia Settings now exposes the same primary card structure above the existing advanced serial/import diagnostics. New `MainWindow.Settings.cs` handles COM discovery and real serial connect, virtual transport, workspace-persisted theme selection, language preference, Windows per-user Run registry startup; `App` honors `--minimized`.
+- ThemeVariant switching is implemented but many Avalonia controls currently have hard-coded brushes, so complete light/dark parity is NOT yet achieved. Language selection persists preference but does NOT translate the UI yet. These are explicitly incomplete and must not be marked WPF parity-complete.
+- Commits `fd5e324`, `51f27e6`, `e2704d6`, `78e619f`, `97bf0ee`, `03daa13`, `915e3a1`. HEAD CI pending; Windows registry, tray startup, serial reconnect and desktop Settings interactions unverified.
