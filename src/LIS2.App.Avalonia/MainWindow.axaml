@@ -297,6 +297,15 @@
         </Border>
         <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
+            <TextBlock Text="Linux MPRIS players (playerctl)" FontWeight="SemiBold" FontSize="18"/>
+            <TextBlock Name="LinuxMediaStatus" Text="Disconnected"/>
+            <TextBlock Name="LinuxMediaTitle" Text="Nothing playing"/>
+            <TextBlock Name="LinuxMediaArtist"/>
+            <Button Name="LinuxMediaPage" Content="Create playback page"/>
+          </StackPanel>
+        </Border>
+        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="7">
             <TextBlock Text="Winamp" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="WinampMediaStatus" Text="Disconnected"/>
             <TextBlock Name="WinampMediaTitle" Text="Nothing playing" FontSize="22"/>
