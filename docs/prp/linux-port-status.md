@@ -520,3 +520,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Pages: fixed-size two-line VFD editor preview now matches the 402×112 preview geometry used on Dashboard. Sensor group headers use the light WPF-style palette.
 - Fans: temperature-to-output curve plot alongside text editor, refreshed as points change or channel selection changes. Four output bars remain dry-run previews only. No change to serial authorization, safety frame, or physical fan commands.
 - Still pending: exact WPF UI parity on all ten screens, complete language/theme translation, interactive desktop comparison and current HEAD CI. The UI work is not accepted as 1:1 parity.
+
+## WPF UI alignment: hardware and media grouping (2026-10-19)
+
+- Reworked Hardware page into three WPF-oriented white cards: live sensor browser with search/filters/grouped rows, selected sensor aliases/favorites/fan-channel assignments, and display presets. Existing event handlers and safety restrictions retained.
+- Media Windows provider cards now have WPF-style right-aligned status badges. Winamp has distinct Playback, Playlist, Audio and VU/Spectrum groups; playlist position/count and bitrate/sample rate are bound to existing Winamp telemetry keys, not placeholder data.
+- Existing Pages VFD preview and HA table, fan curve and virtual Events work from preceding package remain. UI parity is still incomplete on all ten screens, including full localization and themes. Source comparison only, no desktop screenshot acceptance yet.
+- Changes: `MainWindow.axaml`, `MainWindow.Media.cs`; commits `7f457cf`, `ede7153`, `0af5658`, `d87bf60`. Latest HEAD CI not yet green; Actions concurrency cancels intermediate runs. Next: validate HEAD and fix any failures, then continue detailed WPF parity and UI tests.
