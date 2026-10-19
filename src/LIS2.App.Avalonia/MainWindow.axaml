@@ -273,10 +273,10 @@
               <TextBlock Name="PageVariableStatus" Opacity="0.65" />
               <TextBlock Name="PagePlaybackStatus" Text="Sequence stopped" Opacity="0.75" />
               <TextBlock Text="Live preview" FontWeight="SemiBold" />
-              <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6" Padding="18,12" HorizontalAlignment="Left">
-                <StackPanel>
-                  <TextBlock Name="PagePreview1" FontFamily="Consolas" FontSize="26" Foreground="#F7FBFF" />
-                  <TextBlock Name="PagePreview2" FontFamily="Consolas" FontSize="26" Foreground="#F7FBFF" />
+              <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6" Padding="8,12" HorizontalAlignment="Left" Width="402" Height="112" ClipToBounds="True">
+                <StackPanel Width="384" HorizontalAlignment="Left" Spacing="0">
+                  <TextBlock Name="PagePreview1" Width="384" FontFamily="Consolas" FontSize="30" Foreground="#F7FBFF" TextWrapping="NoWrap"/>
+                  <TextBlock Name="PagePreview2" Width="384" FontFamily="Consolas" FontSize="30" Foreground="#F7FBFF" TextWrapping="NoWrap"/>
                 </StackPanel>
               </Border>
               <StackPanel Orientation="Horizontal" Spacing="7">
@@ -519,7 +519,7 @@
           <ListBox Name="HardwareSensorList" MinHeight="260" MaxHeight="450">
             <ListBox.DataTemplates>
               <DataTemplate DataType="local:HardwareSensorGroupHeader">
-                <Border Background="#18222D" Padding="8,6" Margin="0,8,0,4">
+                <Border Background="#E8EEF3" Padding="8,6" Margin="0,8,0,4">
                   <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
                 </Border>
               </DataTemplate>
