@@ -259,18 +259,19 @@ public partial class MainWindow : Window
         }
 
         if (description is not null)
-            description.Text = section == "Settings" ? SettingsTranslate("LIS2 transport, COM port and Windows startup behavior.") : section == "Dashboard"
-                ? "Overview and quick access to the most important functions."
-                : section == "Display"
-                    ? "Quick display tests, custom characters and brightness."
-                : section == "Pages"
-                    ? "Manage display pages, templates, conditions and live preview."
-                    : section == "Hardware"
-                    ? "Browse platform temperature sensors and assign a sensor to a fan channel."
-                    : section == "Settings"
-                    ? "Configure transport and inspect experimental connection controls."
-                    : section == "Fan Control"
-                    ? "Configure four fan channels and test the regulation in a safe simulation."
-                    : $"{section} is not connected to the LIS2 runtime yet.";
+            description.Text = SettingsTranslate(section switch
+            {
+                "Dashboard" => "Overview and quick access to the most important functions.",
+                "Display" => "Quick display tests, custom characters and brightness.",
+                "Pages" => "Manage display pages, templates, conditions and live preview.",
+                "Media" => "View active media players, track metadata and audio telemetry.",
+                "Events" => "Compose and manage prioritized, timed display events.",
+                "Hardware" => "Browse platform sensors, aliases and fan assignments.",
+                "Fan Control" => "Configure four fan channels and inspect regulation curves.",
+                "Settings" => "LIS2 transport, COM port and Windows startup behavior.",
+                "Diagnostics" => "Inspect the virtual device, commands and protocol log.",
+                "Home Assistant" => "Connect entities, favorites and templates to the display.",
+                _ => ""
+            });
     }
 }
