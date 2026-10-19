@@ -568,3 +568,11 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Pages: restored WPF preset picker and create-from-preset button above the list. Clock and LIS2 Status templates are constructed with WPF's exact name, line templates, duration and truncate overflow; added to PageWorkspace and persisted. WPF contains additional hardware/media presets not yet ported; do not claim full preset parity.
 - Localized new preset controls to German. Commits: `0f7ec0d`, `3d495e2`, `4764ab3`, `0275735`.
 - Visual/interaction 1:1 acceptance is not complete; no claim of fully finished GUI. Continue remaining WPF presets, fan control controls and screenshot checks. Current CI not confirmed green.
+
+## WPF page preset restoration block (2026-10-19)
+
+- Pages preset picker now lists all 11 WPF-enabled definitions in WPF order/categories: Clock, Status, CPU, GPU, Memory, Temperatures, Fans, Winamp Now Playing, Winamp VU, Winamp Spectrum, Windows Media Now Playing. WMP Legacy presets remain disabled, matching the WPF reference.
+- Ported actual Clock/Status and six? hardware/media presets through `CreateWpfPagePreset`; Winamp and WindowsMedia templates/conditions/durations/overflow/timing match WPF definitions. Hardware presets use available live Hardware.* numeric source values and fail explicitly if unavailable, rather than inventing sensor data. Hardware matching is heuristic and still needs WPF sensor-type/alias/favorite parity review.
+- Preset creation saves to PageWorkspace and selects the new page. Winamp Spectrum custom glyph confirmation/programming from WPF is NOT yet implemented, so full preset parity is still incomplete.
+- Inspected failed CI run #39276890834: Avalonia XAML AVLN2000 on unsupported `StrokeLineJoin` attribute in FanCurvePreviewPath. Removed unsupported attribute in `5c782e6`; current HEAD CI pending.
+- No claim of 1:1 GUI acceptance: exact WPF control parity, per-screen screenshots and desktop runtime verification remain outstanding.
