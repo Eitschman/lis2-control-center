@@ -142,8 +142,8 @@ public partial class MainWindow
         serialPicker.SelectedItem = port;
         if (_virtualDevice.IsConnected)
             await RunVirtualActionAsync(async () => { StopPagePlayback(); await _virtualDevice.DisconnectAsync(); });
-        this.FindControl<Button>("SerialConnect")!.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
-        status.Text = "Serial connection requested for " + port + ". See serial status below.";
+        await ConnectSerialAsync();
+        status.Text = _serialDisplay?.IsConnected == true ? "Serial LIS2 connected to " + port + "." : "Serial connection failed; see serial status below.";
     }
 
     private static bool IsWindowsStartupEnabled()
