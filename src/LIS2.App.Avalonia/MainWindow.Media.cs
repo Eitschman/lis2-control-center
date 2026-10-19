@@ -41,24 +41,30 @@ public partial class MainWindow
             RefreshMedia();
             return;
         }
-        try
-        {
-            await _windowsMedia.StartAsync();
-            if (_mediaStopping) return;
-            this.FindControl<Border>("WindowsMediaCard")!.IsVisible = _windowsMedia.IsAvailable;
-            await _mediaWinamp.StartAsync();
-            if (_mediaStopping) return;
-            await _mediaLegacy.StartAsync();
-            if (!_mediaStopping) RefreshMedia();
-        }
+        await StartMediaProviderSafeAsync("WindowsMedia", () => _windowsMedia.StartAsync());
+        if (_mediaStopping) return;
+        this.FindControl<Border>("WindowsMediaCard")!.IsVisible = _windowsMedia.IsAvailable;
+        await StartMediaProviderSafeAsync("Winamp", () => _mediaWinamp.StartAsync());
+        await StartMediaProviderSafeAsync("WmpLegacy", () => _mediaLegacy.StartAsync());
+        if (!_mediaStopping) RefreshMedia();
+    }
+
+    private async Task StartMediaProviderSafeAsync(string provider, Func<Task> start)
+    {
+        if (_mediaStopping) return;
+        try { await start(); }
         catch (Exception ex)
         {
-            System.Diagnostics.Trace.TraceError("Media startup failed: {0}", ex);
-            if (!_mediaStopping)
+            System.Diagnostics.Trace.TraceError("Media startup {0} failed: {1}", provider, ex);
+            if (_mediaStopping) return;
+            var controlName = provider switch
             {
-                var status = this.FindControl<TextBlock>("WindowsMediaStatus");
-                if (status is not null) status.Text = "Media startup error: " + ex.GetBaseException().Message;
-            }
+                "WindowsMedia" => "WindowsMediaStatus",
+                "Winamp" => "WinampMediaStatus",
+                _ => "WmpLegacyMediaStatus"
+            };
+            var status = this.FindControl<TextBlock>(controlName);
+            if (status is not null) status.Text = "Provider startup error: " + ex.GetBaseException().Message;
         }
     }
 
