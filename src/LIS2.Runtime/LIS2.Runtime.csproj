@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../LIS2.Core/LIS2.Core.csproj" />
+    <ProjectReference Include="../LIS2.Sources/LIS2.Sources.csproj" />
     <Compile Include="../LIS2.App.Avalonia/DisplayRuntimeHost.cs" Link="Runtime/DisplayRuntimeHost.cs" />
     <Compile Include="../LIS2.App.Avalonia/PagePlayback.cs" Link="Runtime/PagePlayback.cs" />
     <Compile Include="../LIS2.App.Avalonia/PageDefinition.cs" Link="Runtime/PageDefinition.cs" />
@@ -14,11 +15,5 @@
     <Compile Include="../LIS2.App.Avalonia/PageSequenceController.cs" Link="Runtime/PageSequenceController.cs" />
     <ProjectReference Include="../LIS2.Display/LIS2.Display.csproj" />
     <ProjectReference Include="../LIS2.Fans/LIS2.Fans.csproj" />
-    <Compile Include="../LIS2.Sources/IDataSource.cs" Link="Sources/IDataSource.cs" />
-    <Compile Include="../LIS2.Sources/DataSourceRegistry.cs" Link="Sources/DataSourceRegistry.cs" />
-    <Compile Include="../LIS2.Sources/ClockDataSource.cs" Link="Sources/ClockDataSource.cs" />
-    <Compile Include="../LIS2.Sources/HomeAssistantDataSource.cs" Link="Sources/HomeAssistantDataSource.cs" />
-    <Compile Include="../LIS2.Sources/HomeAssistantEntityInfo.cs" Link="Sources/HomeAssistantEntityInfo.cs" />
-    <Compile Include="../LIS2.Sources/HomeAssistantValueConverter.cs" Link="Sources/HomeAssistantValueConverter.cs" />
   </ItemGroup>
 </Project>
