@@ -554,18 +554,18 @@
       <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="14">
           <Border BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
-              <TextBlock Text="Gerät / Transport" FontWeight="SemiBold" FontSize="18"/>
+              <TextBlock Name="SettingsDeviceHeading" Text="Device / Transport" FontWeight="SemiBold" FontSize="18"/>
               <Grid ColumnDefinitions="100,190,100,180,*" ColumnSpacing="8">
-                <TextBlock Grid.Column="0" Text="Transport" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Name="SettingsTransportLabel" Text="Transport" VerticalAlignment="Center"/>
                 <ComboBox Grid.Column="1" Name="TransportModeComboBox" SelectedIndex="0">
-                  <ComboBoxItem Content="Virtuell"/>
+                  <ComboBoxItem Content="Virtual"/>
                   <ComboBoxItem Content="Serial"/>
                 </ComboBox>
-                <TextBlock Grid.Column="2" Text="COM-Port" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Name="SettingsPortLabel" Text="COM port" VerticalAlignment="Center"/>
                 <ComboBox Grid.Column="3" Name="SettingsPortComboBox"/>
                 <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="7">
-                  <Button Name="SettingsRefreshPorts" Content="Aktualisieren"/>
-                  <Button Name="SettingsApplyTransport" Content="Anwenden / neu verbinden"/>
+                  <Button Name="SettingsRefreshPorts" Content="Refresh"/>
+                  <Button Name="SettingsApplyTransport" Content="Apply / reconnect"/>
                 </StackPanel>
               </Grid>
               <TextBlock Name="SettingsTransportStatus" TextWrapping="Wrap" Opacity="0.75"/>
@@ -573,25 +573,25 @@
           </Border>
           <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
-              <TextBlock Text="Darstellung" FontWeight="SemiBold" FontSize="18"/>
+              <TextBlock Name="SettingsAppearanceHeading" Text="Appearance" FontWeight="SemiBold" FontSize="18"/>
               <Grid ColumnDefinitions="100,220,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="10">
-                <TextBlock Grid.Row="0" Text="Design" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="0" Name="SettingsThemeLabel" Text="Theme" VerticalAlignment="Center"/>
                 <ComboBox Grid.Row="0" Grid.Column="1" Name="ThemeModeComboBox">
-                  <ComboBoxItem Content="Systemstandard"/>
-                  <ComboBoxItem Content="Hell"/>
-                  <ComboBoxItem Content="Dunkel"/>
+                  <ComboBoxItem Content="System default"/>
+                  <ComboBoxItem Content="Light"/>
+                  <ComboBoxItem Content="Dark"/>
                 </ComboBox>
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="Systemstandard folgt automatisch dem Betriebssystem-Design." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
-                <TextBlock Grid.Row="1" Text="Sprache" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Name="SettingsThemeHint" Text="System default follows the operating system theme." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
+                <TextBlock Grid.Row="1" Name="SettingsLanguageLabel" Text="Language" VerticalAlignment="Center"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" Name="LanguageModeComboBox">
-                  <ComboBoxItem Content="Systemstandard"/>
-                  <ComboBoxItem Content="Englisch"/>
-                  <ComboBoxItem Content="Deutsch"/>
-                  <ComboBoxItem Content="Französisch"/>
-                  <ComboBoxItem Content="Türkisch"/>
-                  <ComboBoxItem Content="Russisch"/>
+                  <ComboBoxItem Content="System default"/>
+                  <ComboBoxItem Content="English"/>
+                  <ComboBoxItem Content="German"/>
+                  <ComboBoxItem Content="French"/>
+                  <ComboBoxItem Content="Turkish"/>
+                  <ComboBoxItem Content="Russian"/>
                 </ComboBox>
-                <TextBlock Grid.Row="1" Grid.Column="2" Text="Systemstandard verwendet die Anzeigesprache des Betriebssystems." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Name="SettingsLanguageHint" Text="System default uses the operating system display language." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
               </Grid>
               <TextBlock Name="SettingsAppearanceStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
@@ -599,7 +599,7 @@
           <Border Name="SettingsWindowsCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Text="Windows" FontWeight="SemiBold" FontSize="18"/>
-              <CheckBox Name="StartWithWindowsCheckBox" Content="LIS2 Control Center mit Windows starten (minimiert im Infobereich)"/>
+              <CheckBox Name="StartWithWindowsCheckBox" Content="Start LIS2 Control Center with Windows (minimized to tray)"/>
               <TextBlock Name="SettingsStartupStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
           </Border>
