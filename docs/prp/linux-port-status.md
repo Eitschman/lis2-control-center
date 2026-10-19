@@ -561,3 +561,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Replaced single concatenated event queue strings with WPF-style three-column rows (priority name, display line text, remaining time). ItemTemplate binds typed rows and preserves selected-index cancellation, priority queue order and existing virtual display behavior.
 - Compared all ten WPF/Avalonia page control counts as an inventory only; counts are not a substitute for functional/visual parity. WPF has 10 tabs, Avalonia 10 navigation pages; many have differing control counts because of platform-specific transport and fan safety controls.
 - Latest code commits: `b7a395f` layout, `fca10d6` event rows. Full 1:1 acceptance remains unverified; head CI pending.
+
+## Large WPF parity block: media and pages (2026-10-19)
+
+- Media: Windows session card now follows WPF hierarchy (title/artist/album, hidden technical playback status, bottom timeline and right-aligned create-page button). Winamp, legacy WMP and Linux MPRIS share WPF-size typography, truncation and subdued album text; existing provider bindings untouched.
+- Pages: restored WPF preset picker and create-from-preset button above the list. Clock and LIS2 Status templates are constructed with WPF's exact name, line templates, duration and truncate overflow; added to PageWorkspace and persisted. WPF contains additional hardware/media presets not yet ported; do not claim full preset parity.
+- Localized new preset controls to German. Commits: `0f7ec0d`, `3d495e2`, `4764ab3`, `0275735`.
+- Visual/interaction 1:1 acceptance is not complete; no claim of fully finished GUI. Continue remaining WPF presets, fan control controls and screenshot checks. Current CI not confirmed green.
