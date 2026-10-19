@@ -499,3 +499,9 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 - CI on earlier `31e79a2` failed on Linux and Windows due to CA1416 Windows registry API without platform guard; corrected in `c19dda9`.
 - Replaced hard-coded German Settings labels with dynamic translation for English, German, French, Turkish and Russian; System resolves `CultureInfo.CurrentUICulture`. Settings headings, hints, combo options, action buttons, Windows startup label, navigation sidebar and current section heading update on selection and persisted workspace load. Source: `MainWindow.SettingsLocalization.cs`.
 - Remaining: whole-app localization beyond Settings/sidebar; app-wide WPF visual and theme parity; runtime desktop verification and CI of new HEAD. No full parity claim yet.
+
+## Ten-screen WPF/Avalonia screenshot comparison (2026-10-19)
+
+Owner provided LIS2.zip with WPF and Avalonia captures for Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics, Home Assistant. All ten pairs visually compared. Findings: shared shell dark vs WPF light, WPF green active navigation, WPF compact cards; Events page entirely blank in Avalonia; Fan Control, Hardware, Media, Pages and Home Assistant substantially diverge in layout and control hierarchy. Display and Dashboard also differ. WPF visual parity is NOT achieved.
+
+Implemented initial cross-screen package: common light shell/white card styling, WPF-sized default window, green navigation highlight, and new Events page with prioritized expiring virtual-display event queue, cancel/clear, timed preview and playback restoration. Files: MainWindow.axaml, MainWindow.axaml.cs, MainWindow.Events.cs. Current HEAD CI and desktop checks pending. Further WPF screen-by-screen UI reconstruction and behavior parity remain open; do not claim screenshot parity complete.
