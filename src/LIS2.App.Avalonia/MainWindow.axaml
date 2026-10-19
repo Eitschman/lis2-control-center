@@ -221,7 +221,18 @@
                 <ComboBoxItem Content="Media · Windows Media Now Playing"/>
               </ComboBox>
               <Button Name="PageCreatePreset" Content="Create from preset" HorizontalAlignment="Stretch"/>
-              <ListBox Name="PagesList" MinHeight="250" MaxHeight="420" />
+              <ListBox Name="PagesList" MinHeight="250" MaxHeight="420">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9" Margin="3,4">
+                      <CheckBox Grid.Column="0" IsChecked="{Binding Enabled}" Click="PageListEnabledClick"
+                                VerticalAlignment="Center" ToolTip.Tip="Enable or disable this page"/>
+                      <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"
+                                 TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
               <WrapPanel>
                 <Button Name="PageAdd" Content="Add" Margin="0,0,7,7" />
                 <Button Name="PageDuplicate" Content="Duplicate" Margin="0,0,7,7" />
