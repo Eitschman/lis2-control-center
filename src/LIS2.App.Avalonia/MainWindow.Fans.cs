@@ -31,8 +31,35 @@ public partial class MainWindow
         }
     }
 
+    private void RefreshFanCurvePreview()
+    {
+        var target = this.FindControl<Avalonia.Controls.Shapes.Path>("FanCurvePreviewPath");
+        if (target is null) return;
+        var points = new List<(double Temperature, double Percent)>();
+        foreach (var line in (this.FindControl<TextBox>("FanCurve")?.Text ?? "").Split('\n'))
+        {
+            var fields = line.Trim().Split('=');
+            if (fields.Length != 2 ||
+                !double.TryParse(fields[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var temp) ||
+                !double.TryParse(fields[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var percent) ||
+                !double.IsFinite(temp) || !double.IsFinite(percent) || percent is < 0 or > 100)
+                continue;
+            points.Add((temp, percent));
+        }
+        points.Sort((a, b) => a.Temperature.CompareTo(b.Temperature));
+        if (points.Count == 0) { target.Data = null; return; }
+        var min = Math.Min(0, points[0].Temperature);
+        var max = Math.Max(min + 1, points[^1].Temperature);
+        var segments = points.Select((point, i) =>
+            (i == 0 ? "M " : "L ") +
+            ((point.Temperature - min) / (max - min) * 298).ToString("0.##", CultureInfo.InvariantCulture) + "," +
+            (110 - point.Percent * 1.1).ToString("0.##", CultureInfo.InvariantCulture));
+        target.Data = Avalonia.Media.Geometry.Parse(string.Join(" ", segments));
+    }
+
     private void InitializeFanEditor()
     {
+        this.FindControl<TextBox>("FanCurve")!.TextChanged += (_, _) => RefreshFanCurvePreview();
         this.FindControl<ComboBox>("FanChannelPicker")!.SelectionChanged += (_, _) =>
         {
             if (_fanEditorLoading) return;
@@ -299,6 +326,7 @@ public partial class MainWindow
                 channel.Curve.Select(p => $"{p.Temperature.ToString(CultureInfo.InvariantCulture)}={p.OutputPercent}"));
         }
         finally { _fanEditorLoading = false; }
+        RefreshFanCurvePreview();
     }
 
     private void SaveFanEditor()
