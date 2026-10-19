@@ -492,3 +492,10 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 - Avalonia Settings now exposes the same primary card structure above the existing advanced serial/import diagnostics. New `MainWindow.Settings.cs` handles COM discovery and real serial connect, virtual transport, workspace-persisted theme selection, language preference, Windows per-user Run registry startup; `App` honors `--minimized`.
 - ThemeVariant switching is implemented but many Avalonia controls currently have hard-coded brushes, so complete light/dark parity is NOT yet achieved. Language selection persists preference but does NOT translate the UI yet. These are explicitly incomplete and must not be marked WPF parity-complete.
 - Commits `fd5e324`, `51f27e6`, `e2704d6`, `78e619f`, `97bf0ee`, `03daa13`, `915e3a1`. HEAD CI pending; Windows registry, tray startup, serial reconnect and desktop Settings interactions unverified.
+
+## Settings screenshot parity and language-aware UI (2026-10-19)
+
+- WPF screenshot supplied by owner is the reference for the compact three-card Settings layout. Existing branch commit `71bf7d8` arranged three German cards and hid advanced diagnostics; controls remain in visual tree for existing event wiring.
+- CI on earlier `31e79a2` failed on Linux and Windows due to CA1416 Windows registry API without platform guard; corrected in `c19dda9`.
+- Replaced hard-coded German Settings labels with dynamic translation for English, German, French, Turkish and Russian; System resolves `CultureInfo.CurrentUICulture`. Settings headings, hints, combo options, action buttons, Windows startup label, navigation sidebar and current section heading update on selection and persisted workspace load. Source: `MainWindow.SettingsLocalization.cs`.
+- Remaining: whole-app localization beyond Settings/sidebar; app-wide WPF visual and theme parity; runtime desktop verification and CI of new HEAD. No full parity claim yet.
