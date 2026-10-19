@@ -116,7 +116,8 @@
       <StackPanel Spacing="14">
         <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="12">
-            <TextBlock Text="Quick Display Test" FontWeight="SemiBold" FontSize="16" />
+            <TextBlock Text="Display controls" FontWeight="SemiBold" FontSize="18" />
+            <TextBlock Text="Send individual lines or both lines to the selected LIS2 transport." Opacity="0.7" TextWrapping="Wrap"/>
             <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
               <TextBlock Grid.Row="0" Text="Line 1" VerticalAlignment="Center" Margin="0,0,10,9" />
               <TextBox Name="Line1TextBox" Grid.Row="0" Grid.Column="1" Text="LIS2 Control Center" Margin="0,0,10,9" />
@@ -133,7 +134,7 @@
         </Border>
         <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
-            <TextBlock Text="Character ROM / Special Characters" FontWeight="SemiBold" FontSize="16" />
+            <TextBlock Text="Character ROM / Special Characters" FontWeight="SemiBold" FontSize="18" />
             <TextBlock Text="Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display." TextWrapping="Wrap" Opacity="0.7" />
             <WrapPanel>
               <Button Name="SendSpecialCharacterTest" Content="Send special-character test" Margin="0,0,8,0" />
@@ -151,16 +152,16 @@
         </Border>
         <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
-            <TextBlock Text="Custom Characters / CG Builder" FontWeight="SemiBold" FontSize="16" />
+            <TextBlock Text="Custom Characters / CG Builder" FontWeight="SemiBold" FontSize="18" />
             <CheckBox Name="ProgramGlyphsOnConnect" Content="Program saved glyphs on connect" />
-            <Grid ColumnDefinitions="190,220,24,*">
+            <Grid ColumnDefinitions="200,250,20,*">
               <StackPanel Grid.Column="0" Spacing="5">
                 <TextBlock Text="Slot" />
                 <ComboBox Name="GlyphSlot" SelectedIndex="0"><ComboBoxItem Content="1" /><ComboBoxItem Content="2" /><ComboBoxItem Content="3" /><ComboBoxItem Content="4" /><ComboBoxItem Content="5" /><ComboBoxItem Content="6" /><ComboBoxItem Content="7" /><ComboBoxItem Content="8" /></ComboBox>
                 <TextBlock Text="Name" />
                 <TextBox Name="GlyphName" Text="Glyph 1" />
                 <TextBlock Text="Template key" />
-                <TextBlock Name="GlyphTemplateKey" Text="{}{Glyph.1}" FontFamily="Consolas" />
+                <TextBlock Name="GlyphTemplateKey" Text="{Glyph.1}" FontFamily="Consolas" />
               </StackPanel>
               <StackPanel Grid.Column="1" Spacing="5">
                 <TextBlock Text="5x8 bitmap (8 rows)" />
@@ -186,7 +187,7 @@
         </Border>
         <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="12">
-            <TextBlock Text="Brightness" FontWeight="SemiBold" FontSize="16" />
+            <TextBlock Text="Brightness" FontWeight="SemiBold" FontSize="18" />
             <StackPanel Orientation="Horizontal" Spacing="7">
               <Button Name="Brightness100" Content="100%" />
               <Button Name="Brightness75" Content="75%" />
