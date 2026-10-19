@@ -58,6 +58,18 @@ public sealed class PageSourceValuesTests
     }
 
     [Fact]
+    public async Task WindowsMediaBridgeHasSafeDisconnectedState()
+    {
+        await using var bridge = new WindowsMediaBridge();
+        Assert.Equal(false, bridge.Values["Connected"]);
+        if (!OperatingSystem.IsWindows())
+        {
+            await bridge.StartAsync();
+            Assert.Equal(false, bridge.Values["Connected"]);
+        }
+    }
+
+    [Fact]
     public async Task SourceLifecycleIsIdempotent()
     {
         await using var sources = new PageSourceValues();
