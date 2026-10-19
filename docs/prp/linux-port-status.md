@@ -534,3 +534,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Display view now groups display controls, ROM, custom character builder and brightness with WPF-style headings and more room for glyph editing. Preserve Avalonia markup escape on literal glyph template keys.
 - Dashboard fan status wording corrected: safety authorization remains required; do not suggest that the runtime is absent.
 - HEAD before documentation: `fdf00fc`. No current HEAD CI success yet. This is source-based layout progress, not completed WPF GUI parity. Missing: full ten-screen pixel/interaction/theme/language acceptance and any failed build repairs.
+
+## GUI parity continuation: full-page descriptions and theme resources (2026-10-19)
+
+- Removed misleading navigation placeholder text claiming Media, Events, Diagnostics and Home Assistant are unconnected. Every page now has a concrete description reflecting existing functionality.
+- All ten page descriptions translated into English (fallback), German, French, Turkish and Russian, respecting saved explicit language or OS language. Navigation update and settings language change apply translations immediately.
+- Centralized card, surface, sidebar, border, and selection colors into Avalonia dynamic resources. Light/Dark/System setting updates resources and navigation colors; replaces hard-coded white backgrounds across pages. WPF light palette preserved.
+- This is a substantial theme/i18n improvement, NOT a claim of 1:1 WPF GUI completion. Remaining blockers: complete translation of page-level content and buttons, precise screenshot comparison of all ten pages, accessibility and runtime smoke acceptance. Latest HEAD before this note `4b26a6c`; CI not confirmed green. Do not remove WPF project yet.
