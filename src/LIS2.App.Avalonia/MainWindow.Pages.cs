@@ -15,27 +15,29 @@ public partial class MainWindow
         this.FindControl<ListBox>("PagesList")!.SelectionChanged += (_, _) => LoadPageEditor();
         this.FindControl<Button>("PageCreatePreset")!.Click += (_, _) =>
         {
-            var choice = this.FindControl<ComboBox>("PagePresetPicker")!.SelectedIndex;
-            _pages.Add();
-            var index = _pages.Pages.Count - 1;
-            var page = _pages.Get(index);
-            if (choice == 0)
+            try
             {
-                page.Name = "Clock";
-                page.Line1Template = "{Clock.Time}";
-                page.Line2Template = "{Clock.Date}";
+                var choice = this.FindControl<ComboBox>("PagePresetPicker")!.SelectedIndex;
+                var preset = CreateWpfPagePreset(choice);
+                _pages.Add();
+                var index = _pages.Pages.Count - 1;
+                var page = _pages.Get(index);
+                page.Name = preset.Name;
+                page.Line1Template = preset.Line1;
+                page.Line2Template = preset.Line2;
+                page.DurationSeconds = preset.Duration;
+                page.VisibilityExpression = preset.Visibility;
+                page.Line1OverflowMode = preset.Overflow1;
+                page.Line2OverflowMode = preset.Overflow2;
+                page.ScrollStepMilliseconds = preset.ScrollStep;
+                page.ScrollEdgePauseMilliseconds = preset.EdgePause;
+                RefreshPageList(index);
+                _ = SavePortableWorkspaceAsync();
             }
-            else
+            catch (Exception ex)
             {
-                page.Name = "LIS2 Status";
-                page.Line1Template = "LIS2 Control Center";
-                page.Line2Template = "Ready";
+                SetVirtualStatus("Page preset error: " + ex.Message);
             }
-            page.DurationSeconds = 5;
-            page.Line1OverflowMode = "Truncate";
-            page.Line2OverflowMode = "Truncate";
-            RefreshPageList(index);
-            _ = SavePortableWorkspaceAsync();
         };
         this.FindControl<Button>("PageAdd")!.Click += (_, _) =>
         {
@@ -82,6 +84,69 @@ public partial class MainWindow
         LoadPortableWorkspace();
         InitializeWindowsSettingsImport();
         _ = StartPageSourcesAsync();
+    }
+
+    private sealed record PagePresetSpec(
+        string Name, string Line1, string Line2, int Duration = 5,
+        string Visibility = "", string Overflow1 = "Truncate",
+        string Overflow2 = "Truncate", int ScrollStep = 250, int EdgePause = 800);
+
+    private PagePresetSpec CreateWpfPagePreset(int choice)
+    {
+        return choice switch
+        {
+            0 => new("Clock", "{Clock.Time}", "{Clock.Date}"),
+            1 => new("LIS2 Status", "LIS2 Control Center", "Ready"),
+            2 => CreateHardwarePagePreset("CPU", "Load", "Temperature", "CPU", "Temp", "CPU", "Processor"),
+            3 => CreateHardwarePagePreset("GPU", "Load", "Temperature", "GPU", "Temp", "GPU", "Graphics"),
+            4 => CreateHardwarePagePreset("Memory", "Load", "Data", "RAM", "Used", "Memory", "RAM"),
+            5 => CreateHardwarePagePreset("Temperatures", "Temperature", "Temperature", "T1", "T2"),
+            6 => CreateHardwarePagePreset("Fans", "Fan", "Fan", "Fan1", "Fan2"),
+            7 => new("Winamp Now Playing", "{Winamp.Artist}", "{Winamp.Title}", 7,
+                "Winamp.State=Playing", "PingPong", "PingPong"),
+            8 => new("Winamp VU", "{Winamp.Title}", "{Winamp.Vu}", 7,
+                "Winamp.State=Playing", "PingPong"),
+            9 => new("Winamp Spectrum", "{Winamp.Artist}", "{Winamp.SpectrumGlyphs}", 7,
+                "Winamp.State=Playing", "PingPong"),
+            10 => new("Windows Media Now Playing", "{WindowsMedia.Artist|fallback:--}",
+                "{WindowsMedia.Title|fallback:--}", 7,
+                "WindowsMedia.State=Playing", "PingPong", "PingPong"),
+            _ => throw new ArgumentOutOfRangeException(nameof(choice), "Unknown page preset.")
+        };
+    }
+
+    private PagePresetSpec CreateHardwarePagePreset(
+        string name, string type1, string type2, string label1, string label2,
+        params string[] matchingTerms)
+    {
+        var values = _runtime.Snapshot();
+        var sensors = values.Keys
+            .Where(key => key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase)
+                && !key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase)
+                && values.TryGetValue(key, out var value)
+                && value is not null
+                && double.TryParse(Convert.ToString(value, CultureInfo.InvariantCulture),
+                    NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+            .OrderBy(key => key, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        string[] Matching(string type) => sensors.Where(key =>
+            key.Contains(type, StringComparison.OrdinalIgnoreCase) &&
+            (matchingTerms.Length == 0 || matchingTerms.Any(term =>
+                key.Contains(term, StringComparison.OrdinalIgnoreCase)))).ToArray();
+
+        var first = Matching(type1).FirstOrDefault();
+        var second = Matching(type2).FirstOrDefault(key => key != first);
+        if (first is null && second is null)
+            throw new InvalidOperationException($"No matching hardware sensors for '{name}'.");
+
+        string Line(string label, string? key) => key is null ? "" :
+            label + " {" + key + "}" +
+            (values.TryGetValue(key + ".Unit", out var unit) ? Convert.ToString(unit) : "");
+
+        return new PagePresetSpec(name,
+            first is null ? name : Line(label1, first),
+            Line(label2, second), Overflow1: "PingPong", Overflow2: "PingPong");
     }
 
     private int? SelectedPageIndex =>
