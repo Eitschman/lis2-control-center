@@ -225,7 +225,7 @@
                 <ListBox.ItemTemplate>
                   <DataTemplate>
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9" Margin="3,4">
-                      <CheckBox Grid.Column="0" IsChecked="{Binding Enabled}" Click="PageListEnabledClick"
+                      <CheckBox Grid.Column="0" IsChecked="{Binding Enabled, Mode=OneWay}" Click="PageListEnabledClick"
                                 VerticalAlignment="Center" ToolTip.Tip="Enable or disable this page"/>
                       <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"
                                  TextTrimming="CharacterEllipsis"/>
