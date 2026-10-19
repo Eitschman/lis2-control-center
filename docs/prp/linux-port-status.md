@@ -576,3 +576,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Preset creation saves to PageWorkspace and selects the new page. Winamp Spectrum custom glyph confirmation/programming from WPF is NOT yet implemented, so full preset parity is still incomplete.
 - Inspected failed CI run #39276890834: Avalonia XAML AVLN2000 on unsupported `StrokeLineJoin` attribute in FanCurvePreviewPath. Removed unsupported attribute in `5c782e6`; current HEAD CI pending.
 - No claim of 1:1 GUI acceptance: exact WPF control parity, per-screen screenshots and desktop runtime verification remain outstanding.
+
+## WPF Pages checkbox / Fan Control layout parity (2026-10-19)
+
+- After green Actions run #446 (all platform jobs passed), replaced the Pages list's non-WPF `(off)` text convention with a WPF-style checkbox and ellipsized page name for each row. Clicking a row checkbox updates the indexed PageWorkspace entry, refreshes the editor/list and persists the workspace. The checkbox binding is explicitly OneWay to avoid writing to immutable display records; the click handler owns persistence.
+- Moved `FanAutomatic` to the Fan Outputs header on the right, matching the WPF automatic-control position; removed the duplicate header/control from the lower fan configuration card. Existing authorization/physical fan safety logic untouched.
+- Commits `45a62c0`, `66c5978`, `7780fb5`, `2afd39d`. New CI not yet confirmed; WPF full GUI parity remains outstanding.
