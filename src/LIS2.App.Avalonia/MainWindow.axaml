@@ -549,6 +549,10 @@
               </DataTemplate>
             </ListBox.DataTemplates>
           </ListBox>
+        </StackPanel></Border>
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Selected sensor / fan assignment" FontSize="18" FontWeight="SemiBold"/>
           <TextBlock Name="HardwareSelectedSensor" Text="Select a sensor above." TextWrapping="Wrap" />
           <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBox Name="HardwareAlias" Width="260" Watermark="Alias for selected sensor" />
@@ -563,6 +567,9 @@
             <Button Name="HardwareUseForFan4" Content="Fan 4" IsEnabled="False" />
           </StackPanel>
           <TextBlock Text="Sensor assignment updates the fan editor but is not saved until you explicitly save fan configuration. Physical fan output remains disabled unless separately authorized." TextWrapping="Wrap" />
+        </StackPanel></Border>
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="10">
           <TextBlock Text="Display presets" FontSize="16" FontWeight="SemiBold" />
           <TextBlock Text="Create editable display pages from available hardware sensor keys. Pages are saved to the portable workspace; no LIS2 device commands are sent." TextWrapping="Wrap" />
           <StackPanel Orientation="Horizontal" Spacing="8">
