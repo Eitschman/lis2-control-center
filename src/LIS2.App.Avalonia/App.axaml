@@ -9,6 +9,11 @@
     <SolidColorBrush x:Key="Lis2SidebarBrush" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Lis2SidebarTextBrush" Color="#10243A"/>
     <SolidColorBrush x:Key="Lis2SelectedBrush" Color="#DDF6E7"/>
+    <SolidColorBrush x:Key="Lis2IconBrush" Color="#233D55"/>
+    <SolidColorBrush x:Key="Lis2MutedCardBrush" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="Lis2HeaderBrush" Color="#E8EEF3"/>
+    <SolidColorBrush x:Key="Lis2StatusBrush" Color="#E8F5EC"/>
+    <SolidColorBrush x:Key="Lis2StatusTextBrush" Color="#166534"/>
   </Application.Resources>
   <Application.Styles>
     <FluentTheme />
