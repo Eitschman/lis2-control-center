@@ -11,6 +11,7 @@ public partial class MainWindow
     private static readonly Dictionary<string, string> GermanPageLabels = new(StringComparer.Ordinal)
     {
         ["VFD Preview"] = "VFD-Vorschau",
+        ["Preset"] = "Vorlage",
         ["System Status"] = "Systemstatus",
         ["Quick Links"] = "Schnellzugriff",
         ["Fan Outputs"] = "Lüfterausgänge",
@@ -90,6 +91,7 @@ public partial class MainWindow
     private static readonly Dictionary<string, string> GermanButtonLabels = new(StringComparer.Ordinal)
     {
         ["Change..."] = "Ändern...",
+        ["Create from preset"] = "Aus Vorlage erstellen",
         ["Send demo display"] = "Demoanzeige senden",
         ["Open Display Controls"] = "Displaysteuerung öffnen",
         ["Open Fan Control"] = "Lüftersteuerung öffnen",
