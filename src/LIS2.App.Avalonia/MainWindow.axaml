@@ -298,8 +298,6 @@
     </ScrollViewer>
     <ScrollViewer Name="MediaView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="14">
-        <TextBlock Text="Connected media players" FontWeight="SemiBold" FontSize="17"/>
-        <TextBlock Text="Player metadata is available for display page templates. Playback providers are detected automatically." TextWrapping="Wrap" Opacity="0.7"/>
         <Border Background="{DynamicResource Lis2CardBrush}" Name="WindowsMediaCard" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
@@ -311,18 +309,20 @@
             <TextBlock Name="WindowsMediaTitle" Text="Nothing playing" FontSize="24" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
             <TextBlock Name="WindowsMediaArtist" TextTrimming="CharacterEllipsis" FontSize="16"/>
             <TextBlock Name="WindowsMediaAlbum" TextTrimming="CharacterEllipsis" Opacity="0.7"/>
-            <TextBlock Name="WindowsMediaPlayback" FontWeight="SemiBold"/>
-            <TextBlock Name="WindowsMediaTime" FontFamily="Consolas" Opacity="0.7"/>
-            <Button Name="WindowsMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
+            <TextBlock Name="WindowsMediaPlayback" FontWeight="SemiBold" IsVisible="False"/>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+              <TextBlock Name="WindowsMediaTime" FontFamily="Consolas" FontSize="16" Opacity="0.7" VerticalAlignment="Center"/>
+              <Button Grid.Column="1" Name="WindowsMediaPage" Content="Create playback page"/>
+            </Grid>
           </StackPanel>
         </Border>
         <Border Background="{DynamicResource Lis2CardBrush}" Name="LinuxMediaCard" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Linux MPRIS players (playerctl)" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="LinuxMediaStatus" Text="Disconnected"/>
-            <TextBlock Name="LinuxMediaTitle" Text="Nothing playing"/>
-            <TextBlock Name="LinuxMediaArtist"/>
-            <TextBlock Name="LinuxMediaAlbum"/>
+            <TextBlock Name="LinuxMediaTitle" Text="Nothing playing" FontSize="24" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Name="LinuxMediaArtist" FontSize="16" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Name="LinuxMediaAlbum" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
             <TextBlock Name="LinuxMediaPlayback"/>
             <TextBlock Name="LinuxMediaDuration"/>
             <Button Name="LinuxMediaPage" Content="Create playback page"/>
@@ -336,9 +336,9 @@
                 <TextBlock Name="WinampMediaStatus" Text="Disconnected" Foreground="{DynamicResource Lis2StatusTextBrush}" FontWeight="SemiBold"/>
               </Border>
             </Grid>
-            <TextBlock Name="WinampMediaTitle" Text="Nothing playing" FontSize="22"/>
-            <TextBlock Name="WinampMediaArtist" Text="Waiting for Winamp..."/>
-            <TextBlock Name="WinampMediaAlbum"/>
+            <TextBlock Name="WinampMediaTitle" Text="Nothing playing" FontSize="24" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Name="WinampMediaArtist" Text="Waiting for Winamp..." FontSize="16" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Name="WinampMediaAlbum" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
             <Grid ColumnDefinitions="*,16,*,16,*" Margin="0,6,0,10">
               <StackPanel Grid.Column="0" Spacing="3">
                 <TextBlock Text="Playback" FontWeight="SemiBold"/>
@@ -370,11 +370,11 @@
                 <TextBlock Name="WmpLegacyMediaStatus" Text="Disconnected" Foreground="{DynamicResource Lis2StatusTextBrush}" FontWeight="SemiBold"/>
               </Border>
             </Grid>
-            <TextBlock Name="WmpLegacyMediaTitle" Text="Nothing playing" FontSize="22"/>
-            <TextBlock Name="WmpLegacyMediaArtist" Text="Waiting for legacy player..."/>
-            <TextBlock Name="WmpLegacyMediaAlbum"/>
+            <TextBlock Name="WmpLegacyMediaTitle" Text="Nothing playing" FontSize="24" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Name="WmpLegacyMediaArtist" Text="Waiting for legacy player..." FontSize="16" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Name="WmpLegacyMediaAlbum" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
             <TextBlock Name="WmpLegacyMediaPlayback"/>
-            <TextBlock Name="WmpLegacyMediaTime"/>
+            <TextBlock Name="WmpLegacyMediaTime" FontFamily="Consolas" FontSize="16" Opacity="0.7"/>
             <TextBlock Name="WmpLegacyMediaTelemetry"/>
             <Button Name="WmpLegacyMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
