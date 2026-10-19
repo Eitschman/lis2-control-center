@@ -18,7 +18,7 @@ public sealed class WindowsMediaBridge : IAsyncDisposable
         var assembly = Assembly.LoadFrom(file);
         var type = assembly.GetType("LIS2.WindowsMedia.WindowsMediaDataSource");
         if (type is null) return;
-        _provider = Activator.CreateInstance(type);
+        _provider = Activator.CreateInstance(type, [null]);
         if (_provider is null) return;
         _values = type.GetProperty("Values");
         _stop = type.GetMethod("StopAsync");
