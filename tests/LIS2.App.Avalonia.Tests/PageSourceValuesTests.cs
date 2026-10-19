@@ -38,6 +38,16 @@ public sealed class PageSourceValuesTests
     }
 
     [Fact]
+    public void LinuxMprisMapsPlaybackMetadata()
+    {
+        var values = LinuxMprisSource.Map("Playing", "Song", "Artist");
+        Assert.Equal(true, values["Connected"]);
+        Assert.Equal("Song", values["Title"]);
+        Assert.Equal("Artist", values["Artist"]);
+        Assert.Equal(false, LinuxMprisSource.Map("", "", "")["Connected"]);
+    }
+
+    [Fact]
     public async Task SourceLifecycleIsIdempotent()
     {
         await using var sources = new PageSourceValues();
