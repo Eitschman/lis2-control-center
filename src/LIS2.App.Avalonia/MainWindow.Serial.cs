@@ -11,41 +11,7 @@ public partial class MainWindow
     private void InitializeSerialDisplay()
     {
         this.FindControl<Button>("SerialRefreshPorts")!.Click += (_, _) => RefreshSerialPorts();
-        this.FindControl<Button>("SerialConnect")!.Click += async (_, _) =>
-        {
-            if (_serialDisplay is not null || _serialBusy) return;
-            var port = this.FindControl<ComboBox>("SerialPortPicker")!.SelectedItem as string;
-            if (string.IsNullOrWhiteSpace(port))
-            {
-                SetSerialStatus("Select a serial port first.");
-                return;
-            }
-
-            _serialBusy = true;
-            UpdateSerialControls();
-            SerialDisplaySession? session = null;
-            try
-            {
-                session = new SerialDisplaySession(port);
-                await session.ConnectAsync();
-                _serialDisplay = session;
-                session.FanFaulted += ex => global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
-                {
-                    SetFanStatus("HARDWARE FAN CONTROL FAILED; safety restoration attempted: " + ex.Message);
-                    UpdateHardwareFanControls();
-                });
-                session = null;
-                SetSerialStatus($"Connected to {port} (display only; fans disabled).");
-                UpdateHardwareFanControls();
-            }
-            catch (Exception ex) { SetSerialStatus($"Serial connect failed: {ex.Message}"); }
-            finally
-            {
-                if (session is not null) await session.DisposeAsync();
-                _serialBusy = false;
-                UpdateSerialControls();
-            }
-        };
+        this.FindControl<Button>("SerialConnect")!.Click += async (_, _) => await ConnectSerialAsync();
         this.FindControl<Button>("SerialDisconnect")!.Click += async (_, _) =>
             await RunSerialActionAsync(async () =>
             {
@@ -108,6 +74,42 @@ public partial class MainWindow
             });
         InitializeSerialPlayback();
         RefreshSerialPorts();
+    }
+
+    private async Task ConnectSerialAsync()
+    {
+            if (_serialDisplay is not null || _serialBusy) return;
+            var port = this.FindControl<ComboBox>("SerialPortPicker")!.SelectedItem as string;
+            if (string.IsNullOrWhiteSpace(port))
+            {
+                SetSerialStatus("Select a serial port first.");
+                return;
+            }
+
+            _serialBusy = true;
+            UpdateSerialControls();
+            SerialDisplaySession? session = null;
+            try
+            {
+                session = new SerialDisplaySession(port);
+                await session.ConnectAsync();
+                _serialDisplay = session;
+                session.FanFaulted += ex => global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                {
+                    SetFanStatus("HARDWARE FAN CONTROL FAILED; safety restoration attempted: " + ex.Message);
+                    UpdateHardwareFanControls();
+                });
+                session = null;
+                SetSerialStatus($"Connected to {port} (display only; fans disabled).");
+                UpdateHardwareFanControls();
+            }
+            catch (Exception ex) { SetSerialStatus($"Serial connect failed: {ex.Message}"); }
+            finally
+            {
+                if (session is not null) await session.DisposeAsync();
+                _serialBusy = false;
+                UpdateSerialControls();
+            }
     }
 
     private void RefreshSerialPorts()
