@@ -231,7 +231,7 @@ public partial class MainWindow : Window
         var description = this.FindControl<TextBlock>("SectionDescription");
 
         if (title is not null)
-            title.Text = section;
+            title.Text = SettingsTranslate(section);
 
         this.FindControl<ScrollViewer>("DashboardView")!.IsVisible = section == "Dashboard";
         this.FindControl<ScrollViewer>("DisplayView")!.IsVisible = section == "Display";
@@ -256,7 +256,7 @@ public partial class MainWindow : Window
         }
 
         if (description is not null)
-            description.Text = section == "Dashboard"
+            description.Text = section == "Settings" ? SettingsTranslate("LIS2 transport, COM port and Windows startup behavior.") : section == "Dashboard"
                 ? "Overview and quick access to the most important functions."
                 : section == "Display"
                     ? "Quick display tests, custom characters and brightness."
