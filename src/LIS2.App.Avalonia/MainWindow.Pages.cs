@@ -149,6 +149,22 @@ public partial class MainWindow
             Line(label2, second), Overflow1: "PingPong", Overflow2: "PingPong");
     }
 
+    private sealed record PageListRow(int Index, string Name, bool Enabled);
+
+    private void PageListEnabledClick(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (_loadingPage || sender is not CheckBox { DataContext: PageListRow row } checkbox)
+            return;
+
+        if (row.Index < 0 || row.Index >= _pages.Pages.Count)
+            return;
+
+        _pages.Get(row.Index).Enabled = checkbox.IsChecked == true;
+        var selectedIndex = SelectedPageIndex ?? row.Index;
+        RefreshPageList(selectedIndex);
+        _ = SavePortableWorkspaceAsync();
+    }
+
     private int? SelectedPageIndex =>
         this.FindControl<ListBox>("PagesList")!.SelectedIndex is int i && i >= 0 && i < _pages.Pages.Count ? i : null;
 
@@ -157,7 +173,7 @@ public partial class MainWindow
         _loadingPage = true;
         var list = this.FindControl<ListBox>("PagesList")!;
         list.ItemsSource = null;
-        list.ItemsSource = _pages.Pages.Select(p => p.Enabled ? p.Name : $"(off) {p.Name}").ToArray();
+        list.ItemsSource = _pages.Pages.Select((p, index) => new PageListRow(index, p.Name, p.Enabled)).ToArray();
         list.SelectedIndex = selection;
         _loadingPage = false;
         LoadPageEditor();
