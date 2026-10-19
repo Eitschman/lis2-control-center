@@ -21,6 +21,23 @@ public sealed class PageSourceValuesTests
     }
 
     [Fact]
+    public async Task MediaValuesAreNamespacedReplacedAndRenderInPages()
+    {
+        await using var sources = new PageSourceValues();
+        sources.UpdateMedia("Winamp", new Dictionary<string, object?>
+        {
+            ["Title"] = "First track", ["Artist"] = "Artist A"
+        });
+        var first = sources.Snapshot(DateTimeOffset.Now);
+        Assert.Equal("First track", first["Winamp.Title"]);
+        Assert.Equal("First track", new TemplateRenderer().Render("{Winamp.Title}", first));
+        sources.UpdateMedia("Winamp", new Dictionary<string, object?> { ["Title"] = "Second track" });
+        var second = sources.Snapshot(DateTimeOffset.Now);
+        Assert.Equal("Second track", second["Winamp.Title"]);
+        Assert.False(second.ContainsKey("Winamp.Artist"));
+    }
+
+    [Fact]
     public async Task SourceLifecycleIsIdempotent()
     {
         await using var sources = new PageSourceValues();
