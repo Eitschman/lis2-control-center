@@ -42,6 +42,7 @@ public partial class MainWindow
         }
         try { await _windowsMedia.StartAsync(); }
         catch (Exception ex) { this.FindControl<TextBlock>("WindowsMediaStatus")!.Text = ex.GetBaseException().Message; }
+        this.FindControl<Border>("WindowsMediaCard")!.IsVisible = _windowsMedia.IsAvailable;
         try { await _mediaWinamp.StartAsync(); }
         catch (Exception ex) { this.FindControl<TextBlock>("WinampMediaStatus")!.Text = ex.Message; }
         try { await _mediaLegacy.StartAsync(); }
@@ -121,6 +122,7 @@ public partial class MainWindow
     private async Task StopMediaAsync()
     {
         _mediaTimer?.Stop();
+        _mediaTimer = null;
         await _windowsMedia.DisposeAsync();
         await _mediaWinamp.StopAsync();
         await _mediaLegacy.StopAsync();
