@@ -113,6 +113,12 @@ public partial class MainWindow
             this.FindControl<TextBlock>("LinuxMediaPlayback")!.Text = Read("State");
             this.FindControl<TextBlock>("LinuxMediaDuration")!.Text = Read("Duration");
         }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceError("Linux MPRIS refresh failed: {0}", ex);
+            var status = this.FindControl<TextBlock>("LinuxMediaStatus");
+            if (status is not null) status.Text = "Provider error: " + ex.GetBaseException().Message;
+        }
         finally { _mprisRefreshing = false; }
     }
 
