@@ -551,6 +551,45 @@
           </Border>
         </Grid>
       </ScrollViewer>
+      <ScrollViewer Name="EventsView" Grid.Row="1" IsVisible="False">
+        <StackPanel Spacing="14">
+          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+            <Grid ColumnDefinitions="100,*,110,120" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="9">
+              <TextBlock Grid.Row="0" Text="Line 1" VerticalAlignment="Center"/>
+              <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Name="EventLine1" Text="BUILD FINISHED"/>
+              <TextBlock Grid.Row="1" Text="Line 2" VerticalAlignment="Center"/>
+              <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Name="EventLine2" Text="0 errors"/>
+              <TextBlock Grid.Row="2" Text="Priority" VerticalAlignment="Center"/>
+              <ComboBox Grid.Row="2" Grid.Column="1" Name="EventPriority" HorizontalAlignment="Left" Width="180" SelectedIndex="1">
+                <ComboBoxItem Content="Info (10)"/>
+                <ComboBoxItem Content="Notice (50)"/>
+                <ComboBoxItem Content="Warning (100)"/>
+                <ComboBoxItem Content="Critical (200)"/>
+              </ComboBox>
+              <TextBlock Grid.Row="2" Grid.Column="2" Text="Duration (s)" VerticalAlignment="Center"/>
+              <TextBox Grid.Row="2" Grid.Column="3" Name="EventDuration" Text="5"/>
+              <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="8">
+                <Button Name="EventShow" Content="Show event"/>
+                <Button Name="EventTestWarning" Content="Test warning"/>
+                <Button Name="EventClear" Content="Clear all"/>
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10" MinHeight="380">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Active / pending events" FontSize="18" FontWeight="SemiBold"/>
+                <TextBlock Name="EventCount" Text="0 events" VerticalAlignment="Center" Opacity="0.65"/>
+              </StackPanel>
+              <ListBox Grid.Row="1" Name="EventList" MinHeight="280" BorderBrush="#D4DCE5" BorderThickness="1"/>
+              <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                <TextBlock Name="EventStatus" Text="Select an event to display." Opacity="0.7" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Name="EventCancel" Content="Cancel selected"/>
+              </Grid>
+            </Grid>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
       <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="14">
           <Border BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
