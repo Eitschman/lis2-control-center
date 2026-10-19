@@ -527,3 +527,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Media Windows provider cards now have WPF-style right-aligned status badges. Winamp has distinct Playback, Playlist, Audio and VU/Spectrum groups; playlist position/count and bitrate/sample rate are bound to existing Winamp telemetry keys, not placeholder data.
 - Existing Pages VFD preview and HA table, fan curve and virtual Events work from preceding package remain. UI parity is still incomplete on all ten screens, including full localization and themes. Source comparison only, no desktop screenshot acceptance yet.
 - Changes: `MainWindow.axaml`, `MainWindow.Media.cs`; commits `7f457cf`, `ede7153`, `0af5658`, `d87bf60`. Latest HEAD CI not yet green; Actions concurrency cancels intermediate runs. Next: validate HEAD and fix any failures, then continue detailed WPF parity and UI tests.
+
+## WPF UI alignment follow-up: Pages and Display (2026-10-19)
+
+- Pages editor now groups page properties, template variable insertion and fixed-size VFD preview with clearer labels and spacing. List width and height improved; page behavior and persistence untouched.
+- Display view now groups display controls, ROM, custom character builder and brightness with WPF-style headings and more room for glyph editing. Preserve Avalonia markup escape on literal glyph template keys.
+- Dashboard fan status wording corrected: safety authorization remains required; do not suggest that the runtime is absent.
+- HEAD before documentation: `fdf00fc`. No current HEAD CI success yet. This is source-based layout progress, not completed WPF GUI parity. Missing: full ten-screen pixel/interaction/theme/language acceptance and any failed build repairs.
