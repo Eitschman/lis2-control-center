@@ -208,8 +208,17 @@
               <TextBlock Text="Pages" FontWeight="SemiBold" FontSize="16" />
               <TextBlock Text="Preset" Opacity="0.7"/>
               <ComboBox Name="PagePresetPicker" SelectedIndex="0">
-                <ComboBoxItem Content="Clock"/>
-                <ComboBoxItem Content="LIS2 Status"/>
+                <ComboBoxItem Content="General · Clock &amp; date"/>
+                <ComboBoxItem Content="General · LIS2 status"/>
+                <ComboBoxItem Content="Hardware · CPU"/>
+                <ComboBoxItem Content="Hardware · GPU"/>
+                <ComboBoxItem Content="Hardware · Memory"/>
+                <ComboBoxItem Content="Hardware · Temperatures"/>
+                <ComboBoxItem Content="Hardware · Fans"/>
+                <ComboBoxItem Content="Winamp · Now Playing"/>
+                <ComboBoxItem Content="Winamp · VU"/>
+                <ComboBoxItem Content="Winamp · Spectrum"/>
+                <ComboBoxItem Content="Media · Windows Media Now Playing"/>
               </ComboBox>
               <Button Name="PageCreatePreset" Content="Create from preset" HorizontalAlignment="Stretch"/>
               <ListBox Name="PagesList" MinHeight="250" MaxHeight="420" />
