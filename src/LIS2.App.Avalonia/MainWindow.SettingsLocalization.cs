@@ -80,6 +80,69 @@ public partial class MainWindow
         return SettingsTranslations.ContainsKey(code) ? code : "en";
     }
 
+    private static readonly Dictionary<string, string[]> SectionDescriptionTranslations = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["de"] =
+        [
+            "Übersicht und Schnellzugriff auf die wichtigsten Funktionen.",
+            "Displaytests, Sonderzeichen und Helligkeit.",
+            "Displayseiten, Vorlagen, Bedingungen und Vorschau verwalten.",
+            "Aktive Medienplayer, Titelinformationen und Audiowerte anzeigen.",
+            "Priorisierte, zeitgesteuerte Displayereignisse erstellen und verwalten.",
+            "Systemsensoren, Aliase und Lüfterzuordnungen verwalten.",
+            "Vier Lüfterkanäle konfigurieren und Regelkurven prüfen.",
+            "LIS2-Transport, COM-Port und Windows-Startverhalten.",
+            "Virtuelles Gerät, Befehle und Protokoll untersuchen.",
+            "Home-Assistant-Entitäten, Favoriten und Vorlagen verbinden."
+        ],
+        ["fr"] =
+        [
+            "Vue d'ensemble et accès rapide aux fonctions essentielles.",
+            "Tests d'affichage, caractères personnalisés et luminosité.",
+            "Gérer les pages, modèles, conditions et aperçu.",
+            "Lecteurs multimédias, métadonnées et télémétrie audio.",
+            "Créer et gérer les événements d'affichage prioritaires.",
+            "Capteurs, alias et affectations des ventilateurs.",
+            "Configurer quatre ventilateurs et leurs courbes.",
+            "Transport LIS2, port COM et démarrage Windows.",
+            "Inspecter l'appareil virtuel, les commandes et le journal.",
+            "Associer les entités Home Assistant, favoris et modèles."
+        ],
+        ["tr"] =
+        [
+            "Önemli işlevlere genel bakış ve hızlı erişim.",
+            "Ekran testleri, özel karakterler ve parlaklık.",
+            "Ekran sayfalarını, şablonları ve koşulları yönetin.",
+            "Medya oynatıcıları ve ses verilerini görüntüleyin.",
+            "Öncelikli ve zamanlanmış ekran olaylarını yönetin.",
+            "Sensörleri, takma adları ve fan atamalarını yönetin.",
+            "Dört fan kanalını ve kontrol eğrilerini yapılandırın.",
+            "LIS2 bağlantısı, COM bağlantı noktası ve Windows başlangıcı.",
+            "Sanal cihazı, komutları ve protokol günlüğünü inceleyin.",
+            "Home Assistant varlıklarını ve şablonlarını bağlayın."
+        ],
+        ["ru"] =
+        [
+            "Обзор и быстрый доступ к основным функциям.",
+            "Тесты дисплея, символы и яркость.",
+            "Управление страницами, шаблонами и условиями.",
+            "Медиаплееры, метаданные и аудиотелеметрия.",
+            "Управление приоритетными событиями дисплея.",
+            "Датчики, псевдонимы и назначения вентиляторов.",
+            "Настройка четырёх вентиляторов и кривых.",
+            "Подключение LIS2, COM-порт и запуск Windows.",
+            "Диагностика виртуального устройства, команд и журнала.",
+            "Home Assistant: сущности, избранное и шаблоны."
+        ]
+    };
+
+    private string TranslateSectionDescription(string section, string fallback)
+    {
+        var index = Array.IndexOf(SectionNames, section);
+        return index >= 0 && SectionDescriptionTranslations.TryGetValue(CurrentUiLanguage(), out var items)
+            ? items[index] : fallback;
+    }
+
     private string SettingsTranslate(string text)
     {
         var index = Array.IndexOf(SettingsKeys, text);
