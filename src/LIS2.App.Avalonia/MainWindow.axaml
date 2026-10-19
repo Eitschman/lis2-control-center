@@ -468,6 +468,7 @@
     </ScrollViewer>
       <ScrollViewer Name="HardwareView" Grid.Row="1" IsVisible="False">
         <StackPanel Spacing="12">
+          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16"><StackPanel Spacing="12">
           <TextBlock Text="Hardware monitoring" FontSize="18" FontWeight="SemiBold" />
           <TextBlock Text="Read-only sensors from the current operating system. Refresh to capture a new snapshot; no LIS2 hardware commands are sent." TextWrapping="Wrap" />
           <StackPanel Orientation="Horizontal" Spacing="8">
@@ -535,6 +536,7 @@
             <Button Name="HardwarePresetTemperatures" Content="Temperatures" />
             <Button Name="HardwarePresetFans" Content="Fans" />
           </StackPanel>
+        </StackPanel></Border>
         </StackPanel>
       </ScrollViewer>
       <ScrollViewer Name="DiagnosticsView" Grid.Row="1" IsVisible="False">
