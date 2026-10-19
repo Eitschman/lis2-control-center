@@ -9,6 +9,12 @@ on:
       - main
   workflow_dispatch:
 
+# Cancel superseded runs of this workflow on the same branch or pull request.
+# A newer push replaces older queued and in-progress builds.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
