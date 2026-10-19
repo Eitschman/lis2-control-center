@@ -104,7 +104,7 @@
               </Grid>
                 <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Name="DashboardFansApply" Content="Apply" HorizontalAlignment="Right" MinWidth="110" IsEnabled="False" />
               </Grid>
-              <TextBlock Text="Fan outputs are read-only until the safety-reviewed fan runtime is ported." Opacity="0.65" TextWrapping="Wrap" />
+              <TextBlock Text="Manual fan outputs require an authorized LIS2 connection. Use Fan Control to configure and authorize hardware operation." Opacity="0.65" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
           <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="6" Padding="12,9">
@@ -202,10 +202,10 @@
         <TextBlock Text="Display pages" FontSize="18" FontWeight="SemiBold"/>
         <TextBlock Text="Create, organize and preview pages on the LIS2 display." Opacity="0.7"/>
         <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
-          <Grid ColumnDefinitions="230,16,*">
+          <Grid ColumnDefinitions="250,18,*">
             <StackPanel Grid.Column="0" Spacing="9">
               <TextBlock Text="Pages" FontWeight="SemiBold" FontSize="16" />
-              <ListBox Name="PagesList" Height="380" />
+              <ListBox Name="PagesList" MinHeight="380" MaxHeight="560" />
               <WrapPanel>
                 <Button Name="PageAdd" Content="Add" Margin="0,0,7,7" />
                 <Button Name="PageDuplicate" Content="Duplicate" Margin="0,0,7,7" />
@@ -221,7 +221,8 @@
               </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="2" Spacing="9">
-              <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+              <TextBlock Text="Page properties" FontSize="16" FontWeight="SemiBold"/>
+              <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="9" ColumnSpacing="10">
                 <TextBlock Grid.Row="0" Text="Name" />
                 <TextBox Name="PageName" Grid.Row="0" Grid.Column="1" />
                 <TextBlock Grid.Row="1" Text="Line 1" />
@@ -264,6 +265,7 @@
                 <TextBlock Grid.Row="7" Text="Enabled" />
                 <CheckBox Name="PageEnabled" Grid.Row="7" Grid.Column="1" />
               </Grid>
+              <TextBlock Text="Insert template variable" FontWeight="SemiBold" Margin="0,6,0,0"/>
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <ComboBox Name="PageVariablePicker" Width="220" />
                 <Button Name="PageInsertLine1" Content="Insert into line 1" />
@@ -271,8 +273,11 @@
                 <Button Name="PageRefreshVariables" Content="Refresh variables" />
               </StackPanel>
               <TextBlock Name="PageVariableStatus" Opacity="0.65" />
-              <TextBlock Name="PagePlaybackStatus" Text="Sequence stopped" Opacity="0.75" />
-              <TextBlock Text="Live preview" FontWeight="SemiBold" />
+              <Separator Margin="0,5"/>
+              <Grid ColumnDefinitions="*,Auto" Margin="0,5,0,0">
+                <TextBlock Text="Live VFD preview" FontWeight="SemiBold" FontSize="16"/>
+                <TextBlock Grid.Column="1" Name="PagePlaybackStatus" Text="Sequence stopped" Opacity="0.75" VerticalAlignment="Center"/>
+              </Grid>
               <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6" Padding="8,12" HorizontalAlignment="Left" Width="402" Height="112" ClipToBounds="True">
                 <StackPanel Width="384" HorizontalAlignment="Left" Spacing="0">
                   <TextBlock Name="PagePreview1" Width="384" FontFamily="Consolas" FontSize="30" Foreground="#F7FBFF" TextWrapping="NoWrap"/>
