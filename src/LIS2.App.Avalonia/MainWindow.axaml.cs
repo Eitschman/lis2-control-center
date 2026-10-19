@@ -73,6 +73,7 @@ public partial class MainWindow : Window
         InitializePagesEditor();
         InitializeMedia();
         InitializeSettings();
+        InitializeEvents();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
         Closed += OnWindowClosed;
         // The virtual transport is hardware-free: make the WPF-style preview
@@ -92,6 +93,7 @@ public partial class MainWindow : Window
     private async void OnWindowClosed(object? sender, EventArgs e)
     {
         StopPagePlayback();
+        _eventTimer.Stop();
         _hardwareRefreshTimer.Stop();
         StopHomeAssistantUi();
         await StopMediaAsync();
@@ -240,6 +242,7 @@ public partial class MainWindow : Window
         this.FindControl<ScrollViewer>("HomeAssistantView")!.IsVisible = section == "Home Assistant";
         this.FindControl<ScrollViewer>("FanControlView")!.IsVisible = section == "Fan Control";
         this.FindControl<ScrollViewer>("SettingsView")!.IsVisible = section == "Settings";
+        this.FindControl<ScrollViewer>("EventsView")!.IsVisible = section == "Events";
         this.FindControl<ScrollViewer>("HardwareView")!.IsVisible = section == "Hardware";
         this.FindControl<ScrollViewer>("DiagnosticsView")!.IsVisible = section == "Diagnostics";
         if (section == "Diagnostics") RefreshDiagnostics();
