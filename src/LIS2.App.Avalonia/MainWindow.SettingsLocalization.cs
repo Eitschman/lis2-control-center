@@ -188,6 +188,7 @@ public partial class MainWindow
                 foreach (var child in grid.Children)
                     if (child is TextBlock block) block.Text = SettingsTranslate(SectionNames[i]);
         }
+        ApplyPageLocalization();
         UpdateSection();
     }
 }
