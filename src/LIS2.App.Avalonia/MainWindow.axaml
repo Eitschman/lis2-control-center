@@ -161,7 +161,7 @@
                 <TextBlock Text="Name" />
                 <TextBox Name="GlyphName" Text="Glyph 1" />
                 <TextBlock Text="Template key" />
-                <TextBlock Name="GlyphTemplateKey" Text="{Glyph.1}" FontFamily="Consolas" />
+                <TextBlock Name="GlyphTemplateKey" Text="{}{Glyph.1}" FontFamily="Consolas" />
               </StackPanel>
               <StackPanel Grid.Column="1" Spacing="5">
                 <TextBlock Text="5x8 bitmap (8 rows)" />
