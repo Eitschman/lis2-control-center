@@ -471,3 +471,10 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 - Connected GSMTC state, title, artist, album, elapsed/duration to Avalonia Media tab and playback-page creation. Windows publish workflow builds the Windows-only source and copies its assembly into win-x64 package. Added missing-provider headless regression test.
 - Implementation commits `7bf44eb`, `1960516`, `ece79a8`, `ddafdba`, `ad78904`. **Current HEAD CI not yet verified; do not mark package accepted until green.** Real Windows GSMTC session behavior not manually tested.
 - Remaining: full WPF media visual parity, Windows session packaging runtime smoke validation, Linux MPRIS integration on actual player, general WPF/Avalonia parity audit and remaining port phases.
+
+## Media stabilization follow-up (2026-10-19)
+
+- Verified prior GSMTC bridge HEAD `07af626` green, GitHub Actions run [39265470263](https://github.com/Eitschman/lis2-control-center/actions/runs/39265470263).
+- Fixed Linux MPRIS `playerctl --format` delimiter/parser mismatch and updated parser regression test to match the real command format.
+- Extended Windows publish packaging to include provider output DLL dependencies. Added GSMTC provider availability signal, hides Windows Media panel when bridge DLL is absent, and stops the media refresh timer on shutdown.
+- New commits `b1ecc5e`, `6b7e0ae`, `ce193ca`, `9bb31ed`, `849104f`. Latest HEAD CI not yet accepted. Real-device and full WPF visual parity remain open.
