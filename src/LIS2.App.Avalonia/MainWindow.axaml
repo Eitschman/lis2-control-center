@@ -393,12 +393,12 @@
           <StackPanel Spacing="12">
             <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Fan outputs" FontSize="18" FontWeight="SemiBold"/><TextBlock Grid.Column="1" Text="Four channels / hardware-safe" Opacity="0.65"/></Grid>
             <Grid ColumnDefinitions="90,*,65" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="12">
-              <TextBlock Grid.Row="0" Text="Fan 1"/><ProgressBar Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="100" Height="14" Foreground="#17A45A"/><TextBlock Grid.Row="0" Grid.Column="2" Text="100 %" TextAlignment="Right"/>
-              <TextBlock Grid.Row="1" Text="Fan 2"/><ProgressBar Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Value="100" Height="14" Foreground="#17A45A"/><TextBlock Grid.Row="1" Grid.Column="2" Text="100 %" TextAlignment="Right"/>
-              <TextBlock Grid.Row="2" Text="Fan 3"/><ProgressBar Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="100" Value="100" Height="14" Foreground="#17A45A"/><TextBlock Grid.Row="2" Grid.Column="2" Text="100 %" TextAlignment="Right"/>
-              <TextBlock Grid.Row="3" Text="Fan 4"/><ProgressBar Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="100" Value="100" Height="14" Foreground="#17A45A"/><TextBlock Grid.Row="3" Grid.Column="2" Text="100 %" TextAlignment="Right"/>
+              <TextBlock Grid.Row="0" Text="Fan 1"/><ProgressBar Name="FanOutputBar1" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="0" Height="14" Foreground="#17A45A"/><TextBlock Name="FanOutputText1" Grid.Row="0" Grid.Column="2" Text="—" TextAlignment="Right"/>
+              <TextBlock Grid.Row="1" Text="Fan 2"/><ProgressBar Name="FanOutputBar2" Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Value="0" Height="14" Foreground="#17A45A"/><TextBlock Name="FanOutputText2" Grid.Row="1" Grid.Column="2" Text="—" TextAlignment="Right"/>
+              <TextBlock Grid.Row="2" Text="Fan 3"/><ProgressBar Name="FanOutputBar3" Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="100" Value="0" Height="14" Foreground="#17A45A"/><TextBlock Name="FanOutputText3" Grid.Row="2" Grid.Column="2" Text="—" TextAlignment="Right"/>
+              <TextBlock Grid.Row="3" Text="Fan 4"/><ProgressBar Name="FanOutputBar4" Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="100" Value="0" Height="14" Foreground="#17A45A"/><TextBlock Name="FanOutputText4" Grid.Row="3" Grid.Column="2" Text="—" TextAlignment="Right"/>
             </Grid>
-            <TextBlock Text="Safety output shown; real fan commands require explicit authorization below." FontSize="12" Opacity="0.7"/>
+            <TextBlock Text="Preview values appear after simulation; they do not represent actual hardware output." FontSize="12" Opacity="0.7"/>
           </StackPanel>
         </Border>
         <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
