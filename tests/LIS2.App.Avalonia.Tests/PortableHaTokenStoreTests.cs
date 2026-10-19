@@ -22,6 +22,23 @@ public sealed class PortableHaTokenStoreTests
     }
 
     [Fact]
+    public void MissingSecretToolFallsBackToLocalEncryptedToken()
+    {
+        if (!OperatingSystem.IsLinux()) return;
+        var directory = Path.Combine(Path.GetTempPath(), "lis2-ha-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var store = new PortableHaTokenStore(directory, "/missing-secret-tool-for-test");
+            store.Save("new-fallback-token");
+            Assert.Equal("new-fallback-token", store.Load());
+            Assert.True(File.Exists(Path.Combine(directory, "ha-token.bin")));
+            store.Delete();
+            Assert.Null(store.Load());
+        }
+        finally { if (Directory.Exists(directory)) Directory.Delete(directory, true); }
+    }
+
+    [Fact]
     public void WindowsDpapiTokenRoundTrips()
     {
         if (!OperatingSystem.IsWindows()) return;
