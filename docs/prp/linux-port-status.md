@@ -548,3 +548,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Added reversible German translations for dozens of static labels spanning Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Diagnostics and Home Assistant; selection and live telemetry are not overwritten. Hooked into language changes. Other languages still require full page-level translations; navigation and page descriptions support five languages.
 - Code: `App.axaml`, `MainWindow.axaml`, `MainWindow.Settings.cs`, new `MainWindow.UiLocalization.cs`, `MainWindow.SettingsLocalization.cs`.
 - This work is NOT verified 1:1 visual parity. Remaining: screen-by-screen screenshot comparisons, exact layout/control parity, other-language labels, complete dark-mode validation, desktop runtime tests and HEAD CI. Do not remove WPF yet.
+
+## WPF parity continuation and compile repair (2026-10-19)
+
+- Added German translations for interactive command buttons across all ten Avalonia pages, preserving command bindings and reversible language changes. Existing static-label and page-description translation remains.
+- Matched WPF Events composer 20-character limit for both LIS2 display lines and adjusted queue label/minimum height.
+- Examined Actions failure #39275645016 for `a015d3ad`: compiler CS0103 and CS0234 from ambiguous/unqualified Avalonia namespace references in MainWindow, Fans and Settings. Fixed with `global::Avalonia` qualifications; HEAD CI is pending, not yet green.
+- Source control inventory of WPF/Avalonia interactive controls completed for all ten tabs; this is not a visual or functional 1:1 certification. Remaining: exact WPF layout/behavior review, full translations for French/Turkish/Russian static controls, CI and final owner desktop verification. No claim of 1:1 parity yet.
