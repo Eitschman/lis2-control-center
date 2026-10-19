@@ -21,7 +21,11 @@ public partial class App : Application
             var window = new MainWindow();
             desktop.MainWindow = window;
             if (OperatingSystem.IsWindows())
+            {
                 ConfigureWindowsTray(desktop, window);
+                if (Environment.GetCommandLineArgs().Contains("--minimized", StringComparer.OrdinalIgnoreCase))
+                    window.Opened += (_, _) => window.Hide();
+            }
         }
         base.OnFrameworkInitializationCompleted();
     }
