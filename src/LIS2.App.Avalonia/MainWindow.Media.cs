@@ -15,6 +15,10 @@ public partial class MainWindow
 
     private void InitializeMedia()
     {
+        this.FindControl<Border>("LinuxMediaCard")!.IsVisible = OperatingSystem.IsLinux();
+        this.FindControl<Border>("WinampMediaCard")!.IsVisible = OperatingSystem.IsWindows();
+        this.FindControl<Border>("WmpLegacyMediaCard")!.IsVisible = OperatingSystem.IsWindows();
+        this.FindControl<Border>("WindowsMediaCard")!.IsVisible = OperatingSystem.IsWindows();
         _mediaTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _mediaTimer.Tick += (_, _) => RefreshMedia();
         _mediaTimer.Start();
