@@ -512,3 +512,11 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Added WPF-oriented card grouping and contextual headings for Fan Control, Hardware, Media, Pages and Home Assistant; four fan-channel visual indicators are explicitly simulation-only and update from actual dry-run outputs, never misleadingly claim physical fan readings.
 - Previously added light shared shell, green selection and event composer/queue; all must still pass current HEAD CI and Windows/Linux runtime acceptance. A full 10-screen 1:1 visual parity result has NOT been achieved; page editor, fan curve, HA entity table, hardware sensor table and media composition remain outstanding. Keep these as open scope; no final acceptance claim.
 - Latest code commit before this status update: `8f6992b`. Await GitHub Actions for this HEAD; no local dotnet compiler in current container.
+
+## Coherent UI follow-up: HA entity table, page preview, fan curve (2026-10-19)
+
+- Previous HEAD `ab71feb` passed GitHub Actions #39272898902 on Windows/Linux. New HEAD CI is not yet confirmed.
+- Home Assistant: entity table now shows favorite marker, entity ID, friendly name, current state and template key. Selection synchronizes with existing combo, filters, alias/favorite editor and attribute/details card; existing HA source and token handling unchanged. Changes: `MainWindow.axaml`, `MainWindow.HomeAssistant.cs`.
+- Pages: fixed-size two-line VFD editor preview now matches the 402×112 preview geometry used on Dashboard. Sensor group headers use the light WPF-style palette.
+- Fans: temperature-to-output curve plot alongside text editor, refreshed as points change or channel selection changes. Four output bars remain dry-run previews only. No change to serial authorization, safety frame, or physical fan commands.
+- Still pending: exact WPF UI parity on all ten screens, complete language/theme translation, interactive desktop comparison and current HEAD CI. The UI work is not accepted as 1:1 parity.
