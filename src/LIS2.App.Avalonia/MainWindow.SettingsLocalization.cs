@@ -107,7 +107,7 @@ public partial class MainWindow
         void SetCombo(string control, params string[] labels)
         {
             if (this.FindControl<ComboBox>(control) is not { } combo) return;
-            for (var i = 0; i < labels.Length && i < combo.ItemCount; i++)
+            for (var i = 0; i < labels.Length && i < combo.Items.Count; i++)
                 if (combo.Items[i] is ComboBoxItem item) item.Content = SettingsTranslate(labels[i]);
         }
         SetCombo("TransportModeComboBox", "Virtual", "Serial");
