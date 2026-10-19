@@ -4,11 +4,11 @@
         x:Class="LIS2.App.Avalonia.MainWindow"
         Title="LIS2 Control Center"
         Width="1305" Height="893" MinWidth="950" MinHeight="600"
-        WindowStartupLocation="CenterScreen" Background="#F5F7FA">
+        WindowStartupLocation="CenterScreen" Background="{DynamicResource Lis2SurfaceBrush}">
   <Grid ColumnDefinitions="250,*">
-    <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#D4DCE5" BorderThickness="0,0,1,0">
+    <Border Grid.Column="0" Background="{DynamicResource Lis2SidebarBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="0,0,1,0">
       <Grid Margin="16" RowDefinitions="Auto,*,Auto">
-        <TextBlock Grid.Row="0" Text="LIS2 CONTROL CENTER" FontSize="16" FontWeight="Bold" Margin="4,18,0,24" Foreground="#10243A" />
+        <TextBlock Grid.Row="0" Text="LIS2 CONTROL CENTER" FontSize="16" FontWeight="Bold" Margin="4,18,0,24" Foreground="{DynamicResource Lis2SidebarTextBrush}" />
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="8">
           <StackPanel Name="NavigationPanel" Spacing="2">
             <Button Name="NavButton0" Tag="0" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,8 L8,2 L14,8 M4,7 L4,14 L12,14 L12,7"/><TextBlock Grid.Column="1" Text="Dashboard" VerticalAlignment="Center"/></Grid></Button>
@@ -49,7 +49,7 @@
       <ScrollViewer Name="DashboardView" Grid.Row="1">
         <StackPanel Spacing="14">
           <Grid ColumnDefinitions="3*,14,2*">
-            <Border Background="White" Grid.Column="0" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+            <Border Background="{DynamicResource Lis2CardBrush}" Grid.Column="0" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
               <StackPanel Spacing="12">
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
                 <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6"
@@ -63,13 +63,13 @@
               </StackPanel>
             </Border>
             <StackPanel Grid.Column="2" Spacing="14">
-              <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+              <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
                 <StackPanel Spacing="10">
                   <TextBlock Text="System Status" FontSize="16" FontWeight="SemiBold" />
                   <TextBlock Name="VirtualStateText" Text="State available when Virtual transport is active." TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
-              <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+              <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
                 <StackPanel Spacing="10">
                   <TextBlock Text="Quick Links" FontSize="16" FontWeight="SemiBold" />
                   <Button Name="OpenDisplayControls" Content="Open Display Controls" />
@@ -78,7 +78,7 @@
               </Border>
             </StackPanel>
           </Grid>
-          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Text="Fan Outputs" FontWeight="SemiBold" FontSize="16" />
               <Grid ColumnDefinitions="*,18,*" RowDefinitions="Auto,12,Auto,14,Auto">
@@ -107,14 +107,14 @@
               <TextBlock Text="Manual fan outputs require an authorized LIS2 connection. Use Fan Control to configure and authorize hardware operation." Opacity="0.65" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
-          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="6" Padding="12,9">
+          <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12,9">
             <TextBlock Text="💡  Tip: Use the navigation on the left to access display settings, page editor, Winamp integration, hardware and fan control." TextWrapping="Wrap" />
           </Border>
         </StackPanel>
       </ScrollViewer>
     <ScrollViewer Name="DisplayView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="14">
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="12">
             <TextBlock Text="Display controls" FontWeight="SemiBold" FontSize="18" />
             <TextBlock Text="Send individual lines or both lines to the selected LIS2 transport." Opacity="0.7" TextWrapping="Wrap"/>
@@ -132,7 +132,7 @@
             </Grid>
           </StackPanel>
         </Border>
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Character ROM / Special Characters" FontWeight="SemiBold" FontSize="18" />
             <TextBlock Text="Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display." TextWrapping="Wrap" Opacity="0.7" />
@@ -150,7 +150,7 @@
             </StackPanel>
           </StackPanel>
         </Border>
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Custom Characters / CG Builder" FontWeight="SemiBold" FontSize="18" />
             <CheckBox Name="ProgramGlyphsOnConnect" Content="Program saved glyphs on connect" />
@@ -185,7 +185,7 @@
             <TextBlock Text="{}Use {Glyph.Name} or {Glyph.1} through {Glyph.8} in page templates." Opacity="0.7" />
           </StackPanel>
         </Border>
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="12">
             <TextBlock Text="Brightness" FontWeight="SemiBold" FontSize="18" />
             <StackPanel Orientation="Horizontal" Spacing="7">
@@ -202,7 +202,7 @@
       <StackPanel Spacing="12">
         <TextBlock Text="Display pages" FontSize="18" FontWeight="SemiBold"/>
         <TextBlock Text="Create, organize and preview pages on the LIS2 display." Opacity="0.7"/>
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <Grid ColumnDefinitions="250,18,*">
             <StackPanel Grid.Column="0" Spacing="9">
               <TextBlock Text="Pages" FontWeight="SemiBold" FontSize="16" />
@@ -300,7 +300,7 @@
       <StackPanel Spacing="14">
         <TextBlock Text="Connected media players" FontWeight="SemiBold" FontSize="17"/>
         <TextBlock Text="Player metadata is available for display page templates. Playback providers are detected automatically." TextWrapping="Wrap" Opacity="0.7"/>
-        <Border Background="White" Name="WindowsMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" Name="WindowsMediaCard" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
               <TextBlock Text="Windows Media Player" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
@@ -316,7 +316,7 @@
             <Button Name="WindowsMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
         </Border>
-        <Border Background="White" Name="LinuxMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" Name="LinuxMediaCard" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Linux MPRIS players (playerctl)" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="LinuxMediaStatus" Text="Disconnected"/>
@@ -328,7 +328,7 @@
             <Button Name="LinuxMediaPage" Content="Create playback page"/>
           </StackPanel>
         </Border>
-        <Border Background="White" Name="WinampMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" Name="WinampMediaCard" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
               <TextBlock Text="Winamp" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
@@ -362,7 +362,7 @@
             <Button Name="WinampMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
         </Border>
-        <Border Background="White" Name="WmpLegacyMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" Name="WmpLegacyMediaCard" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
               <TextBlock Text="Windows Media Player Legacy" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
@@ -385,7 +385,7 @@
       <StackPanel Spacing="12">
         <TextBlock Text="Home Assistant" FontSize="18" FontWeight="SemiBold"/>
         <TextBlock Text="Connect to Home Assistant and manage entity aliases, favorites and display templates." Opacity="0.7" TextWrapping="Wrap"/>
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Connection" FontWeight="SemiBold" FontSize="18" />
             <CheckBox Name="HaEnabled" Content="Enable Home Assistant" />
@@ -401,7 +401,7 @@
             </StackPanel>
           </StackPanel>
         </Border>
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Home Assistant entities" FontWeight="SemiBold" FontSize="18" />
             <StackPanel Orientation="Horizontal" Spacing="8">
@@ -432,7 +432,7 @@
             </ListBox>
           </StackPanel>
         </Border>
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Selected entity" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="HaSelectedEntity" Text="Select an entity above." />
@@ -448,7 +448,7 @@
     </ScrollViewer>
     <ScrollViewer Name="FanControlView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="12">
             <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Fan outputs" FontSize="18" FontWeight="SemiBold"/><TextBlock Grid.Column="1" Text="Four channels / hardware-safe" Opacity="0.65"/></Grid>
             <Grid ColumnDefinitions="90,*,65" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="12">
@@ -460,7 +460,7 @@
             <TextBlock Text="Preview values appear after simulation; they do not represent actual hardware output." FontSize="12" Opacity="0.7"/>
           </StackPanel>
         </Border>
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Fan Outputs" FontSize="17" FontWeight="SemiBold" />
             <TextBlock Text="Physical fan outputs require explicit authorization. Configuration and previews do not send hardware commands." TextWrapping="Wrap" />
@@ -493,7 +493,7 @@
             <TextBlock Text="Curve points (temperature=percent, one per line)" />
             <Grid ColumnDefinitions="250,18,330" RowDefinitions="Auto">
               <TextBox Grid.Column="0" Name="FanCurve" Height="154" HorizontalAlignment="Stretch" AcceptsReturn="True" />
-              <Border Grid.Column="2" Background="#F8FAFC" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="5" Padding="8">
+              <Border Grid.Column="2" Background="#F8FAFC" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="5" Padding="8">
                 <StackPanel Spacing="5">
                   <TextBlock Text="Fan curve preview · 0–100 %" FontSize="12" Opacity="0.7"/>
                   <Canvas Width="300" Height="116" ClipToBounds="True">
@@ -539,7 +539,7 @@
     </ScrollViewer>
       <ScrollViewer Name="HardwareView" Grid.Row="1" IsVisible="False">
         <StackPanel Spacing="12">
-          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16"><StackPanel Spacing="12">
+          <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16"><StackPanel Spacing="12">
           <TextBlock Text="Hardware monitoring" FontSize="18" FontWeight="SemiBold" />
           <TextBlock Text="Read-only sensors from the current operating system. Refresh to capture a new snapshot; no LIS2 hardware commands are sent." TextWrapping="Wrap" />
           <StackPanel Orientation="Horizontal" Spacing="8">
@@ -585,7 +585,7 @@
             </ListBox.DataTemplates>
           </ListBox>
         </StackPanel></Border>
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Selected sensor / fan assignment" FontSize="18" FontWeight="SemiBold"/>
           <TextBlock Name="HardwareSelectedSensor" Text="Select a sensor above." TextWrapping="Wrap" />
@@ -603,7 +603,7 @@
           </StackPanel>
           <TextBlock Text="Sensor assignment updates the fan editor but is not saved until you explicitly save fan configuration. Physical fan output remains disabled unless separately authorized." TextWrapping="Wrap" />
         </StackPanel></Border>
-        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
           <TextBlock Text="Display presets" FontSize="16" FontWeight="SemiBold" />
           <TextBlock Text="Create editable display pages from available hardware sensor keys. Pages are saved to the portable workspace; no LIS2 device commands are sent." TextWrapping="Wrap" />
@@ -619,7 +619,7 @@
       </ScrollViewer>
       <ScrollViewer Name="DiagnosticsView" Grid.Row="1" IsVisible="False">
         <Grid ColumnDefinitions="*,12,*" RowDefinitions="Auto,12,Auto" Margin="0,0,8,8">
-          <Border Background="White" Grid.Row="0" Grid.Column="0" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="12">
+          <Border Background="{DynamicResource Lis2CardBrush}" Grid.Row="0" Grid.Column="0" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
               <TextBlock Text="Diagnostics Snapshot" FontSize="18" FontWeight="SemiBold" />
               <StackPanel Orientation="Horizontal" Spacing="8">
@@ -629,19 +629,19 @@
               <TextBox Name="DiagnosticsSnapshot" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="210" FontFamily="Consolas" />
             </StackPanel>
           </Border>
-          <Border Background="White" Grid.Row="0" Grid.Column="2" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="12">
+          <Border Background="{DynamicResource Lis2CardBrush}" Grid.Row="0" Grid.Column="2" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
               <TextBlock Text="Virtual LIS2 state" FontSize="18" FontWeight="SemiBold" />
               <TextBox Name="DiagnosticsVirtualState" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
             </StackPanel>
           </Border>
-          <Border Background="White" Grid.Row="2" Grid.Column="0" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="12">
+          <Border Background="{DynamicResource Lis2CardBrush}" Grid.Row="2" Grid.Column="0" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
               <TextBlock Text="Decoded command history" FontSize="18" FontWeight="SemiBold" />
               <TextBox Name="DiagnosticsCommandHistory" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
             </StackPanel>
           </Border>
-          <Border Background="White" Grid.Row="2" Grid.Column="2" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="12">
+          <Border Background="{DynamicResource Lis2CardBrush}" Grid.Row="2" Grid.Column="2" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
               <TextBlock Text="Protocol Log" FontSize="18" FontWeight="SemiBold" />
               <TextBox Name="DiagnosticsProtocolLog" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
@@ -651,7 +651,7 @@
       </ScrollViewer>
       <ScrollViewer Name="EventsView" Grid.Row="1" IsVisible="False">
         <StackPanel Spacing="14">
-          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
             <Grid ColumnDefinitions="100,*,110,120" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="9">
               <TextBlock Grid.Row="0" Text="Line 1" VerticalAlignment="Center"/>
               <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Name="EventLine1" Text="BUILD FINISHED"/>
@@ -673,13 +673,13 @@
               </StackPanel>
             </Grid>
           </Border>
-          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
             <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10" MinHeight="380">
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <TextBlock Text="Active / pending events" FontSize="18" FontWeight="SemiBold"/>
                 <TextBlock Name="EventCount" Text="0 events" VerticalAlignment="Center" Opacity="0.65"/>
               </StackPanel>
-              <ListBox Grid.Row="1" Name="EventList" MinHeight="280" BorderBrush="#D4DCE5" BorderThickness="1"/>
+              <ListBox Grid.Row="1" Name="EventList" MinHeight="280" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1"/>
               <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
                 <TextBlock Name="EventStatus" Text="Select an event to display." Opacity="0.7" VerticalAlignment="Center"/>
                 <Button Grid.Column="1" Name="EventCancel" Content="Cancel selected"/>
@@ -689,7 +689,7 @@
         </StackPanel>
       </ScrollViewer>
       <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="14">
-          <Border BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Border BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Name="SettingsDeviceHeading" Text="Device / Transport" FontWeight="SemiBold" FontSize="18"/>
               <Grid ColumnDefinitions="100,190,100,180,*" ColumnSpacing="8">
@@ -708,7 +708,7 @@
               <TextBlock Name="SettingsTransportStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
           </Border>
-          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Name="SettingsAppearanceHeading" Text="Appearance" FontWeight="SemiBold" FontSize="18"/>
               <Grid ColumnDefinitions="100,220,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="10">
@@ -733,7 +733,7 @@
               <TextBlock Name="SettingsAppearanceStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
           </Border>
-          <Border Background="White" Name="SettingsWindowsCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Border Background="{DynamicResource Lis2CardBrush}" Name="SettingsWindowsCard" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Text="Windows" FontWeight="SemiBold" FontSize="18"/>
               <CheckBox Name="StartWithWindowsCheckBox" Content="Start LIS2 Control Center with Windows (minimized to tray)"/>
