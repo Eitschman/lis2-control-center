@@ -11,16 +11,16 @@
         <TextBlock Grid.Row="0" Text="LIS2 CONTROL CENTER" FontSize="16" FontWeight="Bold" Margin="4,18,0,24" Foreground="{DynamicResource Lis2SidebarTextBrush}" />
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="8">
           <StackPanel Name="NavigationPanel" Spacing="2">
-            <Button Name="NavButton0" Tag="0" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,8 L8,2 L14,8 M4,7 L4,14 L12,14 L12,7"/><TextBlock Grid.Column="1" Text="Dashboard" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton1" Tag="1" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,3 L14,3 L14,13 L2,13 Z M5,6 L11,6 M5,9 L11,9"/><TextBlock Grid.Column="1" Text="Display" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton2" Tag="2" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M3,2 L13,2 L13,14 L3,14 Z M5,5 L11,5 M5,8 L11,8 M5,11 L9,11"/><TextBlock Grid.Column="1" Text="Pages" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton3" Tag="3" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M5,12 L5,3 L13,2 L13,10 M5,5 L13,4"/><TextBlock Grid.Column="1" Text="Media" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton4" Tag="4" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M8,2 L15,14 L1,14 Z M8,6 L8,10 M8,12 L8,12.5"/><TextBlock Grid.Column="1" Text="Events" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton5" Tag="5" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,3 L14,3 L14,13 L2,13 Z M6,3 L6,13 M10,3 L10,13"/><TextBlock Grid.Column="1" Text="Hardware" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton6" Tag="6" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M8,2 L8,14 M2,8 L14,8 M4,4 L12,12 M12,4 L4,12"/><TextBlock Grid.Column="1" Text="Fan Control" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton7" Tag="7" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M6,2 L10,2 L11,4 L13,5 L14,8 L13,11 L11,12 L10,14 L6,14 L5,12 L3,11 L2,8 L3,5 L5,4 Z M8,6 L8,10"/><TextBlock Grid.Column="1" Text="Settings" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton8" Tag="8" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,10 Q5,3 8,8 T14,6 M2,13 L14,13"/><TextBlock Grid.Column="1" Text="Diagnostics" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton9" Tag="9" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,8 L8,2 L14,8 M4,7 L4,14 L12,14 L12,7 M6,10 L10,10"/><TextBlock Grid.Column="1" Text="Home Assistant" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton0" Tag="0" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource Lis2IconBrush}" StrokeThickness="1.5" Data="M2,8 L8,2 L14,8 M4,7 L4,14 L12,14 L12,7"/><TextBlock Grid.Column="1" Text="Dashboard" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton1" Tag="1" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource Lis2IconBrush}" StrokeThickness="1.5" Data="M2,3 L14,3 L14,13 L2,13 Z M5,6 L11,6 M5,9 L11,9"/><TextBlock Grid.Column="1" Text="Display" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton2" Tag="2" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource Lis2IconBrush}" StrokeThickness="1.5" Data="M3,2 L13,2 L13,14 L3,14 Z M5,5 L11,5 M5,8 L11,8 M5,11 L9,11"/><TextBlock Grid.Column="1" Text="Pages" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton3" Tag="3" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource Lis2IconBrush}" StrokeThickness="1.5" Data="M5,12 L5,3 L13,2 L13,10 M5,5 L13,4"/><TextBlock Grid.Column="1" Text="Media" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton4" Tag="4" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource Lis2IconBrush}" StrokeThickness="1.5" Data="M8,2 L15,14 L1,14 Z M8,6 L8,10 M8,12 L8,12.5"/><TextBlock Grid.Column="1" Text="Events" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton5" Tag="5" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource Lis2IconBrush}" StrokeThickness="1.5" Data="M2,3 L14,3 L14,13 L2,13 Z M6,3 L6,13 M10,3 L10,13"/><TextBlock Grid.Column="1" Text="Hardware" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton6" Tag="6" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource Lis2IconBrush}" StrokeThickness="1.5" Data="M8,2 L8,14 M2,8 L14,8 M4,4 L12,12 M12,4 L4,12"/><TextBlock Grid.Column="1" Text="Fan Control" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton7" Tag="7" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource Lis2IconBrush}" StrokeThickness="1.5" Data="M6,2 L10,2 L11,4 L13,5 L14,8 L13,11 L11,12 L10,14 L6,14 L5,12 L3,11 L2,8 L3,5 L5,4 Z M8,6 L8,10"/><TextBlock Grid.Column="1" Text="Settings" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton8" Tag="8" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource Lis2IconBrush}" StrokeThickness="1.5" Data="M2,10 Q5,3 8,8 T14,6 M2,13 L14,13"/><TextBlock Grid.Column="1" Text="Diagnostics" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton9" Tag="9" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource Lis2IconBrush}" StrokeThickness="1.5" Data="M2,8 L8,2 L14,8 M4,7 L4,14 L12,14 L12,7 M6,10 L10,10"/><TextBlock Grid.Column="1" Text="Home Assistant" VerticalAlignment="Center"/></Grid></Button>
           </StackPanel>
           <Separator Margin="4,18,4,16" />
           <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
@@ -304,8 +304,8 @@
           <StackPanel Spacing="7">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
               <TextBlock Text="Windows Media Player" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
-              <Border Grid.Column="1" Background="#E8F5EC" CornerRadius="12" Padding="12,7">
-                <TextBlock Name="WindowsMediaStatus" Text="Disconnected" Foreground="#166534" FontWeight="SemiBold"/>
+              <Border Grid.Column="1" Background="{DynamicResource Lis2StatusBrush}" CornerRadius="12" Padding="12,7">
+                <TextBlock Name="WindowsMediaStatus" Text="Disconnected" Foreground="{DynamicResource Lis2StatusTextBrush}" FontWeight="SemiBold"/>
               </Border>
             </Grid>
             <TextBlock Name="WindowsMediaTitle" Text="Nothing playing" FontSize="24" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
@@ -332,8 +332,8 @@
           <StackPanel Spacing="7">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
               <TextBlock Text="Winamp" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
-              <Border Grid.Column="1" Background="#E8F5EC" CornerRadius="12" Padding="12,7">
-                <TextBlock Name="WinampMediaStatus" Text="Disconnected" Foreground="#166534" FontWeight="SemiBold"/>
+              <Border Grid.Column="1" Background="{DynamicResource Lis2StatusBrush}" CornerRadius="12" Padding="12,7">
+                <TextBlock Name="WinampMediaStatus" Text="Disconnected" Foreground="{DynamicResource Lis2StatusTextBrush}" FontWeight="SemiBold"/>
               </Border>
             </Grid>
             <TextBlock Name="WinampMediaTitle" Text="Nothing playing" FontSize="22"/>
@@ -366,8 +366,8 @@
           <StackPanel Spacing="7">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
               <TextBlock Text="Windows Media Player Legacy" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
-              <Border Grid.Column="1" Background="#E8F5EC" CornerRadius="12" Padding="12,7">
-                <TextBlock Name="WmpLegacyMediaStatus" Text="Disconnected" Foreground="#166534" FontWeight="SemiBold"/>
+              <Border Grid.Column="1" Background="{DynamicResource Lis2StatusBrush}" CornerRadius="12" Padding="12,7">
+                <TextBlock Name="WmpLegacyMediaStatus" Text="Disconnected" Foreground="{DynamicResource Lis2StatusTextBrush}" FontWeight="SemiBold"/>
               </Border>
             </Grid>
             <TextBlock Name="WmpLegacyMediaTitle" Text="Nothing playing" FontSize="22"/>
@@ -493,7 +493,7 @@
             <TextBlock Text="Curve points (temperature=percent, one per line)" />
             <Grid ColumnDefinitions="250,18,330" RowDefinitions="Auto">
               <TextBox Grid.Column="0" Name="FanCurve" Height="154" HorizontalAlignment="Stretch" AcceptsReturn="True" />
-              <Border Grid.Column="2" Background="#F8FAFC" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="5" Padding="8">
+              <Border Grid.Column="2" Background="{DynamicResource Lis2MutedCardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="5" Padding="8">
                 <StackPanel Spacing="5">
                   <TextBlock Text="Fan curve preview · 0–100 %" FontSize="12" Opacity="0.7"/>
                   <Canvas Width="300" Height="116" ClipToBounds="True">
@@ -566,7 +566,7 @@
           <ListBox Name="HardwareSensorList" MinHeight="260" MaxHeight="450">
             <ListBox.DataTemplates>
               <DataTemplate DataType="local:HardwareSensorGroupHeader">
-                <Border Background="#E8EEF3" Padding="8,6" Margin="0,8,0,4">
+                <Border Background="{DynamicResource Lis2HeaderBrush}" Padding="8,6" Margin="0,8,0,4">
                   <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
                 </Border>
               </DataTemplate>
