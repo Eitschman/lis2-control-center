@@ -2,6 +2,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="LIS2.App.Avalonia.App"
              RequestedThemeVariant="Default">
+  <Application.Resources>
+    <SolidColorBrush x:Key="Lis2CardBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Lis2SurfaceBrush" Color="#F5F7FA"/>
+    <SolidColorBrush x:Key="Lis2BorderBrush" Color="#D4DCE5"/>
+    <SolidColorBrush x:Key="Lis2SidebarBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Lis2SidebarTextBrush" Color="#10243A"/>
+    <SolidColorBrush x:Key="Lis2SelectedBrush" Color="#DDF6E7"/>
+  </Application.Resources>
   <Application.Styles>
     <FluentTheme />
   </Application.Styles>
