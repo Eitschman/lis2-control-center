@@ -28,6 +28,8 @@ public sealed class WindowsMediaBridge : IAsyncDisposable
             await task;
     }
 
+    public bool IsAvailable => _provider is not null;
+
     public IReadOnlyDictionary<string, object?> Values =>
         _provider is not null && _values?.GetValue(_provider) is IReadOnlyDictionary<string, object?> values
             ? values : new Dictionary<string, object?> { ["Connected"] = false };
