@@ -333,9 +333,26 @@
             <TextBlock Name="WinampMediaTitle" Text="Nothing playing" FontSize="22"/>
             <TextBlock Name="WinampMediaArtist" Text="Waiting for Winamp..."/>
             <TextBlock Name="WinampMediaAlbum"/>
-            <TextBlock Name="WinampMediaPlayback"/>
-            <TextBlock Name="WinampMediaTime"/>
-            <TextBlock Name="WinampMediaTelemetry"/>
+            <Grid ColumnDefinitions="*,16,*,16,*" Margin="0,6,0,10">
+              <StackPanel Grid.Column="0" Spacing="3">
+                <TextBlock Text="Playback" FontWeight="SemiBold"/>
+                <TextBlock Name="WinampMediaPlayback" FontSize="18" FontWeight="SemiBold"/>
+                <TextBlock Name="WinampMediaTime" FontFamily="Consolas" Opacity="0.7"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2" Spacing="3">
+                <TextBlock Text="Playlist" FontWeight="SemiBold"/>
+                <TextBlock Name="WinampMediaPlaylist" Text="- / -" FontSize="18" FontWeight="SemiBold"/>
+                <TextBlock Text="Current position / total tracks" Opacity="0.7"/>
+              </StackPanel>
+              <StackPanel Grid.Column="4" Spacing="3">
+                <TextBlock Text="Audio" FontWeight="SemiBold"/>
+                <TextBlock Name="WinampMediaAudio" Text="-" FontSize="18" FontWeight="SemiBold"/>
+                <TextBlock Text="Bitrate / sample rate" Opacity="0.7"/>
+              </StackPanel>
+            </Grid>
+            <Separator/>
+            <TextBlock Text="VU / Spectrum" FontWeight="SemiBold"/>
+            <TextBlock Name="WinampMediaTelemetry" FontFamily="Consolas" TextWrapping="Wrap"/>
             <Button Name="WinampMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
         </Border>
