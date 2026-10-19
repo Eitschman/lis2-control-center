@@ -456,7 +456,19 @@
               <TextBlock Grid.Row="6" Text="Allow stop" /><CheckBox Grid.Row="6" Grid.Column="1" Name="FanAllowStop" />
             </Grid>
             <TextBlock Text="Curve points (temperature=percent, one per line)" />
-            <TextBox Name="FanCurve" Width="240" Height="110" HorizontalAlignment="Left" AcceptsReturn="True" />
+            <Grid ColumnDefinitions="250,18,330" RowDefinitions="Auto">
+              <TextBox Grid.Column="0" Name="FanCurve" Height="154" HorizontalAlignment="Stretch" AcceptsReturn="True" />
+              <Border Grid.Column="2" Background="#F8FAFC" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="5" Padding="8">
+                <StackPanel Spacing="5">
+                  <TextBlock Text="Fan curve preview · 0–100 %" FontSize="12" Opacity="0.7"/>
+                  <Canvas Width="300" Height="116" ClipToBounds="True">
+                    <Path Stroke="#CBD5E1" StrokeThickness="1" Data="M 0,0 L 0,110 L 298,110"/>
+                    <Path Stroke="#CBD5E1" StrokeThickness="1" Data="M 0,55 L 298,55"/>
+                    <Path Name="FanCurvePreviewPath" Stroke="#15975A" StrokeThickness="2.5" StrokeLineCap="Round" StrokeLineJoin="Round"/>
+                  </Canvas>
+                </StackPanel>
+              </Border>
+            </Grid>
             <StackPanel Orientation="Horizontal" Spacing="8">
               <TextBlock Text="Simulated sensor temperature" VerticalAlignment="Center" />
               <TextBox Name="FanSimulatedTemperature" Width="90" Text="50" />
