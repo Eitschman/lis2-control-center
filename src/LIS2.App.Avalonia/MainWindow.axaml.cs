@@ -259,7 +259,7 @@ public partial class MainWindow : Window
         }
 
         if (description is not null)
-            description.Text = SettingsTranslate(section switch
+            description.Text = TranslateSectionDescription(section, section switch
             {
                 "Dashboard" => "Overview and quick access to the most important functions.",
                 "Display" => "Quick display tests, custom characters and brightness.",
