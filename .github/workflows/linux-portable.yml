@@ -94,6 +94,7 @@ jobs:
           if ($size -lt 10000) { throw "Unexpectedly small executable ($size bytes)" }
           if (-not (Test-Path "$folder/LIS2.App.Avalonia.dll")) { throw "Missing managed application assembly" }
           if (-not (Test-Path "$folder/LIS2.App.Avalonia.runtimeconfig.json")) { throw "Missing runtime configuration" }
+          if ("${{ runner.os }}" -eq "Windows" -and -not (Test-Path "$folder/LIS2.WindowsMedia.dll")) { throw "Missing Windows GSMTC provider in publish output" }
           Write-Host "Verified ${{ matrix.rid }} executable: $size bytes"
       - name: Package Linux executable
         if: runner.os == 'Linux'
