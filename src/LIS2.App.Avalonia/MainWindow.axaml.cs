@@ -242,7 +242,17 @@ public partial class MainWindow : Window
         this.FindControl<ScrollViewer>("HardwareView")!.IsVisible = section == "Hardware";
         this.FindControl<ScrollViewer>("DiagnosticsView")!.IsVisible = section == "Diagnostics";
         if (section == "Diagnostics") RefreshDiagnostics();
-        if (section == "Media") RefreshMedia();
+        if (section == "Media")
+        {
+            // A provider failure must never escape the navigation click handler.
+            try { RefreshMedia(); }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Media navigation failed: {0}", ex);
+                var status = this.FindControl<TextBlock>("WindowsMediaStatus");
+                if (status is not null) status.Text = "Media error: " + ex.GetBaseException().Message;
+            }
+        }
 
         if (description is not null)
             description.Text = section == "Dashboard"
