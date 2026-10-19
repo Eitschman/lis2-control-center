@@ -555,3 +555,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Matched WPF Events composer 20-character limit for both LIS2 display lines and adjusted queue label/minimum height.
 - Examined Actions failure #39275645016 for `a015d3ad`: compiler CS0103 and CS0234 from ambiguous/unqualified Avalonia namespace references in MainWindow, Fans and Settings. Fixed with `global::Avalonia` qualifications; HEAD CI is pending, not yet green.
 - Source control inventory of WPF/Avalonia interactive controls completed for all ten tabs; this is not a visual or functional 1:1 certification. Remaining: exact WPF layout/behavior review, full translations for French/Turkish/Russian static controls, CI and final owner desktop verification. No claim of 1:1 parity yet.
+
+## Events WPF queue parity (2026-10-19)
+
+- Replaced single concatenated event queue strings with WPF-style three-column rows (priority name, display line text, remaining time). ItemTemplate binds typed rows and preserves selected-index cancellation, priority queue order and existing virtual display behavior.
+- Compared all ten WPF/Avalonia page control counts as an inventory only; counts are not a substitute for functional/visual parity. WPF has 10 tabs, Avalonia 10 navigation pages; many have differing control counts because of platform-specific transport and fan safety controls.
+- Latest code commits: `b7a395f` layout, `fca10d6` event rows. Full 1:1 acceptance remains unverified; head CI pending.
