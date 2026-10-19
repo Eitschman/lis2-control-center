@@ -12,6 +12,8 @@ public sealed class WindowsHardwareFanSensors : IFanSensorSource, IDisposable
 {
     private readonly Computer _computer;
     private bool _disposed;
+    private int _emptySnapshots;
+    public string Diagnostic { get; private set; } = "Not sampled";
 
     public WindowsHardwareFanSensors()
     {
@@ -30,8 +32,27 @@ public sealed class WindowsHardwareFanSensors : IFanSensorSource, IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         var values = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+        // LibreHardwareMonitor can report an empty hardware tree at startup.
+        // Re-open discovery after consecutive empty samples, rather than
+        // permanently presenting an empty list until application restart.
+        if (_computer.Hardware.Count == 0 && ++_emptySnapshots >= 3)
+        {
+            _computer.Close();
+            _computer.Open();
+            _emptySnapshots = 0;
+        }
+        var devices = 0;
         foreach (var hardware in _computer.Hardware)
+        {
+            devices++;
             Read(hardware, values);
+        }
+        if (values.Count > 0) _emptySnapshots = 0;
+        Diagnostic = $"LibreHardwareMonitor: {devices} device(s), {values.Count / 2} numeric sensor(s).";
+        if (devices == 0)
+            Diagnostic += " No hardware discovered; check Windows permissions and LibreHardwareMonitor support.";
+        else if (values.Count == 0)
+            Diagnostic += " Hardware detected but no readable sensor values.";
         return values;
     }
 
