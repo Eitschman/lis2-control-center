@@ -212,8 +212,8 @@ public partial class MainWindow
                 if (!GermanPageLabels.ContainsKey(original) && WpfTranslationCatalog.Translate(original, CurrentUiLanguage()) == original) continue;
                 _originalPageLabels.Add(label, original);
             }
-            label.Text = CurrentUiLanguage() == "de" &&
-                GermanPageLabels.TryGetValue(original, out var translated) ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
+            label.Text = CurrentUiLanguage() == "de" && GermanPageLabels.TryGetValue(original, out var translated)
+                ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
         foreach (var checkBox in this.GetLogicalDescendants().OfType<CheckBox>())
         {
@@ -224,8 +224,8 @@ public partial class MainWindow
                 original = content;
                 _originalPageCheckBoxes.Add(checkBox, original);
             }
-            checkBox.Content = CurrentUiLanguage() == "de" &&
-                GermanCheckBoxLabels.TryGetValue(original, out var translated) ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
+            checkBox.Content = CurrentUiLanguage() == "de" && GermanCheckBoxLabels.TryGetValue(original, out var translated)
+                ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
         foreach (var button in this.GetLogicalDescendants().OfType<Button>())
         {
@@ -236,8 +236,8 @@ public partial class MainWindow
                 original = text;
                 _originalPageButtons.Add(button, original);
             }
-            button.Content = CurrentUiLanguage() == "de" &&
-                GermanButtonLabels.TryGetValue(original, out var translated) ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
+            button.Content = CurrentUiLanguage() == "de" && GermanButtonLabels.TryGetValue(original, out var translated)
+                ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
     }
 }
