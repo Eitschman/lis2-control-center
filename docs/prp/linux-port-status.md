@@ -449,3 +449,10 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 - Files modified in repair commits: `src/LIS2.Sources/LIS2.Sources.csproj`, `src/LIS2.Winamp/LIS2.Winamp.csproj`, `src/LIS2.WmpLegacy/LIS2.WmpLegacy.csproj`, `src/LIS2.Runtime/LIS2.Runtime.csproj`. No physical device or manual UI acceptance performed.
 - **Media package remains incomplete:** Windows modern Media Player GSMTC integration, Linux MPRIS adapter, WPF-equivalent media controls/visualizations, capability-based UI visibility and tests are pending. Preserve `Winamp.*` and `WindowsMedia.*` template keys and existing native Winamp plugin. WMP Legacy and Wine support remain explicitly deferred according to PRP.
 - **Single next action:** implement a cohesive cross-platform Media provider/UI parity package based on `docs/prp/linux-avalonia-port.md` Phase 3 and the WPF parity audit; include regression tests, Windows/Linux/ARM64 CI validation and status documentation. Do not mark complete without current HEAD CI green.
+
+## Linux MPRIS implementation (2026-10-19)
+
+- Linux MPRIS metadata adapter added in `LinuxMprisSource.cs`, querying optional `playerctl` without native dependencies. Exposes `Media.Connected`, `Media.State`, `Media.Title`, and `Media.Artist` through `PageSourceValues.UpdateMedia`.
+- Avalonia Media tab includes Linux MPRIS status and playback-page creation; headless mapping regression test added. This is an implementation increment, not a claim of complete WPF Media parity.
+- GitHub commits: `b4c9e5a`, `30842af`, `29e1fda`, `ac79c2b`. CI pending on latest HEAD. Playerctl availability and real player behavior not verified on Raspberry Pi.
+- Open: Windows GSMTC integration, capability-specific card visibility, Windows Winamp spectrum/VU parity, detailed media controls, Linux MPRIS robustness and CI verification. Next actionable work: complete provider/UI parity and confirm latest HEAD green.
