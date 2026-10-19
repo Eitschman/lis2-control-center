@@ -190,5 +190,6 @@ public partial class MainWindow
         }
         ApplyPageLocalization();
         UpdateSection();
+        UpdateVirtualControls();
     }
 }
