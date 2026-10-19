@@ -39,8 +39,8 @@ public partial class MainWindow
             {
                 1 => "English", 2 => "German", 3 => "French", 4 => "Turkish", 5 => "Russian", _ => "System"
             };
-            this.FindControl<TextBlock>("SettingsAppearanceStatus")!.Text =
-                "Language preference saved. Full UI translation is not yet available in this port.";
+            ApplySettingsLocalization();
+            this.FindControl<TextBlock>("SettingsAppearanceStatus")!.Text = string.Empty;
             _ = SavePortableWorkspaceAsync();
         };
         this.FindControl<Border>("SettingsWindowsCard")!.IsVisible = OperatingSystem.IsWindows();
@@ -78,6 +78,7 @@ public partial class MainWindow
             };
         ApplyPreferredTheme();
         _loadingSettings = false;
+        ApplySettingsLocalization();
     }
 
     private void ApplyPreferredTheme()
