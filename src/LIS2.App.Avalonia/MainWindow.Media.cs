@@ -13,6 +13,7 @@ public partial class MainWindow
     private readonly LinuxMprisSource _mpris = new();
     private readonly WindowsMediaBridge _windowsMedia = new();
     private bool _mprisRefreshing;
+    private bool _mediaStopping;
 
     private void InitializeMedia()
     {
@@ -40,18 +41,30 @@ public partial class MainWindow
             RefreshMedia();
             return;
         }
-        try { await _windowsMedia.StartAsync(); }
-        catch (Exception ex) { this.FindControl<TextBlock>("WindowsMediaStatus")!.Text = ex.GetBaseException().Message; }
-        this.FindControl<Border>("WindowsMediaCard")!.IsVisible = _windowsMedia.IsAvailable;
-        try { await _mediaWinamp.StartAsync(); }
-        catch (Exception ex) { this.FindControl<TextBlock>("WinampMediaStatus")!.Text = ex.Message; }
-        try { await _mediaLegacy.StartAsync(); }
-        catch (Exception ex) { this.FindControl<TextBlock>("WmpLegacyMediaStatus")!.Text = ex.Message; }
-        RefreshMedia();
+        try
+        {
+            await _windowsMedia.StartAsync();
+            if (_mediaStopping) return;
+            this.FindControl<Border>("WindowsMediaCard")!.IsVisible = _windowsMedia.IsAvailable;
+            await _mediaWinamp.StartAsync();
+            if (_mediaStopping) return;
+            await _mediaLegacy.StartAsync();
+            if (!_mediaStopping) RefreshMedia();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceError("Media startup failed: {0}", ex);
+            if (!_mediaStopping)
+            {
+                var status = this.FindControl<TextBlock>("WindowsMediaStatus");
+                if (status is not null) status.Text = "Media startup error: " + ex.GetBaseException().Message;
+            }
+        }
     }
 
     private void RefreshMedia()
     {
+        if (_mediaStopping) return;
         if (!OperatingSystem.IsWindows())
         {
             _ = RefreshMprisAsync();
@@ -149,6 +162,7 @@ public partial class MainWindow
 
     private async Task StopMediaAsync()
     {
+        _mediaStopping = true;
         _mediaTimer?.Stop();
         _mediaTimer = null;
         await _windowsMedia.DisposeAsync();
