@@ -148,6 +148,7 @@ public partial class MainWindow
 
     private static bool IsWindowsStartupEnabled()
     {
+        if (!OperatingSystem.IsWindows()) return false;
         using var key = Registry.CurrentUser.OpenSubKey(StartupKey);
         return key?.GetValue(StartupValue) is string;
     }
