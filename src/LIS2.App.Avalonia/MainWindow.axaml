@@ -296,13 +296,17 @@
         <TextBlock Text="Player metadata is available for display page templates. Playback providers are detected automatically." TextWrapping="Wrap" Opacity="0.7"/>
         <Border Background="White" Name="WindowsMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
-            <TextBlock Text="Windows Media Player" FontWeight="SemiBold" FontSize="18"/>
-            <TextBlock Name="WindowsMediaStatus" Text="Disconnected"/>
-            <TextBlock Name="WindowsMediaTitle" Text="Nothing playing" FontSize="22"/>
-            <TextBlock Name="WindowsMediaArtist"/>
-            <TextBlock Name="WindowsMediaAlbum"/>
-            <TextBlock Name="WindowsMediaPlayback"/>
-            <TextBlock Name="WindowsMediaTime"/>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+              <TextBlock Text="Windows Media Player" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
+              <Border Grid.Column="1" Background="#E8F5EC" CornerRadius="12" Padding="12,7">
+                <TextBlock Name="WindowsMediaStatus" Text="Disconnected" Foreground="#166534" FontWeight="SemiBold"/>
+              </Border>
+            </Grid>
+            <TextBlock Name="WindowsMediaTitle" Text="Nothing playing" FontSize="24" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Name="WindowsMediaArtist" TextTrimming="CharacterEllipsis" FontSize="16"/>
+            <TextBlock Name="WindowsMediaAlbum" TextTrimming="CharacterEllipsis" Opacity="0.7"/>
+            <TextBlock Name="WindowsMediaPlayback" FontWeight="SemiBold"/>
+            <TextBlock Name="WindowsMediaTime" FontFamily="Consolas" Opacity="0.7"/>
             <Button Name="WindowsMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
         </Border>
@@ -320,8 +324,12 @@
         </Border>
         <Border Background="White" Name="WinampMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
-            <TextBlock Text="Winamp" FontWeight="SemiBold" FontSize="18"/>
-            <TextBlock Name="WinampMediaStatus" Text="Disconnected"/>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+              <TextBlock Text="Winamp" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
+              <Border Grid.Column="1" Background="#E8F5EC" CornerRadius="12" Padding="12,7">
+                <TextBlock Name="WinampMediaStatus" Text="Disconnected" Foreground="#166534" FontWeight="SemiBold"/>
+              </Border>
+            </Grid>
             <TextBlock Name="WinampMediaTitle" Text="Nothing playing" FontSize="22"/>
             <TextBlock Name="WinampMediaArtist" Text="Waiting for Winamp..."/>
             <TextBlock Name="WinampMediaAlbum"/>
@@ -333,8 +341,12 @@
         </Border>
         <Border Background="White" Name="WmpLegacyMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
-            <TextBlock Text="Windows Media Player Legacy" FontWeight="SemiBold" FontSize="18"/>
-            <TextBlock Name="WmpLegacyMediaStatus" Text="Disconnected"/>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+              <TextBlock Text="Windows Media Player Legacy" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
+              <Border Grid.Column="1" Background="#E8F5EC" CornerRadius="12" Padding="12,7">
+                <TextBlock Name="WmpLegacyMediaStatus" Text="Disconnected" Foreground="#166534" FontWeight="SemiBold"/>
+              </Border>
+            </Grid>
             <TextBlock Name="WmpLegacyMediaTitle" Text="Nothing playing" FontSize="22"/>
             <TextBlock Name="WmpLegacyMediaArtist" Text="Waiting for legacy player..."/>
             <TextBlock Name="WmpLegacyMediaAlbum"/>
