@@ -84,6 +84,9 @@ jobs:
           $dll = "src/LIS2.WindowsMedia/bin/Release/net8.0-windows10.0.19041.0/LIS2.WindowsMedia.dll"
           if (-not (Test-Path $dll)) { throw "Missing Windows GSMTC provider: $dll" }
           Copy-Item $dll "publish/${{ matrix.rid }}/LIS2.WindowsMedia.dll"
+          Get-ChildItem "src/LIS2.WindowsMedia/bin/Release/net8.0-windows10.0.19041.0" -Filter "*.dll" |
+            Where-Object { $_.Name -ne "LIS2.WindowsMedia.dll" } |
+            ForEach-Object { if (-not (Test-Path "publish/${{ matrix.rid }}/$($_.Name)")) { Copy-Item $_.FullName "publish/${{ matrix.rid }}/$($_.Name)" } }
       - name: Verify published executable and runtime assets
         shell: pwsh
         run: |
