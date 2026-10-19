@@ -13,6 +13,19 @@ public sealed class LinuxMprisSource
             ["Artist"] = artist
         };
 
+    public static IReadOnlyDictionary<string, object?> Parse(string output)
+    {
+        var parts = output.TrimEnd('\r', '\n').Split('\t');
+        if (parts.Length < 5) return Map("", "", "");
+        var values = new Dictionary<string, object?>(Map(parts[0], parts[1], parts[2]), StringComparer.OrdinalIgnoreCase)
+        {
+            ["Album"] = parts[3], ["Duration"] = null
+        };
+        if (long.TryParse(parts[4], out var micros) && micros >= 0)
+            values["Duration"] = TimeSpan.FromMicroseconds(micros).ToString(@"hh\:mm\:ss");
+        return values;
+    }
+
     public async Task<IReadOnlyDictionary<string, object?>> ReadAsync()
     {
         if (!OperatingSystem.IsLinux()) return Map("", "", "");
@@ -22,7 +35,7 @@ public sealed class LinuxMprisSource
             process.StartInfo.FileName = "playerctl";
             process.StartInfo.ArgumentList.Add("metadata");
             process.StartInfo.ArgumentList.Add("--format");
-            process.StartInfo.ArgumentList.Add("{{status}}|{{title}}|{{artist}}");
+            process.StartInfo.ArgumentList.Add("{{status}}\\t{{xesam:title}}\\t{{xesam:artist}}\\t{{xesam:album}}\\t{{mpris:length}}");
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
             if (!process.Start()) return Map("", "", "");
@@ -31,8 +44,7 @@ public sealed class LinuxMprisSource
             await process.WaitForExitAsync(timeout.Token);
             if (process.ExitCode == 0)
             {
-                var parts = output.Trim().Split('|');
-                if (parts.Length >= 3) return Map(parts[0], parts[1], parts[2]);
+                return Parse(output);
             }
         }
         catch (System.ComponentModel.Win32Exception) { }
