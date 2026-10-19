@@ -456,3 +456,10 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 - Avalonia Media tab includes Linux MPRIS status and playback-page creation; headless mapping regression test added. This is an implementation increment, not a claim of complete WPF Media parity.
 - GitHub commits: `b4c9e5a`, `30842af`, `29e1fda`, `ac79c2b`. CI pending on latest HEAD. Playerctl availability and real player behavior not verified on Raspberry Pi.
 - Open: Windows GSMTC integration, capability-specific card visibility, Windows Winamp spectrum/VU parity, detailed media controls, Linux MPRIS robustness and CI verification. Next actionable work: complete provider/UI parity and confirm latest HEAD green.
+
+## MPRIS metadata completion checkpoint (2026-10-19)
+
+- Confirmed GitHub Actions success for prior HEAD `64aa37e`, run [39263888870](https://github.com/Eitschman/lis2-control-center/actions/runs/39263888870).
+- Follow-up implementation: MPRIS album and duration parsing, additional Avalonia fields for album/state/duration, malformed-response regression test. Commits `67ee30a`, `c332178`, `6b4671c`, `53c4e13`.
+- Current HEAD CI pending. This increment does not implement Windows GSMTC; the existing Windows-only `LIS2.WindowsMedia` provider requires an architecture that preserves the shared `net8.0` Avalonia target and Windows publish packaging.
+- Next task: implement and test Windows GSMTC host bridge; then compare media display controls to WPF and close remaining parity gaps. No hardware or desktop acceptance claimed.
