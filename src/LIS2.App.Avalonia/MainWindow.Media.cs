@@ -68,6 +68,9 @@ public partial class MainWindow
             this.FindControl<TextBlock>("LinuxMediaStatus")!.Text = Read("Connected") == "True" ? "Connected" : "Disconnected";
             this.FindControl<TextBlock>("LinuxMediaTitle")!.Text = Read("Title");
             this.FindControl<TextBlock>("LinuxMediaArtist")!.Text = Read("Artist");
+            this.FindControl<TextBlock>("LinuxMediaAlbum")!.Text = Read("Album");
+            this.FindControl<TextBlock>("LinuxMediaPlayback")!.Text = Read("State");
+            this.FindControl<TextBlock>("LinuxMediaDuration")!.Text = Read("Duration");
         }
         finally { _mprisRefreshing = false; }
     }
