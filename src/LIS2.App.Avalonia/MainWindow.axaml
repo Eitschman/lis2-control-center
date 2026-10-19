@@ -301,6 +301,9 @@
             <TextBlock Name="LinuxMediaStatus" Text="Disconnected"/>
             <TextBlock Name="LinuxMediaTitle" Text="Nothing playing"/>
             <TextBlock Name="LinuxMediaArtist"/>
+            <TextBlock Name="LinuxMediaAlbum"/>
+            <TextBlock Name="LinuxMediaPlayback"/>
+            <TextBlock Name="LinuxMediaDuration"/>
             <Button Name="LinuxMediaPage" Content="Create playback page"/>
           </StackPanel>
         </Border>
