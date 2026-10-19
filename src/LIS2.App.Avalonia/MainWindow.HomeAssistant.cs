@@ -8,6 +8,8 @@ public partial class MainWindow
 {
     private PeriodicRuntimeLoop _haUiTimer = null!;
     private bool _haActionBusy;
+    private sealed record HaEntityRow(string EntityId, string FriendlyName, string State, string TemplateKey, string Favorite);
+
 
     private void InitializeHomeAssistant()
     {
@@ -40,6 +42,14 @@ public partial class MainWindow
             });
         this.FindControl<TextBox>("HaEntityFilter")!.TextChanged += (_, _) => RefreshHaEntities();
         this.FindControl<ComboBox>("HaEntityPicker")!.SelectionChanged += (_, _) => RefreshHaSelection();
+        this.FindControl<ListBox>("HaEntityList")!.SelectionChanged += (_, _) =>
+        {
+            if (_updatingHaSelection) return;
+            if (this.FindControl<ListBox>("HaEntityList")!.SelectedItem is not HaEntityRow row) return;
+            var picker = this.FindControl<ComboBox>("HaEntityPicker")!;
+            if (!string.Equals(picker.SelectedItem as string, row.EntityId, StringComparison.OrdinalIgnoreCase))
+                picker.SelectedItem = row.EntityId;
+        };
         this.FindControl<ComboBox>("HaDomainFilter")!.SelectionChanged += (_, _) => RefreshHaEntities();
         this.FindControl<Button>("HaSaveEntity")!.Click += async (_, _) =>
         {
@@ -156,6 +166,22 @@ public partial class MainWindow
             _updatingHaSelection = false;
             RefreshHaSelection();
         }
+        var rows = entities.Select(id =>
+        {
+            var entity = ha.Entities.First(e => string.Equals(e.EntityId, id, StringComparison.OrdinalIgnoreCase));
+            var favorite = _haPreferences.Any(p => string.Equals(p.EntityId, id, StringComparison.OrdinalIgnoreCase) && p.IsFavorite);
+            return new HaEntityRow(id, entity.FriendlyName, entity.State + " " + entity.Unit,
+                HaEntityKey(id), favorite ? "★" : "");
+        }).ToArray();
+        var entityList = this.FindControl<ListBox>("HaEntityList")!;
+        _updatingHaSelection = true;
+        try
+        {
+            entityList.ItemsSource = rows;
+            entityList.SelectedItem = rows.FirstOrDefault(row =>
+                string.Equals(row.EntityId, picker.SelectedItem as string, StringComparison.OrdinalIgnoreCase));
+        }
+        finally { _updatingHaSelection = false; }
         this.FindControl<TextBlock>("HaStatus")!.Text = ha.IsConnected
             ? $"Home Assistant connected ({ha.HomeAssistantVersion ?? "unknown version"}), {ha.Entities.Count} entities, read-only."
             : ha.LastError is { Length: > 0 } error ? $"Home Assistant disconnected: {error}"
@@ -166,6 +192,18 @@ public partial class MainWindow
     {
         if (_updatingHaSelection) return;
         var id = SelectedHaEntityId();
+        var listView = this.FindControl<ListBox>("HaEntityList")!;
+        if (listView.SelectedItem is not HaEntityRow selectedRow ||
+            !string.Equals(selectedRow.EntityId, id, StringComparison.OrdinalIgnoreCase))
+        {
+            _updatingHaSelection = true;
+            try
+            {
+                listView.SelectedItem = (listView.ItemsSource as IEnumerable<HaEntityRow>)?
+                    .FirstOrDefault(row => string.Equals(row.EntityId, id, StringComparison.OrdinalIgnoreCase));
+            }
+            finally { _updatingHaSelection = false; }
+        }
         var entity = _pageSources.HomeAssistant.Entities.FirstOrDefault(e => e.EntityId == id);
         var preference = _haPreferences.FirstOrDefault(p => string.Equals(p.EntityId, id, StringComparison.OrdinalIgnoreCase));
         this.FindControl<TextBlock>("HaSelectedEntity")!.Text = entity is null
