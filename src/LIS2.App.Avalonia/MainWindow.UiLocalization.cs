@@ -209,35 +209,35 @@ public partial class MainWindow
             if (!_originalPageLabels.TryGetValue(label, out var original))
             {
                 original = label.Text ?? string.Empty;
-                if (!GermanPageLabels.ContainsKey(original)) continue;
+                if (!GermanPageLabels.ContainsKey(original) && WpfTranslationCatalog.Translate(original, CurrentUiLanguage()) == original) continue;
                 _originalPageLabels.Add(label, original);
             }
             label.Text = CurrentUiLanguage() == "de" &&
-                GermanPageLabels.TryGetValue(original, out var translated) ? translated : original;
+                GermanPageLabels.TryGetValue(original, out var translated) ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
         foreach (var checkBox in this.GetLogicalDescendants().OfType<CheckBox>())
         {
             if (!_originalPageCheckBoxes.TryGetValue(checkBox, out var original))
             {
-                if (checkBox.Content is not string content || !GermanCheckBoxLabels.ContainsKey(content))
+                if (checkBox.Content is not string content || (!GermanCheckBoxLabels.ContainsKey(content) && WpfTranslationCatalog.Translate(content, CurrentUiLanguage()) == content))
                     continue;
                 original = content;
                 _originalPageCheckBoxes.Add(checkBox, original);
             }
             checkBox.Content = CurrentUiLanguage() == "de" &&
-                GermanCheckBoxLabels.TryGetValue(original, out var translated) ? translated : original;
+                GermanCheckBoxLabels.TryGetValue(original, out var translated) ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
         foreach (var button in this.GetLogicalDescendants().OfType<Button>())
         {
             if (!_originalPageButtons.TryGetValue(button, out var original))
             {
-                if (button.Content is not string text || !GermanButtonLabels.ContainsKey(text))
+                if (button.Content is not string text || (!GermanButtonLabels.ContainsKey(text) && WpfTranslationCatalog.Translate(text, CurrentUiLanguage()) == text))
                     continue;
                 original = text;
                 _originalPageButtons.Add(button, original);
             }
             button.Content = CurrentUiLanguage() == "de" &&
-                GermanButtonLabels.TryGetValue(original, out var translated) ? translated : original;
+                GermanButtonLabels.TryGetValue(original, out var translated) ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
     }
 }
