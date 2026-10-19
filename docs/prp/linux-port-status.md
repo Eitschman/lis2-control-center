@@ -541,3 +541,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - All ten page descriptions translated into English (fallback), German, French, Turkish and Russian, respecting saved explicit language or OS language. Navigation update and settings language change apply translations immediately.
 - Centralized card, surface, sidebar, border, and selection colors into Avalonia dynamic resources. Light/Dark/System setting updates resources and navigation colors; replaces hard-coded white backgrounds across pages. WPF light palette preserved.
 - This is a substantial theme/i18n improvement, NOT a claim of 1:1 WPF GUI completion. Remaining blockers: complete translation of page-level content and buttons, precise screenshot comparison of all ten pages, accessibility and runtime smoke acceptance. Latest HEAD before this note `4b26a6c`; CI not confirmed green. Do not remove WPF project yet.
+
+## Continued 10-page GUI parity implementation (2026-10-19)
+
+- Added dark-aware theme resources for sidebar icons, muted cards, group headers and status indicators, replacing remaining hardcoded light-only brushes in these shared UI elements. Theme setting now updates the additional resources.
+- Added reversible German translations for dozens of static labels spanning Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Diagnostics and Home Assistant; selection and live telemetry are not overwritten. Hooked into language changes. Other languages still require full page-level translations; navigation and page descriptions support five languages.
+- Code: `App.axaml`, `MainWindow.axaml`, `MainWindow.Settings.cs`, new `MainWindow.UiLocalization.cs`, `MainWindow.SettingsLocalization.cs`.
+- This work is NOT verified 1:1 visual parity. Remaining: screen-by-screen screenshot comparisons, exact layout/control parity, other-language labels, complete dark-mode validation, desktop runtime tests and HEAD CI. Do not remove WPF yet.
