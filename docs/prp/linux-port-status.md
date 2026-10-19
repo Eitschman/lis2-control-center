@@ -463,3 +463,11 @@ Verified WPF Home Assistant tab owns enable, URL, token, test, save/reconnect, e
 - Follow-up implementation: MPRIS album and duration parsing, additional Avalonia fields for album/state/duration, malformed-response regression test. Commits `67ee30a`, `c332178`, `6b4671c`, `53c4e13`.
 - Current HEAD CI pending. This increment does not implement Windows GSMTC; the existing Windows-only `LIS2.WindowsMedia` provider requires an architecture that preserves the shared `net8.0` Avalonia target and Windows publish packaging.
 - Next task: implement and test Windows GSMTC host bridge; then compare media display controls to WPF and close remaining parity gaps. No hardware or desktop acceptance claimed.
+
+## Windows GSMTC bridge implementation (2026-10-19)
+
+- Prior MPRIS package HEAD `045a40b` confirmed green in GitHub Actions run [39264812311](https://github.com/Eitschman/lis2-control-center/actions/runs/39264812311).
+- Added `WindowsMediaBridge` to load the existing Windows-only `LIS2.WindowsMedia.WindowsMediaDataSource` via runtime reflection; preserves the cross-platform `net8.0` Avalonia target and the existing `WindowsMedia.*` variable namespace.
+- Connected GSMTC state, title, artist, album, elapsed/duration to Avalonia Media tab and playback-page creation. Windows publish workflow builds the Windows-only source and copies its assembly into win-x64 package. Added missing-provider headless regression test.
+- Implementation commits `7bf44eb`, `1960516`, `ece79a8`, `ddafdba`, `ad78904`. **Current HEAD CI not yet verified; do not mark package accepted until green.** Real Windows GSMTC session behavior not manually tested.
+- Remaining: full WPF media visual parity, Windows session packaging runtime smoke validation, Linux MPRIS integration on actual player, general WPF/Avalonia parity audit and remaining port phases.
