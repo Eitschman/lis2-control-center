@@ -80,6 +80,9 @@ public partial class MainWindow : Window
         // immediately testable without requiring an experimental serial connection.
         Opened += async (_, _) =>
         {
+            // The visual tree is not fully attached in the constructor; translate
+            // page controls after Opened so system-language defaults reach them.
+            ApplyPageLocalization();
             if (!_virtualDevice.IsConnected)
                 await RunVirtualActionAsync(ConnectWithGlyphsAsync);
             // WPF starts page rendering automatically after transport connection.
