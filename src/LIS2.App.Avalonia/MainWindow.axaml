@@ -551,7 +551,60 @@
           </Border>
         </Grid>
       </ScrollViewer>
-      <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="12"><TextBlock Text="Windows settings import" FontSize="18" FontWeight="SemiBold"/>
+      <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="14">
+          <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Device / Transport" FontWeight="SemiBold" FontSize="18"/>
+              <Grid ColumnDefinitions="100,190,100,180,*" ColumnSpacing="8">
+                <TextBlock Grid.Column="0" Text="Transport" VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="1" Name="TransportModeComboBox" SelectedIndex="0">
+                  <ComboBoxItem Content="Virtual"/>
+                  <ComboBoxItem Content="Serial"/>
+                </ComboBox>
+                <TextBlock Grid.Column="2" Text="COM port" VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="3" Name="SettingsPortComboBox"/>
+                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="7">
+                  <Button Name="SettingsRefreshPorts" Content="Refresh"/>
+                  <Button Name="SettingsApplyTransport" Content="Apply / reconnect"/>
+                </StackPanel>
+              </Grid>
+              <TextBlock Name="SettingsTransportStatus" TextWrapping="Wrap" Opacity="0.75"/>
+            </StackPanel>
+          </Border>
+          <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Appearance" FontWeight="SemiBold" FontSize="18"/>
+              <Grid ColumnDefinitions="100,220,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="10">
+                <TextBlock Grid.Row="0" Text="Theme" VerticalAlignment="Center"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" Name="ThemeModeComboBox">
+                  <ComboBoxItem Content="System default"/>
+                  <ComboBoxItem Content="Light"/>
+                  <ComboBoxItem Content="Dark"/>
+                </ComboBox>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="System default follows the operating system." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
+                <TextBlock Grid.Row="1" Text="Language" VerticalAlignment="Center"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" Name="LanguageModeComboBox">
+                  <ComboBoxItem Content="System default"/>
+                  <ComboBoxItem Content="English"/>
+                  <ComboBoxItem Content="German"/>
+                  <ComboBoxItem Content="French"/>
+                  <ComboBoxItem Content="Turkish"/>
+                  <ComboBoxItem Content="Russian"/>
+                </ComboBox>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="System default uses the operating system language." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
+              </Grid>
+              <TextBlock Name="SettingsAppearanceStatus" TextWrapping="Wrap" Opacity="0.75"/>
+            </StackPanel>
+          </Border>
+          <Border Name="SettingsWindowsCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Windows" FontWeight="SemiBold" FontSize="18"/>
+              <CheckBox Name="StartWithWindowsCheckBox" Content="Start LIS2 Control Center with Windows (minimized to tray)"/>
+              <TextBlock Name="SettingsStartupStatus" TextWrapping="Wrap" Opacity="0.75"/>
+            </StackPanel>
+          </Border>
+          <Separator Margin="0,10,0,2"/>
+          <TextBlock Text="Advanced / Diagnostics" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Windows settings import" FontSize="18" FontWeight="SemiBold"/>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Name="ImportWindowsSettings" Content="Import Windows settings.json..." />
             <TextBlock Name="WindowsImportStatus" Text="Existing Windows settings remain unchanged." VerticalAlignment="Center" Opacity="0.7" TextWrapping="Wrap" />
