@@ -204,9 +204,13 @@ public partial class MainWindow : Window
             badge.Text = connected ? "Connected (Virtual)" : "Disconnected";
         var virtualState = this.FindControl<TextBlock>("VirtualStateText");
         if (virtualState is not null)
-            virtualState.Text = connected
-                ? $"Virtual LIS2 connected. Commands: {_virtualDevice.CommandCount}."
-                : "State available when Virtual transport is active.";
+            virtualState.Text = CurrentUiLanguage() == "de"
+                ? connected
+                    ? $"Virtueller LIS2 verbunden. Befehle: {_virtualDevice.CommandCount}."
+                    : "Status verfügbar, wenn der virtuelle Transport aktiv ist."
+                : connected
+                    ? $"Virtual LIS2 connected. Commands: {_virtualDevice.CommandCount}."
+                    : "State available when Virtual transport is active.";
     }
 
     private static readonly string[] SectionNames = { "Dashboard", "Display", "Pages", "Media", "Events", "Hardware", "Fan Control", "Settings", "Diagnostics", "Home Assistant" };
