@@ -3,24 +3,24 @@
         xmlns:local="clr-namespace:LIS2.App.Avalonia"
         x:Class="LIS2.App.Avalonia.MainWindow"
         Title="LIS2 Control Center"
-        Width="1200" Height="700" MinWidth="850" MinHeight="480"
-        WindowStartupLocation="CenterScreen">
+        Width="1305" Height="893" MinWidth="950" MinHeight="600"
+        WindowStartupLocation="CenterScreen" Background="#F5F7FA">
   <Grid ColumnDefinitions="250,*">
-    <Border Grid.Column="0" Background="#182431" BorderBrush="#354351" BorderThickness="0,0,1,0">
-      <Grid Margin="14" RowDefinitions="Auto,*,Auto"><Grid.Styles><Style Selector="TextBlock"><Setter Property="Foreground" Value="#F1F5F9"/></Style><Style Selector="Button"><Setter Property="Foreground" Value="#F1F5F9"/></Style></Grid.Styles>
-        <TextBlock Grid.Row="0" Text="LIS2 CONTROL CENTER" FontSize="16" FontWeight="Bold" Margin="4,18,0,24" Foreground="White" />
+    <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#D4DCE5" BorderThickness="0,0,1,0">
+      <Grid Margin="16" RowDefinitions="Auto,*,Auto">
+        <TextBlock Grid.Row="0" Text="LIS2 CONTROL CENTER" FontSize="16" FontWeight="Bold" Margin="4,18,0,24" Foreground="#10243A" />
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="8">
           <StackPanel Name="NavigationPanel" Spacing="2">
-            <Button Name="NavButton0" Tag="0" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#F1F5F9" StrokeThickness="1.5" Data="M2,8 L8,2 L14,8 M4,7 L4,14 L12,14 L12,7"/><TextBlock Grid.Column="1" Text="Dashboard" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton1" Tag="1" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#F1F5F9" StrokeThickness="1.5" Data="M2,3 L14,3 L14,13 L2,13 Z M5,6 L11,6 M5,9 L11,9"/><TextBlock Grid.Column="1" Text="Display" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton2" Tag="2" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#F1F5F9" StrokeThickness="1.5" Data="M3,2 L13,2 L13,14 L3,14 Z M5,5 L11,5 M5,8 L11,8 M5,11 L9,11"/><TextBlock Grid.Column="1" Text="Pages" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton3" Tag="3" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#F1F5F9" StrokeThickness="1.5" Data="M5,12 L5,3 L13,2 L13,10 M5,5 L13,4"/><TextBlock Grid.Column="1" Text="Media" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton4" Tag="4" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#F1F5F9" StrokeThickness="1.5" Data="M8,2 L15,14 L1,14 Z M8,6 L8,10 M8,12 L8,12.5"/><TextBlock Grid.Column="1" Text="Events" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton5" Tag="5" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#F1F5F9" StrokeThickness="1.5" Data="M2,3 L14,3 L14,13 L2,13 Z M6,3 L6,13 M10,3 L10,13"/><TextBlock Grid.Column="1" Text="Hardware" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton6" Tag="6" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#F1F5F9" StrokeThickness="1.5" Data="M8,2 L8,14 M2,8 L14,8 M4,4 L12,12 M12,4 L4,12"/><TextBlock Grid.Column="1" Text="Fan Control" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton7" Tag="7" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#F1F5F9" StrokeThickness="1.5" Data="M6,2 L10,2 L11,4 L13,5 L14,8 L13,11 L11,12 L10,14 L6,14 L5,12 L3,11 L2,8 L3,5 L5,4 Z M8,6 L8,10"/><TextBlock Grid.Column="1" Text="Settings" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton8" Tag="8" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#F1F5F9" StrokeThickness="1.5" Data="M2,10 Q5,3 8,8 T14,6 M2,13 L14,13"/><TextBlock Grid.Column="1" Text="Diagnostics" VerticalAlignment="Center"/></Grid></Button>
-            <Button Name="NavButton9" Tag="9" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#F1F5F9" StrokeThickness="1.5" Data="M2,8 L8,2 L14,8 M4,7 L4,14 L12,14 L12,7 M6,10 L10,10"/><TextBlock Grid.Column="1" Text="Home Assistant" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton0" Tag="0" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,8 L8,2 L14,8 M4,7 L4,14 L12,14 L12,7"/><TextBlock Grid.Column="1" Text="Dashboard" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton1" Tag="1" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,3 L14,3 L14,13 L2,13 Z M5,6 L11,6 M5,9 L11,9"/><TextBlock Grid.Column="1" Text="Display" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton2" Tag="2" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M3,2 L13,2 L13,14 L3,14 Z M5,5 L11,5 M5,8 L11,8 M5,11 L9,11"/><TextBlock Grid.Column="1" Text="Pages" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton3" Tag="3" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M5,12 L5,3 L13,2 L13,10 M5,5 L13,4"/><TextBlock Grid.Column="1" Text="Media" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton4" Tag="4" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M8,2 L15,14 L1,14 Z M8,6 L8,10 M8,12 L8,12.5"/><TextBlock Grid.Column="1" Text="Events" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton5" Tag="5" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,3 L14,3 L14,13 L2,13 Z M6,3 L6,13 M10,3 L10,13"/><TextBlock Grid.Column="1" Text="Hardware" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton6" Tag="6" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M8,2 L8,14 M2,8 L14,8 M4,4 L12,12 M12,4 L4,12"/><TextBlock Grid.Column="1" Text="Fan Control" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton7" Tag="7" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M6,2 L10,2 L11,4 L13,5 L14,8 L13,11 L11,12 L10,14 L6,14 L5,12 L3,11 L2,8 L3,5 L5,4 Z M8,6 L8,10"/><TextBlock Grid.Column="1" Text="Settings" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton8" Tag="8" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,10 Q5,3 8,8 T14,6 M2,13 L14,13"/><TextBlock Grid.Column="1" Text="Diagnostics" VerticalAlignment="Center"/></Grid></Button>
+            <Button Name="NavButton9" Tag="9" HorizontalContentAlignment="Stretch" Padding="9,10" Background="Transparent" BorderThickness="0" CornerRadius="5"><Grid ColumnDefinitions="28,*"><Path Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#233D55" StrokeThickness="1.5" Data="M2,8 L8,2 L14,8 M4,7 L4,14 L12,14 L12,7 M6,10 L10,10"/><TextBlock Grid.Column="1" Text="Home Assistant" VerticalAlignment="Center"/></Grid></Button>
           </StackPanel>
           <Separator Margin="4,18,4,16" />
           <TextBlock Text="Transport" FontWeight="SemiBold" Margin="4,0,0,8" />
@@ -29,7 +29,7 @@
         </StackPanel></ScrollViewer>
         <StackPanel Grid.Row="2" Margin="4,12,0,10" Spacing="7">
           <Separator />
-          <TextBlock Text="LIS2 Control Center · Preview" TextWrapping="Wrap" FontSize="11" Opacity="0.8" />
+          <TextBlock Text="LIS2 Control Center" TextWrapping="Wrap" FontSize="11" Opacity="0.8" />
         </StackPanel>
       </Grid>
     </Border>
@@ -37,19 +37,19 @@
       <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,18">
         <StackPanel Grid.Column="0" Spacing="5">
           <StackPanel Orientation="Horizontal" Spacing="12">
-            <TextBlock Name="SectionTitle" Text="Dashboard" FontSize="30" FontWeight="SemiBold" />
-            <TextBlock Text="Preview" FontSize="12" Foreground="#64748B" VerticalAlignment="Center" />
+            <TextBlock Name="SectionTitle" Text="Dashboard" FontSize="28" FontWeight="SemiBold" />
+
           </StackPanel>
           <TextBlock Name="SectionDescription" Text="Overview and quick access to the most important functions." Opacity="0.65" TextWrapping="Wrap" />
         </StackPanel>
-        <Border Grid.Column="1" Background="#354351" CornerRadius="14" Padding="14,9" VerticalAlignment="Top">
-          <TextBlock Name="ConnectionText" Text="Disconnected" FontWeight="SemiBold" Foreground="White" />
+        <Border Grid.Column="1" Background="#DDF6E7" CornerRadius="14" Padding="14,9" VerticalAlignment="Top">
+          <TextBlock Name="ConnectionText" Text="Disconnected" FontWeight="SemiBold" Foreground="#086D35" />
         </Border>
       </Grid>
       <ScrollViewer Name="DashboardView" Grid.Row="1">
         <StackPanel Spacing="14">
           <Grid ColumnDefinitions="3*,14,2*">
-            <Border Grid.Column="0" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+            <Border Background="White" Grid.Column="0" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
               <StackPanel Spacing="12">
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
                 <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6"
@@ -63,13 +63,13 @@
               </StackPanel>
             </Border>
             <StackPanel Grid.Column="2" Spacing="14">
-              <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+              <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
                 <StackPanel Spacing="10">
                   <TextBlock Text="System Status" FontSize="16" FontWeight="SemiBold" />
                   <TextBlock Name="VirtualStateText" Text="State available when Virtual transport is active." TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
-              <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+              <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
                 <StackPanel Spacing="10">
                   <TextBlock Text="Quick Links" FontSize="16" FontWeight="SemiBold" />
                   <Button Name="OpenDisplayControls" Content="Open Display Controls" />
@@ -78,7 +78,7 @@
               </Border>
             </StackPanel>
           </Grid>
-          <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Text="Fan Outputs" FontWeight="SemiBold" FontSize="16" />
               <Grid ColumnDefinitions="*,18,*" RowDefinitions="Auto,12,Auto,14,Auto">
@@ -107,14 +107,14 @@
               <TextBlock Text="Fan outputs are read-only until the safety-reviewed fan runtime is ported." Opacity="0.65" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
-          <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="6" Padding="12,9">
+          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="6" Padding="12,9">
             <TextBlock Text="💡  Tip: Use the navigation on the left to access display settings, page editor, Winamp integration, hardware and fan control." TextWrapping="Wrap" />
           </Border>
         </StackPanel>
       </ScrollViewer>
     <ScrollViewer Name="DisplayView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="14">
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="12">
             <TextBlock Text="Quick Display Test" FontWeight="SemiBold" FontSize="16" />
             <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
@@ -131,7 +131,7 @@
             </Grid>
           </StackPanel>
         </Border>
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Character ROM / Special Characters" FontWeight="SemiBold" FontSize="16" />
             <TextBlock Text="Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display." TextWrapping="Wrap" Opacity="0.7" />
@@ -149,7 +149,7 @@
             </StackPanel>
           </StackPanel>
         </Border>
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Custom Characters / CG Builder" FontWeight="SemiBold" FontSize="16" />
             <CheckBox Name="ProgramGlyphsOnConnect" Content="Program saved glyphs on connect" />
@@ -184,7 +184,7 @@
             <TextBlock Text="{}Use {Glyph.Name} or {Glyph.1} through {Glyph.8} in page templates." Opacity="0.7" />
           </StackPanel>
         </Border>
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="12">
             <TextBlock Text="Brightness" FontWeight="SemiBold" FontSize="16" />
             <StackPanel Orientation="Horizontal" Spacing="7">
@@ -199,7 +199,7 @@
     </ScrollViewer>
     <ScrollViewer Name="PagesView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <Grid ColumnDefinitions="230,16,*">
             <StackPanel Grid.Column="0" Spacing="9">
               <TextBlock Text="Pages" FontWeight="SemiBold" FontSize="16" />
@@ -290,7 +290,7 @@
     </ScrollViewer>
     <ScrollViewer Name="MediaView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="14">
-        <Border Name="WindowsMediaCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" Name="WindowsMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Windows Media Player" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="WindowsMediaStatus" Text="Disconnected"/>
@@ -302,7 +302,7 @@
             <Button Name="WindowsMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
         </Border>
-        <Border Name="LinuxMediaCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" Name="LinuxMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Linux MPRIS players (playerctl)" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="LinuxMediaStatus" Text="Disconnected"/>
@@ -314,7 +314,7 @@
             <Button Name="LinuxMediaPage" Content="Create playback page"/>
           </StackPanel>
         </Border>
-        <Border Name="WinampMediaCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" Name="WinampMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Winamp" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="WinampMediaStatus" Text="Disconnected"/>
@@ -327,7 +327,7 @@
             <Button Name="WinampMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
         </Border>
-        <Border Name="WmpLegacyMediaCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" Name="WmpLegacyMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Windows Media Player Legacy" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="WmpLegacyMediaStatus" Text="Disconnected"/>
@@ -344,7 +344,7 @@
     </ScrollViewer>
     <ScrollViewer Name="HomeAssistantView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Connection" FontWeight="SemiBold" FontSize="18" />
             <CheckBox Name="HaEnabled" Content="Enable Home Assistant" />
@@ -360,7 +360,7 @@
             </StackPanel>
           </StackPanel>
         </Border>
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Home Assistant entities" FontWeight="SemiBold" FontSize="18" />
             <StackPanel Orientation="Horizontal" Spacing="8">
@@ -383,7 +383,7 @@
     </ScrollViewer>
     <ScrollViewer Name="FanControlView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Fan Outputs" FontSize="17" FontWeight="SemiBold" />
             <TextBlock Text="Physical fan outputs require explicit authorization. Configuration and previews do not send hardware commands." TextWrapping="Wrap" />
@@ -521,7 +521,7 @@
       </ScrollViewer>
       <ScrollViewer Name="DiagnosticsView" Grid.Row="1" IsVisible="False">
         <Grid ColumnDefinitions="*,12,*" RowDefinitions="Auto,12,Auto" Margin="0,0,8,8">
-          <Border Grid.Row="0" Grid.Column="0" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="12">
+          <Border Background="White" Grid.Row="0" Grid.Column="0" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
               <TextBlock Text="Diagnostics Snapshot" FontSize="18" FontWeight="SemiBold" />
               <StackPanel Orientation="Horizontal" Spacing="8">
@@ -531,19 +531,19 @@
               <TextBox Name="DiagnosticsSnapshot" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="210" FontFamily="Consolas" />
             </StackPanel>
           </Border>
-          <Border Grid.Row="0" Grid.Column="2" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="12">
+          <Border Background="White" Grid.Row="0" Grid.Column="2" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
               <TextBlock Text="Virtual LIS2 state" FontSize="18" FontWeight="SemiBold" />
               <TextBox Name="DiagnosticsVirtualState" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
             </StackPanel>
           </Border>
-          <Border Grid.Row="2" Grid.Column="0" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="12">
+          <Border Background="White" Grid.Row="2" Grid.Column="0" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
               <TextBlock Text="Decoded command history" FontSize="18" FontWeight="SemiBold" />
               <TextBox Name="DiagnosticsCommandHistory" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
             </StackPanel>
           </Border>
-          <Border Grid.Row="2" Grid.Column="2" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="12">
+          <Border Background="White" Grid.Row="2" Grid.Column="2" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
               <TextBlock Text="Protocol Log" FontSize="18" FontWeight="SemiBold" />
               <TextBox Name="DiagnosticsProtocolLog" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
@@ -610,7 +610,7 @@
               <TextBlock Name="SettingsTransportStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
           </Border>
-          <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Name="SettingsAppearanceHeading" Text="Appearance" FontWeight="SemiBold" FontSize="18"/>
               <Grid ColumnDefinitions="100,220,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="10">
@@ -635,7 +635,7 @@
               <TextBlock Name="SettingsAppearanceStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
           </Border>
-          <Border Name="SettingsWindowsCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Border Background="White" Name="SettingsWindowsCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Text="Windows" FontWeight="SemiBold" FontSize="18"/>
               <CheckBox Name="StartWithWindowsCheckBox" Content="Start LIS2 Control Center with Windows (minimized to tray)"/>
