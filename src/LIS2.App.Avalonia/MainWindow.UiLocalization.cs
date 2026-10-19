@@ -198,12 +198,34 @@ public partial class MainWindow
             "Ich autorisiere ausdrücklich die physischen Lüfterausgänge für diese Verbindung"
     };
 
+    private readonly Dictionary<TextBox, string> _originalWatermarks = new();
+    private readonly Dictionary<ComboBoxItem, string> _originalComboLabels = new();
+
     private void ApplyPageLocalization()
     {
         // Logical descendants include controls in inactive/hidden pages and do not
         // depend on the visual template being attached at the moment of translation.
         // Restrict translations to a known set of static labels. Never overwrite live
         // sensor values, media metadata, Home Assistant states or error messages.
+        foreach (var input in this.GetLogicalDescendants().OfType<TextBox>())
+        {
+            if (!_originalWatermarks.TryGetValue(input, out var original))
+            {
+                original = input.Watermark ?? string.Empty;
+                _originalWatermarks[input] = original;
+            }
+            input.Watermark = WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
+        }
+        foreach (var item in this.GetLogicalDescendants().OfType<ComboBoxItem>())
+        {
+            if (item.Content is not string current) continue;
+            if (!_originalComboLabels.TryGetValue(item, out var original))
+            {
+                original = current;
+                _originalComboLabels[item] = original;
+            }
+            item.Content = WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
+        }
         foreach (var label in this.GetLogicalDescendants().OfType<TextBlock>())
         {
             if (!_originalPageLabels.TryGetValue(label, out var original))
