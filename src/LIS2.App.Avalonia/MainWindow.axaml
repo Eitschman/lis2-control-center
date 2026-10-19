@@ -679,7 +679,17 @@
                 <TextBlock Text="Active / queued events" FontSize="18" FontWeight="SemiBold"/>
                 <TextBlock Name="EventCount" Text="0 events" VerticalAlignment="Center" Opacity="0.65"/>
               </StackPanel>
-              <ListBox Grid.Row="1" Name="EventList" MinHeight="220" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1"/>
+              <ListBox Grid.Row="1" Name="EventList" MinHeight="220" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="1.8*,3*,1.1*" Margin="2,4">
+                      <TextBlock Grid.Column="0" Text="{Binding PriorityName}" FontWeight="SemiBold"/>
+                      <TextBlock Grid.Column="1" Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis"/>
+                      <TextBlock Grid.Column="2" Text="{Binding Remaining}" FontFamily="Consolas" HorizontalAlignment="Right" Opacity="0.7"/>
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
               <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
                 <TextBlock Name="EventStatus" Text="Select an event to display." Opacity="0.7" VerticalAlignment="Center"/>
                 <Button Grid.Column="1" Name="EventCancel" Content="Cancel selected"/>
