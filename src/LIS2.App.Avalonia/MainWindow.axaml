@@ -206,7 +206,13 @@
           <Grid ColumnDefinitions="250,18,*">
             <StackPanel Grid.Column="0" Spacing="9">
               <TextBlock Text="Pages" FontWeight="SemiBold" FontSize="16" />
-              <ListBox Name="PagesList" MinHeight="380" MaxHeight="560" />
+              <TextBlock Text="Preset" Opacity="0.7"/>
+              <ComboBox Name="PagePresetPicker" SelectedIndex="0">
+                <ComboBoxItem Content="Clock"/>
+                <ComboBoxItem Content="LIS2 Status"/>
+              </ComboBox>
+              <Button Name="PageCreatePreset" Content="Create from preset" HorizontalAlignment="Stretch"/>
+              <ListBox Name="PagesList" MinHeight="250" MaxHeight="420" />
               <WrapPanel>
                 <Button Name="PageAdd" Content="Add" Margin="0,0,7,7" />
                 <Button Name="PageDuplicate" Content="Duplicate" Margin="0,0,7,7" />
