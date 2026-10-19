@@ -40,15 +40,29 @@ public sealed class WindowsHardwareFanSensors : IFanSensorSource, IDisposable
         hardware.Update();
         foreach (var sensor in hardware.Sensors)
         {
-            if (sensor.SensorType != SensorType.Temperature ||
-                sensor.Value is not float temperature || !float.IsFinite(temperature))
+            if (sensor.Value is not float value || !float.IsFinite(value))
                 continue;
-            var key = $"{Normalize(hardware.Name)}.Temperature.{Normalize(sensor.Name)}";
-            values[key] = temperature;
+            var key = $"Hardware.{Normalize(hardware.Name)}.{sensor.SensorType}.{Normalize(sensor.Name)}";
+            values[key] = value;
+            values[key + ".Unit"] = Unit(sensor.SensorType);
         }
         foreach (var child in hardware.SubHardware)
             Read(child, values);
     }
+
+    private static string Unit(SensorType type) => type switch
+    {
+        SensorType.Temperature => "C",
+        SensorType.Load => "%",
+        SensorType.Fan => "RPM",
+        SensorType.Clock => "MHz",
+        SensorType.Voltage => "V",
+        SensorType.Power => "W",
+        SensorType.Data => "GB",
+        SensorType.SmallData => "MB",
+        SensorType.Throughput => "B/s",
+        _ => string.Empty
+    };
 
     private static string Normalize(string value)
     {
