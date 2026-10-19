@@ -199,6 +199,8 @@
     </ScrollViewer>
     <ScrollViewer Name="PagesView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
+        <TextBlock Text="Display pages" FontSize="18" FontWeight="SemiBold"/>
+        <TextBlock Text="Create, organize and preview pages on the LIS2 display." Opacity="0.7"/>
         <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <Grid ColumnDefinitions="230,16,*">
             <StackPanel Grid.Column="0" Spacing="9">
@@ -290,6 +292,8 @@
     </ScrollViewer>
     <ScrollViewer Name="MediaView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="14">
+        <TextBlock Text="Connected media players" FontWeight="SemiBold" FontSize="17"/>
+        <TextBlock Text="Player metadata is available for display page templates. Playback providers are detected automatically." TextWrapping="Wrap" Opacity="0.7"/>
         <Border Background="White" Name="WindowsMediaCard" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Windows Media Player" FontWeight="SemiBold" FontSize="18"/>
@@ -344,6 +348,8 @@
     </ScrollViewer>
     <ScrollViewer Name="HomeAssistantView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
+        <TextBlock Text="Home Assistant" FontSize="18" FontWeight="SemiBold"/>
+        <TextBlock Text="Connect to Home Assistant and manage entity aliases, favorites and display templates." Opacity="0.7" TextWrapping="Wrap"/>
         <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Connection" FontWeight="SemiBold" FontSize="18" />
@@ -383,6 +389,18 @@
     </ScrollViewer>
     <ScrollViewer Name="FanControlView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
+        <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Fan outputs" FontSize="18" FontWeight="SemiBold"/><TextBlock Grid.Column="1" Text="Four channels / hardware-safe" Opacity="0.65"/></Grid>
+            <Grid ColumnDefinitions="90,*,65" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="12">
+              <TextBlock Grid.Row="0" Text="Fan 1"/><ProgressBar Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="100" Height="14" Foreground="#17A45A"/><TextBlock Grid.Row="0" Grid.Column="2" Text="100 %" TextAlignment="Right"/>
+              <TextBlock Grid.Row="1" Text="Fan 2"/><ProgressBar Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Value="100" Height="14" Foreground="#17A45A"/><TextBlock Grid.Row="1" Grid.Column="2" Text="100 %" TextAlignment="Right"/>
+              <TextBlock Grid.Row="2" Text="Fan 3"/><ProgressBar Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="100" Value="100" Height="14" Foreground="#17A45A"/><TextBlock Grid.Row="2" Grid.Column="2" Text="100 %" TextAlignment="Right"/>
+              <TextBlock Grid.Row="3" Text="Fan 4"/><ProgressBar Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="100" Value="100" Height="14" Foreground="#17A45A"/><TextBlock Grid.Row="3" Grid.Column="2" Text="100 %" TextAlignment="Right"/>
+            </Grid>
+            <TextBlock Text="Safety output shown; real fan commands require explicit authorization below." FontSize="12" Opacity="0.7"/>
+          </StackPanel>
+        </Border>
         <Border Background="White" BorderBrush="#D4DCE5" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Fan Outputs" FontSize="17" FontWeight="SemiBold" />
@@ -450,7 +468,7 @@
     </ScrollViewer>
       <ScrollViewer Name="HardwareView" Grid.Row="1" IsVisible="False">
         <StackPanel Spacing="12">
-          <TextBlock Text="Hardware temperature sensors" FontSize="18" FontWeight="SemiBold" />
+          <TextBlock Text="Hardware monitoring" FontSize="18" FontWeight="SemiBold" />
           <TextBlock Text="Read-only sensors from the current operating system. Refresh to capture a new snapshot; no LIS2 hardware commands are sent." TextWrapping="Wrap" />
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Name="HardwareRefresh" Content="Refresh sensors" />
