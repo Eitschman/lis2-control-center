@@ -289,13 +289,13 @@
     </ScrollViewer>
     <ScrollViewer Name="MediaView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="14">
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Name="WindowsMediaCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Windows Media Player" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Text="Windows media session integration is not available in this build." TextWrapping="Wrap"/>
           </StackPanel>
         </Border>
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Name="LinuxMediaCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Linux MPRIS players (playerctl)" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="LinuxMediaStatus" Text="Disconnected"/>
@@ -304,7 +304,7 @@
             <Button Name="LinuxMediaPage" Content="Create playback page"/>
           </StackPanel>
         </Border>
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Name="WinampMediaCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Winamp" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="WinampMediaStatus" Text="Disconnected"/>
@@ -317,7 +317,7 @@
             <Button Name="WinampMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
         </Border>
-        <Border BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
+        <Border Name="WmpLegacyMediaCard" BorderBrush="#596675" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="7">
             <TextBlock Text="Windows Media Player Legacy" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="WmpLegacyMediaStatus" Text="Disconnected"/>
