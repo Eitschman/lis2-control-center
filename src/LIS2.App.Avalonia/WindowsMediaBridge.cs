@@ -30,9 +30,24 @@ public sealed class WindowsMediaBridge : IAsyncDisposable
 
     public bool IsAvailable => _provider is not null;
 
-    public IReadOnlyDictionary<string, object?> Values =>
-        _provider is not null && _values?.GetValue(_provider) is IReadOnlyDictionary<string, object?> values
-            ? values : new Dictionary<string, object?> { ["Connected"] = false };
+    public IReadOnlyDictionary<string, object?> Values
+    {
+        get
+        {
+            if (_provider is null || _values is null)
+                return new Dictionary<string, object?> { ["Connected"] = false };
+            try
+            {
+                if (_values.GetValue(_provider) is IReadOnlyDictionary<string, object?> values)
+                    return values;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Windows GSMTC snapshot failed: {0}", ex);
+            }
+            return new Dictionary<string, object?> { ["Connected"] = false };
+        }
+    }
 
     public async ValueTask DisposeAsync()
     {
