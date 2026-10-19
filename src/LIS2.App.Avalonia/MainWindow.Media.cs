@@ -11,6 +11,7 @@ public partial class MainWindow
     private readonly WmpLegacyDataSource _mediaLegacy = new();
     private DispatcherTimer? _mediaTimer;
     private readonly LinuxMprisSource _mpris = new();
+    private readonly WindowsMediaBridge _windowsMedia = new();
     private bool _mprisRefreshing;
 
     private void InitializeMedia()
@@ -22,6 +23,7 @@ public partial class MainWindow
         _mediaTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _mediaTimer.Tick += (_, _) => RefreshMedia();
         _mediaTimer.Start();
+        this.FindControl<Button>("WindowsMediaPage")!.Click += (_, _) => CreateMediaPage("WindowsMedia", "Windows Media Player");
         this.FindControl<Button>("WinampMediaPage")!.Click += (_, _) =>
             CreateMediaPage("Winamp", "Winamp");
         this.FindControl<Button>("LinuxMediaPage")!.Click += (_, _) => CreateMediaPage("Media", "Linux media");
@@ -38,6 +40,8 @@ public partial class MainWindow
             RefreshMedia();
             return;
         }
+        try { await _windowsMedia.StartAsync(); }
+        catch (Exception ex) { this.FindControl<TextBlock>("WindowsMediaStatus")!.Text = ex.GetBaseException().Message; }
         try { await _mediaWinamp.StartAsync(); }
         catch (Exception ex) { this.FindControl<TextBlock>("WinampMediaStatus")!.Text = ex.Message; }
         try { await _mediaLegacy.StartAsync(); }
@@ -52,8 +56,22 @@ public partial class MainWindow
             _ = RefreshMprisAsync();
             return;
         }
+        RefreshWindowsMedia();
         RefreshMediaSource("Winamp", _mediaWinamp.Values);
         RefreshMediaSource("WmpLegacy", _mediaLegacy.Values);
+    }
+
+    private void RefreshWindowsMedia()
+    {
+        var values = _windowsMedia.Values;
+        _pageSources.UpdateMedia("WindowsMedia", values);
+        string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
+        this.FindControl<TextBlock>("WindowsMediaStatus")!.Text = Read("Connected") == "True" ? "Connected" : "Disconnected";
+        this.FindControl<TextBlock>("WindowsMediaTitle")!.Text = Read("Title");
+        this.FindControl<TextBlock>("WindowsMediaArtist")!.Text = Read("Artist");
+        this.FindControl<TextBlock>("WindowsMediaAlbum")!.Text = Read("Album");
+        this.FindControl<TextBlock>("WindowsMediaPlayback")!.Text = Read("State");
+        this.FindControl<TextBlock>("WindowsMediaTime")!.Text = Read("Elapsed") + " / " + Read("Duration");
     }
 
     private async Task RefreshMprisAsync()
@@ -103,6 +121,7 @@ public partial class MainWindow
     private async Task StopMediaAsync()
     {
         _mediaTimer?.Stop();
+        await _windowsMedia.DisposeAsync();
         await _mediaWinamp.StopAsync();
         await _mediaLegacy.StopAsync();
         await _mediaWinamp.DisposeAsync();
