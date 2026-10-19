@@ -57,9 +57,31 @@ public partial class MainWindow
             _ = RefreshMprisAsync();
             return;
         }
-        RefreshWindowsMedia();
-        RefreshMediaSource("Winamp", _mediaWinamp.Values);
-        RefreshMediaSource("WmpLegacy", _mediaLegacy.Values);
+        RefreshMediaProvider("WindowsMedia", RefreshWindowsMedia);
+        RefreshMediaProvider("Winamp", () => RefreshMediaSource("Winamp", _mediaWinamp.Values));
+        RefreshMediaProvider("WmpLegacy", () => RefreshMediaSource("WmpLegacy", _mediaLegacy.Values));
+    }
+
+    private void RefreshMediaProvider(string provider, Action refresh)
+    {
+        try
+        {
+            refresh();
+        }
+        catch (Exception ex)
+        {
+            var message = ex.GetBaseException().Message;
+            System.Diagnostics.Trace.TraceError("Media provider {0} failed: {1}", provider, ex);
+            var status = provider switch
+            {
+                "WindowsMedia" => "WindowsMediaStatus",
+                "Winamp" => "WinampMediaStatus",
+                _ => "WmpLegacyMediaStatus"
+            };
+            var statusControl = this.FindControl<TextBlock>(status);
+            if (statusControl is not null)
+                statusControl.Text = "Provider error: " + message;
+        }
     }
 
     private void RefreshWindowsMedia()
