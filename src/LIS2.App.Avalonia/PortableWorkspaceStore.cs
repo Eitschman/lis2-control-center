@@ -27,6 +27,7 @@ public sealed class PortableWorkspaceStore
             result.CustomGlyphs ??= new List<CustomGlyphSettings>();
             result.HomeAssistantEntityPreferences ??= new List<PortableHaEntityPreference>();
             result.HardwareSensorPreferences ??= new List<PortableHardwareSensorPreference>();
+            result.PageVariableFavorites ??= new List<string>();
             result.HomeAssistantUrl ??= string.Empty;
             result.Fans = PortableFanSettings.Normalize(result.Fans);
             return result;
@@ -63,6 +64,7 @@ public sealed class PortableWorkspace
     public List<CustomGlyphSettings> CustomGlyphs { get; set; } = new();
     public List<PortableHaEntityPreference> HomeAssistantEntityPreferences { get; set; } = new();
     public List<PortableHardwareSensorPreference> HardwareSensorPreferences { get; set; } = new();
+    public List<string> PageVariableFavorites { get; set; } = new();
     public int BrightnessPercent { get; set; } = 100;
     public bool ProgramCustomGlyphsOnConnect { get; set; }
     public string ThemeMode { get; set; } = "System";
