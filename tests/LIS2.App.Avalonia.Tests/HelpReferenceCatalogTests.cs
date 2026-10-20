@@ -38,7 +38,9 @@ public class HelpReferenceCatalogTests
         Assert.Contains("{Clock.Time}", text);
         Assert.Contains("{Hardware.Cpu.Load}", text);
         Assert.DoesNotContain("{HA.sensor.2999}", text);
-        Assert.Equal(1, text.Split("{Clock.Time}").Length - 1);
+        var runtimeList = HelpReferenceCatalog.GetSection(2, keys, [])
+            .Single(entry => entry.Heading == "Available runtime variables").Body;
+        Assert.Equal(1, runtimeList.Split("{Clock.Time}").Length - 1);
     }
 
     [Fact]
