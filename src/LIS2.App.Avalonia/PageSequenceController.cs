@@ -44,6 +44,26 @@ public sealed class PageSequenceController
 
     public void Stop() => IsRunning = false;
 
+    /// <summary>Replace the running page schedule without dropping the device connection.
+    /// An active display write must finish before the new schedule is installed.</summary>
+    public async Task<bool> ReloadAsync(IEnumerable<PageDefinition> pages,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(pages);
+        if (!IsRunning) return false;
+        var snapshot = pages.ToArray();
+        await _tickGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            if (!IsRunning) return false;
+            _playback.Reload(snapshot);
+            _dispatcher = new PageFrameDispatcher(_write, _clear);
+            NextDelay = TimeSpan.FromMilliseconds(1);
+            return true;
+        }
+        finally { _tickGate.Release(); }
+    }
+
     /// <summary>Stop new ticks and wait for any in-flight display write to finish.</summary>
     public async Task StopAndDrainAsync(CancellationToken cancellationToken = default)
     {

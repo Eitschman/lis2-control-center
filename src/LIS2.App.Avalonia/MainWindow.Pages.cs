@@ -34,6 +34,7 @@ public partial class MainWindow
                 page.ScrollStepMilliseconds = preset.ScrollStep;
                 page.ScrollEdgePauseMilliseconds = preset.EdgePause;
                 RefreshPageList(index);
+                await ReloadRunningPagesAsync();
                 _ = SavePortableWorkspaceAsync();
             }
             catch (Exception ex)
@@ -41,33 +42,39 @@ public partial class MainWindow
                 SetVirtualStatus("Page preset error: " + ex.Message);
             }
         };
-        this.FindControl<Button>("PageAdd")!.Click += (_, _) =>
+        this.FindControl<Button>("PageAdd")!.Click += async (_, _) =>
         {
             _pages.Add();
             RefreshPageList(_pages.Pages.Count - 1);
+            await ReloadRunningPagesAsync();
             _ = SavePortableWorkspaceAsync();
         };
-        this.FindControl<Button>("PageDuplicate")!.Click += (_, _) =>
+        this.FindControl<Button>("PageDuplicate")!.Click += async (_, _) =>
         {
             if (SelectedPageIndex is int i)
             {
                 _pages.Duplicate(i);
                 RefreshPageList(i + 1);
+                await ReloadRunningPagesAsync();
                 _ = SavePortableWorkspaceAsync();
             }
         };
-        this.FindControl<Button>("PageDelete")!.Click += (_, _) =>
+        this.FindControl<Button>("PageDelete")!.Click += async (_, _) =>
         {
             if (SelectedPageIndex is int i)
             {
                 _pages.Delete(i);
                 RefreshPageList(Math.Min(i, _pages.Pages.Count - 1));
+                await ReloadRunningPagesAsync();
                 _ = SavePortableWorkspaceAsync();
             }
         };
-        this.FindControl<Button>("PageUp")!.Click += (_, _) => MovePage(-1);
-        this.FindControl<Button>("PageDown")!.Click += (_, _) => MovePage(1);
-        this.FindControl<Button>("PageSave")!.Click += (_, _) => SavePageEditor();
+        this.FindControl<Button>("PageUp")!.Click += async (_, _) => await MovePageAsync(-1);
+        this.FindControl<Button>("PageDown")!.Click += async (_, _) => await MovePageAsync(1);
+        this.FindControl<Button>("PageSave")!.Click += async (_, _) =>
+        {
+            if (SavePageEditor()) await ReloadRunningPagesAsync();
+        };
         this.FindControl<Button>("PageTest")!.Click += async (_, _) =>
         {
             if (SelectedPageIndex is not int i) return;
@@ -198,6 +205,7 @@ public partial class MainWindow
         _pages.Get(row.Index).Enabled = checkbox.IsChecked == true;
         var selectedIndex = SelectedPageIndex ?? row.Index;
         RefreshPageList(selectedIndex);
+        _ = ReloadRunningPagesAsync();
         _ = SavePortableWorkspaceAsync();
     }
 
@@ -215,10 +223,11 @@ public partial class MainWindow
         LoadPageEditor();
     }
 
-    private void MovePage(int offset)
+    private async Task MovePageAsync(int offset)
     {
         if (SelectedPageIndex is not int i) return;
         RefreshPageList(_pages.Move(i, offset));
+        await ReloadRunningPagesAsync();
         _ = SavePortableWorkspaceAsync();
     }
 

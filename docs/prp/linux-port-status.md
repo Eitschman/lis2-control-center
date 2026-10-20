@@ -648,3 +648,6 @@ Implemented initial cross-screen package: common light shell/white card styling,
 ## Pages validation and live visibility diagnostics (2026-10-20)
 - Replaced misleading Pages condition status claiming runtime values are disconnected: now evaluates the configured expression against current PagePreviewValues(), reports match/mismatch, empty condition, malformed expression and evaluation failure, localized in all five languages. Condition editor key/value/operator changes also refresh diagnostics.
 - Page JSON import now rejects null page entries and case-insensitive duplicate IDs without replacing existing workspace; regression tests cover transactional preservation and valid multi-page roundtrip. Original WPF page schema remains unchanged. CI and desktop verification pending.
+
+## Live Pages schedule reload (2026-10-20)
+- Running virtual LIS2 page playback now refreshes its scheduler after add, duplicate, delete, reorder, enabled-toggle, preset creation, and explicit page save, without disconnecting/restarting the virtual device. Added PageSequenceController.ReloadAsync guarded by the existing tick semaphore so in-flight device writes finish before schedule replacement. The refreshed schedule is immediately ticked. Tests cover live reload and concurrent in-flight write safety. No physical device acceptance claimed; CI pending.

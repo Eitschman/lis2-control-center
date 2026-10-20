@@ -6,6 +6,44 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class PageSequenceControllerTests
 {
     [Fact]
+    public async Task ReloadChangesRunningPageWithoutReconnecting()
+    {
+        var written = new List<DisplayFrame>();
+        var runtime = new PageSequenceController(
+            (frame, _) => { written.Add(frame); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        var values = new Dictionary<string, object?>();
+        Assert.False(await runtime.ReloadAsync([new PageDefinition { Line1Template = "NO" }]));
+        Assert.True(runtime.Start([new PageDefinition { Id = "first", Line1Template = "FIRST" }]));
+        Assert.True(await runtime.TickAsync(DateTimeOffset.UnixEpoch, values));
+        Assert.True(await runtime.ReloadAsync([new PageDefinition { Id = "second", Line1Template = "SECOND" }]));
+        Assert.True(runtime.IsRunning);
+        Assert.True(await runtime.TickAsync(DateTimeOffset.UnixEpoch.AddMilliseconds(1), values));
+        Assert.Equal("second", runtime.CurrentPageId);
+        Assert.Equal("SECOND".PadRight(20), written[^1].Line1);
+    }
+
+    [Fact]
+    public async Task ReloadWaitsForInflightWrite()
+    {
+        var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var runtime = new PageSequenceController(
+            async (_, _) => { entered.TrySetResult(true); await release.Task; },
+            _ => Task.CompletedTask);
+        runtime.Start([new PageDefinition { Line1Template = "OLD" }]);
+        var tick = runtime.TickAsync(DateTimeOffset.UnixEpoch, new Dictionary<string, object?>());
+        await entered.Task;
+        var reload = runtime.ReloadAsync([new PageDefinition { Line1Template = "NEW" }]);
+        Assert.False(reload.IsCompleted);
+        release.SetResult(true);
+        await tick;
+        Assert.True(await reload);
+        Assert.True(runtime.IsRunning);
+    }
+
+
+    [Fact]
     public async Task StartTickDeduplicateAndStop()
     {
         var writes = new List<DisplayFrame>();

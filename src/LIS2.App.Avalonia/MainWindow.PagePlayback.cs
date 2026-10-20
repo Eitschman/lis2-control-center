@@ -51,6 +51,21 @@ public partial class MainWindow
         await TickPagePlaybackAsync();
     }
 
+    private async Task ReloadRunningPagesAsync()
+    {
+        if (_virtualSequence?.IsRunning != true) return;
+        try
+        {
+            if (await _virtualSequence.ReloadAsync(_pages.Pages))
+                await TickPagePlaybackAsync();
+        }
+        catch (Exception ex)
+        {
+            StopPagePlayback();
+            SetVirtualStatus($"Page sequence reload failed: {ex.Message}");
+        }
+    }
+
     private void StopPagePlayback()
     {
         _pageTimer.Stop();
