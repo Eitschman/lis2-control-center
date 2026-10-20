@@ -597,3 +597,8 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Added localization regression tests for catalog entries, language roundtrips, prefixed labels, and preservation of runtime sensor/media text. The latest change guards previously localized controls against overwriting live telemetry, media titles or status values.
 - Commits include `3d144d8`, `fb6ecfc`, `1d41208`, `59d2cee`, `0033794`, `6947267`, `3f1bdf8`. CI run 475 passed at `0033794`; run 477 for latest `3f1bdf8` was still in progress when recorded. Do not claim latest HEAD is green until confirmed.
 - Remaining: full ten-view WPF source/UI/behavior parity audit, all-language runtime coverage, Windows/Linux desktop sign-off, and final product acceptance. WPF remains authoritative; physical hardware is not available and is not a package gate.
+
+## Localization lookup performance and key stability (2026-10-20)
+- Reverse lookup of translated WPF strings now uses a one-time indexed catalog rather than nested scans of all language dictionaries for each control on every navigation/language switch. Existing Avalonia navigation aliases take precedence; original English WPF catalog keys are preserved before reverse lookup to prevent accidental translation collisions.
+- Added tests for English-key stability and WPF translation roundtrips across German, French, Turkish and Russian. Changes: `fbf90de`, `f39fba8`. CI for this HEAD is pending; do not mark package accepted until Windows/Ubuntu jobs pass.
+- This is a localization reliability/performance increment, NOT completion of the ten-view WPF parity package. The latter still requires comprehensive source audit, functionality, integration tests and final owner desktop acceptance.
