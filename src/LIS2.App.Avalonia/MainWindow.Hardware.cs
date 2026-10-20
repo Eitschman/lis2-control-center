@@ -8,6 +8,7 @@ public partial class MainWindow
     private readonly Dictionary<string, object?> _hardwareSensors = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<PortableHardwareSensorPreference> _hardwarePreferences = new();
     private bool _hardwareListRebinding;
+    private string? _selectedHardwareSensorKey;
     private string? _hardwareSourceError;
     // Hardware values feed display templates even when the Hardware view is not selected.
     private readonly DispatcherTimer _hardwareRefreshTimer = new() { Interval = TimeSpan.FromSeconds(2) };
@@ -66,6 +67,7 @@ public partial class MainWindow
                 return;
             }
             var selected = this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem as HardwareSensorEntry;
+            _selectedHardwareSensorKey = selected?.Key;
             SetHardwareFanAssignmentEnabled(selected?.IsAvailable == true);
             this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = selected is not null;
             var preference = _hardwarePreferences.FirstOrDefault(p => string.Equals(p.Key, selected?.Key, StringComparison.OrdinalIgnoreCase));
@@ -173,7 +175,7 @@ public partial class MainWindow
         var options = HardwareSensorCatalog.Build(_hardwareSensors, _hardwarePreferences, search,
             this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsChecked == true, typeFilter, tracked);
         var list = this.FindControl<ListBox>("HardwareSensorList")!;
-        var previousKey = (list.SelectedItem as HardwareSensorEntry)?.Key;
+        var previousKey = _selectedHardwareSensorKey;
         _hardwareListRebinding = true;
         try
         {
@@ -184,6 +186,7 @@ public partial class MainWindow
         finally { _hardwareListRebinding = false; }
         if (list.SelectedItem is null)
         {
+            _selectedHardwareSensorKey = null;
             this.FindControl<TextBox>("HardwareAlias")!.Text = "";
             this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked = false;
             this.FindControl<TextBlock>("HardwareSelectedSensor")!.Text = "Select a sensor above.";
