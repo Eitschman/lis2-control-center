@@ -73,7 +73,7 @@ public sealed class PageEditorPreviewTests
     {
         var preview = new PageEditorPreview();
         var values = new Dictionary<string, object?> { ["Clock"] = "12:00" };
-        preview.Configure("Time {Clock}", "", "Truncate", "Truncate", 100, 200);
+        preview.Configure("Time {Clock}", "", "Truncate", "Truncate", 100, 200, 250);
         var start = DateTimeOffset.UnixEpoch;
         Assert.Equal("Time 12:00".PadRight(20), preview.Tick(start, values).Line1);
         values["Clock"] = "12:01";
@@ -103,5 +103,44 @@ public sealed class PageEditorPreviewTests
         var frame = preview.Tick(DateTimeOffset.UnixEpoch, new Dictionary<string, object?>());
         Assert.Equal("Short".PadRight(20), frame.Line1);
         Assert.True(preview.NextDelay > TimeSpan.Zero);
+    }
+
+    [Fact]
+    public void SourceValuesRespectDraftRefreshInterval()
+    {
+        var preview = new PageEditorPreview();
+        var values = new Dictionary<string, object?> { ["Value"] = "Before" };
+        preview.Configure("{Value}", "", "Truncate", "Truncate", 100, 200, 1000);
+        var start = DateTimeOffset.UnixEpoch;
+        Assert.Equal("Before".PadRight(20), preview.Tick(start, values).Line1);
+        values["Value"] = "After";
+        Assert.Equal("Before".PadRight(20), preview.Tick(start.AddMilliseconds(999), values).Line1);
+        Assert.Equal("After".PadRight(20), preview.Tick(start.AddMilliseconds(1000), values).Line1);
+    }
+
+    [Fact]
+    public void UnchangedDraftDoesNotResetScrollingPosition()
+    {
+        var preview = new PageEditorPreview();
+        var values = new Dictionary<string, object?>();
+        preview.Configure("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "", "PingPong", "Truncate", 100, 200);
+        var start = DateTimeOffset.UnixEpoch;
+        preview.Tick(start, values);
+        var advanced = preview.Tick(start.AddMilliseconds(350), values);
+        preview.Configure("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "", "PingPong", "Truncate", 100, 200);
+        Assert.Equal(advanced.Line1, preview.Tick(start.AddMilliseconds(350), values).Line1);
+    }
+
+    [Fact]
+    public void ChangingRefreshCadenceReconfiguresPreview()
+    {
+        var preview = new PageEditorPreview();
+        var values = new Dictionary<string, object?> { ["Value"] = "A" };
+        preview.Configure("{Value}", "", "Truncate", "Truncate", 100, 200, 1000);
+        preview.Tick(DateTimeOffset.UnixEpoch, values);
+        preview.Configure("{Value}", "", "Truncate", "Truncate", 100, 200, 100);
+        values["Value"] = "B";
+        Assert.Equal("B".PadRight(20),
+            preview.Tick(DateTimeOffset.UnixEpoch.AddMilliseconds(200), values).Line1);
     }
 }
