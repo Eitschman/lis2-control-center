@@ -4,6 +4,20 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class PageVariableBrowserCatalogTests
 {
+    [Fact]
+    public void RealHomeAssistantKeysExposeEntityAndAttributeLabels()
+    {
+        const string state = "HA.sensor.wohnzimmer_temperatur";
+        const string attribute = "HA.sensor.wohnzimmer_temperatur.unit_of_measurement";
+        var names = new Dictionary<string, string> { ["sensor.wohnzimmer_temperatur"] = "Wohnzimmer Temperatur" };
+        Assert.Equal("Home Assistant", PageVariableBrowserCatalog.Category(state));
+        Assert.Equal("sensor.wohnzimmer_temperatur", PageVariableBrowserCatalog.Entity(attribute));
+        Assert.Equal("Wohnzimmer Temperatur · State", PageVariableBrowserCatalog.Label(state, names));
+        Assert.Equal("Wohnzimmer Temperatur · unit of measurement", PageVariableBrowserCatalog.Label(attribute, names));
+        Assert.Equal(2, PageVariableBrowserCatalog.Search([state, attribute], null, "Home Assistant", null).Count);
+    }
+
+
     private static readonly string[] Keys =
     [
         "Clock.Time", "Clock.Date", "Hardware.CPU.Temperature.Package",
