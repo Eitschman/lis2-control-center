@@ -57,6 +57,7 @@ public partial class MainWindow
         {
             System.Diagnostics.Trace.TraceError("Media startup {0} failed: {1}", provider, ex);
             if (_mediaStopping) return;
+            _pageSources.UpdateMedia(provider, new Dictionary<string, object?>());
             var controlName = provider switch
             {
                 "WindowsMedia" => "WindowsMediaStatus",
@@ -97,6 +98,7 @@ public partial class MainWindow
                 "Winamp" => "WinampMediaStatus",
                 _ => "WmpLegacyMediaStatus"
             };
+            _pageSources.UpdateMedia(provider, new Dictionary<string, object?>());
             var statusControl = this.FindControl<TextBlock>(status);
             if (statusControl is not null)
                 statusControl.Text = "Provider error: " + message;
@@ -135,6 +137,7 @@ public partial class MainWindow
         catch (Exception ex)
         {
             System.Diagnostics.Trace.TraceError("Linux MPRIS refresh failed: {0}", ex);
+            _pageSources.UpdateMedia("Media", new Dictionary<string, object?>());
             var status = this.FindControl<TextBlock>("LinuxMediaStatus");
             if (status is not null) status.Text = "Provider error: " + ex.GetBaseException().Message;
         }
@@ -170,6 +173,7 @@ public partial class MainWindow
         page.Line1Template = "{" + sourceId + ".Title}";
         page.Line2Template = "{" + sourceId + ".Artist}";
         RefreshPageList(_pages.Pages.Count - 1);
+        _ = ReloadRunningPagesAsync();
         _ = SavePortableWorkspaceAsync();
         NavigateTo(2);
     }
