@@ -28,7 +28,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Bereich | Stand | Offener Umfang |
 | --- | --- | --- |
 | Projektstruktur | Avalonia 11.3.6, .NET 8, portable Bibliotheken und `LIS2.Runtime` vorhanden | Plattformverträge sind noch nicht durchgängig angebunden; UI-Code enthält weitere Orchestrierung |
-| Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen; gemeinsame Geräteaktionen am angewendeten Transport | Physische Ausgabe und differenzielle Schreibspannen offen |
+| Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen; gemeinsame Geräteaktionen und differenzielle Spannen am angewendeten Transport | Physische Ausgabe offen |
 | Seiteneditor | Seitenpflege, Vorlagen, Bedingungen, Presets, animierte Vorschau, Variablenbrowser, validierter JSON-Import/-Export und gemeinsamer Entwurfsschutz für Quellenaktionen vorhanden | GUI-Interaktionen und WPF-Bedienparität prüfen |
 | Glyphen | Acht 5x8-Slots, Dateien, Namen, Spektrumset und Ersetzungsdialog vorhanden | Physische Zeichenprüfung und UI-/Transportabgleich offen |
 | Sensoren | LibreHardwareMonitor auf Windows; procfs/sysfs/hwmon auf Linux; Aliase, Favoriten und fehlende Sensoren berücksichtigt | Stabile Identitäten und Rechte auf Zielsystemen prüfen |

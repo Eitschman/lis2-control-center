@@ -75,7 +75,7 @@ public partial class MainWindow
             var status = this.FindControl<TextBlock>(controlName);
             if (status is not null)
             {
-                status.Text = "Provider startup error: " + ex.GetBaseException().Message;
+                status.Text = "Provider startup error: " + MediaErrorMessage(provider, ex);
                 status.TextWrapping = global::Avalonia.Media.TextWrapping.Wrap;
                 status.MaxWidth = 280;
                 status.Foreground = global::Avalonia.Media.Brushes.DarkRed;
@@ -160,7 +160,7 @@ public partial class MainWindow
             System.Diagnostics.Trace.TraceError("Linux MPRIS refresh failed: {0}", ex);
             _pageSources.UpdateMedia("Media", new Dictionary<string, object?>());
             var status = this.FindControl<TextBlock>("LinuxMediaStatus");
-            if (status is not null) status.Text = "Provider error: " + ex.GetBaseException().Message;
+            if (status is not null) status.Text = "Provider error: " + MediaErrorMessage("Media", ex);
         }
         finally { _mprisRefreshing = false; }
     }
@@ -186,6 +186,11 @@ public partial class MainWindow
         }
         this.FindControl<TextBlock>(prefix + "Telemetry")!.Text = "VU: " + Read("Vu") + "  Spectrum: " + Read("Spectrum");
     }
+
+    private static string MediaErrorMessage(string provider, Exception exception) =>
+        provider == "Media" && exception.GetBaseException() is System.ComponentModel.Win32Exception { NativeErrorCode: 2 }
+            ? "playerctl is missing. Install playerctl to enable Linux media."
+            : exception.GetBaseException().Message;
 
     private async Task CreateMediaPageAsync(string sourceId, string title)
     {
