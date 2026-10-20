@@ -286,3 +286,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Startup transport safety follow-up (2026-10-20)
 - The Avalonia Opened handler must honor the selected transport mode and must not auto-connect or start playback of the virtual device when Serial is selected. Commit `a5e7afc`; CI pending. WPF UI/function parity remains open.
+
+## Hardware browser localization/filter contract (2026-10-20)
+- Sensor type filters must use stable semantic keys rather than translated ComboBox labels. The twelve Hardware filter choices are mapped to catalog keys by selection index, with regression tests for mapping and filtered sensor results. Commits `c4217f8`, `a47daec`; CI pending at documentation time. This does not complete the larger hardware parity audit.
