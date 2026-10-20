@@ -31,10 +31,20 @@ public partial class MainWindow
             });
         this.FindControl<Button>("SerialPlaybackStart")!.Click += async (_, _) =>
         {
-            if (_serialDisplay?.IsConnected != true || _serialBusy || _serialSequence?.IsRunning == true ||
-                _serialSequence?.IsBusy == true) return;
+            if (_serialDisplay?.IsConnected != true || _serialBusy || _serialSequence?.IsBusy == true ||
+                (_serialSequence?.IsRunning == true && !_eventStartedSerial)) return;
             if (SelectedPageIndex is not null && !SavePageEditor()) return;
             _serialSequence ??= CreateSerialSequence();
+            if (_eventStartedSerial && _serialSequence.IsRunning)
+            {
+                // Preserve the active event while promoting temporary playback.
+                if (!await _serialSequence.ReloadAsync(_pages.Pages)) return;
+                _eventStartedSerial = false;
+                UpdateSerialControls();
+                await TickSerialPlaybackAsync();
+                return;
+            }
+            _eventStartedSerial = false;
             if (!_serialSequence.Start(_pages.Pages)) return;
             await _serialPlaybackTimer.StopAndDrainAsync();
             _serialPlaybackTimer.Start();
@@ -49,6 +59,7 @@ public partial class MainWindow
     {
         _serialPlaybackTimer.Stop();
         _serialSequence?.Stop();
+        _eventStartedSerial = false;
         UpdateSerialControls();
     }
 
