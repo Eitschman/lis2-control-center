@@ -279,3 +279,7 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 - Avalonia reuses the WPF translation catalog; localize controls in logical and visual trees and again when pages are realized. Keep original English keys recoverable across language switches, including Avalonia-specific navigation wording that differs from WPF.
 - Static text translation must not overwrite dynamic sensor readings, media metadata, Home Assistant state or runtime diagnostics. Regression tests must cover this distinction and all supported languages.
 - Source implementation and tests are on `feature/linux-avalonia` through `3f1bdf8`. CI run 475 was green at the prior head; run 477 for current head was pending completion when documented. Full WPF UI/function parity and final desktop acceptance remain open.
+
+## Localization lookup implementation note (2026-10-20)
+- Preserve original English WPF keys and Avalonia navigation aliases when translating between languages. Reverse translations are indexed once, not recomputed by scanning all dictionaries per UI control.
+- Guard runtime text (sensor/media/HA/diagnostics) from static-label rewrites. Unit tests cover original key stability and multilingual roundtrips. Commits `fbf90de`, `f39fba8`; HEAD CI pending at documentation time. WPF parity is not yet complete.
