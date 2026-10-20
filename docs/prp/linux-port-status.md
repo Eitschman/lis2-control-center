@@ -709,3 +709,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - After green CI for a3c0a7d, tightened the cross-view media-to-pages workflow: all four media-page buttons now await live schedule reload and portable workspace persistence before navigating to Pages, rather than starting both operations fire-and-forget.
 - Shared PageSourceValues.UpdateMedia now treats explicit Connected=false snapshots as disconnected even if the provider retains stale Title/Artist metadata: it publishes Connected=false only and removes prior media template keys. Reconnection with Connected=true restores fresh values; other provider namespaces are unaffected.
 - Added headless tests for disconnected stale metadata, recovery, and cross-provider isolation. No WPF or fan/serial safety changes; CI and desktop parity pending. Commits ebe6ba0, 99b9482, 0bacf0f.
+
+
+## Virtual/serial page playback parity: live edits (2026-10-20)
+- Following green CI for a131752f, audited cross-transport page lifecycle and found ReloadRunningPagesAsync updated only the virtual sequence. Live serial playback kept its old schedule after page add/duplicate/delete/reorder/save/import/preset/media page creation or enabled-toggle.
+- Shared reload path now updates both active sequences independently, with transport-specific error reporting and immediate ticks. The underlying PageSequenceController still gates in-flight writes and retains actual device frame state. Serial connection is not restarted and fan authorization is unchanged.
+- Enabled checkbox handler now awaits schedule reload and portable workspace persistence instead of fire-and-forget tasks. Added headless tests for simultaneous virtual/serial workspace edits and transport independence. Commits a3148e6, ed41ace, 8db56b0. CI and physical serial/desktop verification pending.
