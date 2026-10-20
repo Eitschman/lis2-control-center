@@ -682,3 +682,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - After green CI for 1e2ac61, hardened Avalonia page workspace JSON import: unsupported or null overflow modes for either display line now fail before the existing workspace is replaced, rather than silently falling back during playback.
 - Added tests for valid overflow roundtrips, invalid modes on both lines, refresh and scroll timing boundaries, and case-insensitive duplicate IDs. Invalid imports retain the original workspace.
 - Commits da3251a, 55dba0f, b39cd65. New CI pending; no physical device or desktop sign-off claimed.
+
+
+## Pages editor empty-selection lifecycle and import UI synchronization (2026-10-20)
+- Following green CI at eb9f681, fixed stale editor preview after deleting the last page, importing an empty page list, or clearing list selection: stop timer, invalidate preview and clear both preview lines. Selecting/adding a page reconfigures the preview normally.
+- Reloading a page in the editor also refreshes the live visibility-condition status instead of leaving status text from the previous page. Removed duplicate preview ticks on draft updates.
+- Added headless workspace regression tests for empty JSON import/repopulation and preserving original page object identity when invalid import is rejected.
+- Commits 43e590a, f8b3ab2, f7552ad. CI pending; UI visual sign-off pending.
