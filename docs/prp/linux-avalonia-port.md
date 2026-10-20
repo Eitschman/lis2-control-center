@@ -299,3 +299,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 ## Owner HA connectivity and live Hardware selection (2026-10-20)
 - Owner manually confirmed Avalonia Windows Home Assistant connectivity. Do not generalize this to Linux or all HA functions.
 - Hardware list selection identity now survives grouped ItemsSource rebinding using a retained sensor key (commit `3675cec`). CI pending. Full hardware end-to-end/WPF parity remains outstanding.
+
+## Approved deviation: page variable browser (2026-10-20)
+- Owner authorized replacing the multi-thousand-entry WPF-style variable ComboBox with an Avalonia modal browser. Search is bounded to 50 results, supports multiple search terms and categories, favorites (session only), current-value preview and insertion into line 1/2 without changing stored template syntax. Tests added for search, filtering, favorites, and large catalogs. Commits `52e29fd`, `8b11d48`, `8bbe024`, `e1966a4`. CI pending. Follow-ups: persistent favorites, richer friendly labels and HA entity/attribute hierarchy, desktop acceptance.
