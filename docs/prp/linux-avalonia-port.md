@@ -325,3 +325,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Page file import live playback integration (2026-10-20)
 - Page JSON import now reloads a running virtual display sequence immediately after successful validation, before workspace persistence. Invalid import continues to preserve the existing workspace and running schedule. Imported page order and enabled flags are preserved; null name/template strings are rejected to avoid runtime null dereferences. Added import/order/disabled-page and live sequence reload regression tests. Virtual transport remains connected. CI and desktop acceptance pending.
+
+## Pages editor preview playback parity (2026-10-20)
+- Pages editor preview now uses the actual PagePlayback template/overflow renderer through a side-effect-free PageEditorPreview helper instead of a separate TemplateRenderer-only code path. Preview updates for both lines, overflow modes and scroll timing edits without persisting drafts. Live sequence and saved page remain untouched; tests cover 20-column output, three overflow modes and source value immutability. Preview is an initial static frame; animated scrolling and visual desktop sign-off remain pending. CI pending.

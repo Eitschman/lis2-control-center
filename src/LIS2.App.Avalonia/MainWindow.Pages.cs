@@ -82,8 +82,10 @@ public partial class MainWindow
             var frame = _pages.Preview(i, PagePreviewValues());
             await RunVirtualActionAsync(() => _virtualDevice.RenderBothAsync(frame.Line1, frame.Line2));
         };
-        foreach (var name in new[] { "PageLine1", "PageLine2" })
+        foreach (var name in new[] { "PageLine1", "PageLine2", "PageDuration", "PageRefresh", "PageScrollStep", "PageScrollPause" })
             this.FindControl<TextBox>(name)!.TextChanged += (_, _) => RefreshPagePreview();
+        foreach (var name in new[] { "PageOverflow1", "PageOverflow2" })
+            this.FindControl<ComboBox>(name)!.SelectionChanged += (_, _) => RefreshPagePreview();
         InitializePageTools();
         _pages.Add();
         RefreshPageList(0);
@@ -302,10 +304,18 @@ public partial class MainWindow
     {
         if (_loadingPage || SelectedPageIndex is not int i) return;
         var original = _pages.Get(i);
-        var frame = new LIS2.Display.TemplateRenderer().RenderFrame(
-            this.FindControl<TextBox>("PageLine1")!.Text ?? original.Line1Template,
-            this.FindControl<TextBox>("PageLine2")!.Text ?? original.Line2Template,
-            PagePreviewValues());
+        var line1 = this.FindControl<TextBox>("PageLine1")!.Text ?? original.Line1Template;
+        var line2 = this.FindControl<TextBox>("PageLine2")!.Text ?? original.Line2Template;
+        var overflow1 = OverflowName(this.FindControl<ComboBox>("PageOverflow1")!.SelectedIndex);
+        var overflow2 = OverflowName(this.FindControl<ComboBox>("PageOverflow2")!.SelectedIndex);
+        var stepText = this.FindControl<TextBox>("PageScrollStep")!.Text;
+        var pauseText = this.FindControl<TextBox>("PageScrollPause")!.Text;
+        var step = int.TryParse(stepText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedStep)
+            && parsedStep > 0 ? parsedStep : original.ScrollStepMilliseconds;
+        var pause = int.TryParse(pauseText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedPause)
+            && parsedPause >= 0 ? parsedPause : original.ScrollEdgePauseMilliseconds;
+        var frame = PageEditorPreview.Render(line1, line2, overflow1, overflow2,
+            step, pause, PagePreviewValues());
         this.FindControl<TextBlock>("PagePreview1")!.Text = frame.Line1;
         this.FindControl<TextBlock>("PagePreview2")!.Text = frame.Line2;
     }
