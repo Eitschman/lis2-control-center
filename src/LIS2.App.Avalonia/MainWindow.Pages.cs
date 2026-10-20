@@ -202,7 +202,7 @@ public partial class MainWindow
 
     private sealed record PageListRow(int Index, string Name, bool Enabled);
 
-    private void PageListEnabledClick(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
+    private async void PageListEnabledClick(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (_loadingPage || sender is not CheckBox { DataContext: PageListRow row } checkbox)
             return;
@@ -213,8 +213,8 @@ public partial class MainWindow
         _pages.Get(row.Index).Enabled = checkbox.IsChecked == true;
         var selectedIndex = SelectedPageIndex ?? row.Index;
         RefreshPageList(selectedIndex);
-        _ = ReloadRunningPagesAsync();
-        _ = SavePortableWorkspaceAsync();
+        await ReloadRunningPagesAsync();
+        await SavePortableWorkspaceAsync();
     }
 
     private int? SelectedPageIndex =>
