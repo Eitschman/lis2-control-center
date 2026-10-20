@@ -158,7 +158,7 @@ public partial class MainWindow
         this.FindControl<Button>("SerialDisconnect")!.IsEnabled = !_serialBusy && !(_serialSequence?.IsBusy == true) && _serialDisplay is not null;
         this.FindControl<Button>("SerialSendLines")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
         this.FindControl<Button>("SerialClear")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
-        this.FindControl<Button>("SerialPlaybackStart")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
+        this.FindControl<Button>("SerialPlaybackStart")!.IsEnabled = !_serialBusy && connected && (!(_serialSequence?.IsRunning == true) || _eventStartedSerial) && !(_serialSequence?.IsBusy == true);
         this.FindControl<Button>("SerialPlaybackStop")!.IsEnabled = (_serialSequence?.IsRunning == true);
         UpdateSerialPlaybackStatus();
         UpdateHardwareFanControls();
