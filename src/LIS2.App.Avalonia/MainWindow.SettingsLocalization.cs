@@ -189,6 +189,10 @@ public partial class MainWindow
                     if (child is TextBlock block) block.Text = SettingsTranslate(SectionNames[i]);
         }
         ApplyPageLocalization();
+        if (this.FindControl<Button>("PageVariableBrowser") is { } browser)
+            browser.Content = BrowserText("Browse variables…", "Variablen durchsuchen…");
+        if (this.FindControl<TextBlock>("PageVariableStatus") is not null)
+            RefreshPageVariables();
         UpdateSection();
         UpdateVirtualControls();
     }
