@@ -67,4 +67,41 @@ public sealed class PageEditorPreviewTests
         Assert.Throws<InvalidOperationException>(() =>
             new PageEditorPreview().Tick(DateTimeOffset.UnixEpoch, new Dictionary<string, object?>()));
     }
+
+    [Fact]
+    public void LiveValuesRefreshWithoutReconfiguringDraft()
+    {
+        var preview = new PageEditorPreview();
+        var values = new Dictionary<string, object?> { ["Clock"] = "12:00" };
+        preview.Configure("Time {Clock}", "", "Truncate", "Truncate", 100, 200);
+        var start = DateTimeOffset.UnixEpoch;
+        Assert.Equal("Time 12:00".PadRight(20), preview.Tick(start, values).Line1);
+        values["Clock"] = "12:01";
+        Assert.Equal("Time 12:01".PadRight(20), preview.Tick(start.AddMilliseconds(300), values).Line1);
+    }
+
+    [Fact]
+    public void BothLinesScrollIndependently()
+    {
+        var preview = new PageEditorPreview();
+        preview.Configure("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "0123456789ABCDEFGHIJKLM",
+            "Marquee", "PingPong", 100, 200);
+        var values = new Dictionary<string, object?>();
+        var first = preview.Tick(DateTimeOffset.UnixEpoch, values);
+        var later = preview.Tick(DateTimeOffset.UnixEpoch.AddMilliseconds(350), values);
+        Assert.NotEqual(first.Line1, later.Line1);
+        Assert.NotEqual(first.Line2, later.Line2);
+        Assert.Equal(20, later.Line1.Length);
+        Assert.Equal(20, later.Line2.Length);
+    }
+
+    [Fact]
+    public void ShortTextDoesNotScheduleScroll()
+    {
+        var preview = new PageEditorPreview();
+        preview.Configure("Short", "OK", "Marquee", "PingPong", 100, 200);
+        var frame = preview.Tick(DateTimeOffset.UnixEpoch, new Dictionary<string, object?>());
+        Assert.Equal("Short".PadRight(20), frame.Line1);
+        Assert.True(preview.NextDelay > TimeSpan.Zero);
+    }
 }
