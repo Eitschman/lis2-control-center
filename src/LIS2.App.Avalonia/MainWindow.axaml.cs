@@ -122,13 +122,16 @@ public partial class MainWindow : Window
         if (_busy || _virtualSequence?.IsBusy == true)
             return;
 
-        // Manual display actions take ownership of the virtual device.
-        StopPagePlayback();
-
+        // Reserve manual ownership before awaiting any drain. A scheduled
+        // playback callback must finish before a manual command can be sent.
         _busy = true;
+        StopPagePlayback();
         UpdateVirtualControls();
         try
         {
+            await _pageTimer.StopAndDrainAsync();
+            if (_virtualSequence is not null)
+                await _virtualSequence.StopAndDrainAsync();
             await action();
             UpdatePreview();
             SetVirtualStatus(_virtualDevice.IsConnected
