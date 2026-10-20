@@ -689,3 +689,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Reloading a page in the editor also refreshes the live visibility-condition status instead of leaving status text from the previous page. Removed duplicate preview ticks on draft updates.
 - Added headless workspace regression tests for empty JSON import/repopulation and preserving original page object identity when invalid import is rejected.
 - Commits 43e590a, f8b3ab2, f7552ad. CI pending; UI visual sign-off pending.
+
+
+## Cross-cutting live display schedule reload correctness (2026-10-20)
+- After green CI at 4fe15c7, reviewed the shared headless PageSequenceController rather than continuing editor-only polishing. Found a runtime bug: ReloadAsync replaced PageFrameDispatcher, losing knowledge of the frame actually displayed on virtual/serial LIS2. This caused redundant writes for unchanged frames and, more seriously, failure to clear a stale display after reloading to zero visible pages.
+- ReloadAsync now preserves the dispatcher and its last-successful-output state while replacing only the scheduler. A fresh dispatcher is still created on a new Start, and the existing tick gate continues to serialize reload with in-flight output.
+- Added four deterministic headless tests: unchanged-frame deduplication, clear exactly once after empty schedule, clear after disabled-only schedule, and replacement-frame write without intermediate clear. Applies to both virtual and serial playback adapters; no fan control or WPF modifications.
+- Commits e1d8827 and 84fc5b9. Latest CI and final Windows/Linux desktop parity remain pending.
