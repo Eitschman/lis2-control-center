@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace LIS2.App.Avalonia;
 
 /// <summary>WPF-compatible single-page presets; selection never touches a physical device.</summary>
@@ -11,11 +9,10 @@ public static class HardwareDisplayPresetBuilder
     {
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(preferences);
+        // The catalog has already rejected non-finite/non-numeric readings.
+        // Keep its normalized unit and availability semantics for all presets.
         var entries = HardwareSensorCatalog.Build(snapshot, preferences)
-            .Where(entry => entry.IsAvailable && entry.Value is not null &&
-                !entry.Key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase) &&
-                double.TryParse(Convert.ToString(entry.Value, CultureInfo.InvariantCulture),
-                    NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+            .Where(entry => entry.IsAvailable)
             .ToArray();
 
         HardwareSensorEntry? First(string type, params string[] terms) =>
@@ -29,12 +26,8 @@ public static class HardwareDisplayPresetBuilder
             entries.Where(entry => string.Equals(entry.SensorType, type, StringComparison.OrdinalIgnoreCase))
                 .OrderByDescending(entry => entry.IsFavorite).Take(2).ToArray();
 
-        string Line(string label, HardwareSensorEntry entry)
-        {
-            var unitKey = entry.Key + ".Unit";
-            var unit = snapshot.FirstOrDefault(pair => string.Equals(pair.Key, unitKey, StringComparison.OrdinalIgnoreCase)).Value;
-            return label + " {" + entry.Key + "}" + (Convert.ToString(unit, CultureInfo.InvariantCulture) ?? "");
-        }
+        static string Line(string label, HardwareSensorEntry entry) =>
+            label + " {" + entry.Key + "}" + entry.Unit;
 
         HardwareDisplayPresetPage? Pair(string name, HardwareSensorEntry? first,
             HardwareSensorEntry? second, string label1, string label2)
