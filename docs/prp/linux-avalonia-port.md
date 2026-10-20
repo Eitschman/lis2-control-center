@@ -289,3 +289,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Hardware browser localization/filter contract (2026-10-20)
 - Sensor type filters must use stable semantic keys rather than translated ComboBox labels. The twelve Hardware filter choices are mapped to catalog keys by selection index, with regression tests for mapping and filtered sensor results. Commits `c4217f8`, `a47daec`; CI pending at documentation time. This does not complete the larger hardware parity audit.
+
+## Hardware template sensor-key tracking (2026-10-20)
+- The Hardware browser must track the base sensor key when a page template includes a numeric format suffix (e.g. `{Hardware.CPU.Load.Total:F1}`), including when the sensor is offline. Added regression coverage; commits `8f2a03a`, `f0f4b37`. CI and full WPF parity remain pending.
