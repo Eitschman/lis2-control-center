@@ -663,3 +663,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Introduced a stateful PageEditorPreview backed by the existing PagePlayback renderer. A UI DispatcherTimer now advances both scrolling lines according to PagePlayback.NextDelay without persisting draft changes or touching the active virtual sequence.
 - Editor changes reconfigure the isolated preview; closing the window stops its timer. Added deterministic headless regression tests for scrolling, draft reset and unconfigured use.
 - Commits ba680f3, d3a0c74, 77cc7ad. CI for current HEAD is pending; Windows/Linux visual acceptance and complete ten-view WPF parity remain outstanding.
+
+
+## Editor preview navigation and live-source regression pass (2026-10-20)
+- After confirmed green CI for animated preview fix 757eaf7, paused the editor preview timer when navigating away from Pages and resumed it when returning. This avoids background UI updates while keeping draft state independent of running playback.
+- Added headless coverage for changing runtime template values, independent scrolling on both display lines, and non-scrolling short text. No WPF code or physical fan/serial behavior changed.
+- Commits 7a7b823, 82580f3, c310317. Latest HEAD CI and owner Windows/Linux desktop acceptance pending; this is not full ten-view parity sign-off.
