@@ -208,6 +208,20 @@ public partial class MainWindow
             .Distinct();
     }
 
+    // Only rewrite text still owned by the localization layer. Runtime status,
+    // sensor values and media titles can replace static labels at any time.
+    internal static bool IsLocalizedStaticText(string current, string original, string? germanOverride = null)
+    {
+        if (current == original || (germanOverride is not null && current == germanOverride))
+            return true;
+        foreach (var language in new[] { "de", "fr", "tr", "ru" })
+        {
+            if (current == WpfTranslationCatalog.Translate(original, language))
+                return true;
+        }
+        return false;
+    }
+
     private void ApplyPageLocalization()
     {
         // Logical descendants include controls in inactive/hidden pages and do not
@@ -222,7 +236,10 @@ public partial class MainWindow
                 original = WpfTranslationCatalog.FindEnglishSource(tooltip);
                 _originalTooltips[control] = original;
             }
-            ToolTip.SetTip(control, WpfTranslationCatalog.Translate(original, CurrentUiLanguage()));
+            if (IsLocalizedStaticText(tooltip, original))
+                ToolTip.SetTip(control, WpfTranslationCatalog.Translate(original, CurrentUiLanguage()));
+            else
+                _originalTooltips.Remove(control);
         }
         foreach (var input in LocalizableControls<TextBox>())
         {
@@ -231,7 +248,10 @@ public partial class MainWindow
                 original = WpfTranslationCatalog.FindEnglishSource(input.Watermark ?? string.Empty);
                 _originalWatermarks[input] = original;
             }
-            input.Watermark = WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
+            if (IsLocalizedStaticText(input.Watermark ?? string.Empty, original))
+                input.Watermark = WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
+            else
+                _originalWatermarks.Remove(input);
         }
         foreach (var item in LocalizableControls<ComboBoxItem>())
         {
@@ -241,7 +261,10 @@ public partial class MainWindow
                 original = WpfTranslationCatalog.FindEnglishSource(current);
                 _originalComboLabels[item] = original;
             }
-            item.Content = WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
+            if (IsLocalizedStaticText(current, original))
+                item.Content = WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
+            else
+                _originalComboLabels.Remove(item);
         }
         foreach (var label in LocalizableControls<TextBlock>())
         {
@@ -250,6 +273,11 @@ public partial class MainWindow
                 original = WpfTranslationCatalog.FindEnglishSource(label.Text ?? string.Empty);
                 if (!GermanPageLabels.ContainsKey(original) && WpfTranslationCatalog.Translate(original, CurrentUiLanguage()) == original) continue;
                 _originalPageLabels.Add(label, original);
+            }
+            if (!IsLocalizedStaticText(label.Text ?? string.Empty, original, GermanPageLabels.GetValueOrDefault(original)))
+            {
+                _originalPageLabels.Remove(label);
+                continue;
             }
             label.Text = CurrentUiLanguage() == "de" && GermanPageLabels.TryGetValue(original, out var translated)
                 ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
@@ -263,6 +291,11 @@ public partial class MainWindow
                 original = WpfTranslationCatalog.FindEnglishSource(content);
                 _originalPageCheckBoxes.Add(checkBox, original);
             }
+            if (checkBox.Content is not string current || !IsLocalizedStaticText(current, original, GermanCheckBoxLabels.GetValueOrDefault(original)))
+            {
+                _originalPageCheckBoxes.Remove(checkBox);
+                continue;
+            }
             checkBox.Content = CurrentUiLanguage() == "de" && GermanCheckBoxLabels.TryGetValue(original, out var translated)
                 ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
@@ -274,6 +307,11 @@ public partial class MainWindow
                     continue;
                 original = WpfTranslationCatalog.FindEnglishSource(text);
                 _originalPageButtons.Add(button, original);
+            }
+            if (button.Content is not string current || !IsLocalizedStaticText(current, original, GermanButtonLabels.GetValueOrDefault(original)))
+            {
+                _originalPageButtons.Remove(button);
+                continue;
             }
             button.Content = CurrentUiLanguage() == "de" && GermanButtonLabels.TryGetValue(original, out var translated)
                 ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
