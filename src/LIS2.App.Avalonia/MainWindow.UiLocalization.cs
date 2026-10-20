@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
+using Avalonia.VisualTree;
 
 namespace LIS2.App.Avalonia;
 
@@ -201,13 +202,22 @@ public partial class MainWindow
     private readonly Dictionary<TextBox, string> _originalWatermarks = new();
     private readonly Dictionary<ComboBoxItem, string> _originalComboLabels = new();
 
+    private IEnumerable<T> LocalizableControls<T>() where T : global::Avalonia.Visual
+    {
+        // Some Avalonia controls exist only in the logical tree, others are
+        // instantiated by templates in the visual tree. WPF walks both.
+        return this.GetLogicalDescendants().OfType<T>()
+            .Concat(this.GetVisualDescendants().OfType<T>())
+            .Distinct();
+    }
+
     private void ApplyPageLocalization()
     {
         // Logical descendants include controls in inactive/hidden pages and do not
         // depend on the visual template being attached at the moment of translation.
         // Restrict translations to a known set of static labels. Never overwrite live
         // sensor values, media metadata, Home Assistant states or error messages.
-        foreach (var input in this.GetLogicalDescendants().OfType<TextBox>())
+        foreach (var input in LocalizableControls<TextBox>())
         {
             if (!_originalWatermarks.TryGetValue(input, out var original))
             {
@@ -216,7 +226,7 @@ public partial class MainWindow
             }
             input.Watermark = WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
-        foreach (var item in this.GetLogicalDescendants().OfType<ComboBoxItem>())
+        foreach (var item in LocalizableControls<ComboBoxItem>())
         {
             if (item.Content is not string current) continue;
             if (!_originalComboLabels.TryGetValue(item, out var original))
@@ -226,7 +236,7 @@ public partial class MainWindow
             }
             item.Content = WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
-        foreach (var label in this.GetLogicalDescendants().OfType<TextBlock>())
+        foreach (var label in LocalizableControls<TextBlock>())
         {
             if (!_originalPageLabels.TryGetValue(label, out var original))
             {
@@ -237,7 +247,7 @@ public partial class MainWindow
             label.Text = CurrentUiLanguage() == "de" && GermanPageLabels.TryGetValue(original, out var translated)
                 ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
-        foreach (var checkBox in this.GetLogicalDescendants().OfType<CheckBox>())
+        foreach (var checkBox in LocalizableControls<CheckBox>())
         {
             if (!_originalPageCheckBoxes.TryGetValue(checkBox, out var original))
             {
@@ -249,7 +259,7 @@ public partial class MainWindow
             checkBox.Content = CurrentUiLanguage() == "de" && GermanCheckBoxLabels.TryGetValue(original, out var translated)
                 ? translated : WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
         }
-        foreach (var button in this.GetLogicalDescendants().OfType<Button>())
+        foreach (var button in LocalizableControls<Button>())
         {
             if (!_originalPageButtons.TryGetValue(button, out var original))
             {
