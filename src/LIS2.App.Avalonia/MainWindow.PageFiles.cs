@@ -94,8 +94,10 @@ public partial class MainWindow
         if (files.Count == 0) return;
         await using var stream = await files[0].OpenReadAsync();
         using var reader = new StreamReader(stream);
-        _pages.ImportJson(await reader.ReadToEndAsync());
+        var imported = await reader.ReadToEndAsync();
+        _pages.ImportJson(imported);
         RefreshPageList(_pages.Pages.Count > 0 ? 0 : -1);
+        await ReloadRunningPagesAsync();
         await SavePortableWorkspaceAsync();
         SetVirtualStatus("Page definitions imported.");
     }

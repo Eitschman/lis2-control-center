@@ -52,6 +52,7 @@ public sealed class PageWorkspace
 
     public void ImportJson(string json)
     {
+        ArgumentNullException.ThrowIfNull(json);
         var pages = JsonSerializer.Deserialize<List<PageDefinition>>(json)
             ?? throw new InvalidOperationException("Invalid page configuration.");
         if (pages.Any(p => p is null || string.IsNullOrWhiteSpace(p.Id) || p.DurationSeconds <= 0 ||
@@ -62,6 +63,8 @@ public sealed class PageWorkspace
             throw new InvalidOperationException("Page configuration contains invalid timing or identifiers.");
         if (pages.Select(p => p.Id).Distinct(StringComparer.OrdinalIgnoreCase).Count() != pages.Count)
             throw new InvalidOperationException("Page configuration contains duplicate page identifiers.");
+        if (pages.Any(p => p.Line1Template is null || p.Line2Template is null || p.Name is null))
+            throw new InvalidOperationException("Page configuration contains null page text fields.");
         _pages.Clear();
         _pages.AddRange(pages);
     }

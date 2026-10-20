@@ -651,3 +651,6 @@ Implemented initial cross-screen package: common light shell/white card styling,
 
 ## Live Pages schedule reload (2026-10-20)
 - Running virtual LIS2 page playback now refreshes its scheduler after add, duplicate, delete, reorder, enabled-toggle, preset creation, and explicit page save, without disconnecting/restarting the virtual device. Added PageSequenceController.ReloadAsync guarded by the existing tick semaphore so in-flight device writes finish before schedule replacement. The refreshed schedule is immediately ticked. Tests cover live reload and concurrent in-flight write safety. No physical device acceptance claimed; CI pending.
+
+## Page file import live playback integration (2026-10-20)
+- Page JSON import now reloads a running virtual display sequence immediately after successful validation, before workspace persistence. Invalid import continues to preserve the existing workspace and running schedule. Imported page order and enabled flags are preserved; null name/template strings are rejected to avoid runtime null dereferences. Added import/order/disabled-page and live sequence reload regression tests. Virtual transport remains connected. CI and desktop acceptance pending.

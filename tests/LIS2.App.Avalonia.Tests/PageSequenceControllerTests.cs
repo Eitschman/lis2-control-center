@@ -6,6 +6,34 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class PageSequenceControllerTests
 {
     [Fact]
+    public async Task ImportedScheduleReloadDropsRemovedPagesAndRespectsDisabledPages()
+    {
+        var writes = new List<DisplayFrame>();
+        var runtime = new PageSequenceController(
+            (frame, _) => { writes.Add(frame); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        var workspace = new PageWorkspace();
+        workspace.Add().Line1Template = "ORIGINAL";
+        Assert.True(runtime.Start(workspace.Pages));
+        var now = DateTimeOffset.UnixEpoch;
+        var values = new Dictionary<string, object?>();
+        Assert.True(await runtime.TickAsync(now, values));
+
+        var imported = new PageWorkspace();
+        imported.Add().Line1Template = "IMPORTED";
+        var disabled = imported.Add();
+        disabled.Line1Template = "DISABLED";
+        disabled.Enabled = false;
+        workspace.ImportJson(imported.ExportJson());
+        Assert.True(await runtime.ReloadAsync(workspace.Pages));
+        Assert.True(await runtime.TickAsync(now.AddMilliseconds(1), values));
+        Assert.Equal("IMPORTED".PadRight(20), writes[^1].Line1);
+        Assert.Equal(workspace.Get(0).Id, runtime.CurrentPageId);
+        Assert.True(runtime.IsRunning);
+    }
+
+
+    [Fact]
     public async Task ReloadChangesRunningPageWithoutReconnecting()
     {
         var written = new List<DisplayFrame>();

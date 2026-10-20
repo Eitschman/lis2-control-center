@@ -5,6 +5,34 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class PageWorkspaceTests
 {
     [Fact]
+    public void ImportedPageOrderAndEnabledFlagsArePreserved()
+    {
+        var source = new PageWorkspace();
+        source.Add().Name = "First";
+        var disabled = source.Add();
+        disabled.Name = "Second";
+        disabled.Enabled = false;
+        var target = new PageWorkspace();
+        target.Add().Name = "Old";
+        target.ImportJson(source.ExportJson());
+        Assert.Equal(new[] { "First", "Second" }, target.Pages.Select(p => p.Name));
+        Assert.True(target.Get(0).Enabled);
+        Assert.False(target.Get(1).Enabled);
+    }
+
+    [Fact]
+    public void NullPageTextIsRejectedWithoutChangingWorkspace()
+    {
+        var target = new PageWorkspace();
+        var original = target.Add();
+        var bad = """[{"Id":"valid","Name":null,"Line1Template":"A","Line2Template":"B","DurationSeconds":5,"RefreshIntervalMilliseconds":1000,"ScrollStepMilliseconds":250,"ScrollEdgePauseMilliseconds":800}]""";
+        Assert.Throws<InvalidOperationException>(() => target.ImportJson(bad));
+        Assert.Single(target.Pages);
+        Assert.Equal(original.Id, target.Get(0).Id);
+    }
+
+
+    [Fact]
     public void DuplicateIdentifiersAreRejectedTransactionally()
     {
         var workspace = new PageWorkspace();
