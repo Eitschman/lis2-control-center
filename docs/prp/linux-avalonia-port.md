@@ -295,3 +295,7 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Hardware preset/catalog consistency (2026-10-20)
 - Generate CPU/GPU/Memory/Temperature/Fan presets from HardwareSensorCatalog validated available entries, using their unit metadata directly. This shares sensor validity/unit behavior with the Hardware browser. Regression tests cover case-insensitive unit keys and non-finite sensor rejection. Commits `385f4b1`, `ce0cf1d`; CI pending, broader WPF parity remains open.
+
+## Owner HA connectivity and live Hardware selection (2026-10-20)
+- Owner manually confirmed Avalonia Windows Home Assistant connectivity. Do not generalize this to Linux or all HA functions.
+- Hardware list selection identity now survives grouped ItemsSource rebinding using a retained sensor key (commit `3675cec`). CI pending. Full hardware end-to-end/WPF parity remains outstanding.
