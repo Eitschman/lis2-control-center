@@ -274,3 +274,8 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Virtual LIS2 first test priority (2026-10-14)
 - User reprioritized immediately testable virtual LIS2 and WPF VFD colors. Virtual LIS2 now connects on window Opened via existing ConnectWithGlyphsAsync (hardware-free); existing Settings virtual connect/disconnect remains available. Dashboard and Pages VFD preview colors match WPF Dark.xaml and Light.xaml: background #123B8A, border #5D8FE8, text #F7FBFF. Diagnostics refresh follows virtual preview updates. CI and interactive smoke test pending.
+
+## Localization parity follow-up (2026-10-20)
+- Avalonia reuses the WPF translation catalog; localize controls in logical and visual trees and again when pages are realized. Keep original English keys recoverable across language switches, including Avalonia-specific navigation wording that differs from WPF.
+- Static text translation must not overwrite dynamic sensor readings, media metadata, Home Assistant state or runtime diagnostics. Regression tests must cover this distinction and all supported languages.
+- Source implementation and tests are on `feature/linux-avalonia` through `3f1bdf8`. CI run 475 was green at the prior head; run 477 for current head was pending completion when documented. Full WPF UI/function parity and final desktop acceptance remain open.
