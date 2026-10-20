@@ -283,3 +283,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 ## Localization lookup implementation note (2026-10-20)
 - Preserve original English WPF keys and Avalonia navigation aliases when translating between languages. Reverse translations are indexed once, not recomputed by scanning all dictionaries per UI control.
 - Guard runtime text (sensor/media/HA/diagnostics) from static-label rewrites. Unit tests cover original key stability and multilingual roundtrips. Commits `fbf90de`, `f39fba8`; HEAD CI pending at documentation time. WPF parity is not yet complete.
+
+## Startup transport safety follow-up (2026-10-20)
+- The Avalonia Opened handler must honor the selected transport mode and must not auto-connect or start playback of the virtual device when Serial is selected. Commit `a5e7afc`; CI pending. WPF UI/function parity remains open.
