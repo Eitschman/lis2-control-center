@@ -45,6 +45,22 @@ public class WpfTranslationCatalogTests
         Assert.Equal(wpfTranslation, WpfTranslationCatalog.Translate("Dashboard", language));
     }
 
+    [Theory]
+    [InlineData("Dashboard", "Dashboard", true)]
+    [InlineData("Übersicht", "Dashboard", true)]
+    [InlineData("Tableau de bord", "Dashboard", true)]
+    [InlineData("Gösterge Paneli", "Dashboard", true)]
+    [InlineData("Панель", "Dashboard", true)]
+    [InlineData("CPU: 47%", "Dashboard", false)]
+    [InlineData("Artist - Track", "Dashboard", false)]
+    [InlineData("sensor.cpu.package", "Dashboard", false)]
+    public void StaticLocalizationDoesNotOverwriteLiveValues(string current, string original, bool expected)
+        => Assert.Equal(expected, MainWindow.IsLocalizedStaticText(current, original));
+
+    [Fact]
+    public void GermanAvaloniaOverridesAreRecognized()
+        => Assert.True(MainWindow.IsLocalizedStaticText("VFD-Vorschau", "VFD Preview", "VFD-Vorschau"));
+
     [Fact]
     public void WpfPrefixPreservesDecorativeMarkers()
         => Assert.Equal("• Übersicht", WpfTranslationCatalog.Translate("• Dashboard", "de"));
