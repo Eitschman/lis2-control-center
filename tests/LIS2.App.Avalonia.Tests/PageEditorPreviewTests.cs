@@ -40,10 +40,10 @@ public sealed class PageEditorPreviewTests
     {
         var preview = new PageEditorPreview();
         var values = new Dictionary<string, object?> { ["Long"] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
-        preview.Configure("{Long}", "", overflow, "Truncate", 100, 0);
+        preview.Configure("{Long}", "", overflow, "Truncate", 100, 200);
         var start = DateTimeOffset.UnixEpoch;
         var first = preview.Tick(start, values);
-        var later = preview.Tick(start.AddMilliseconds(500), values);
+        var later = preview.Tick(start.AddMilliseconds(350), values);
         Assert.NotEqual(first.Line1, later.Line1);
         Assert.Equal("ABCDEFGHIJKLMNOPQRSTUVWXYZ", values["Long"]);
     }
