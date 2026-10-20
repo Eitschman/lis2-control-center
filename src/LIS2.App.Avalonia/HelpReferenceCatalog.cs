@@ -16,46 +16,55 @@ internal static class HelpReferenceCatalog
     internal static int ClampSection(int index) => Math.Clamp(index, 0, Sections.Length - 1);
 
     internal static IReadOnlyList<(string Heading, string Body)> GetSection(
-        int index, IEnumerable<string> variableKeys, IEnumerable<string> glyphNames)
+        int index, IEnumerable<string> variableKeys, IEnumerable<string> glyphNames, string language = "en")
     {
         var content = new List<(string, string)>();
-        void Add(string heading, string body) => content.Add((heading, body));
+        void Add(string heading, string body) => content.Add((
+            HelpReferenceLocalization.Translate(heading, language), HelpReferenceLocalization.Translate(body, language)));
+        // Beispiele und dynamische Schlüssel sind ausführbare Vorlagensyntax, keine übersetzbaren Texte.
+        void AddExample(string heading, string body) => content.Add((HelpReferenceLocalization.Translate(heading, language), body));
         switch (ClampSection(index))
         {
             case 0:
                 Add("Dashboard", "The Dashboard shows the current 20x2 VFD preview, connection status, recent commands and direct fan outputs.");
                 Add("VFD preview", "The preview displays the normalized 20-character lines. Long text may scroll during page playback.");
-                Add("Fan outputs", "Manuelle Ausgaben beachten Minimum, Maximum und AllowStop der vier Kanäle. Bei serieller Ausgabe ist jede Aktion erneut freizugeben. Die erste Ausgabe setzt 100 Prozent; Trennen oder Stoppen stellt 100 Prozent wieder her. Während automatischer Regelung bleibt die Handausgabe gesperrt.");
+                Add("Fan outputs", "Manual output respects the minimum, maximum and AllowStop of all four channels. Each serial action needs fresh authorization. Authorized serial fan output sends 100% first; stop or orderly disconnect sends 100%. Manual serial output is blocked during automatic serial control.");
                 Add("Quick links", "Open Display for manual output or Fan Control for regulation and sensor assignments.");
                 break;
             case 1:
                 Add("Display", "Use the Display section for direct physical or virtual LIS2 output. Manual commands interrupt page scheduling.");
-                Add("Lines and brightness", "Zeilen, Zeichen und Helligkeit werden an den angewendeten Transport gesendet. Helligkeit unterstützt 100%, 75%, 50% und 25%, wird gespeichert und beim Verbinden erneut angewendet. Die serielle Vorschau zeigt gesendete Inhalte, keine Display-Rückmeldung.");
+                Add("Lines and brightness", "Lines, characters and brightness use the applied transport. Brightness supports 100%, 75%, 50% and 25%, is saved and reapplied on connection. The serial preview shows sent content, without feedback from the physical display.");
                 Add("Custom glyphs", "Eight programmable 5x8 slots are available. Use {Glyph.1} through {Glyph.8} in templates.");
-                foreach (var name in glyphNames.Where(n => !string.IsNullOrWhiteSpace(n)))
-                    Add("Named glyph", "{Glyph." + NormalizeGlyphName(name) + "}");
+                foreach (var glyph in glyphNames.Take(8).Select((name, index) => (name, slot: index + 1))
+                             .Where(glyph => !string.IsNullOrWhiteSpace(glyph.name)))
+                    AddExample("Named glyph", glyph.name + ": {Glyph." + glyph.slot + "}");
                 Add("Character ROM", "The raw ROM and special-character tests are intended for protocol validation on real hardware.");
+                Add("Custom glyphs", "Save glyphs in the workspace and send them to the connected device. Enable programming on connect to restore them after reconnecting. Names label the editor slots; templates currently require numeric references such as {Glyph.1}.");
                 break;
             case 2:
                 Add("Pages", "Each enabled page contains a name, two templates, duration, refresh interval, overflow modes and optional visibility condition.");
                 Add("Timing", "Duration is in seconds; refresh and scrolling use milliseconds. Overflow can truncate, marquee or ping-pong.");
-                Add("Template syntax", "{Variable}  {Variable|fallback:--}  {Variable|number:1}  {Variable|percent:0}  {Variable|bytes:1}");
+                AddExample("Template syntax", "{Variable}  {Variable|fallback:--}  {Variable|number:1}  {Variable|percent:0}  {Variable|bytes:1}");
                 Add("Formatting", "Operations may be chained: prefix, suffix, upper, lower, fallback, number, percent and bytes.");
                 Add("Visibility", "Use =, !=, >, >=, < or <=. Example: HA.sensor.temperature>=25");
-                Add("Clock", "{Clock.Time}  {Clock.Date}  {Clock.Day}");
+                Add("Formatting details", "number and percent accept 0 to 6 decimal places. percent appends % without multiplying by 100; bytes uses powers of 1024. Numbers follow the operating system culture. Missing values return fallback directly, without further formatting. Visibility uses one condition without braces; numeric comparisons use a decimal point. Missing keys hide the page.");
+                AddExample("Clock", "{Clock.Time}  {Clock.Date}  {Clock.Day}");
                 var keys = variableKeys.Where(k => !k.StartsWith("HA.", StringComparison.OrdinalIgnoreCase))
                     .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(k => k, StringComparer.OrdinalIgnoreCase).Take(200).ToArray();
-                Add("Available runtime variables", keys.Length == 0
-                    ? "No runtime variables currently available."
-                    : string.Join(Environment.NewLine, keys.Select(k => "{" + k + "}")));
+                if (keys.Length == 0) Add("Available runtime variables", "No runtime variables currently available.");
+                else AddExample("Available runtime variables", string.Join(Environment.NewLine, keys.Select(k => "{" + k + "}")));
+                Add("Finding keys", "This list shows up to 200 current non-HA keys. Browse variables searches the current snapshot and shows at most 50 matches; narrow the search or refresh it after connecting a source. Copy a key or insert it into a line. Save page changes before starting playback. Only enabled pages with a matching visibility condition participate in rotation.");
                 Add("Home Assistant variables", "Use the Home Assistant browser for the full live entity and attribute catalogue rather than listing thousands of entries here.");
                 break;
             case 3:
                 Add("Media", "Connected players supply read-only playback status, track metadata, elapsed time, duration and audio telemetry where supported.");
-                Add("Winamp", "{Winamp.State}  {Winamp.Artist}  {Winamp.Title}  {Winamp.Album}  {Winamp.Elapsed}  {Winamp.Duration}");
+                AddExample("Winamp", "{Winamp.State}  {Winamp.Artist}  {Winamp.Title}  {Winamp.Album}  {Winamp.Elapsed}  {Winamp.Duration}");
                 Add("Spectrum", "{Winamp.Vu}  {Winamp.Spectrum}  {Winamp.SpectrumGlyphs} require a supported source of live audio telemetry.");
-                Add("Windows media", "{WindowsMedia.State}  {WindowsMedia.Artist}  {WindowsMedia.Title}  {WindowsMedia.Connected}");
-                Add("Example", "{Winamp.Artist|fallback:Nothing playing} / {Winamp.Title|fallback:--}");
+                AddExample("Windows media", "{WindowsMedia.State}  {WindowsMedia.Artist}  {WindowsMedia.Title}  {WindowsMedia.Connected}");
+                Add("Linux and Windows", "Linux uses MPRIS through playerctl, which must be installed. Its Media.* values include state, title, artist, album, duration and connection status, but no elapsed position, VU or spectrum. Windows uses WindowsMedia.* for GSMTC, Winamp.* for the Winamp plug-in and WmpLegacy.* for the separate Legacy plug-in. Create a page from the relevant media card. No plug-in is needed for GSMTC.");
+                AddExample("Media", "{Media.State}  {Media.Title}  {Media.Artist}  {Media.Album}  {Media.Duration}  {Media.Connected}");
+                AddExample("Windows media", "{WmpLegacy.State}  {WmpLegacy.Title}  {WmpLegacy.Artist}  {WmpLegacy.Elapsed}  {WmpLegacy.Duration}");
+                AddExample("Example", "{Winamp.Artist|fallback:Nothing playing} / {Winamp.Title|fallback:--}");
                 break;
             case 4:
                 Add("Events", "Timed events temporarily override ordinary page output on connected displays.");
@@ -69,13 +78,13 @@ internal static class HelpReferenceCatalog
                 break;
             case 6:
                 Add("Fan Control", "Configure four channels, each with sensor assignment, mode and safe minimum/maximum output.");
-                Add("Regulation", "Choose a fixed percentage or temperature-based control with hysteresis.");
-                Add("Fail-safe", "Loss of a sensor or connection invokes the configured fail-safe output. Physical fan control requires explicit authorization.");
+                Add("Regulation", "Fixed uses the configured percentage. Curve interpolates temperature=percent points and applies hysteresis. Follow rounds the sensor value to a percentage. External uses the fail-safe value because this application supplies no external control percentage. Off outputs zero only with AllowStop; otherwise it uses the minimum. Minimum and maximum limit normal outputs.");
+                Add("Fail-safe", "Missing or invalid sensors in Curve and Follow use the configured fail-safe value within the channel limits. Preview and simulation do not control physical fans. Physical output requires explicit authorization for the current serial connection. Start sends 100% first; stop and orderly disconnect send 100%. A broken physical connection cannot guarantee delivery of a safety frame.");
                 break;
             case 7:
                 Add("Settings", "Select Virtual LIS2 or a serial port. Configure language, appearance and device startup preferences.");
-                Add("Transport", "Transport und Port werden beim Anwenden gespeichert. Die Anwendung trennt die bisherige Verbindung und verbindet den gewählten Transport neu. Ein fehlender gespeicherter Port bleibt ausgewählt und wird nicht automatisch ersetzt. Serielle Displaybedienung aktiviert keine Lüfter.");
-                Add("Windows-Import", "Der sichtbare Import in den Einstellungen liest settings.json, ohne die Quelldatei zu ändern. Transport, Port, Helligkeit, Glyphen, Seiten, Lüfter und Sensorpräferenzen werden übernommen. Home-Assistant-Aktivierung und URL werden übernommen, der Token bleibt getrennt. Home Assistant danach bei Bedarf neu verbinden.");
+                Add("Transport", "Applying saves the transport and port, disconnects the current device and connects the selected transport. A missing saved port remains selected and is never replaced automatically. Serial display control does not enable fans.");
+                Add("Windows import", "Import in Settings reads settings.json without changing the source file. It imports transport, port, brightness, glyphs, pages, fans and sensor preferences, including Home Assistant activation and URL. The token stays separate. Reconnect Home Assistant afterward if required.");
                 Add("Appearance", "The system, light and dark themes are supported. Language changes apply to the application interface.");
                 Add("Windows startup", "Automatic startup is only available on Windows.");
                 break;
@@ -87,12 +96,12 @@ internal static class HelpReferenceCatalog
             case 9:
                 Add("Home Assistant", "The read-only WebSocket integration loads states and receives live state_changed updates.");
                 Add("Connection", "Enter the Home Assistant URL and a long-lived access token, then test and save the connection.");
-                Add("Entity state", "{HA.sensor.living_room_temperature}");
-                Add("Unit and friendly name", "{HA.sensor.living_room_temperature.Unit}  {HA.sensor.living_room_temperature.FriendlyName}");
-                Add("Attributes", "{HA.media_player.living_room.attribute.media_title}");
-                Add("Aliases", "{HA.LivingRoomTemp}  {HA.LivingRoomTemp.Unit}  {HA.LivingRoomTemp.attribute.device_class}");
-                Add("Formatting", "{HA.sensor.temperature|fallback:--|number:1|suffix:°C}");
-                Add("Visibility", "HA.binary_sensor.window=on  /  HA.sensor.temperature>=25");
+                AddExample("Entity state", "{HA.sensor.living_room_temperature}");
+                AddExample("Unit and friendly name", "{HA.sensor.living_room_temperature.Unit}  {HA.sensor.living_room_temperature.FriendlyName}");
+                AddExample("Attributes", "{HA.media_player.living_room.attribute.media_title}");
+                AddExample("Aliases", "{HA.LivingRoomTemp}  {HA.LivingRoomTemp.Unit}  {HA.LivingRoomTemp.attribute.device_class}");
+                AddExample("Formatting", "{HA.sensor.temperature|fallback:--|number:1|suffix:°C}");
+                AddExample("Visibility", "HA.binary_sensor.window=on  /  HA.sensor.temperature>=25");
                 Add("Unavailable values", "Unknown and unavailable states can be handled with fallback. Complex attributes are represented as compact JSON.");
                 Add("Finding keys", "Search the Home Assistant browser by entity ID, friendly name or alias, then inspect attributes and copy the exact template key.");
                 break;
@@ -100,6 +109,4 @@ internal static class HelpReferenceCatalog
         return content;
     }
 
-    internal static string NormalizeGlyphName(string value) =>
-        new string(value.Select(c => char.IsLetterOrDigit(c) || c is '_' or '-' ? c : '_').ToArray()).Trim('_');
 }

@@ -19,7 +19,7 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 333/333 Avalonia-Tests sowie der native Windows-Smoke erfolgreich. Der [Status](linux-port-status.md) ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
+Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 345/345 Avalonia-Tests einschließlich Hilfesprache erfolgreich; der native Windows-Smoke ist im [Status](linux-port-status.md) eingegrenzt. Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
 
 ## Implementierungsstand
 
@@ -36,7 +36,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Medien | Winamp, reflektiert geladener GSMTC-Anbieter und Linux-`playerctl` angebunden | MPRIS-Zeitposition, Playerwahl und echte Zielplayer offen; WMP Legacy weicht vom zurückgestellten Produktumfang ab |
 | Home Assistant | WebSocket-Quelle, Entitäten, Attribute, Aliase, Favoriten und Seitenaktionen mit Sequenz-Reload vorhanden | Linux-Liveprüfung und Deaktivierung/Persistenz prüfen |
 | Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache und Windows-Tray/Autostart | Nativer Dateidialog und Linux-Desktopintegration offen |
-| Hilfe und About | Kontextbezogene Hilfe mit zehn Themen, Live-Schlüsseln, Glyphenreferenz und About-Dialog vorhanden | WPF-Inhaltstiefe, Übersetzungen, Platzierung und Desktop-Bedienung offen |
+| Hilfe und About | Kontextbezogene Hilfe mit zehn Themen in fünf Sprachen, Live-Schlüsseln und numerischer Glyphenreferenz; About-Dialog vorhanden | Weitere WPF-Inhaltstiefe, About-Übersetzungen, Platzierung und Desktop-Bedienung offen |
 | Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Export mit zeitgestempeltem Anwendungs-/Transportjournal | Sitzungsprotokoll begrenzt; kein dauerhaftes Logarchiv; nativen Dateidialog prüfen |
 | CI und Pakete | Windows-/Ubuntu-Builds, vier Testprojekte je OS, nativer Desktop-Smoke und drei selbstständige Pakete mit Prüfsummen | Archivstart und echte ARM64-Ausführung fehlen |
 
@@ -79,6 +79,7 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 - [x] Variablenbrowser enthält Suche, Kategorien, HA-Filter, Livewerte, persistente Favoriten und Einfügen in beide Zeilen.
 - [ ] Semantischen Funktionsabgleich aller zehn Ansichten einschließlich Fehler-, Leer-, Auswahl- und Persistenzpfaden schließen.
 - [ ] Hilfe und About mit WPF-Inhalt, Übersetzungen und Navigation abgleichen.
+- [x] Hilfesprache einschließlich Systemstandard und offenem Dialog prüfen; Inhalte gegen aktuelle Avalonia-Abläufe korrigieren und Beispiele mit der tatsächlichen Vorlagen-Engine ausführen.
 - [x] Avalonia-GUI-Smoke für zehn Ansichten, Hilfe/About, fehlende Medienanbieter, Diagnose und geordnetes Beenden ergänzt; aktuelle Nachweise im Status.
 - [ ] Desktop-Darstellung, Tastatur, DPI, Theme und Sprachen auf den Zielsystemen prüfen.
 - [ ] Linux-Tray/Autostart, Single Instance und Splash entsprechend dem Portierungsziel bearbeiten.

@@ -1,7 +1,7 @@
 # TODO: Avalonia-Portierung
 
 Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-03. Lokal 333/333 Avalonia-Tests und nativer Windows-Smoke erfolgreich; aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
+Implementierungsstand: PORT-03 mit lokalisierter Hilfe. Lokal 345/345 Avalonia-Tests erfolgreich; nativer Windows-Smoke und aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -74,7 +74,9 @@ Nächstes Implementierungspaket: **PORT-04: Medien und Produktgrenzen**.
 ### PORT-06: WPF-Abgleich und Desktopintegration
 
 - [ ] Die zehn Ansichten anhand der [aktuellen Matrix](docs/prp/wpf-avalonia-parity-audit.md) semantisch prüfen, einschließlich Fehler-, Leer-, Auswahl- und Speicherpfaden.
-- [ ] Hilfeinhalt/-tiefe und Übersetzungen gegen die WPF-Referenz prüfen; neue Avalonia-Hilfetexte sind überwiegend Englisch.
+- [x] Zehn Hilfethemen einschließlich Titel, Navigation und Absätzen in fünf Sprachen; gespeicherte Sprache, Systemstandard und Wechsel im offenen Dialog mit Controls geprüft.
+- [x] Hilfetexte gegen den Avalonia-Code prüfen: Lüftermodi/-Sicherheitsgrenzen, Medien je Plattform, numerische Glyphenreferenzen, Variablenliste, Formatierung und Sichtbarkeit.
+- [ ] Weitere WPF-Inhaltstiefe und About-Übersetzungen abgleichen. Benannte Glyphenschlüssel werden von der Avalonia-Runtime nicht bereitgestellt; die Hilfe zeigt dafür nutzbare numerische Slots.
 - [ ] Hilfeplatzierung, Tray-Menütexte und weitere hart codierte Laufzeittexte abgleichen.
 - [ ] Themes, Tastatur/Fokus, DPI, Fenstergrenzen und lange Texte in allen fünf Sprachen prüfen.
 - [ ] Bestehenden Display-Formatierungstest kulturfest formulieren: deutscher Windows-Lauf ergibt korrektes Komma, Test erwartet fest einen Dezimalpunkt; invarianter Lauf besteht mit 48/48. Produktformatierung nach `CurrentCulture` erhalten.

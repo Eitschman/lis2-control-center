@@ -10,7 +10,8 @@ Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](..
 
 Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 
-- Avalonia: 333/333 Tests erfolgreich, Exit 0, keine übersprungenen Tests. Frischer Lauf `TestResults/port03-all.trx`.
+- Avalonia: 345/345 Tests erfolgreich, Exit 0, keine übersprungenen Tests. Frischer Lauf `TestResults/help-all.trx`; Hilfedialog zusätzlich in `help-sidebar.trx` mit 6/6 Fällen geprüft.
+- Hilfe: fünf Sprachen, Systemstandard und Sprachwechsel im offenen Dialog mit echten Controls geprüft. Katalogtests decken alle zehn Themen, leere und gefüllte Variablenlisten, unveränderte technische Schlüssel sowie die Ausführung von HA-Formatierungs-/Sichtbarkeitsbeispielen und numerischen Glyphenreferenzen ab. Die Gegenprobe vor der Korrektur scheiterte bei deutscher Sprache am englischen Dialogtitel (`help-language-negative.trx`, Exit 1).
 - Sieben Fälle in `RuntimeHardeningTests` prüfen verzögerten erfolgreichen/fehlgeschlagenen Start gegen Shutdown, Fortsetzung nach Cleanup-Fehlern, differenzielle serielle/virtuelle Frames, Teilfehler, manuelle Cacheinvalidierung, Reconnect mit/ohne Lüfterfreigabe, begrenztes Journal sowie tatsächliche Ansichten und Dialoge.
 - Gegenprobe: ausgelassener Start-Drain, fehlendes Cache-Reset nach Teilfehler und still ignorierte Provider-DLL führen zu vier gezielt fehlgeschlagenen Tests, Exit 1 (`port03-negative.trx`). Regulären Code wiederhergestellt und gesamte Suite mit Exit 0 geprüft.
 - Wiederverbindung mit Lüfterfreigabe: fehlendes Cache-Reset reproduziert, 1/1 gezielter Test fehlgeschlagen (`port03-reconnect-negative.trx`); beide Connect-Pfade invalidieren den Cache.
@@ -25,6 +26,8 @@ Artefakte: `Avalonia-device-views-Windows`/`Linux`, `Avalonia-desktop-smoke-Wind
 
 ## Implementierung nach Codebefund
 
+Lokalisierte Hilfedialoge wurden unter Windows mit Skia bei 840 × 600 Pixeln gerendert und angesehen: Home Assistant in fünf Sprachen sowie Seitenhilfe auf Französisch und Lüfterhilfe auf Russisch. Überschriften und Absätze umbrechen; die Themenliste und Schließen bleiben sichtbar. Lange Inhalte werden vertikal gescrollt. Screenshots: `TestResults/screenshots/help-*.png`. Diese Prüfung verwendet isolierte Stores und ein virtuelles Gerät; sie ersetzt keine WPF-Inhaltstiefen- oder Hardwareabnahme.
+
 | Bereich | Implementiert und geprüft | Grenze |
 | --- | --- | --- |
 | Runtime | Quellen-/Sequenzbesitzer, adaptive Schleifen, Start-Drain vor Dispose; Cleanup weiterer Ressourcen trotz Einzelfehlern | UI-Orchestrierung weiterhin teilweise in MainWindow; Vertragsabgleich im Inventar |
@@ -36,7 +39,7 @@ Artefakte: `Avalonia-device-views-Windows`/`Linux`, `Avalonia-desktop-smoke-Wind
 | Home Assistant | WebSocket, Entitäten/Attribute, Aliase/Favoriten, Clipboard und Seitenerzeugung | Keine eigene aktuelle Liveprüfung oder Linux-Abnahme |
 | Einstellungen | Persistierter Transport/Port/HA-Aktivierung, Helligkeit, Windows-Import, Theme/Sprache, Windows-Tray/Autostart | Native Dateiauswahl und Linux-Desktopintegration offen |
 | Tokenstore | DPAPI, secret-tool, lokaler AES-Dateipfad und Migration | Automatischer AES-Ausweichpfad in PORT-05 zu klären |
-| Hilfe/About | Kontextauswahl, zehn Themen, Versions-/Laufzeitdaten und tatsächlicher Workspace-Ordner; Dialog-Smoke | Übersetzungen und WPF-Inhaltstiefe offen |
+| Hilfe/About | Kontextauswahl und zehn Themen in fünf Sprachen; gespeicherte Sprache, Systemstandard und offener Dialog geprüft; Inhalte gegen Code korrigiert; About mit Versions-/Laufzeitdaten und tatsächlichem Workspace-Ordner | Weitere WPF-Inhaltstiefe, About-Übersetzungen und Hilfeplatzierung offen; Runtime unterstützt nur numerische Glyphenschlüssel |
 | Diagnose | UTC-Journal für Anwendung und tatsächliche virtuelle/serielle Transportergebnisse, OK/ERROR, dekodierte Befehle, aktueller Export | Maximal 1000 Einträge pro Journal und zehn serielle Sitzungen; kein persistentes Logarchiv |
 
 ## Verbindliche Grenzen und Weiterarbeit

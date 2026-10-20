@@ -195,5 +195,7 @@ public partial class MainWindow
             RefreshPageVariables();
         UpdateSection();
         UpdateVirtualControls();
+        this.FindControl<Button>("OpenHelp")!.Content = HelpReferenceLocalization.Translate("Help & reference", CurrentUiLanguage());
+        HelpLanguageChanged?.Invoke();
     }
 }

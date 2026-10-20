@@ -12,16 +12,18 @@ namespace LIS2.App.Avalonia;
 
 public partial class MainWindow
 {
+    private event Action? HelpLanguageChanged;
+
     private async System.Threading.Tasks.Task OpenHelpAsync()
     {
         var dialog = new Window
         {
-            Name = "HelpDialog", Title = SettingsTranslate("Help"),
+            Name = "HelpDialog",
             Icon = Icon, Width = 1080, Height = 780, MinWidth = 840, MinHeight = 600,
             WindowStartupLocation = WindowStartupLocation.CenterOwner
         };
-        var title = new TextBlock { Text = SettingsTranslate("Help"), FontSize = 25, FontWeight = FontWeight.SemiBold };
-        var close = new Button { Content = BrowserText("Close"), MinWidth = 90 };
+        var title = new TextBlock { FontSize = 25, FontWeight = FontWeight.SemiBold };
+        var close = new Button { Name = "HelpClose", MinWidth = 90 };
         close.Click += (_, _) => dialog.Close();
         var header = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(0, 0, 0, 14) };
         var heading = new StackPanel { Spacing = 5 };
@@ -30,7 +32,7 @@ public partial class MainWindow
         Grid.SetColumn(close, 1);
         header.Children.Add(close);
 
-        var sectionList = new ListBox { Width = 235, ItemsSource = HelpReferenceCatalog.Sections.Select(SettingsTranslate).ToArray() };
+        var sectionList = new ListBox { Name = "HelpSections", Width = 235 };
         var content = new StackPanel { Spacing = 10, Margin = new Thickness(18) };
         var scroll = new ScrollViewer { Content = content, HorizontalScrollBarVisibility = global::Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
         var body = new Grid { ColumnDefinitions = new ColumnDefinitions("235,8,*") };
@@ -50,29 +52,44 @@ public partial class MainWindow
             var index = HelpReferenceCatalog.ClampSection(sectionList.SelectedIndex);
             var sectionTitle = new TextBlock
             {
-                Text = SettingsTranslate(HelpReferenceCatalog.Sections[index]),
-                FontSize = 24, FontWeight = FontWeight.SemiBold
+                Text = HelpReferenceLocalization.Translate(HelpReferenceCatalog.Sections[index], CurrentUiLanguage()),
+                FontSize = 24, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap
             };
             content.Children.Add(sectionTitle);
             foreach (var (sectionHeading, text) in HelpReferenceCatalog.GetSection(index,
-                         PagePreviewValues().Keys, _glyphs.Glyphs.Select(g => g.Name)))
+                         PagePreviewValues().Keys, _glyphs.Glyphs.Select(g => g.Name), CurrentUiLanguage()))
             {
+                if (sectionHeading != sectionTitle.Text)
+                    content.Children.Add(new TextBlock
+                    {
+                        Text = sectionHeading, FontSize = 17, TextWrapping = TextWrapping.Wrap,
+                        FontWeight = FontWeight.SemiBold, Margin = new Thickness(0, 12, 0, 0)
+                    });
                 content.Children.Add(new TextBlock
                 {
-                    Text = BrowserText(sectionHeading), FontSize = 17,
-                    FontWeight = FontWeight.SemiBold, Margin = new Thickness(0, 12, 0, 0)
-                });
-                content.Children.Add(new TextBlock
-                {
-                    Text = BrowserText(text), TextWrapping = TextWrapping.Wrap,
+                    Text = text, TextWrapping = TextWrapping.Wrap,
                     FontFamily = text.Contains('{') ? new FontFamily("Consolas") : FontFamily.Default
                 });
             }
             scroll.Offset = new Vector(0, 0);
         }
+        void ApplyLanguage()
+        {
+            var selected = HelpReferenceCatalog.ClampSection(sectionList.SelectedIndex);
+            var language = CurrentUiLanguage();
+            dialog.Title = title.Text = HelpReferenceLocalization.Translate("Help", language);
+            close.Content = HelpReferenceLocalization.Translate("Close", language);
+            sectionList.ItemsSource = HelpReferenceCatalog.Sections
+                .Select(section => HelpReferenceLocalization.Translate(section, language)).ToArray();
+            sectionList.SelectedIndex = selected;
+            Render();
+        }
+        ApplyLanguage();
         sectionList.SelectionChanged += (_, _) => Render();
         sectionList.SelectedIndex = HelpReferenceCatalog.ClampSection(_selectedSection);
-        await dialog.ShowDialog(this);
+        HelpLanguageChanged += ApplyLanguage;
+        try { await dialog.ShowDialog(this); }
+        finally { HelpLanguageChanged -= ApplyLanguage; }
     }
 
     private async System.Threading.Tasks.Task OpenAboutAsync()

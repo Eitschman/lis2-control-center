@@ -34,7 +34,7 @@ Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin`
 | Geheimnisse | PortableHaTokenStore, LegacyHaTokenStore; DPAPI, secret-tool und lokaler AES-Dateipfad |
 | Hardware | LinuxSystemSensors/LinuxHwmonFanSensors, WindowsHardwareFanSensors, HardwareSensorCatalog und HardwareDisplayPresetBuilder |
 | Medien | MainWindow.Media, WindowsMediaBridge und LinuxMprisSource; Originalquellen in Winamp, WindowsMedia und WmpLegacy |
-| Hilfe/Sprachen | HelpReferenceCatalog, MainWindow.HelpAbout, WpfTranslationCatalog, Settings-/UI-/Browser-Lokalisierung |
+| Hilfe/Sprachen | HelpReferenceCatalog mit eigenem HelpReferenceLocalization-Katalog für fünf Sprachen, MainWindow.HelpAbout, WpfTranslationCatalog, Settings-/UI-/Browser-Lokalisierung |
 
 Die `IPlatform*`-Verträge haben derzeit keine entsprechenden Adapterimplementierungen. UI-unabhängige Schleifen bestehen neben weiterer Orchestrierung in den MainWindow-Dateien.
 
