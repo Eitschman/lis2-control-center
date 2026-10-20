@@ -5,6 +5,10 @@ namespace LIS2.App.Avalonia;
 
 public partial class MainWindow
 {
+    private sealed record VariableRow(string Key, string Label)
+    {
+        public override string ToString() => Label + "  [" + Key + "]";
+    }
     private string? _chosenPageVariable;
     private readonly HashSet<string> _favoritePageVariables = new(StringComparer.OrdinalIgnoreCase);
 
@@ -63,6 +67,7 @@ public partial class MainWindow
             ItemsSource = new[] { "All", "Favorites", "Home Assistant", "Hardware", "Clock", "Media / Other" },
             SelectedIndex = 0, MinWidth = 150
         };
+        var entityPicker = new ComboBox { MinWidth = 160 };
         var results = new ListBox { MinHeight = 240 };
         var count = new TextBlock();
         var details = new TextBlock { TextWrapping = Avalonia.Media.TextWrapping.Wrap };
@@ -71,10 +76,11 @@ public partial class MainWindow
         var insert2 = new Button { Content = "Insert into line 2" };
         var close = new Button { Content = "Close" };
         var refresh = new Button { Content = "Refresh values" };
-        var layout = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto,Auto,Auto"), RowSpacing = 10, Margin = new Avalonia.Thickness(16) };
+        var layout = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto,Auto,Auto,Auto"), RowSpacing = 10, Margin = new Avalonia.Thickness(16) };
         var filters = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         filters.Children.Add(search);
         filters.Children.Add(category);
+        filters.Children.Add(entityPicker);
         Grid.SetRow(filters, 0); layout.Children.Add(filters);
         Grid.SetRow(count, 1); layout.Children.Add(count);
         Grid.SetRow(results, 2); layout.Children.Add(results);
@@ -85,7 +91,17 @@ public partial class MainWindow
         Grid.SetRow(actions, 5); layout.Children.Add(actions);
         dialog.Content = layout;
 
-        string? Selected() => results.SelectedItem as string;
+        var friendlyNames = _pageSources.HomeAssistant.Entities.ToDictionary(e => e.EntityId, e => e.FriendlyName, StringComparer.OrdinalIgnoreCase);
+        string? Selected() => (results.SelectedItem as VariableRow)?.Key;
+        void RefreshEntities()
+        {
+            var old = entityPicker.SelectedItem as string;
+            var entities = new[] { "All entities" }.Concat(keys.Where(key => PageVariableBrowserCatalog.Category(key) == "Home Assistant")
+                .Select(PageVariableBrowserCatalog.Entity).Where(entity => entity.Length > 0)
+                .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(entity => entity, StringComparer.OrdinalIgnoreCase)).ToArray();
+            entityPicker.ItemsSource = entities;
+            entityPicker.SelectedItem = old is not null && entities.Contains(old) ? old : "All entities";
+        }
         void UpdateDetails()
         {
             var key = Selected();
@@ -99,21 +115,31 @@ public partial class MainWindow
         void Filter()
         {
             var selected = Selected();
-            var filtered = PageVariableBrowserCatalog.Search(keys, search.Text, category.SelectedItem as string,
+            var terms = (search.Text ?? "").Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            var matching = keys.Where(key => terms.All(term =>
+                key.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                PageVariableBrowserCatalog.Label(key, friendlyNames).Contains(term, StringComparison.OrdinalIgnoreCase)));
+            var entity = entityPicker.SelectedItem as string;
+            if (!string.IsNullOrEmpty(entity) && entity != "All entities")
+                matching = matching.Where(key => string.Equals(PageVariableBrowserCatalog.Entity(key), entity, StringComparison.OrdinalIgnoreCase));
+            var filtered = PageVariableBrowserCatalog.Search(matching, null, category.SelectedItem as string,
                 _favoritePageVariables);
-            results.ItemsSource = filtered;
-            results.SelectedItem = selected is not null && filtered.Contains(selected) ? selected : filtered.FirstOrDefault();
-            count.Text = $"{filtered.Count} shown (maximum 50) of {keys.Length} available variables";
+            var rows = filtered.Select(key => new VariableRow(key, PageVariableBrowserCatalog.Label(key, friendlyNames))).ToArray();
+            results.ItemsSource = rows;
+            results.SelectedItem = rows.FirstOrDefault(row => string.Equals(row.Key, selected, StringComparison.OrdinalIgnoreCase)) ?? rows.FirstOrDefault();
+            count.Text = $"{rows.Length} shown (maximum 50) of {keys.Length} available variables";
             UpdateDetails();
         }
         search.TextChanged += (_, _) => Filter();
         category.SelectionChanged += (_, _) => Filter();
+        entityPicker.SelectionChanged += (_, _) => Filter();
         results.SelectionChanged += (_, _) => UpdateDetails();
         favorite.Click += (_, _) =>
         {
             if (Selected() is not { } key) return;
             if (!_favoritePageVariables.Add(key)) _favoritePageVariables.Remove(key);
             Filter();
+            _ = SavePortableWorkspaceAsync();
         };
         insert1.Click += (_, _) => { if (Selected() is { } key) { InsertSelectedPageVariable("PageLine1", key); dialog.Close(); } };
         insert2.Click += (_, _) => { if (Selected() is { } key) { InsertSelectedPageVariable("PageLine2", key); dialog.Close(); } };
@@ -121,10 +147,15 @@ public partial class MainWindow
         {
             snapshot = PagePreviewValues();
             keys = snapshot.Keys.ToArray();
+            friendlyNames = _pageSources.HomeAssistant.Entities.ToDictionary(e => e.EntityId, e => e.FriendlyName, StringComparer.OrdinalIgnoreCase);
+            RefreshEntities();
             Filter();
         };
         close.Click += (_, _) => dialog.Close();
+        RefreshEntities();
         Filter();
+        if (insertTarget is "PageLine1" or "PageLine2")
+            details.Text = "Select a variable, then insert it into the requested line.";
         await dialog.ShowDialog(this);
     }
 }
