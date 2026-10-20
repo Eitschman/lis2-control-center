@@ -294,4 +294,56 @@ public sealed class PageSequenceControllerTests
         Assert.Equal(new[] { "OLD", "NEW" }, writes);
         Assert.Equal(0, clears);
     }
+
+    [Fact]
+    public async Task IndependentVirtualAndSerialSequencesBothAcceptEditedWorkspace()
+    {
+        var virtualWrites = new List<string>();
+        var serialWrites = new List<string>();
+        var virtualSequence = new PageSequenceController(
+            (frame, _) => { virtualWrites.Add(frame.Line1.TrimEnd()); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        var serialSequence = new PageSequenceController(
+            (frame, _) => { serialWrites.Add(frame.Line1.TrimEnd()); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        var workspace = new PageWorkspace();
+        workspace.Add().Line1Template = "BEFORE";
+        var values = new Dictionary<string, object?>();
+        var now = DateTimeOffset.UnixEpoch;
+        Assert.True(virtualSequence.Start(workspace.Pages));
+        Assert.True(serialSequence.Start(workspace.Pages));
+        await virtualSequence.TickAsync(now, values);
+        await serialSequence.TickAsync(now, values);
+        workspace.Get(0).Line1Template = "AFTER";
+        Assert.True(await virtualSequence.ReloadAsync(workspace.Pages));
+        Assert.True(await serialSequence.ReloadAsync(workspace.Pages));
+        await virtualSequence.TickAsync(now.AddMilliseconds(1), values);
+        await serialSequence.TickAsync(now.AddMilliseconds(1), values);
+        Assert.Equal(new[] { "BEFORE", "AFTER" }, virtualWrites);
+        Assert.Equal(new[] { "BEFORE", "AFTER" }, serialWrites);
+        Assert.True(virtualSequence.IsRunning);
+        Assert.True(serialSequence.IsRunning);
+    }
+
+    [Fact]
+    public async Task ReloadingOneTransportDoesNotRestartOrAlterOtherTransport()
+    {
+        var serialWrites = 0;
+        var virtualSequence = new PageSequenceController(
+            (_, _) => Task.CompletedTask, _ => Task.CompletedTask);
+        var serialSequence = new PageSequenceController(
+            (_, _) => { serialWrites++; return Task.CompletedTask; }, _ => Task.CompletedTask);
+        var original = new[] { new PageDefinition { Id = "old", Line1Template = "OLD" } };
+        var replacement = new[] { new PageDefinition { Id = "new", Line1Template = "NEW" } };
+        Assert.True(virtualSequence.Start(original));
+        Assert.True(serialSequence.Start(original));
+        var now = DateTimeOffset.UnixEpoch;
+        var values = new Dictionary<string, object?>();
+        await serialSequence.TickAsync(now, values);
+        Assert.True(await virtualSequence.ReloadAsync(replacement));
+        Assert.Equal("old", serialSequence.CurrentPageId);
+        Assert.False(await serialSequence.TickAsync(now.AddMilliseconds(1), values));
+        Assert.Equal(1, serialWrites);
+        Assert.True(serialSequence.IsRunning);
+    }
 }
