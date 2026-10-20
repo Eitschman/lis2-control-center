@@ -346,4 +346,49 @@ public sealed class PageSequenceControllerTests
         Assert.Equal(1, serialWrites);
         Assert.True(serialSequence.IsRunning);
     }
+
+    [Fact]
+    public async Task ManualCommandRunsOnlyAfterScheduledWriteHasDrained()
+    {
+        var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var operations = new List<string>();
+        var runtime = new PageSequenceController(
+            async (_, _) =>
+            {
+                operations.Add("playback-start");
+                entered.TrySetResult(true);
+                await release.Task;
+                operations.Add("playback-end");
+            },
+            _ => Task.CompletedTask);
+        Assert.True(runtime.Start([new PageDefinition { Line1Template = "PAGE" }]));
+        var pending = runtime.TickAsync(DateTimeOffset.UnixEpoch, new Dictionary<string, object?>());
+        await entered.Task;
+        runtime.Stop();
+        var manual = Task.Run(async () =>
+        {
+            await runtime.StopAndDrainAsync();
+            operations.Add("manual");
+        });
+        Assert.False(manual.IsCompleted);
+        release.TrySetResult(true);
+        await Task.WhenAll(pending, manual);
+        Assert.Equal(new[] { "playback-start", "playback-end", "manual" }, operations);
+        Assert.False(runtime.IsRunning);
+    }
+
+    [Fact]
+    public async Task FailedScheduledWriteCanBeDrainedBeforeManualRecovery()
+    {
+        var runtime = new PageSequenceController(
+            (_, _) => throw new IOException("Simulated disconnected transport"),
+            _ => Task.CompletedTask);
+        Assert.True(runtime.Start([new PageDefinition { Line1Template = "PAGE" }]));
+        await Assert.ThrowsAsync<IOException>(() =>
+            runtime.TickAsync(DateTimeOffset.UnixEpoch, new Dictionary<string, object?>()));
+        await runtime.StopAndDrainAsync();
+        Assert.False(runtime.IsRunning);
+        Assert.False(runtime.IsBusy);
+    }
 }
