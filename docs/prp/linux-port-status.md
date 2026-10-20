@@ -1,7 +1,8 @@
 # Avalonia-Portierung: aktueller Arbeitsstand
 
 Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-03. Aktueller GitHub-Nachweis wird nach dem Push ergänzt.
+Implementierungsstand: PORT-03.
+Geprüfter Code-Commit: `e79ca0b2082b903979b2536dfdedbe19e5e1cb82`.
 
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
@@ -16,9 +17,11 @@ Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 - Nativer Windows-Desktopprozess: Exit 0; zehn Views, Hilfe/About, sichtbarer Fehler einer fehlenden GSMTC-DLL, Diagnosebericht und Shutdown-Drain. Ergebnisse unter `TestResults/native-smoke-checked`. Isolierte Stores und virtuelles Gerät; keine produktiven Quellen gestartet.
 - Display: 48/48, Exit 0 (`port03-display.trx`, `-m:1 --environment DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1`). Der vorhandene Test `Render_FormatsNumberPercentBytesAndAffixes` erwartet einen Dezimalpunkt; die Produktimplementierung folgt `CurrentCulture`. Dieser Kulturkonflikt bleibt in PORT-06 offen. Der lokale MSBuild-Mehrknotenlauf brach mit MSB4166 ab; der Einzelknotenlauf besteht.
 
-Diagnose, Hilfe/About und Medienfehler wurden gerendert und angesehen. Die Fehleranzeige verwendet Textumbruch und eine rote Markierung. Screenshots liegen unter `TestResults/screenshots/port03-*.png` und im nativen Smoke-Verzeichnis. Die Geräte-UI-Tests aus PORT-02 prüfen zusätzlich Dashboard/Display/Settings bei 1305 × 893 und 950 × 600 Pixeln sowie Trennen per Tastatur. Ein automatisierter Bildvergleich besteht nicht.
+Diagnose, Hilfe/About und Medienfehler wurden unter Windows und Linux gerendert und angesehen. Die Linux-Ansichten stammen aus dem nativen X11-Smoke; die korrigierte Fehlermeldung benennt das fehlende playerctl mit Installationshinweis. Die Fehleranzeige verwendet Textumbruch und rote Schrift. Screenshots liegen unter `TestResults/screenshots/port03-*.png` und in den nativen Smoke-Artefakten. Die Geräte-UI-Tests aus PORT-02 prüfen zusätzlich Dashboard/Display/Settings bei 1305 × 893 und 950 × 600 Pixeln sowie Trennen per Tastatur. Ein automatisierter Bildvergleich besteht nicht.
 
-Der Workflow enthält einen nativen Windows-Smoke und Linux-X11-Smoke über Xvfb, jeweils mit Zeitlimit und Artefakten. Aktuelle CI-Ergebnisse sind bis zum abgeschlossenen Lauf offen. WPF wird durch diesen Workflow nicht geprüft.
+[CI 39450880634](https://github.com/Eitschman/lis2-control-center/actions/runs/39450880634) prüft den angegebenen Code-Commit mit .NET 8. Alle sieben Jobs sind erfolgreich: je OS 333/333 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests sowie die drei Pakete `win-x64`, `linux-x64` und `linux-arm64`. Windows-Desktop-Smoke und Linux-X11-Smoke über Xvfb bestehen einschließlich Prozessende mit Exit 0. Beide verwenden Zeitlimits und isolierte Stores ohne physisches LIS2.
+
+Artefakte: `Avalonia-device-views-Windows`/`Linux`, `Avalonia-desktop-smoke-Windows`/`Linux` sowie drei `LIS2-Avalonia-*`-Pakete. Die Desktop-Smokes enthalten je 13 gerenderte Ansichten, Diagnose vor/nach Shutdown und `result.txt`. WPF wird durch diesen Workflow nicht geprüft. Nachfolgende reine Dokumentationscommits ändern den hier geprüften Code nicht; der verlinkte Lauf gehört ausdrücklich zum angegebenen Commit.
 
 ## Implementierung nach Codebefund
 

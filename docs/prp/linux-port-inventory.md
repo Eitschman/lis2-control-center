@@ -89,6 +89,8 @@ Avalonia-Testgruppen:
 
 `DeviceUiTests` startet zusätzlich das tatsächliche Fenster mit isolierten Stores und simuliertem seriellen Transport über Avalonia.Headless.XUnit und Skia. Geprüft werden Geräte-Buttons, Einstellungen/Import, manuelle Lüfter, Transportwechsel und Trennen per Tastatur. Dashboard, Display und Settings werden in Normal-/Mindestgröße gerendert. Hintergrundquellen sind in dieser Fixture ausdrücklich abgeschaltet. Paketstart, echter Desktop-/Tray-Lebenszyklus, DBus-/HA-/Player-/Sensorintegration und physische LIS2-Ausgabe sind damit nicht abgedeckt. Aktueller CI-Nachweis und Grenzen stehen im [Status](linux-port-status.md).
 
+`RuntimeHardeningTests` und der native Desktop-Smoke ergänzen zehn Views, Hilfe/About, fehlende Medienanbieter, Diagnose und Shutdown. CI startet echte Windows- und Linux-X11-Prozesse. Der Tray-Menüpfad, OS-Abmeldung, native Dateiauswahl, Livequellen und extrahierte Pakete sind damit nicht nachgewiesen; beide Smokes verwenden ein virtuelles Gerät.
+
 ## Referenzen
 
 Die WPF-Referenz bleibt in `src/LIS2.App`, einschließlich MainWindow, UI-Regression, HelpWindow, AboutWindow, Themes, SettingsStore und Plattformdiensten. Das [Paritätsaudit](wpf-avalonia-parity-audit.md) enthält das quellengeprüfte Inventar der 126 benannten WPF-Tab-Controls und 71 tabbezogenen XAML-Handlerverwendungen sowie den aktuellen Avalonia-Abgleich.
