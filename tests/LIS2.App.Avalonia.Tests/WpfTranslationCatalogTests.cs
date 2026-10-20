@@ -33,6 +33,18 @@ public class WpfTranslationCatalogTests
         Assert.Equal(original, WpfTranslationCatalog.Translate(original, "en"));
     }
 
+    [Theory]
+    [InlineData("de", "Übersicht")]
+    [InlineData("fr", "Tableau de bord")]
+    [InlineData("tr", "Genel Bakış")]
+    [InlineData("ru", "Обзор")]
+    public void TranslatedLabelsCanReturnToEnglish(string language, string translated)
+    {
+        Assert.Equal("Dashboard", WpfTranslationCatalog.FindEnglishSource(translated));
+        Assert.Equal("Dashboard", WpfTranslationCatalog.Translate(translated, "en"));
+        Assert.Equal(translated, WpfTranslationCatalog.Translate("Dashboard", language));
+    }
+
     [Fact]
     public void WpfPrefixPreservesDecorativeMarkers()
         => Assert.Equal("• Übersicht", WpfTranslationCatalog.Translate("• Dashboard", "de"));
