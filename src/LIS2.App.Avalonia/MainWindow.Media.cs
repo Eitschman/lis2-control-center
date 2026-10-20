@@ -25,11 +25,11 @@ public partial class MainWindow
         _mediaTimer.Tick += (_, _) => RefreshMedia();
         _mediaTimer.Start();
         this.FindControl<Button>("WindowsMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("WindowsMedia", "Windows Media Player");
-        this.FindControl<Button>("WinampMediaPage")!.Click += (_, _) =>
-            CreateMediaPage("Winamp", "Winamp");
-        this.FindControl<Button>("LinuxMediaPage")!.Click += (_, _) => CreateMediaPage("Media", "Linux media");
-        this.FindControl<Button>("WmpLegacyMediaPage")!.Click += (_, _) =>
-            CreateMediaPage("WmpLegacy", "Windows Media Player Legacy");
+        this.FindControl<Button>("WinampMediaPage")!.Click += async (_, _) =>
+            await CreateMediaPageAsync("Winamp", "Winamp");
+        this.FindControl<Button>("LinuxMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("Media", "Linux media");
+        this.FindControl<Button>("WmpLegacyMediaPage")!.Click += async (_, _) =>
+            await CreateMediaPageAsync("WmpLegacy", "Windows Media Player Legacy");
         _ = StartMediaAsync();
     }
 
