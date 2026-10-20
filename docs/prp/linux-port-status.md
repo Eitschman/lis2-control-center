@@ -669,3 +669,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - After confirmed green CI for animated preview fix 757eaf7, paused the editor preview timer when navigating away from Pages and resumed it when returning. This avoids background UI updates while keeping draft state independent of running playback.
 - Added headless coverage for changing runtime template values, independent scrolling on both display lines, and non-scrolling short text. No WPF code or physical fan/serial behavior changed.
 - Commits 7a7b823, 82580f3, c310317. Latest HEAD CI and owner Windows/Linux desktop acceptance pending; this is not full ten-view parity sign-off.
+
+
+## Pages editor preview refresh-cadence parity (2026-10-20)
+- Editor preview now uses the editable page refresh interval rather than a hardcoded 250 ms. The same PagePlayback engine handles template updates and scrolling independently, as in live playback.
+- Reconfiguring an identical draft is now a no-op to avoid unnecessarily resetting the scroller. Changed draft settings still reset the isolated preview; no persisted page or live sequence is modified.
+- Added tests for delayed source updates, unchanged-draft scroll continuity, and refresh-cadence changes; adjusted earlier live-value test to explicitly request 250 ms refresh.
+- Commits d733e89, b7b59ed, cd5ec3f. Latest CI pending; visual Windows/Linux sign-off remains pending.
