@@ -66,9 +66,12 @@ public partial class MainWindow
         };
         var search = new TextBox { Width = 275, MinWidth = 275, MaxWidth = 275,
             Watermark = BrowserText("Search variable keys (multiple words)…", "Variablen suchen (mehrere Wörter)…") };
+        var categoryKeys = new[] { "All", "Favorites", "Home Assistant", "Hardware", "Clock", "Media / Other" };
         var category = new ComboBox
         {
-            ItemsSource = new[] { "All", "Favorites", "Home Assistant", "Hardware", "Clock", "Media / Other" },
+            ItemsSource = CurrentUiLanguage() == "de"
+                ? new[] { "Alle", "Favoriten", "Home Assistant", "Hardware", "Uhrzeit", "Medien / Sonstige" }
+                : categoryKeys,
             SelectedIndex = 0, MinWidth = 150
         };
         var entityPicker = new ComboBox { MinWidth = 160 };
@@ -101,11 +104,12 @@ public partial class MainWindow
         void RefreshEntities()
         {
             var old = entityPicker.SelectedItem as string;
-            var entities = new[] { "All entities" }.Concat(keys.Where(key => PageVariableBrowserCatalog.Category(key) == "Home Assistant")
+            var allEntities = BrowserText("All entities", "Alle Entitäten");
+            var entities = new[] { allEntities }.Concat(keys.Where(key => PageVariableBrowserCatalog.Category(key) == "Home Assistant")
                 .Select(PageVariableBrowserCatalog.Entity).Where(entity => entity.Length > 0)
                 .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(entity => entity, StringComparer.OrdinalIgnoreCase)).ToArray();
             entityPicker.ItemsSource = entities;
-            entityPicker.SelectedItem = old is not null && entities.Contains(old) ? old : "All entities";
+            entityPicker.SelectedItem = old is not null && entities.Contains(old) ? old : allEntities;
         }
         void UpdateDetails()
         {
@@ -127,9 +131,9 @@ public partial class MainWindow
                 key.Contains(term, StringComparison.OrdinalIgnoreCase) ||
                 PageVariableBrowserCatalog.Label(key, friendlyNames).Contains(term, StringComparison.OrdinalIgnoreCase)));
             var entity = entityPicker.SelectedItem as string;
-            if (!string.IsNullOrEmpty(entity) && entity != "All entities")
+            if (!string.IsNullOrEmpty(entity) && entity != BrowserText("All entities", "Alle Entitäten"))
                 matching = matching.Where(key => string.Equals(PageVariableBrowserCatalog.Entity(key), entity, StringComparison.OrdinalIgnoreCase));
-            var filtered = PageVariableBrowserCatalog.Search(matching, null, category.SelectedItem as string,
+            var filtered = PageVariableBrowserCatalog.Search(matching, null, categoryKeys[Math.Clamp(category.SelectedIndex, 0, categoryKeys.Length - 1)],
                 _favoritePageVariables);
             var rows = filtered.Select(key => new VariableRow(key, PageVariableBrowserCatalog.Label(key, friendlyNames))).ToArray();
             results.ItemsSource = rows;
