@@ -602,3 +602,7 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Reverse lookup of translated WPF strings now uses a one-time indexed catalog rather than nested scans of all language dictionaries for each control on every navigation/language switch. Existing Avalonia navigation aliases take precedence; original English WPF catalog keys are preserved before reverse lookup to prevent accidental translation collisions.
 - Added tests for English-key stability and WPF translation roundtrips across German, French, Turkish and Russian. Changes: `fbf90de`, `f39fba8`. CI for this HEAD is pending; do not mark package accepted until Windows/Ubuntu jobs pass.
 - This is a localization reliability/performance increment, NOT completion of the ten-view WPF parity package. The latter still requires comprehensive source audit, functionality, integration tests and final owner desktop acceptance.
+
+## Startup transport selection guard (2026-10-20)
+- Avalonia window startup now connects the virtual LIS2 and starts virtual page playback only when the selected transport is Virtual. Previously the Opened handler unconditionally connected the simulator, even if Serial had been selected. Existing explicit Apply/reconnect behavior and physical fan authorization remain unchanged.
+- Commit `a5e7afc`; latest HEAD CI pending. This is a focused transport-safety correction, not completion of the full WPF ten-view parity package. Verify startup mode behavior in final desktop acceptance.
