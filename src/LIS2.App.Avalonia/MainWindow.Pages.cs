@@ -1,3 +1,4 @@
+using Avalonia.Threading;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using System.Globalization;
@@ -10,9 +11,14 @@ public partial class MainWindow
     private readonly DisplayRuntimeHost _runtime = new();
     private PageSourceValues _pageSources => _runtime.Sources;
     private bool _loadingPage;
+    private readonly PageEditorPreview _editorPreview = new();
+    private readonly DispatcherTimer _editorPreviewTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
+    private bool _editorPreviewConfigured;
 
     private void InitializePagesEditor()
     {
+        _editorPreviewTimer.Tick += (_, _) => TickEditorPreview();
+        Closed += (_, _) => _editorPreviewTimer.Stop();
         this.FindControl<ListBox>("PagesList")!.SelectionChanged += (_, _) => LoadPageEditor();
         this.FindControl<Button>("PageCreatePreset")!.Click += async (_, _) =>
         {
@@ -314,10 +320,25 @@ public partial class MainWindow
             && parsedStep > 0 ? parsedStep : original.ScrollStepMilliseconds;
         var pause = int.TryParse(pauseText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedPause)
             && parsedPause >= 0 ? parsedPause : original.ScrollEdgePauseMilliseconds;
-        var frame = PageEditorPreview.Render(line1, line2, overflow1, overflow2,
-            step, pause, PagePreviewValues());
+        _editorPreview.Configure(line1, line2, overflow1, overflow2, step, pause);
+        _editorPreviewConfigured = true;
+        TickEditorPreview();
+        if (!_editorPreviewTimer.IsEnabled) _editorPreviewTimer.Start();
+    }
+
+    private void TickEditorPreview()
+    {
+        if (!_editorPreviewConfigured || _loadingPage || SelectedPageIndex is null)
+        {
+            _editorPreviewTimer.Stop();
+            return;
+        }
+        var frame = _editorPreview.Tick(DateTimeOffset.UtcNow, PagePreviewValues());
         this.FindControl<TextBlock>("PagePreview1")!.Text = frame.Line1;
         this.FindControl<TextBlock>("PagePreview2")!.Text = frame.Line2;
+        var delay = _editorPreview.NextDelay;
+        _editorPreviewTimer.Interval = delay < TimeSpan.FromMilliseconds(20)
+            ? TimeSpan.FromMilliseconds(20) : delay;
     }
 
     private bool SavePageEditor()
