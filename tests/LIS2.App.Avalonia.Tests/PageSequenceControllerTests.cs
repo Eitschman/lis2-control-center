@@ -226,4 +226,72 @@ public sealed class PageSequenceControllerTests
         await loop.StopAndDrainAsync();
         Assert.True(Volatile.Read(ref attempts) > 1);
     }
+
+    [Fact]
+    public async Task ReloadWithUnchangedFrameDoesNotRepeatDeviceWrite()
+    {
+        var writes = 0;
+        var runtime = new PageSequenceController(
+            (_, _) => { writes++; return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        var pages = new[] { new PageDefinition { Id = "same", Line1Template = "SAME" } };
+        Assert.True(runtime.Start(pages));
+        var values = new Dictionary<string, object?>();
+        Assert.True(await runtime.TickAsync(DateTimeOffset.UnixEpoch, values));
+        Assert.True(await runtime.ReloadAsync(pages));
+        Assert.False(await runtime.TickAsync(DateTimeOffset.UnixEpoch.AddMilliseconds(1), values));
+        Assert.Equal(1, writes);
+    }
+
+    [Fact]
+    public async Task ReloadToEmptyScheduleClearsPreviouslyDisplayedFrameExactlyOnce()
+    {
+        var writes = 0;
+        var clears = 0;
+        var runtime = new PageSequenceController(
+            (_, _) => { writes++; return Task.CompletedTask; },
+            _ => { clears++; return Task.CompletedTask; });
+        Assert.True(runtime.Start([new PageDefinition { Line1Template = "OLD" }]));
+        var values = new Dictionary<string, object?>();
+        Assert.True(await runtime.TickAsync(DateTimeOffset.UnixEpoch, values));
+        Assert.True(await runtime.ReloadAsync(Array.Empty<PageDefinition>()));
+        Assert.True(await runtime.TickAsync(DateTimeOffset.UnixEpoch.AddMilliseconds(1), values));
+        Assert.False(await runtime.TickAsync(DateTimeOffset.UnixEpoch.AddMilliseconds(2), values));
+        Assert.Equal(1, writes);
+        Assert.Equal(1, clears);
+    }
+
+    [Fact]
+    public async Task ReloadToDisabledPagesClearsOldFrame()
+    {
+        var clears = 0;
+        var runtime = new PageSequenceController(
+            (_, _) => Task.CompletedTask,
+            _ => { clears++; return Task.CompletedTask; });
+        Assert.True(runtime.Start([new PageDefinition { Line1Template = "VISIBLE" }]));
+        var values = new Dictionary<string, object?>();
+        await runtime.TickAsync(DateTimeOffset.UnixEpoch, values);
+        Assert.True(await runtime.ReloadAsync([
+            new PageDefinition { Line1Template = "HIDDEN", Enabled = false }
+        ]));
+        Assert.True(await runtime.TickAsync(DateTimeOffset.UnixEpoch.AddMilliseconds(1), values));
+        Assert.Equal(1, clears);
+    }
+
+    [Fact]
+    public async Task ReloadToDifferentFrameWritesNewFrameWithoutClearingFirst()
+    {
+        var writes = new List<string>();
+        var clears = 0;
+        var runtime = new PageSequenceController(
+            (frame, _) => { writes.Add(frame.Line1.TrimEnd()); return Task.CompletedTask; },
+            _ => { clears++; return Task.CompletedTask; });
+        Assert.True(runtime.Start([new PageDefinition { Line1Template = "OLD" }]));
+        var values = new Dictionary<string, object?>();
+        await runtime.TickAsync(DateTimeOffset.UnixEpoch, values);
+        Assert.True(await runtime.ReloadAsync([new PageDefinition { Line1Template = "NEW" }]));
+        Assert.True(await runtime.TickAsync(DateTimeOffset.UnixEpoch.AddMilliseconds(1), values));
+        Assert.Equal(new[] { "OLD", "NEW" }, writes);
+        Assert.Equal(0, clears);
+    }
 }
