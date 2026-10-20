@@ -119,4 +119,45 @@ public sealed class PageSourceValuesTests
         Assert.Equal("Track B".PadRight(20), frame.Line1);
         Assert.Equal("Artist B".PadRight(20), frame.Line2);
     }
+
+    [Fact]
+    public async Task DisconnectedMediaSnapshotCannotKeepOldSongVisible()
+    {
+        await using var sources = new PageSourceValues();
+        sources.UpdateMedia("Winamp", new Dictionary<string, object?>
+        {
+            ["Connected"] = true, ["Title"] = "Playing"
+        });
+        sources.UpdateMedia("Winamp", new Dictionary<string, object?>
+        {
+            ["Connected"] = false, ["Title"] = "Stale cached song", ["Artist"] = "Stale artist"
+        });
+        var snapshot = sources.Snapshot(DateTimeOffset.UnixEpoch);
+        Assert.Equal(false, snapshot["Winamp.Connected"]);
+        Assert.False(snapshot.ContainsKey("Winamp.Title"));
+        Assert.False(snapshot.ContainsKey("Winamp.Artist"));
+        sources.UpdateMedia("Winamp", new Dictionary<string, object?>
+        {
+            ["Connected"] = true, ["Title"] = "Fresh song"
+        });
+        Assert.Equal("Fresh song", sources.Snapshot(DateTimeOffset.UnixEpoch)["Winamp.Title"]);
+    }
+
+    [Fact]
+    public async Task DisconnectedMediaProviderDoesNotEraseOtherProvider()
+    {
+        await using var sources = new PageSourceValues();
+        sources.UpdateMedia("Media", new Dictionary<string, object?>
+        {
+            ["Connected"] = true, ["Title"] = "Linux track"
+        });
+        sources.UpdateMedia("WindowsMedia", new Dictionary<string, object?>
+        {
+            ["Connected"] = false, ["Title"] = "Old Windows track"
+        });
+        var snapshot = sources.Snapshot(DateTimeOffset.UnixEpoch);
+        Assert.Equal("Linux track", snapshot["Media.Title"]);
+        Assert.False(snapshot.ContainsKey("WindowsMedia.Title"));
+        Assert.Equal(false, snapshot["WindowsMedia.Connected"]);
+    }
 }
