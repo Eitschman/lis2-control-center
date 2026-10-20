@@ -610,3 +610,7 @@ Implemented initial cross-screen package: common light shell/white card styling,
 ## Hardware browser: language-independent sensor filters (2026-10-20)
 - Fixed Hardware sensor type filtering: the selected ComboBox item's translated label was previously passed directly to the English-only HardwareSensorCatalog.MatchesType, causing non-English UI selections to return incorrect or empty results. Filtering now maps the stable selected option index to canonical English filter keys while preserving all localized labels.
 - Added parameterized tests covering all twelve filter choices and a sensor-result regression for Temperature, Load and All types. Commits `c4217f8`, `a47daec`. Current HEAD CI pending; Windows/Linux runtime and complete WPF UI parity are not yet signed off.
+
+## Hardware templates: formatted sensor references and offline tracking (2026-10-20)
+- HardwareSensorCatalog.ExtractTrackedKeys now removes template format specifiers such as `:F1` or `:0` before recording hardware keys. Previously formatted page placeholders could be tracked as invalid sensor IDs, hiding the actual disconnected sensor in the Hardware browser.
+- Added regression test for mixed formatted/unformatted references, deduplication, unrelated Home Assistant placeholders, and offline/unavailable sensor entries. Commits `8f2a03a`, `f0f4b37`; HEAD CI pending. This is a bounded template/browser integration fix, not complete WPF hardware or UI parity.
