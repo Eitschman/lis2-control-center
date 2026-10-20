@@ -57,7 +57,9 @@ public sealed class PageSequenceController
         {
             if (!IsRunning) return false;
             _playback.Reload(snapshot);
-            _dispatcher = new PageFrameDispatcher(_write, _clear);
+            // Preserve the output dispatcher across schedule reloads. It remembers
+            // the actual device frame, so an unchanged page is not written twice
+            // and removing every visible page still clears the previous frame.
             NextDelay = TimeSpan.FromMilliseconds(1);
             return true;
         }
