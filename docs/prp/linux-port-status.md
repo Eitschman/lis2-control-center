@@ -606,3 +606,7 @@ Implemented initial cross-screen package: common light shell/white card styling,
 ## Startup transport selection guard (2026-10-20)
 - Avalonia window startup now connects the virtual LIS2 and starts virtual page playback only when the selected transport is Virtual. Previously the Opened handler unconditionally connected the simulator, even if Serial had been selected. Existing explicit Apply/reconnect behavior and physical fan authorization remain unchanged.
 - Commit `a5e7afc`; latest HEAD CI pending. This is a focused transport-safety correction, not completion of the full WPF ten-view parity package. Verify startup mode behavior in final desktop acceptance.
+
+## Hardware browser: language-independent sensor filters (2026-10-20)
+- Fixed Hardware sensor type filtering: the selected ComboBox item's translated label was previously passed directly to the English-only HardwareSensorCatalog.MatchesType, causing non-English UI selections to return incorrect or empty results. Filtering now maps the stable selected option index to canonical English filter keys while preserving all localized labels.
+- Added parameterized tests covering all twelve filter choices and a sensor-result regression for Temperature, Load and All types. Commits `c4217f8`, `a47daec`. Current HEAD CI pending; Windows/Linux runtime and complete WPF UI parity are not yet signed off.
