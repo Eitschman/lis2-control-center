@@ -77,6 +77,10 @@ public static class HardwareSensorCatalog
                 var close = template.IndexOf('}', open + 1);
                 if (close < 0) break;
                 var token = template.Substring(open + 1, close - open - 1).Trim();
+                // Template format specifiers are not part of the sensor key.
+                // Keep the original key for unavailable-sensor tracking.
+                var formatSeparator = token.IndexOf(':');
+                if (formatSeparator >= 0) token = token[..formatSeparator].Trim();
                 if (IsSensorKey(token)) keys.Add(token);
                 offset = close + 1;
             }
