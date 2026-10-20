@@ -168,4 +168,34 @@ public sealed class PageWorkspaceTests
         target.ImportJson(source.ExportJson());
         Assert.Equal(mode, target.Get(0).Line1OverflowMode);
     }
+
+    [Theory]
+    [InlineData(99, 300, 900)]
+    [InlineData(60001, 300, 900)]
+    [InlineData(1000, 0, 900)]
+    [InlineData(1000, 300, -1)]
+    public void InvalidTimingImportIsAtomic(int refresh, int step, int pause)
+    {
+        var source = new PageWorkspace();
+        var page = source.Add();
+        page.RefreshIntervalMilliseconds = refresh;
+        page.ScrollStepMilliseconds = step;
+        page.ScrollEdgePauseMilliseconds = pause;
+        var target = new PageWorkspace();
+        var original = target.Add();
+        Assert.Throws<InvalidOperationException>(() => target.ImportJson(source.ExportJson()));
+        Assert.Equal(original.Id, Assert.Single(target.Pages).Id);
+    }
+
+    [Fact]
+    public void DuplicateIdentifiersAreCaseInsensitiveAndImportIsAtomic()
+    {
+        var source = new PageWorkspace();
+        source.Add().Id = "Same";
+        source.Add().Id = "same";
+        var target = new PageWorkspace();
+        var original = target.Add();
+        Assert.Throws<InvalidOperationException>(() => target.ImportJson(source.ExportJson()));
+        Assert.Equal(original.Id, Assert.Single(target.Pages).Id);
+    }
 }
