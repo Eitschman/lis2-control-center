@@ -2,7 +2,7 @@
 
 Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
 Implementierungsstand: PORT-03.
-Geprüfter Code-Commit: `e79ca0b2082b903979b2536dfdedbe19e5e1cb82`.
+Geprüfter Code-Commit: `d2d2defdf4d92d0f868daca47ef8ab4bdc402e5e`.
 
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
@@ -20,13 +20,13 @@ Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 
 Diagnose, Hilfe/About und Medienfehler wurden unter Windows und Linux gerendert und angesehen. Die Linux-Ansichten stammen aus dem nativen X11-Smoke; die korrigierte Fehlermeldung benennt das fehlende playerctl mit Installationshinweis. Die Fehleranzeige verwendet Textumbruch und rote Schrift. Screenshots liegen unter `TestResults/screenshots/port03-*.png` und in den nativen Smoke-Artefakten. Die Geräte-UI-Tests aus PORT-02 prüfen zusätzlich Dashboard/Display/Settings bei 1305 × 893 und 950 × 600 Pixeln sowie Trennen per Tastatur. Ein automatisierter Bildvergleich besteht nicht.
 
-[CI 39450880634](https://github.com/Eitschman/lis2-control-center/actions/runs/39450880634) prüft den angegebenen Code-Commit mit .NET 8. Alle sieben Jobs sind erfolgreich: je OS 333/333 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests sowie die drei Pakete `win-x64`, `linux-x64` und `linux-arm64`. Windows-Desktop-Smoke und Linux-X11-Smoke über Xvfb bestehen einschließlich Prozessende mit Exit 0. Beide verwenden Zeitlimits und isolierte Stores ohne physisches LIS2.
+[CI 39455194970](https://github.com/Eitschman/lis2-control-center/actions/runs/39455194970) prüft den angegebenen Code-Commit mit .NET 8. Alle sieben Jobs sind erfolgreich: je OS 345/345 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests sowie die drei Pakete `win-x64`, `linux-x64` und `linux-arm64`. Windows-Desktop-Smoke und Linux-X11-Smoke über Xvfb bestehen einschließlich Prozessende mit Exit 0. Beide verwenden Zeitlimits und isolierte Stores ohne physisches LIS2.
 
 Artefakte: `Avalonia-device-views-Windows`/`Linux`, `Avalonia-desktop-smoke-Windows`/`Linux` sowie drei `LIS2-Avalonia-*`-Pakete. Die Desktop-Smokes enthalten je 13 gerenderte Ansichten, Diagnose vor/nach Shutdown und `result.txt`. WPF wird durch diesen Workflow nicht geprüft. Nachfolgende reine Dokumentationscommits ändern den hier geprüften Code nicht; der verlinkte Lauf gehört ausdrücklich zum angegebenen Commit.
 
 ## Implementierung nach Codebefund
 
-Lokalisierte Hilfedialoge wurden unter Windows mit Skia bei 840 × 600 Pixeln gerendert und angesehen: Home Assistant in fünf Sprachen sowie Seitenhilfe auf Französisch und Lüfterhilfe auf Russisch. Überschriften und Absätze umbrechen; die Themenliste und Schließen bleiben sichtbar. Lange Inhalte werden vertikal gescrollt. Screenshots: `TestResults/screenshots/help-*.png`. Diese Prüfung verwendet isolierte Stores und ein virtuelles Gerät; sie ersetzt keine WPF-Inhaltstiefen- oder Hardwareabnahme.
+Lokalisierte Hilfedialoge wurden unter Windows mit Skia bei 840 × 600 Pixeln gerendert und angesehen: Home Assistant in fünf Sprachen sowie Seitenhilfe auf Französisch und Lüfterhilfe auf Russisch. Dieselben deutschen, französischen und russischen Ansichten wurden aus dem Linux-CI-Artefakt angesehen. Überschriften und Absätze umbrechen; die Themenliste und Schließen bleiben sichtbar. Lange Inhalte werden vertikal gescrollt. Screenshots: `TestResults/screenshots/help-*.png` und `Avalonia-device-views-Linux`. Diese Prüfung verwendet isolierte Stores und ein virtuelles Gerät; sie ersetzt keine WPF-Inhaltstiefen- oder Hardwareabnahme.
 
 | Bereich | Implementiert und geprüft | Grenze |
 | --- | --- | --- |
