@@ -70,6 +70,9 @@ public partial class MainWindow
 
     private async Task SavePagesAsync()
     {
+        // Export must reflect the currently edited page, not its previous
+        // persisted values. Invalid drafts stay in the editor for correction.
+        if (!CommitPendingPageEditor()) return;
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "Save page definitions",
@@ -95,6 +98,11 @@ public partial class MainWindow
         await using var stream = await files[0].OpenReadAsync();
         using var reader = new StreamReader(stream);
         var imported = await reader.ReadToEndAsync();
+        // Validate the file before touching either the workspace or its editor.
+        // PageWorkspace.ImportJson is transactional on invalid input.
+        var candidate = new PageWorkspace();
+        candidate.ImportJson(imported);
+        if (!CommitPendingPageEditor()) return;
         _pages.ImportJson(imported);
         RefreshPageList(_pages.Pages.Count > 0 ? 0 : -1);
         await ReloadRunningPagesAsync();
