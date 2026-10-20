@@ -34,15 +34,15 @@ public class WpfTranslationCatalogTests
     }
 
     [Theory]
-    [InlineData("de", "Übersicht")]
-    [InlineData("fr", "Tableau de bord")]
-    [InlineData("tr", "Genel Bakış")]
-    [InlineData("ru", "Обзор")]
-    public void TranslatedLabelsCanReturnToEnglish(string language, string translated)
+    [InlineData("de", "Übersicht", "Übersicht")]
+    [InlineData("fr", "Tableau de bord", "Tableau de bord")]
+    [InlineData("tr", "Genel Bakış", "Gösterge Paneli")]
+    [InlineData("ru", "Обзор", "Панель")]
+    public void TranslatedLabelsCanReturnToEnglish(string language, string translated, string wpfTranslation)
     {
         Assert.Equal("Dashboard", WpfTranslationCatalog.FindEnglishSource(translated));
         Assert.Equal("Dashboard", WpfTranslationCatalog.Translate(translated, "en"));
-        Assert.Equal(translated, WpfTranslationCatalog.Translate("Dashboard", language));
+        Assert.Equal(wpfTranslation, WpfTranslationCatalog.Translate("Dashboard", language));
     }
 
     [Fact]
