@@ -2,6 +2,7 @@
 
 Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
 Implementierungsstand: PORT-01.
+Geprüfter Code-Commit: `f372ed0dd94d3ab6e18aaae4d788cedafc7177b2`.
 
 Diese Datei beschreibt den aktuellen Stand. Anforderungen stehen im [PRP](linux-avalonia-port.md), priorisierte Restarbeiten in [TODO](../../TODO.md), Plattform- und Projektgrenzen im [Inventar](linux-port-inventory.md).
 
@@ -13,7 +14,9 @@ Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 - Sieben Fälle in `PageWorkspaceActionsTests`: gültiger/abgewiesener Editorentwurf, persistierte neue Seite, virtuelle/serielle/beide/keine laufende Sequenz, leere Workspace-Wiederherstellung und transaktionale Ablehnung ungültiger gespeicherter Seiten.
 - Gegenprobe ohne Entwurfsschutz und mit ignorierter leerer Liste: sechs fehlgeschlagene Tests. Isolierte Gegenprobe ohne Sequenz-Reload: drei fehlgeschlagene Tests für die aktiven Transportkombinationen. Regulären Code wiederhergestellt und gesamte Testsuite erfolgreich ausgeführt.
 
-Der CI-Lauf für dieses Paket steht noch aus. Die vorhandene Branch-CI prüft Windows/Ubuntu mit .NET 8 und drei Pakete. Die Avalonia-Tests prüfen Headless-Klassen einschließlich des gemeinsamen Aktionsablaufs mit echten Sequenzcontrollern und temporären Workspace-Dateien. Die konkreten GUI-Controls und Quellenhandler werden nicht durch Klicktests geprüft.
+[CI 39440198251](https://github.com/Eitschman/lis2-control-center/actions/runs/39440198251) prüft den genannten Code-Commit mit .NET 8. Alle sieben Jobs sind erfolgreich: Avalonia-Build/Tests und Core-/Display-/Fans-Tests jeweils auf Windows und Ubuntu sowie Veröffentlichung/Paketprüfung für `win-x64`, `linux-x64` und `linux-arm64`. Die Logs weisen je OS 55/55 Core-, 48/48 Display-, 12/12 Fans- und 304/304 Avalonia-Tests aus, ohne Fehler oder übersprungene Tests. Das sind 419 Testausführungen je OS, keine Coverage-Angabe.
+
+Die Avalonia-Tests prüfen Headless-Klassen einschließlich des gemeinsamen Aktionsablaufs mit echten Sequenzcontrollern und temporären Workspace-Dateien. Die konkreten GUI-Controls und Quellenhandler werden nicht durch Klicktests geprüft. Nachfolgende reine Dokumentationscommits ändern den hier geprüften Code nicht; der genannte Lauf bezieht sich auf den angegebenen Commit.
 
 Der Workflow startet keine Avalonia-Oberfläche. Die Paketprüfung kontrolliert Dateien und Größen; sie startet weder das extrahierte Programm noch ARM64 auf einem ARM64-System. WPF-Smoke-/Screenshottests aus dem Windows-Workflow sind kein Avalonia-Nachweis.
 
@@ -46,7 +49,7 @@ Diese Befunde stammen aus dem Quellvergleich. Sie wurden nicht durch eine GUI re
 
 ## Verifikation und Produktentscheidungen
 
-- **Automatisiert geprüft:** 304/304 lokale Avalonia-Tests und die genannten Gegenproben.
+- **Automatisiert geprüft:** 304/304 lokale Avalonia-Tests, die genannten Gegenproben und alle sieben CI-Jobs des angegebenen Code-Commits.
 - **Quellseitig geprüft:** Projektziele, Workflow-Inhalt, Ansichten/Handler, Session- und Persistenzpfade sowie zugehörige Testdateien.
 - **Nicht in diesem Auftrag ausgeführt:** Avalonia-GUI-Tests, Desktop-Sichtprüfung, Live-HA-/Player-/Sensorprüfung und physische LIS2-Prüfung.
 - **Verbindlich:** eine gemeinsame Avalonia-Oberfläche; WPF bleibt Referenz bis zur Paritätsabnahme. Modaler Variablenbrowser ist genehmigt. Physische Geräteprüfung wird getrennt ausgewiesen.

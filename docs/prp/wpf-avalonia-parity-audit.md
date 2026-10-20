@@ -37,7 +37,7 @@ Physische Lüfterausgabe erfordert eine ausdrückliche, nicht persistierte Freig
 
 ## Prüfnachweise und verbleibende Abnahme
 
-Lokal sind 304/304 Avalonia-Tests auf Windows erfolgreich. Sieben neue Fälle prüfen den gemeinsamen Quellenaktionsablauf und die Workspace-Wiederherstellung; die Gegenproben erkennen fehlenden Entwurfsschutz, fehlendes Reload und ignorierte leere Seitenlisten. Aktuelle CI-Nachweise stehen im [Status](linux-port-status.md). Es gibt keinen Avalonia-GUI-Smoke oder automatisierten Avalonia-Screenshotvergleich.
+Lokal sind 304/304 Avalonia-Tests auf Windows erfolgreich. [CI 39440198251](https://github.com/Eitschman/lis2-control-center/actions/runs/39440198251) für Code-Commit `f372ed0` meldet alle sieben Jobs erfolgreich, einschließlich 304/304 Avalonia-Tests je OS und der drei Pakete. Sieben neue Fälle prüfen den gemeinsamen Quellenaktionsablauf und die Workspace-Wiederherstellung; die Gegenproben erkennen fehlenden Entwurfsschutz, fehlendes Reload und ignorierte leere Seitenlisten. Details und Grenzen stehen im [Status](linux-port-status.md). Es gibt keinen Avalonia-GUI-Smoke oder automatisierten Avalonia-Screenshotvergleich.
 
 Für jede Ansicht bleiben die semantischen Fehler-/Leer-/Auswahl-/Speicherpfade und die Darstellung auf Windows/Linux zu prüfen. Manuelle Benutzerabnahme erfolgt nach dem vereinbarten Portierungsumfang; physische LIS2-Prüfung bleibt getrennt. WPF wird bis zur Paritätsabnahme erhalten. Prioritäten stehen in [TODO](../../TODO.md).
 

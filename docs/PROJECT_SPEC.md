@@ -306,7 +306,7 @@ Deliberate UX decisions:
 
 ## Quality / CI
 
-Der Avalonia-Workflow prüft Core-, Display-, Fans- und Avalonia-Tests auf Windows/Ubuntu und publiziert Windows x64 sowie Linux x64/ARM64. [CI 39435226116](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116) ist für die genannte Codebasis mit sieben erfolgreichen Jobs nachgewiesen. Dies umfasst Headless-Prüfungen und Paketdateiprüfungen, keinen Avalonia-GUI-Start oder echten ARM64-Lauf.
+Der Avalonia-Workflow prüft Core-, Display-, Fans- und Avalonia-Tests auf Windows/Ubuntu und publiziert Windows x64 sowie Linux x64/ARM64. Commitbezogene Ergebnisse stehen im [Status](prp/linux-port-status.md). Dies umfasst Headless-Prüfungen und Paketdateiprüfungen, keinen Avalonia-GUI-Start oder echten ARM64-Lauf.
 
 Der getrennte Windows-Workflow baut/testet die Solution und führt WPF-Smoke-/UI-Regression aus. Getaggte Releases veröffentlichen weiterhin WPF. Auslöser und Prüflücken stehen in [release.md](release.md).
 

@@ -22,7 +22,7 @@ Artefakte mit 14 Tagen Aufbewahrung:
 
 Die Paketprüfung kontrolliert Executable, Dateigröße, Managed Assembly, Runtimekonfiguration und unter Windows die GSMTC-DLL. Linux-Prüfsummen werden im Workflow gegengeprüft. Weder der Start aus dem extrahierten Paket noch echte ARM64-Ausführung oder Avalonia-GUI-Smoke sind implementiert.
 
-Nachgewiesene Codebasis: `71b72a8987a4f9b8a14a3807f94667569e28be43`, [Lauf 39435226116](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116), sieben erfolgreiche Jobs. Ein neuer Commit muss separat geprüft werden; siehe [aktueller Status](prp/linux-port-status.md).
+Die genaue Codebasis und der zugehörige CI-Lauf stehen im [aktuellen Status](prp/linux-port-status.md). Ein neuer Commit muss separat geprüft werden.
 
 ## Windows-WPF-Referenz
 
