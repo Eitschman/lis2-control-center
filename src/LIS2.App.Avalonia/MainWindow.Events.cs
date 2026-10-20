@@ -9,9 +9,11 @@ public partial class MainWindow
 {
     private sealed record EventQueueRow(string PriorityName, string DisplayName, string Remaining);
 
-    private readonly EventQueue _eventQueue = new();
+    private EventQueue _eventQueue => _runtime.Events;
     private readonly DispatcherTimer _eventTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
-    private bool _resumePlaybackAfterEvents;
+    private bool _eventStartedVirtual;
+    private bool _eventStartedSerial;
+    private bool _updatingEventOverlay;
 
     private void InitializeEvents()
     {
@@ -83,39 +85,95 @@ public partial class MainWindow
 
     private async Task UpdateEventOverlayAsync()
     {
-        var top = _eventQueue.Peek(DateTimeOffset.UtcNow);
-        RefreshEventList();
-        if (top is null)
-        {
-            _eventTimer.Stop();
-            if (_resumePlaybackAfterEvents)
-            {
-                _resumePlaybackAfterEvents = false;
-                await StartPagePlaybackAsync();
-            }
-            return;
-        }
-        if (!_virtualDevice.IsConnected)
-        {
-            this.FindControl<TextBlock>("EventStatus")!.Text = "Connect Virtual LIS2 to show events.";
-            return;
-        }
-        if (!_eventTimer.IsEnabled)
-        {
-            _resumePlaybackAfterEvents = _virtualSequence?.IsRunning == true;
-            StopPagePlayback();
-            _eventTimer.Start();
-        }
-        if (_busy) return;
+        // The runtime owns the single priority queue consumed by BOTH transports.
+        // Never write event frames directly: that would bypass the sequence's
+        // frame tracking and race its scheduled display writes.
+        if (_updatingEventOverlay) return;
+        _updatingEventOverlay = true;
         try
         {
-            await _virtualDevice.RenderBothAsync(top.Frame.Line1, top.Frame.Line2);
-            UpdatePreview();
-            this.FindControl<TextBlock>("EventStatus")!.Text = "Displaying highest-priority event.";
+            var top = _eventQueue.Peek(DateTimeOffset.Now);
+            RefreshEventList();
+            if (top is null)
+            {
+                _eventTimer.Stop();
+
+                // An event-only sequence has no regular pages. Tick once after
+                // expiry to clear its last event frame before stopping it.
+                if (_eventStartedVirtual)
+                {
+                    if (_virtualSequence?.IsRunning == true)
+                        await TickPagePlaybackAsync();
+                    StopPagePlayback();
+                    _eventStartedVirtual = false;
+                }
+                if (_eventStartedSerial)
+                {
+                    if (_serialSequence?.IsRunning == true)
+                        await TickSerialPlaybackAsync();
+                    StopSerialPlayback();
+                    _eventStartedSerial = false;
+                }
+
+                // Existing page playback was never stopped: its next tick
+                // automatically resumes the page that the event overlaid.
+                if (_virtualSequence?.IsRunning == true)
+                    await TickPagePlaybackAsync();
+                if (_serialSequence?.IsRunning == true)
+                    await TickSerialPlaybackAsync();
+                this.FindControl<TextBlock>("EventStatus")!.Text = "No active display events.";
+                return;
+            }
+
+            if (!_eventTimer.IsEnabled)
+                _eventTimer.Start();
+
+            if (_virtualDevice.IsConnected && !_busy)
+            {
+                if (_virtualSequence?.IsRunning != true)
+                {
+                    _virtualSequence ??= CreateVirtualSequence();
+                    if (_virtualSequence.Start(Array.Empty<PageDefinition>()))
+                    {
+                        _eventStartedVirtual = true;
+                        await _pageTimer.StopAndDrainAsync();
+                        _pageTimer.Start();
+                        UpdatePagePlaybackControls();
+                    }
+                }
+                if (_virtualSequence?.IsRunning == true)
+                    await TickPagePlaybackAsync();
+            }
+
+            if (_serialDisplay?.IsConnected == true && !_serialBusy)
+            {
+                if (_serialSequence?.IsRunning != true)
+                {
+                    _serialSequence ??= CreateSerialSequence();
+                    if (_serialSequence.Start(Array.Empty<PageDefinition>()))
+                    {
+                        _eventStartedSerial = true;
+                        await _serialPlaybackTimer.StopAndDrainAsync();
+                        _serialPlaybackTimer.Start();
+                        UpdateSerialControls();
+                    }
+                }
+                if (_serialSequence?.IsRunning == true)
+                    await TickSerialPlaybackAsync();
+            }
+
+            this.FindControl<TextBlock>("EventStatus")!.Text =
+                _virtualDevice.IsConnected || _serialDisplay?.IsConnected == true
+                    ? "Displaying highest-priority event on connected displays."
+                    : "Event queued; connect a virtual or serial LIS2 to display it.";
         }
         catch (Exception ex)
         {
             this.FindControl<TextBlock>("EventStatus")!.Text = "Event display error: " + ex.Message;
+        }
+        finally
+        {
+            _updatingEventOverlay = false;
         }
     }
 }
