@@ -58,6 +58,7 @@ public sealed class PageWorkspace
         if (pages.Any(p => p is null || string.IsNullOrWhiteSpace(p.Id) || p.DurationSeconds <= 0 ||
                            p.RefreshIntervalMilliseconds is < 100 or > 60000 ||
                            p.ScrollStepMilliseconds <= 0 || p.ScrollEdgePauseMilliseconds < 0 ||
+                           !ValidOverflow(p.Line1OverflowMode) || !ValidOverflow(p.Line2OverflowMode) ||
                            (!string.IsNullOrWhiteSpace(p.VisibilityExpression) &&
                             !VisibilityEvaluator.TryParse(p.VisibilityExpression, out _, out _, out _))))
             throw new InvalidOperationException("Page configuration contains invalid timing or identifiers.");
@@ -68,6 +69,9 @@ public sealed class PageWorkspace
         _pages.Clear();
         _pages.AddRange(pages);
     }
+
+    private static bool ValidOverflow(string? mode) =>
+        mode is "PingPong" or "Marquee" or "Truncate";
 
     private int CheckedIndex(int index) =>
         index >= 0 && index < _pages.Count ? index : throw new ArgumentOutOfRangeException(nameof(index));
