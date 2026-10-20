@@ -108,7 +108,7 @@ public partial class MainWindow
     private void UpdatePagePlaybackControls()
     {
         var running = _virtualSequence?.IsRunning == true;
-        this.FindControl<Button>("PagePlaybackStart")!.IsEnabled = !running && _virtualSequence?.IsBusy != true;
+        this.FindControl<Button>("PagePlaybackStart")!.IsEnabled = (!running || _eventStartedVirtual) && _virtualSequence?.IsBusy != true;
         this.FindControl<Button>("PagePlaybackStop")!.IsEnabled = running;
         this.FindControl<TextBlock>("PagePlaybackStatus")!.Text = running
             ? $"Sequence running: {_virtualSequence?.CurrentPageId ?? "waiting for visible page"}"
