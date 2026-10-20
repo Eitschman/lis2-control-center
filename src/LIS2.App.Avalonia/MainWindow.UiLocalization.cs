@@ -195,6 +195,7 @@ public partial class MainWindow
             "Ich autorisiere ausdrücklich die physischen Lüfterausgänge für diese Verbindung"
     };
 
+    private readonly Dictionary<Control, string> _originalTooltips = new();
     private readonly Dictionary<TextBox, string> _originalWatermarks = new();
     private readonly Dictionary<ComboBoxItem, string> _originalComboLabels = new();
 
@@ -213,11 +214,21 @@ public partial class MainWindow
         // depend on the visual template being attached at the moment of translation.
         // Restrict translations to a known set of static labels. Never overwrite live
         // sensor values, media metadata, Home Assistant states or error messages.
+        foreach (var control in LocalizableControls<Control>())
+        {
+            if (ToolTip.GetTip(control) is not string tooltip) continue;
+            if (!_originalTooltips.TryGetValue(control, out var original))
+            {
+                original = WpfTranslationCatalog.FindEnglishSource(tooltip);
+                _originalTooltips[control] = original;
+            }
+            ToolTip.SetTip(control, WpfTranslationCatalog.Translate(original, CurrentUiLanguage()));
+        }
         foreach (var input in LocalizableControls<TextBox>())
         {
             if (!_originalWatermarks.TryGetValue(input, out var original))
             {
-                original = input.Watermark ?? string.Empty;
+                original = WpfTranslationCatalog.FindEnglishSource(input.Watermark ?? string.Empty);
                 _originalWatermarks[input] = original;
             }
             input.Watermark = WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
@@ -227,7 +238,7 @@ public partial class MainWindow
             if (item.Content is not string current) continue;
             if (!_originalComboLabels.TryGetValue(item, out var original))
             {
-                original = current;
+                original = WpfTranslationCatalog.FindEnglishSource(current);
                 _originalComboLabels[item] = original;
             }
             item.Content = WpfTranslationCatalog.Translate(original, CurrentUiLanguage());
@@ -236,7 +247,7 @@ public partial class MainWindow
         {
             if (!_originalPageLabels.TryGetValue(label, out var original))
             {
-                original = label.Text ?? string.Empty;
+                original = WpfTranslationCatalog.FindEnglishSource(label.Text ?? string.Empty);
                 if (!GermanPageLabels.ContainsKey(original) && WpfTranslationCatalog.Translate(original, CurrentUiLanguage()) == original) continue;
                 _originalPageLabels.Add(label, original);
             }
@@ -249,7 +260,7 @@ public partial class MainWindow
             {
                 if (checkBox.Content is not string content || (!GermanCheckBoxLabels.ContainsKey(content) && WpfTranslationCatalog.Translate(content, CurrentUiLanguage()) == content))
                     continue;
-                original = content;
+                original = WpfTranslationCatalog.FindEnglishSource(content);
                 _originalPageCheckBoxes.Add(checkBox, original);
             }
             checkBox.Content = CurrentUiLanguage() == "de" && GermanCheckBoxLabels.TryGetValue(original, out var translated)
@@ -261,7 +272,7 @@ public partial class MainWindow
             {
                 if (button.Content is not string text || (!GermanButtonLabels.ContainsKey(text) && WpfTranslationCatalog.Translate(text, CurrentUiLanguage()) == text))
                     continue;
-                original = text;
+                original = WpfTranslationCatalog.FindEnglishSource(text);
                 _originalPageButtons.Add(button, original);
             }
             button.Content = CurrentUiLanguage() == "de" && GermanButtonLabels.TryGetValue(original, out var translated)
