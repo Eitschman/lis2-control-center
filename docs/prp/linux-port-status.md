@@ -657,3 +657,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 
 ## Pages editor preview playback parity (2026-10-20)
 - Pages editor preview now uses the actual PagePlayback template/overflow renderer through a side-effect-free PageEditorPreview helper instead of a separate TemplateRenderer-only code path. Preview updates for both lines, overflow modes and scroll timing edits without persisting drafts. Live sequence and saved page remain untouched; tests cover 20-column output, three overflow modes and source value immutability. Preview is an initial static frame; animated scrolling and visual desktop sign-off remain pending. CI pending.
+
+
+## Animated Pages editor preview (2026-10-20)
+- Introduced a stateful PageEditorPreview backed by the existing PagePlayback renderer. A UI DispatcherTimer now advances both scrolling lines according to PagePlayback.NextDelay without persisting draft changes or touching the active virtual sequence.
+- Editor changes reconfigure the isolated preview; closing the window stops its timer. Added deterministic headless regression tests for scrolling, draft reset and unconfigured use.
+- Commits ba680f3, d3a0c74, 77cc7ad. CI for current HEAD is pending; Windows/Linux visual acceptance and complete ten-view WPF parity remain outstanding.
