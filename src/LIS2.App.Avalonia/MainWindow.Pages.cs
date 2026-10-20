@@ -228,7 +228,20 @@ public partial class MainWindow
         list.ItemsSource = _pages.Pages.Select((p, index) => new PageListRow(index, p.Name, p.Enabled)).ToArray();
         list.SelectedIndex = selection;
         _loadingPage = false;
+        if (SelectedPageIndex is null)
+        {
+            ClearPageEditorPreview();
+            return;
+        }
         LoadPageEditor();
+    }
+
+    private void ClearPageEditorPreview()
+    {
+        _editorPreviewTimer.Stop();
+        _editorPreviewConfigured = false;
+        this.FindControl<TextBlock>("PagePreview1")!.Text = string.Empty;
+        this.FindControl<TextBlock>("PagePreview2")!.Text = string.Empty;
     }
 
     private async Task MovePageAsync(int offset)
@@ -256,6 +269,7 @@ public partial class MainWindow
         this.FindControl<TextBox>("PageScrollPause")!.Text = p.ScrollEdgePauseMilliseconds.ToString(CultureInfo.InvariantCulture);
         this.FindControl<CheckBox>("PageEnabled")!.IsChecked = p.Enabled;
         _loadingPage = false;
+        UpdateConditionStatus();
         RefreshPagePreview();
     }
 
@@ -308,7 +322,12 @@ public partial class MainWindow
 
     private void RefreshPagePreview()
     {
-        if (_loadingPage || SelectedPageIndex is not int i) return;
+        if (_loadingPage) return;
+        if (SelectedPageIndex is not int i)
+        {
+            ClearPageEditorPreview();
+            return;
+        }
         var original = _pages.Get(i);
         var line1 = this.FindControl<TextBox>("PageLine1")!.Text ?? original.Line1Template;
         var line2 = this.FindControl<TextBox>("PageLine2")!.Text ?? original.Line2Template;
@@ -325,7 +344,6 @@ public partial class MainWindow
             && parsedPause >= 0 ? parsedPause : original.ScrollEdgePauseMilliseconds;
         _editorPreview.Configure(line1, line2, overflow1, overflow2, step, pause, refresh);
         _editorPreviewConfigured = true;
-        TickEditorPreview();
         UpdateEditorPreviewVisibility();
     }
 
