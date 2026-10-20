@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using LIS2.Winamp;
 using LIS2.WmpLegacy;
+using LIS2.Runtime;
 
 namespace LIS2.App.Avalonia;
 
@@ -14,6 +15,10 @@ public partial class MainWindow
     private readonly WindowsMediaBridge _windowsMedia = new();
     private bool _mprisRefreshing;
     private bool _mediaStopping;
+    private readonly AsyncProviderLifetime _mediaLifetime = new();
+    private Task _mediaRefresh = Task.CompletedTask;
+    private readonly CancellationTokenSource _mediaCancellation = new();
+    private readonly Dictionary<string, string> _mediaErrors = new();
 
     private void InitializeMedia()
     {
@@ -30,7 +35,7 @@ public partial class MainWindow
         this.FindControl<Button>("LinuxMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("Media", "Linux media");
         this.FindControl<Button>("WmpLegacyMediaPage")!.Click += async (_, _) =>
             await CreateMediaPageAsync("WmpLegacy", "Windows Media Player Legacy");
-        if (_startBackgroundSources) _ = StartMediaAsync();
+        if (_startBackgroundSources) _ = _mediaLifetime.StartAsync(StartMediaAsync);
     }
 
     private async Task StartMediaAsync()
@@ -43,18 +48,20 @@ public partial class MainWindow
         }
         await StartMediaProviderSafeAsync("WindowsMedia", () => _windowsMedia.StartAsync());
         if (_mediaStopping) return;
-        this.FindControl<Border>("WindowsMediaCard")!.IsVisible = _windowsMedia.IsAvailable;
+        this.FindControl<Border>("WindowsMediaCard")!.IsVisible = true;
         await StartMediaProviderSafeAsync("Winamp", () => _mediaWinamp.StartAsync());
         await StartMediaProviderSafeAsync("WmpLegacy", () => _mediaLegacy.StartAsync());
         if (!_mediaStopping) RefreshMedia();
     }
 
-    private async Task StartMediaProviderSafeAsync(string provider, Func<Task> start)
+    internal async Task StartMediaProviderSafeAsync(string provider, Func<Task> start)
     {
         if (_mediaStopping) return;
         try { await start(); }
         catch (Exception ex)
         {
+            _mediaErrors[provider] = ex.GetBaseException().Message;
+            _applicationJournal.Record("Media", provider + " startup failed (" + ex.GetBaseException().GetType().Name + ")");
             System.Diagnostics.Trace.TraceError("Media startup {0} failed: {1}", provider, ex);
             if (_mediaStopping) return;
             _pageSources.UpdateMedia(provider, new Dictionary<string, object?>());
@@ -62,10 +69,19 @@ public partial class MainWindow
             {
                 "WindowsMedia" => "WindowsMediaStatus",
                 "Winamp" => "WinampMediaStatus",
+                "Media" => "LinuxMediaStatus",
                 _ => "WmpLegacyMediaStatus"
             };
             var status = this.FindControl<TextBlock>(controlName);
-            if (status is not null) status.Text = "Provider startup error: " + ex.GetBaseException().Message;
+            if (status is not null)
+            {
+                status.Text = "Provider startup error: " + ex.GetBaseException().Message;
+                status.TextWrapping = global::Avalonia.Media.TextWrapping.Wrap;
+                status.MaxWidth = 280;
+                status.Foreground = global::Avalonia.Media.Brushes.DarkRed;
+                if (status.Parent is Border badge)
+                    badge.Background = global::Avalonia.Media.Brush.Parse("#FDE8E8");
+            }
         }
     }
 
@@ -74,7 +90,7 @@ public partial class MainWindow
         if (_mediaStopping) return;
         if (!OperatingSystem.IsWindows())
         {
-            _ = RefreshMprisAsync();
+            if (_mediaRefresh.IsCompleted) _mediaRefresh = RefreshMprisAsync();
             return;
         }
         RefreshMediaProvider("WindowsMedia", RefreshWindowsMedia);
@@ -84,12 +100,14 @@ public partial class MainWindow
 
     private void RefreshMediaProvider(string provider, Action refresh)
     {
+        if (_mediaErrors.ContainsKey(provider)) return;
         try
         {
             refresh();
         }
         catch (Exception ex)
         {
+            _applicationJournal.Record("Media", provider + " refresh failed (" + ex.GetBaseException().GetType().Name + ")");
             var message = ex.GetBaseException().Message;
             System.Diagnostics.Trace.TraceError("Media provider {0} failed: {1}", provider, ex);
             var status = provider switch
@@ -124,7 +142,8 @@ public partial class MainWindow
         _mprisRefreshing = true;
         try
         {
-            var values = await _mpris.ReadAsync();
+            var values = await _mpris.ReadAsync(_mediaCancellation.Token);
+            if (_mediaStopping) return;
             _pageSources.UpdateMedia("Media", values);
             string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
             this.FindControl<TextBlock>("LinuxMediaStatus")!.Text = Read("Connected") == "True" ? "Connected" : "Disconnected";
@@ -136,6 +155,8 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
+            if (_mediaStopping) return;
+            _applicationJournal.Record("Media", "MPRIS refresh failed (" + ex.GetBaseException().GetType().Name + ")");
             System.Diagnostics.Trace.TraceError("Linux MPRIS refresh failed: {0}", ex);
             _pageSources.UpdateMedia("Media", new Dictionary<string, object?>());
             var status = this.FindControl<TextBlock>("LinuxMediaStatus");
@@ -181,10 +202,11 @@ public partial class MainWindow
         _mediaStopping = true;
         _mediaTimer?.Stop();
         _mediaTimer = null;
-        await _windowsMedia.DisposeAsync();
-        await _mediaWinamp.StopAsync();
-        await _mediaLegacy.StopAsync();
-        await _mediaWinamp.DisposeAsync();
-        await _mediaLegacy.DisposeAsync();
+        _mediaCancellation.Cancel();
+        await _mediaLifetime.StopAsync(() => RuntimeShutdown.RunAsync(
+            () => _mediaRefresh,
+            () => _windowsMedia.DisposeAsync().AsTask(),
+            () => _mediaWinamp.StopAsync(), () => _mediaLegacy.StopAsync(),
+            () => _mediaWinamp.DisposeAsync().AsTask(), () => _mediaLegacy.DisposeAsync().AsTask()));
     }
 }

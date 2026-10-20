@@ -20,6 +20,18 @@ public sealed class DisplayFrameWriter
     {
         ArgumentNullException.ThrowIfNull(frame);
 
+        try { await WriteCoreAsync(frame, cancellationToken).ConfigureAwait(false); }
+        catch
+        {
+            // Nach einem Teilfehler ist unbekannt, welche Spannen das Gerät übernommen hat.
+            Reset();
+            throw;
+        }
+    }
+
+    private async Task WriteCoreAsync(DisplayFrame frame, CancellationToken cancellationToken)
+    {
+
         if (_lastFrame is null)
         {
             await _device.WriteLineAsync(1, frame.Line1, cancellationToken)

@@ -1,7 +1,7 @@
 # PRP: LIS2 Control Center mit Avalonia
 
 Stand: 20.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-02; genaue Prüfnachweise im [Status](linux-port-status.md).
+Implementierungsstand: PORT-03; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
 
@@ -19,7 +19,7 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 326/326 Avalonia-Tests auf Windows erfolgreich, einschließlich Geräte-UI-Tests mit tatsächlichen Controls und Skia-Rendering. Der [Status](linux-port-status.md) ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
+Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 332/332 Avalonia-Tests sowie der native Windows-Smoke erfolgreich. Der [Status](linux-port-status.md) ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
 
 ## Implementierungsstand
 
@@ -37,8 +37,8 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Home Assistant | WebSocket-Quelle, Entitäten, Attribute, Aliase, Favoriten und Seitenaktionen mit Sequenz-Reload vorhanden | Linux-Liveprüfung und Deaktivierung/Persistenz prüfen |
 | Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache und Windows-Tray/Autostart | Nativer Dateidialog und Linux-Desktopintegration offen |
 | Hilfe und About | Kontextbezogene Hilfe mit zehn Themen, Live-Schlüsseln, Glyphenreferenz und About-Dialog vorhanden | WPF-Inhaltstiefe, Übersetzungen, Platzierung und Desktop-Bedienung offen |
-| Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Textexport vorhanden | Echtes Anwendungs-/Protokoll-Logging fehlt |
-| CI und Pakete | Windows-/Ubuntu-Builds, vier Testprojekte je OS und drei selbstständige Pakete mit Prüfsummen vorhanden | Avalonia-GUI-Smoke, Archivstart und echte ARM64-Ausführung fehlen |
+| Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Export mit zeitgestempeltem Anwendungs-/Transportjournal | Sitzungsprotokoll begrenzt; kein dauerhaftes Logarchiv; nativen Dateidialog prüfen |
+| CI und Pakete | Windows-/Ubuntu-Builds, vier Testprojekte je OS, nativer Desktop-Smoke und drei selbstständige Pakete mit Prüfsummen | Archivstart und echte ARM64-Ausführung fehlen |
 
 ## Prüffähige Checkliste
 
@@ -51,8 +51,8 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 - [x] Serielle Ports werden ohne Geräteöffnung ermittelt; Linux bevorzugt `/dev/serial/by-id`.
 - [x] Serielle Display- und Lüfterkommandos verwenden den gemeinsamen Session-Gate.
 - [x] Lüfter starten nur nach ausdrücklicher, nicht gespeicherter Freigabe. Der sichere 100-%-Frame wird vor der ersten Regelung gesendet.
-- [ ] Alle verbleibenden UI-Orchestrierungen, Timer und Plattformverträge gegen das Runtime-Ziel abgleichen.
-- [ ] Differenzielle Schreibspannen aus `DisplayFrameWriter` auch für den Avalonia-Livepfad nachweisen; vollständige Frame-Deduplizierung allein genügt dafür nicht.
+- [x] UI-Orchestrierungen, Timer und sieben Plattformverträge gegen das Runtime-Ziel abgeglichen; konkrete Adapterabweichungen und Grenzen im Inventar.
+- [x] Differenzielle Schreibspannen aus `DisplayFrameWriter` im virtuellen und seriellen Avalonia-Livepfad einschließlich Teilfehlern und Cacheinvalidierung nachgewiesen.
 - [ ] Serielle Fehler, Wiederverbindung und sichere Ausgabe auf echten Zielsystemen getrennt prüfen.
 
 Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreibt ohne Lüfterfreigabe keine Lüfterwerte. Die Freigabe erfolgt auf der bereits geöffneten Verbindung; Displaykommandos können davor stattgefunden haben. Dies ist von der strengeren Zielvorstellung „sicherer Lüfterzustand vor jeder normalen Geräteausgabe“ zu unterscheiden.
@@ -79,7 +79,7 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 - [x] Variablenbrowser enthält Suche, Kategorien, HA-Filter, Livewerte, persistente Favoriten und Einfügen in beide Zeilen.
 - [ ] Semantischen Funktionsabgleich aller zehn Ansichten einschließlich Fehler-, Leer-, Auswahl- und Persistenzpfaden schließen.
 - [ ] Hilfe und About mit WPF-Inhalt, Übersetzungen und Navigation abgleichen.
-- [ ] Avalonia-GUI-Smoke für Navigation, Dialoge und geordnetes Beenden auf Windows und Linux ergänzen.
+- [x] Avalonia-GUI-Smoke für zehn Ansichten, Hilfe/About, fehlende Medienanbieter, Diagnose und geordnetes Beenden ergänzt; aktuelle Nachweise im Status.
 - [ ] Desktop-Darstellung, Tastatur, DPI, Theme und Sprachen auf den Zielsystemen prüfen.
 - [ ] Linux-Tray/Autostart, Single Instance und Splash entsprechend dem Portierungsziel bearbeiten.
 - [x] Pakete `win-x64`, `linux-x64` und `linux-arm64` werden selbstständig veröffentlicht und mit SHA-256-Dateien hochgeladen.

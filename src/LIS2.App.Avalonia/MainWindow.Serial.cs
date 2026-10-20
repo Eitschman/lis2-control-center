@@ -98,6 +98,8 @@ public partial class MainWindow
             try
             {
                 session = _serialSessionFactory(port);
+                _serialJournals.Add(session.Journal);
+                if (_serialJournals.Count > 10) _serialJournals.RemoveAt(0);
                 await session.ConnectAsync();
                 await ApplyConnectedDisplaySettingsAsync(session);
                 _serialDisplay = session;

@@ -23,7 +23,8 @@ public sealed class SerialDisplaySession : IDisplaySession
     public Exception? FanFault => _fanLoop?.LastFault ?? _lastFanFault;
     public event Action<Exception>? FanFaulted;
     public SerialDisplaySession(string portName) : this(new SerialLis2Transport(portName)) { }
-    public SerialDisplaySession(ILis2Transport transport) => _session = new UnifiedLis2Session(transport);
+    public SerialDisplaySession(ILis2Transport transport) => _session = new UnifiedLis2Session(new DiagnosticTransport(transport, Journal));
+    public DiagnosticJournal Journal { get; } = new();
     public bool IsConnected => _session.IsConnected;
     // Vorschau bestätigt gesendete Inhalte, keine Rückmeldung des physischen Displays.
     public string LastLine1 { get; private set; } = new(' ', 20);

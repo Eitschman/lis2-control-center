@@ -16,24 +16,16 @@ public partial class MainWindow
     {
         var dialog = new Window
         {
-            Title = SettingsTranslate("Help") + " — LIS2 Control Center",
+            Name = "HelpDialog", Title = SettingsTranslate("Help"),
             Icon = Icon, Width = 1080, Height = 780, MinWidth = 840, MinHeight = 600,
             WindowStartupLocation = WindowStartupLocation.CenterOwner
         };
-        var title = new TextBlock { Text = SettingsTranslate("Help") + " & reference", FontSize = 25, FontWeight = FontWeight.SemiBold };
-        var subtitle = new TextBlock
-        {
-            Text = CurrentUiLanguage() == "de"
-                ? "Anleitung, Konfigurationsreferenz und Beispiele für Displayvariablen."
-                : "Instructions, configuration reference and display-variable examples.",
-            TextWrapping = TextWrapping.Wrap
-        };
+        var title = new TextBlock { Text = SettingsTranslate("Help"), FontSize = 25, FontWeight = FontWeight.SemiBold };
         var close = new Button { Content = BrowserText("Close"), MinWidth = 90 };
         close.Click += (_, _) => dialog.Close();
         var header = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(0, 0, 0, 14) };
         var heading = new StackPanel { Spacing = 5 };
         heading.Children.Add(title);
-        heading.Children.Add(subtitle);
         header.Children.Add(heading);
         Grid.SetColumn(close, 1);
         header.Children.Add(close);
@@ -88,9 +80,10 @@ public partial class MainWindow
         var assembly = Assembly.GetExecutingAssembly();
         var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                       ?? assembly.GetName().Version?.ToString() ?? "unknown";
-        var dataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var dataDirectory = System.IO.Path.GetDirectoryName(_workspaceStore.FilePath) ?? _workspaceStore.FilePath;
         var dialog = new Window
         {
+            Name = "AboutDialog",
             Title = SettingsTranslate("About") + " LIS2 Control Center",
             Icon = Icon, Width = 560, MinWidth = 450, Height = 420,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,

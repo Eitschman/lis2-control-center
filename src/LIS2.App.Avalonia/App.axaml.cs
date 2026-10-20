@@ -18,9 +18,35 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var window = new MainWindow();
+            var args = desktop.Args ?? Array.Empty<string>();
+            var smokeIndex = Array.IndexOf(args, "--desktop-smoke");
+            var smokeDirectory = smokeIndex >= 0 && smokeIndex + 1 < args.Length
+                ? Path.GetFullPath(args[smokeIndex + 1]) : null;
+            var window = smokeDirectory is null ? new MainWindow() : DesktopSmoke.CreateWindow(smokeDirectory);
             desktop.MainWindow = window;
-            if (OperatingSystem.IsWindows())
+            desktop.ShutdownRequested += async (_, args) =>
+            {
+                if (_exitRequested) return;
+                args.Cancel = true;
+                await ExitAsync(desktop, window);
+            };
+            if (smokeDirectory is not null)
+            {
+                desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                window.Opened += async (_, _) =>
+                {
+                    var exitCode = 0;
+                    try { await DesktopSmoke.RunAsync(window, smokeDirectory); }
+                    catch (Exception exception)
+                    {
+                        exitCode = 1;
+                        Directory.CreateDirectory(smokeDirectory);
+                        await File.WriteAllTextAsync(Path.Combine(smokeDirectory, "failure.txt"), exception.ToString());
+                    }
+                    await ExitAsync(desktop, window, exitCode);
+                };
+            }
+            else if (OperatingSystem.IsWindows())
             {
                 ConfigureWindowsTray(desktop, window);
                 if (Environment.GetCommandLineArgs().Contains("--minimized", StringComparer.OrdinalIgnoreCase))
@@ -33,6 +59,7 @@ public partial class App : Application
     private void ConfigureWindowsTray(IClassicDesktopStyleApplicationLifetime desktop, MainWindow window)
     {
         desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        window.CloseToTray = true;
         var iconBytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAoUlEQVR4nGOUUDH8zzCAgGkgLR91wKgDBoUDWLAJBrQfoYllGyptMMQwQoBWluMymxG5IIIpwOZSajoA2fzBmQZg4Jd4JFUsYXu5HKfcgIfAqAPwpgFk8PZIKVZxYZtuouRxgaETAoR8QkgeFxjwEBh1AN40gK8EoxYY8BBgRG+W07I6ZmDArGkxQoBWVTEuszFCgN5gwNPAqANGHTDgDgAAoqskQcLla/AAAAAASUVORK5CYII=");
         using var stream = new MemoryStream(iconBytes);
         var icon = new WindowIcon(stream);
@@ -42,11 +69,7 @@ public partial class App : Application
         show.Click += (_, _) => RestoreWindow(window);
         menu.Add(show);
         var exit = new NativeMenuItem("Exit");
-        exit.Click += (_, _) =>
-        {
-            _exitRequested = true;
-            desktop.Shutdown();
-        };
+        exit.Click += async (_, _) => await ExitAsync(desktop, window);
         menu.Add(exit);
         _trayIcon = new TrayIcon { Icon = icon, ToolTipText = "LIS2 Control Center", Menu = menu, IsVisible = true };
         _trayIcon.Clicked += (_, _) => RestoreWindow(window);
@@ -57,12 +80,26 @@ public partial class App : Application
             if (args.Property == Window.WindowStateProperty && window.WindowState == WindowState.Minimized)
                 window.Hide();
         };
-        window.Closing += (_, args) =>
+    }
+
+    private bool _exiting;
+
+    private async Task ExitAsync(IClassicDesktopStyleApplicationLifetime desktop, MainWindow window, int exitCode = 0)
+    {
+        if (_exiting) return;
+        _exiting = true;
+        try { await window.BeginShutdownAsync(); }
+        catch (Exception exception)
         {
-            if (_exitRequested) return;
-            args.Cancel = true;
-            window.Hide();
-        };
+            exitCode = 1;
+            System.Diagnostics.Trace.TraceError("Shutdown failed: {0}", exception);
+        }
+        finally
+        {
+            _trayIcon?.Dispose();
+            _exitRequested = true;
+            desktop.Shutdown(exitCode);
+        }
     }
 
     private static void RestoreWindow(MainWindow window)

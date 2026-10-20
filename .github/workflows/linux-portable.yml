@@ -63,6 +63,25 @@ jobs:
           name: Avalonia-device-views-${{ runner.os }}
           path: tests/LIS2.App.Avalonia.Tests/TestResults/screenshots/*.png
           if-no-files-found: error
+      - name: Native desktop smoke (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $app = "src/LIS2.App.Avalonia/bin/Release/net8.0/LIS2.App.Avalonia.exe"
+          $process = Start-Process $app -ArgumentList '--desktop-smoke', 'desktop-smoke' -PassThru
+          if (-not $process.WaitForExit(90000)) { $process.Kill(); throw "Desktop smoke timed out" }
+          if ($process.ExitCode -ne 0) { throw "Desktop smoke failed: $($process.ExitCode)" }
+          if (-not (Test-Path 'desktop-smoke/result.txt')) { throw "Desktop smoke result missing" }
+      - name: Native desktop smoke (Linux X11)
+        if: runner.os == 'Linux'
+        run: timeout 90s xvfb-run -a dotnet src/LIS2.App.Avalonia/bin/Release/net8.0/LIS2.App.Avalonia.dll --desktop-smoke desktop-smoke
+      - name: Upload native desktop smoke
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Avalonia-desktop-smoke-${{ runner.os }}
+          path: desktop-smoke/
+          if-no-files-found: error
 
 
   portable-app:

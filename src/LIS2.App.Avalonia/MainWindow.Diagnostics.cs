@@ -12,17 +12,18 @@ public partial class MainWindow
         this.FindControl<Button>("DiagnosticsRefresh")!.Click += (_, _) => RefreshDiagnostics();
         this.FindControl<Button>("DiagnosticsExport")!.Click += async (_, _) =>
         {
-            RefreshDiagnostics();
-            var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-            {
-                Title = "Export diagnostics report",
-                SuggestedFileName = "lis2-diagnostics.txt",
-                FileTypeChoices = new[] { new FilePickerFileType("Text report") { Patterns = new[] { "*.txt" } } }
-            });
-            if (file is null) return;
             try
             {
+                RefreshDiagnostics();
+                var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                {
+                    Title = "Export diagnostics report",
+                    SuggestedFileName = "lis2-diagnostics.txt",
+                    FileTypeChoices = new[] { new FilePickerFileType("Text report") { Patterns = new[] { "*.txt" } } }
+                });
+                if (file is null) return;
                 await using var stream = await file.OpenWriteAsync();
+                stream.SetLength(0);
                 using var writer = new StreamWriter(stream);
                 await writer.WriteAsync(BuildDiagnosticsReport());
             }
@@ -34,18 +35,21 @@ public partial class MainWindow
         RefreshDiagnostics();
     }
 
-    private string BuildDiagnosticsReport() =>
-        string.Join(Environment.NewLine + Environment.NewLine, new[]
+    internal string BuildDiagnosticsReport()
+    {
+        RefreshDiagnostics();
+        return string.Join(Environment.NewLine + Environment.NewLine, new[]
         {
             "Diagnostics Snapshot" + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsSnapshot")!.Text ?? ""),
             "Virtual LIS2 state" + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsVirtualState")!.Text ?? ""),
             "Decoded command history" + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsCommandHistory")!.Text ?? ""),
             "Protocol Log" + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsProtocolLog")!.Text ?? "")
         });
+    }
 
     private void RefreshDiagnostics()
     {
-        var serial = _serialDisplay is not null;
+        var serial = _serialDisplay?.IsConnected == true;
         var virtualConnected = _virtualDevice.IsConnected;
         var playback = _virtualSequence?.IsRunning == true;
         var fanMonitor = _fanMonitorTask is { IsCompleted: false };
@@ -80,6 +84,9 @@ public partial class MainWindow
                 string.Join(" ", data.Select(value => value.ToString("X2", CultureInfo.InvariantCulture))) +
                 Environment.NewLine + "      " + Lis2Protocol.DescribeCommand(data)));
         this.FindControl<TextBox>("DiagnosticsProtocolLog")!.Text =
-            "Protocol log capture is not yet available in the Avalonia runtime.";
+            "Application" + Environment.NewLine + _applicationJournal.Snapshot() + Environment.NewLine +
+            "Virtual transport" + Environment.NewLine + _virtualDevice.Journal.Snapshot() + Environment.NewLine +
+            string.Join(Environment.NewLine, _serialJournals.Select((journal, index) =>
+                "Serial session " + (index + 1) + Environment.NewLine + journal.Snapshot()));
     }
 }

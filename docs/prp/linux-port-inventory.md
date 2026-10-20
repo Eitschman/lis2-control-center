@@ -1,6 +1,6 @@
 # Inventar des Avalonia-Branches
 
-Stand: 20.10.2026. Implementierungsstand: PORT-02.
+Stand: 20.10.2026. Implementierungsstand: PORT-03.
 Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Konfiguration. Kein ZIP-Archiv als Implementierungsbaseline.
 
 ## Umfang und Projekte
@@ -38,19 +38,33 @@ Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin`
 
 Die `IPlatform*`-Verträge haben derzeit keine entsprechenden Adapterimplementierungen. UI-unabhängige Schleifen bestehen neben weiterer Orchestrierung in den MainWindow-Dateien.
 
+### Abgleich der Plattformverträge
+
+| Vertrag | Tatsächlicher Aufrufpfad | Abweichung vom Ziel |
+| --- | --- | --- |
+| `IPlatformSerialPortDiscovery` | Statische `SerialPortDiscovery` aus Settings/Serial; kein Hardwarezugriff bei Suche | Kein injizierter Vertragsadapter |
+| `IPlatformSensorProvider` | `IFanSensorSource`, `LinuxSystemSensors`, `WindowsHardwareFanSensors` | Produktivvertrag liefert `object?`, Entwurf nur `double?`; vor Adapterumbau Schlüssel und Metadaten erhalten |
+| `IPlatformMediaProvider` | `WindowsMediaBridge.Values`, Winamp-/Legacy-Values, asynchrones `LinuxMprisSource.ReadAsync` | Synchrones Entwurfs-Snapshot bildet Start, Abbruch und Dispose nicht ab; `AsyncProviderLifetime` ordnet aktuell den Medienabbau |
+| `IPlatformTrayService` | Windows-Tray direkt in `App`; Exit wartet auf `BeginShutdownAsync` | Linux-Tray und Dienstinjektion offen, PORT-06 |
+| `IPlatformAutostartService` | Windows-Registry in `MainWindow.Settings` | Linux-Desktopdatei und Vertragsadapter offen, PORT-06 |
+| `IPlatformSecretStore` | `PortableHaTokenStore`, DPAPI/secret-tool | Synchroner spezialisierter Tokenstore statt allgemeinem Schlüsselvertrag; lokaler AES-Pfad in PORT-05 klären |
+| `IPlatformAppearance` | Avalonia `RequestedThemeVariant`/`ActualThemeVariant`, Windows-Titelbalken | Kein Adapter mit Änderungsereignis; Theme-/Desktopnachweis bleibt PORT-06 |
+
+Der Abgleich ist eine Bestandsaufnahme. Die unbenutzten Entwurfsverträge sind kein Nachweis einer durchgängigen Plattformtrennung. Ein Umbau muss die tatsächlich benötigten asynchronen Lebenszyklen berücksichtigen; zusätzliche Linux-Desktopfunktionen gehören nicht zu PORT-03.
+
 ## Timer und Lebenszyklus
 
 | Lauf | Implementierung / Takt | Beenden |
 | --- | --- | --- |
 | Virtuelle/serielle Seiten | Je AdaptiveRuntimeLoop, vom nächsten Scheduler-/Scrolltermin bestimmt | StopAndDrainAsync plus Sequenz-Drain |
-| Editorpreview | DispatcherTimer, initial 250 ms, danach rendererabhängig mit Untergrenze 20 ms | Navigation pausiert; Closed stoppt |
-| Hardware | DispatcherTimer, 2 s | Closed stoppt |
-| Medien | DispatcherTimer, 1 s; Linux-Abfrage ohne Überlappung | StopMediaAsync stoppt Timer/Anbieter |
-| Ereignisanzeige | DispatcherTimer, 250 ms | Closed stoppt |
+| Editorpreview | DispatcherTimer, initial 250 ms, danach rendererabhängig mit Untergrenze 20 ms | Navigation pausiert; Shutdown stoppt vor Quellen-Dispose |
+| Hardware | DispatcherTimer, 2 s | Shutdown stoppt |
+| Medien | DispatcherTimer, 1 s; Linux-Abfrage ohne Überlappung | Timer stoppen, MPRIS abbrechen/Kindprozess beenden, Start und Refresh drainieren, alle Anbieter abbauen |
+| Ereignisanzeige | DispatcherTimer, 250 ms | Shutdown stoppt |
 | HA-Anzeige | PeriodicRuntimeLoop, 2 s | Stop plus StopAndDrainAsync |
 | Lüfterregelung / Dry-run | FanRuntimeLoop bzw. PeriodicTimer, 2 s | Stop/Drain, Freigabeentzug und angeforderter Sicherheitsframe |
 
-`MainWindow.OnWindowClosed` enthält das asynchrone Aufräumen. Windows-Schließen blendet bei Traybetrieb zunächst nur das Fenster aus. Der Prozessende-Nachweis durch einen Avalonia-GUI-Smoke fehlt.
+`MainWindow.BeginShutdownAsync` besitzt einen wiederverwendeten Shutdown-Task. `Closing` hält das Fenster bis zum Drain offen; Windows-Schließen blendet bei Traybetrieb nur aus. Tray-Exit und Desktop-Shutdown warten auf den Abbau, Fehler führen beim expliziten Exit zu Exit-Code 1. `RuntimeShutdown` führt trotz einzelner Fehler die übrigen Aufräumschritte aus. `--desktop-smoke <Verzeichnis>` startet isolierte Stores und das virtuelle Gerät, navigiert durch zehn Views, öffnet Hilfe/About, prüft einen fehlenden Medienanbieter und beendet den echten Desktopprozess. Physische Geräte und Livequellen werden dabei nicht gestartet.
 
 ## Persistierte Daten und Grenzen
 

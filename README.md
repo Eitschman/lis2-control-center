@@ -15,7 +15,7 @@ LIS2 Control Center is an independent replacement for the obsolete VL System Mul
 
 Stand: 20.10.2026, Arbeitspaket PORT-02. Die gemeinsame App unter `src/LIS2.App.Avalonia` enthält zehn Hauptansichten, Display-/Seiten-/Ereignisruntime, Glyphen, Windows-/Linux-Sensoren, Lüfterregelung mit ausdrücklicher serieller Freigabe, HA, Medien, Workspace, Hilfe und About. Der modale Variablenbrowser ist eine genehmigte Abweichung von WPF.
 
-Lokal sind 326/326 Avalonia-Tests auf Windows erfolgreich. Gerätebedienung und Einstellungen werden auch mit tatsächlichen Avalonia-Controls und Skia-Rendering headless geprüft. Die betroffenen Ansichten wurden bei 1305 × 893 und 950 × 600 Pixeln angesehen. Der aktuelle CI-Nachweis steht im [Status](docs/prp/linux-port-status.md). Ein systemweiter Desktop-Smoke, extrahierter Paketstart, echte ARM64-Ausführung und physische LIS2-Prüfung sind dadurch nicht nachgewiesen.
+Lokal sind 332/332 Avalonia-Tests auf Windows erfolgreich. Gerätebedienung und Einstellungen werden mit tatsächlichen Avalonia-Controls und Skia-Rendering geprüft. Ein nativer Windows-Smoke startet zehn Ansichten, Hilfe/About, fehlende Medienanbieter und Diagnose und wartet auf den Shutdown. Der aktuelle CI-Nachweis und die Sichtprüfungen stehen im [Status](docs/prp/linux-port-status.md). Extrahierter Paketstart, echte ARM64-Ausführung und physische LIS2-Prüfung bleiben offen.
 
 Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. Transport, Port, HA-Aktivierung und Helligkeit werden gespeichert. Gemeinsame Displayaktionen verwenden den angewendeten Transport. Der Windows-Import ist sichtbar; manuelle Lüfterausgaben beachten Kanalgrenzen und benötigen bei serieller Ausgabe je Aktion eine Freigabe. Nächstes Paket: Diagnose und Laufzeitlebenszyklus (PORT-03).
 
@@ -262,7 +262,7 @@ Development artifacts:
 
 Tagged releases additionally contain portable ZIP packages and `SHA256SUMS.txt`. See [Release process](docs/release.md).
 
-Der separate Workflow `linux-portable.yml` prüft `feature/linux-avalonia` und erzeugt `LIS2-Avalonia-win-x64`, `LIS2-Avalonia-linux-x64` und `LIS2-Avalonia-linux-arm64`. Jedes Artefakt enthält ein Archiv und eine SHA-256-Datei; die Aufbewahrung beträgt 14 Tage. Tag-Releases veröffentlichen derzeit weiterhin WPF. Der Avalonia-Workflow führt keine WPF- oder Avalonia-GUI-Smoke-Tests aus.
+Der separate Workflow `linux-portable.yml` prüft `feature/linux-avalonia` einschließlich nativem Windows-/Linux-X11-Smoke und erzeugt `LIS2-Avalonia-win-x64`, `LIS2-Avalonia-linux-x64` und `LIS2-Avalonia-linux-arm64`. Smoke-Screenshots und Ergebnisdateien werden separat hochgeladen. Jedes Paketartefakt enthält ein Archiv und eine SHA-256-Datei; die Aufbewahrung beträgt 14 Tage. Tag-Releases veröffentlichen derzeit weiterhin WPF. Der Avalonia-Workflow führt keine WPF-Tests aus.
 
 ## Documentation
 

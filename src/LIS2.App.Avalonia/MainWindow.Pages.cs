@@ -106,7 +106,7 @@ public partial class MainWindow
         InitializeHomeAssistant();
         LoadPortableWorkspace();
         InitializeWindowsSettingsImport();
-        if (_startBackgroundSources) _ = StartPageSourcesAsync();
+        if (_startBackgroundSources) _sourceStartup = StartPageSourcesAsync();
     }
 
 
@@ -356,6 +356,7 @@ public partial class MainWindow
         try
         {
             await _runtime.StartSourcesAsync();
+            if (_windowClosed) return;
             // Workspace credentials are restored before this startup task runs.
             // Configure the actual HA source, not only the URL/token controls.
             if (this.FindControl<CheckBox>("HaEnabled")!.IsChecked == true)
@@ -374,6 +375,7 @@ public partial class MainWindow
                     }
                 }
             }
+            if (_windowClosed) return;
             RefreshHaEntities();
             RefreshPageVariables();
         }

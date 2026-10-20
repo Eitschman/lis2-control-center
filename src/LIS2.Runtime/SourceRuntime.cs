@@ -62,8 +62,8 @@ public sealed class SourceRuntime : IAsyncDisposable
         {
             if (_disposed) return;
             _disposed = true;
-            await _registry.StopAllAsync().ConfigureAwait(false);
-            await _registry.DisposeAsync().ConfigureAwait(false);
+            try { await _registry.StopAllAsync().ConfigureAwait(false); }
+            finally { await _registry.DisposeAsync().ConfigureAwait(false); }
         }
         finally { _gate.Release(); }
     }

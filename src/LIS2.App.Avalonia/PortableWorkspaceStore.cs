@@ -17,6 +17,7 @@ public sealed class PortableWorkspaceStore
     }
 
     public bool Exists => File.Exists(_path);
+    public string FilePath => _path;
 
     public PortableWorkspace Load()
     {

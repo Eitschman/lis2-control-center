@@ -1,4 +1,5 @@
 using LIS2.Core;
+using LIS2.Display;
 
 namespace LIS2.App.Avalonia;
 
@@ -10,10 +11,14 @@ public sealed class VirtualDeviceSession : IDisplaySession
 {
     private readonly VirtualLis2Transport _transport = new();
     private readonly Lis2Device _device;
+    private readonly DisplayFrameWriter _frameWriter;
+    private readonly SemaphoreSlim _gate = new(1, 1);
+    public DiagnosticJournal Journal { get; } = new();
 
     public VirtualDeviceSession()
     {
-        _device = new Lis2Device(_transport);
+        _device = new Lis2Device(new DiagnosticTransport(_transport, Journal));
+        _frameWriter = new DisplayFrameWriter(_device);
     }
 
     public bool IsConnected => _device.IsConnected;
@@ -22,12 +27,11 @@ public sealed class VirtualDeviceSession : IDisplaySession
     public VirtualLis2State State => _transport.State;
 
     public Task WriteLineAsync(int line, string text, CancellationToken cancellationToken = default) =>
-        _device.WriteLineAsync(line, text, cancellationToken);
+        ExecuteAsync(() => _device.WriteLineAsync(line, text, cancellationToken), true, cancellationToken);
 
     public async Task RenderBothAsync(string line1, string line2, CancellationToken cancellationToken = default)
     {
-        await _device.WriteLineAsync(1, line1, cancellationToken);
-        await _device.WriteLineAsync(2, line2, cancellationToken);
+        await ExecuteAsync(() => _frameWriter.WriteAsync(DisplayFrame.Create(line1, line2), cancellationToken), false, cancellationToken);
     }
 
     public Task SendSpecialCharacterTestAsync(CancellationToken cancellationToken = default) =>
@@ -40,12 +44,12 @@ public sealed class VirtualDeviceSession : IDisplaySession
 
         var firstLine = Enumerable.Range(start, 20).Select(value => (byte)value).ToArray();
         var secondLine = Enumerable.Range(start + 20, 20).Select(value => (byte)value).ToArray();
-        await _device.WriteRawDisplayBytesAsync(1, 0, firstLine, cancellationToken);
-        await _device.WriteRawDisplayBytesAsync(2, 0, secondLine, cancellationToken);
+        await WriteRawDisplayBytesAsync(1, 0, firstLine, cancellationToken);
+        await WriteRawDisplayBytesAsync(2, 0, secondLine, cancellationToken);
     }
 
     public Task ProgramGlyphAsync(int slot, byte[] rows, CancellationToken cancellationToken = default) =>
-        _device.ProgramCharacterAsync(slot, rows, cancellationToken);
+        ExecuteAsync(() => _device.ProgramCharacterAsync(slot, rows, cancellationToken), false, cancellationToken);
 
     public async Task ProgramAllGlyphsAsync(IReadOnlyList<CustomGlyphSettings> glyphs, CancellationToken cancellationToken = default)
     {
@@ -53,36 +57,47 @@ public sealed class VirtualDeviceSession : IDisplaySession
             throw new ArgumentException("Exactly eight valid 5x8 glyphs are required.", nameof(glyphs));
 
         for (var slot = 1; slot <= 8; slot++)
-            await _device.ProgramCharacterAsync(slot, glyphs[slot - 1].Rows, cancellationToken);
+            await ProgramGlyphAsync(slot, glyphs[slot - 1].Rows, cancellationToken);
     }
 
     public Task ClearAsync(CancellationToken cancellationToken = default) =>
-        _device.ClearAsync(cancellationToken);
+        ExecuteAsync(() => _device.ClearAsync(cancellationToken), true, cancellationToken);
 
     public Task WriteRawDisplayBytesAsync(int line, int column, byte[] bytes, CancellationToken cancellationToken = default) =>
-        _device.WriteRawDisplayBytesAsync(line, column, bytes, cancellationToken);
+        ExecuteAsync(() => _device.WriteRawDisplayBytesAsync(line, column, bytes, cancellationToken), true, cancellationToken);
 
     public Task SetFansAsync(IReadOnlyList<int> outputs) =>
-        _device.SetFansAsync(outputs[0], outputs[1], outputs[2], outputs[3]);
+        ExecuteAsync(() => _device.SetFansAsync(outputs[0], outputs[1], outputs[2], outputs[3]), false);
 
     public Task SetBrightnessAsync(Lis2Brightness brightness, CancellationToken cancellationToken = default) =>
-        _device.SetBrightnessAsync(brightness, cancellationToken);
+        ExecuteAsync(() => _device.SetBrightnessAsync(brightness, cancellationToken), false, cancellationToken);
 
     public Task ConnectAsync(CancellationToken cancellationToken = default) =>
-        _device.ConnectAsync(cancellationToken);
+        ExecuteAsync(() => _device.ConnectAsync(cancellationToken), true, cancellationToken);
 
     public Task DisconnectAsync(CancellationToken cancellationToken = default) =>
-        _device.DisconnectAsync(cancellationToken);
+        ExecuteAsync(() => _device.DisconnectAsync(cancellationToken), true, cancellationToken);
 
     public async Task WriteDemoAsync(CancellationToken cancellationToken = default)
     {
         if (!IsConnected)
             throw new InvalidOperationException("Connect the virtual LIS2 first.");
 
-        await _device.ClearAsync(cancellationToken);
-        await _device.WriteLineAsync(1, "LIS2 Control Center", cancellationToken);
-        await _device.WriteLineAsync(2, "Avalonia Windows/Linux", cancellationToken);
+        await ClearAsync(cancellationToken);
+        await RenderBothAsync("LIS2 Control Center", "Avalonia Windows/Linux", cancellationToken);
     }
 
-    public ValueTask DisposeAsync() => _device.DisposeAsync();
+    public async ValueTask DisposeAsync() => await ExecuteAsync(() => _device.DisposeAsync().AsTask(), true);
+
+    /// <summary>Manuelle Ausgabe und Seitenframes teilen einen Schreibbesitzer und invalidieren den Cache.</summary>
+    private async Task ExecuteAsync(Func<Task> action, bool reset, CancellationToken token = default)
+    {
+        await _gate.WaitAsync(token);
+        try
+        {
+            if (reset) _frameWriter.Reset();
+            await action();
+        }
+        finally { _gate.Release(); }
+    }
 }

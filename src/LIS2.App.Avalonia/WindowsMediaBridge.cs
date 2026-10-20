@@ -10,16 +10,16 @@ public sealed class WindowsMediaBridge : IAsyncDisposable
     private MethodInfo? _dispose;
     private PropertyInfo? _values;
 
-    public async Task StartAsync()
+    public async Task StartAsync(string? providerFile = null)
     {
         if (!OperatingSystem.IsWindows()) return;
-        var file = Path.Combine(AppContext.BaseDirectory, "LIS2.WindowsMedia.dll");
-        if (!File.Exists(file)) return;
+        var file = providerFile ?? Path.Combine(AppContext.BaseDirectory, "LIS2.WindowsMedia.dll");
+        if (!File.Exists(file)) throw new FileNotFoundException("Windows Media provider is missing.", file);
         var assembly = Assembly.LoadFrom(file);
         var type = assembly.GetType("LIS2.WindowsMedia.WindowsMediaDataSource");
-        if (type is null) return;
+        if (type is null) throw new TypeLoadException("Windows Media provider type is missing.");
         _provider = Activator.CreateInstance(type, [null]);
-        if (_provider is null) return;
+        if (_provider is null) throw new InvalidOperationException("Could not create Windows Media provider.");
         _values = type.GetProperty("Values");
         _stop = type.GetMethod("StopAsync");
         _dispose = type.GetMethod("DisposeAsync");
@@ -52,8 +52,12 @@ public sealed class WindowsMediaBridge : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         if (_provider is null) return;
-        if (_stop?.Invoke(_provider, [CancellationToken.None]) is Task stop) await stop;
-        if (_dispose?.Invoke(_provider, null) is ValueTask dispose) await dispose;
-        _provider = null;
+        try
+        {
+            await LIS2.Runtime.RuntimeShutdown.RunAsync(
+                () => _stop?.Invoke(_provider, [CancellationToken.None]) as Task ?? Task.CompletedTask,
+                () => _dispose?.Invoke(_provider, null) is ValueTask dispose ? dispose.AsTask() : Task.CompletedTask);
+        }
+        finally { _provider = null; }
     }
 }

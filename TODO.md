@@ -1,7 +1,7 @@
 # TODO: Avalonia-Portierung
 
 Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-02. Lokal 326/326 Avalonia-Tests auf Windows erfolgreich; aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
+Implementierungsstand: PORT-03. Lokal 332/332 Avalonia-Tests und nativer Windows-Smoke erfolgreich; aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -33,7 +33,7 @@ Seitenerzeugung aus HA, Medien und Hardware-Presets verwendet `PageWorkspaceActi
 
 Betroffen: `PageWorkspaceActions`, Quellenhandler, Workspace-Laden und Avalonia-Tests. Die Nachweise prüfen den gemeinsamen Ablauf headless, keine echten GUI-Klicks, HA-Verbindungen oder serielle Hardware.
 
-Nächstes Implementierungspaket: **PORT-03: Diagnose und Laufzeitlebenszyklus**.
+Nächstes Implementierungspaket: **PORT-04: Medien und Produktgrenzen**.
 
 ## Weitere Implementierungs- und Prüfaufgaben
 
@@ -49,11 +49,11 @@ Nächstes Implementierungspaket: **PORT-03: Diagnose und Laufzeitlebenszyklus**.
 
 ### PORT-03: Diagnose und Laufzeitlebenszyklus
 
-- [ ] Echtes Anwendungs-/Protokoll-Logging einschließlich Export implementieren.
-- [ ] Avalonia-GUI-Smoke für Start, zehn Ansichten, Hilfe/About, fehlende Medienanbieter und geordnetes Beenden auf Windows/Linux ergänzen.
-- [ ] Start-/Stop-/Drain-Pfade aller Quellen und Timer einschließlich verzögertem Medienstart gegen Shutdown prüfen.
-- [ ] Differenzielle Display-Schreibspannen im Avalonia-Livepfad nachweisen; derzeit werden nur identische ganze Frames unterdrückt.
-- [ ] Vorhandene `IPlatform*`-Verträge, Adapter und UI-Orchestrierungen gegen die Zielarchitektur abgleichen.
+- [x] Begrenztes UTC-Anwendungs-/Transportjournal einschließlich OK/ERROR, dekodierten Befehlen und aktuellem Textexport.
+- [x] Isolierter nativer Desktop-Smoke für Start, zehn Ansichten, Hilfe/About, fehlende Medienanbieter und geordnetes Beenden; Windows lokal mit Exit 0, Windows/Linux im Workflow vorgesehen. Aktuelle CI-Ergebnisse im Status.
+- [x] Start-/Stop-/Drain-Pfade abgeglichen: Medienstart vor Dispose drainieren, MPRIS abbrechen/Kindprozess beenden, Timer vor Quellenabbau stoppen, weitere Ressourcen trotz Cleanup-Fehlern abbauen. Verzögerter Start erfolgreich/fehlgeschlagen getestet; reale Quellensysteme separat offen.
+- [x] Differenzielle Schreibspannen in serieller und virtueller Session nachgewiesen, einschließlich identischer Frames, manueller Cacheinvalidierung, Reconnect und Teilfehlern.
+- [x] Sieben `IPlatform*`-Verträge gegen tatsächliche Aufrufpfade und Zielarchitektur abgeglichen; Abweichungstabelle im Inventar, kein vorgetäuschter Adapterumbau.
 
 ### PORT-04: Medien und Produktgrenzen
 

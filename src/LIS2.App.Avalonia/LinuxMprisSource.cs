@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace LIS2.App.Avalonia;
 
-public sealed class LinuxMprisSource
+public sealed class LinuxMprisSource(string executable = "playerctl")
 {
     public static IReadOnlyDictionary<string, object?> Map(string state, string title, string artist)
         => new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
@@ -26,30 +26,45 @@ public sealed class LinuxMprisSource
         return values;
     }
 
-    public async Task<IReadOnlyDictionary<string, object?>> ReadAsync()
+    public async Task<IReadOnlyDictionary<string, object?>> ReadAsync(CancellationToken cancellationToken = default)
     {
         if (!OperatingSystem.IsLinux()) return Map("", "", "");
+        using var process = new Process();
         try
         {
-            using var process = new Process();
-            process.StartInfo.FileName = "playerctl";
+            process.StartInfo.FileName = executable;
             process.StartInfo.ArgumentList.Add("metadata");
             process.StartInfo.ArgumentList.Add("--format");
             process.StartInfo.ArgumentList.Add("{{status}}|{{xesam:title}}|{{xesam:artist}}|{{xesam:album}}|{{mpris:length}}");
             process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
             process.StartInfo.UseShellExecute = false;
-            if (!process.Start()) return Map("", "", "");
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            if (!process.Start()) throw new InvalidOperationException("Could not start playerctl.");
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            timeout.CancelAfter(TimeSpan.FromSeconds(3));
+            var errorTask = process.StandardError.ReadToEndAsync(timeout.Token);
             var output = await process.StandardOutput.ReadToEndAsync(timeout.Token);
             await process.WaitForExitAsync(timeout.Token);
+            var error = await errorTask;
             if (process.ExitCode == 0)
             {
                 return Parse(output);
             }
+            if (error.Contains("No players found", StringComparison.OrdinalIgnoreCase)) return Map("", "", "");
+            throw new InvalidOperationException("playerctl failed with exit code " + process.ExitCode + ".");
         }
-        catch (System.ComponentModel.Win32Exception) { }
-        catch (InvalidOperationException) { }
-        catch (OperationCanceledException) { }
-        return Map("", "", "");
+        finally
+        {
+            // Ein abgebrochener Refresh darf keinen Kindprozess über den Shutdown hinaus behalten.
+            try
+            {
+                if (process.Id > 0 && !process.HasExited)
+                {
+                    process.Kill(entireProcessTree: true);
+                    await process.WaitForExitAsync(CancellationToken.None);
+                }
+            }
+            catch (InvalidOperationException) { /* Der Prozess wurde nicht gestartet oder ist bereits beendet. */ }
+        }
     }
 }

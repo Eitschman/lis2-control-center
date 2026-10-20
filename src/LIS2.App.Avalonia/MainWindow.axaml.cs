@@ -12,6 +12,11 @@ public partial class MainWindow : Window
     private bool _busy;
     private readonly bool _startBackgroundSources;
     private readonly Func<string, SerialDisplaySession> _serialSessionFactory;
+    private readonly DiagnosticJournal _applicationJournal = new();
+    private readonly List<DiagnosticJournal> _serialJournals = new();
+    private Task _sourceStartup = Task.CompletedTask;
+    private Task _transportStartup = Task.CompletedTask;
+    internal bool CloseToTray { get; set; }
 
     public MainWindow() : this(new PortableWorkspaceStore(), new PortableHaTokenStore(), true,
         port => new SerialDisplaySession(port)) { }
@@ -92,7 +97,7 @@ public partial class MainWindow : Window
         InitializeSettings();
         InitializeEvents();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
-        Closed += OnWindowClosed;
+        Closing += OnWindowClosing;
         // The virtual transport is hardware-free: make the WPF-style preview
         // immediately testable without requiring an experimental serial connection.
         Opened += async (_, _) =>
@@ -103,7 +108,8 @@ public partial class MainWindow : Window
             // Respect the selected transport: opening the window must never
             // connect the virtual simulator while serial mode is selected.
             // WPF starts page rendering automatically after transport connection.
-            await ApplySettingsTransportAsync();
+            _transportStartup = ApplySettingsTransportAsync();
+            await _transportStartup;
         };
         UpdateSection();
         UpdateVirtualControls();
@@ -112,30 +118,63 @@ public partial class MainWindow : Window
     internal Task ShutdownCompletion { get; private set; } = Task.CompletedTask;
     private bool _windowClosed;
 
-    private async void OnWindowClosed(object? sender, EventArgs e)
+    private async void OnWindowClosing(object? sender, WindowClosingEventArgs e)
     {
+        if (_shutdownFinished) return;
+        e.Cancel = true;
+        if (CloseToTray && !_windowClosed) { Hide(); return; }
+        try { await BeginShutdownAsync(); }
+        catch (Exception exception)
+        {
+            _applicationJournal.Record("Shutdown", "ERROR " + exception.GetType().Name);
+            System.Diagnostics.Trace.TraceError("Shutdown failed: {0}", exception);
+        }
+        finally { _shutdownFinished = true; Close(); }
+    }
+
+    private bool _shutdownFinished;
+
+    /// <summary>Der Desktop darf erst nach Drain und Sicherheitswiederherstellung beendet werden.</summary>
+    internal Task BeginShutdownAsync()
+    {
+        if (_windowClosed) return ShutdownCompletion;
         _windowClosed = true;
+        IsEnabled = false;
+        _applicationJournal.Record("Application", "Shutdown started");
         ShutdownCompletion = ShutdownRuntimeAsync();
-        await ShutdownCompletion;
+        return ShutdownCompletion;
     }
 
     private async Task ShutdownRuntimeAsync()
     {
+        _editorPreviewTimer.Stop();
+        StopPagePlayback();
+        StopSerialPlayback();
+        _eventTimer.Stop();
+        _hardwareRefreshTimer.Stop();
+        StopHomeAssistantUi();
+        await RuntimeShutdown.RunAsync(
+            () => _transportStartup, () => _sourceStartup,
+            DrainDeviceActionsAsync,
+            StopMediaAsync,
+            () => _pageTimer.StopAndDrainAsync(), () => _serialPlaybackTimer.StopAndDrainAsync(),
+            () => _haUiTimer.StopAndDrainAsync(),
+            () => _virtualSequence?.StopAndDrainAsync() ?? Task.CompletedTask,
+            StopFanMonitorAsync, StopVirtualFanSessionAsync, CloseSerialDisplayAsync,
+            () => { if (_liveFanSensors is IDisposable sensors) sensors.Dispose(); return Task.CompletedTask; },
+            () => _virtualDevice.DisposeAsync().AsTask(), () => _runtime.DisposeAsync().AsTask());
+        _applicationJournal.Record("Application", "Shutdown drained");
+    }
+
+    private async Task DrainDeviceActionsAsync()
+    {
+        while (_busy || _serialBusy || _settingsTransportBusy || _dashboardFansBusy || _haActionBusy)
+            await Task.Delay(10);
+        // Ein bereits laufender Connect darf während seines Abschlusses Timer gestartet haben.
         StopPagePlayback();
         _eventTimer.Stop();
         _hardwareRefreshTimer.Stop();
         StopHomeAssistantUi();
-        await StopMediaAsync();
-        await _pageTimer.StopAndDrainAsync();
-        await _serialPlaybackTimer.StopAndDrainAsync();
-        await _haUiTimer.StopAndDrainAsync();
-        if (_virtualSequence is not null) await _virtualSequence.StopAndDrainAsync();
-        await StopFanMonitorAsync();
-        await StopVirtualFanSessionAsync();
-        await CloseSerialDisplayAsync();
-        if (_liveFanSensors is IDisposable fanSensors) fanSensors.Dispose();
-        await _virtualDevice.DisposeAsync();
-        await _runtime.DisposeAsync();
     }
 
     private async Task RunVirtualActionAsync(Func<Task> action)
@@ -216,6 +255,7 @@ public partial class MainWindow : Window
 
     private void SetVirtualStatus(string message)
     {
+        _applicationJournal.Record("Application", message);
         var status = this.FindControl<TextBlock>("VirtualStatus");
         if (status is not null)
             status.Text = message;
@@ -315,7 +355,7 @@ public partial class MainWindow : Window
         }
 
         if (description is not null)
-            description.IsVisible = section is not ("Dashboard" or "Display" or "Settings");
+            description.IsVisible = section is not ("Dashboard" or "Display" or "Settings" or "Diagnostics" or "Media");
         if (description is not null)
             description.Text = TranslateSectionDescription(section, section switch
             {

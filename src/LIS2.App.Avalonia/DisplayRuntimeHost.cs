@@ -64,8 +64,8 @@ public sealed class DisplayRuntimeHost : IAsyncDisposable
         if (_disposed) return;
         _disposed = true;
         foreach (var sequence in _sequences) sequence.Stop();
-        foreach (var sequence in _sequences)
-            await sequence.StopAndDrainAsync().ConfigureAwait(false);
-        await _sources.DisposeAsync().ConfigureAwait(false);
+        await LIS2.Runtime.RuntimeShutdown.RunAsync(_sequences
+            .Select(sequence => (Func<Task>)(() => sequence.StopAndDrainAsync()))
+            .Append(() => _sources.DisposeAsync().AsTask()).ToArray()).ConfigureAwait(false);
     }
 }

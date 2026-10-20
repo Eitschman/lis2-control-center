@@ -1,5 +1,6 @@
 using LIS2.Core;
 using LIS2.Runtime;
+using LIS2.Display;
 
 namespace LIS2.App.Avalonia;
 
@@ -11,13 +12,17 @@ namespace LIS2.App.Avalonia;
 public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
 {
     private readonly Lis2Device _device;
+    private readonly DisplayFrameWriter _frameWriter;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private bool _authorized;
     private int[]? _safeFrame;
     private bool _disposed;
 
-    public UnifiedLis2Session(ILis2Transport transport) =>
+    public UnifiedLis2Session(ILis2Transport transport)
+    {
         _device = new Lis2Device(transport ?? throw new ArgumentNullException(nameof(transport)));
+        _frameWriter = new DisplayFrameWriter(_device);
+    }
 
     public bool IsConnected => _device.IsConnected;
     public bool FansAuthorized => _authorized && IsConnected;
@@ -31,6 +36,7 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
             if (IsConnected) throw new InvalidOperationException("Already connected.");
             _authorized = false;
             _safeFrame = null;
+            _frameWriter.Reset();
             await _device.ConnectAsync(token).ConfigureAwait(false);
         }
         finally { _gate.Release(); }
@@ -127,8 +133,7 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
         try
         {
             if (!IsConnected) throw new InvalidOperationException("Display is disconnected.");
-            await _device.WriteLineAsync(1, line1, token).ConfigureAwait(false);
-            await _device.WriteLineAsync(2, line2, token).ConfigureAwait(false);
+            await _frameWriter.WriteAsync(DisplayFrame.Create(line1, line2), token).ConfigureAwait(false);
         }
         finally { _gate.Release(); }
     }
@@ -137,14 +142,14 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
     public async Task WriteLineAsync(int line, string text, CancellationToken token = default)
     {
         await _gate.WaitAsync(token).ConfigureAwait(false);
-        try { RequireConnected(); await _device.WriteLineAsync(line, text, token).ConfigureAwait(false); }
+        try { RequireConnected(); _frameWriter.Reset(); await _device.WriteLineAsync(line, text, token).ConfigureAwait(false); }
         finally { _gate.Release(); }
     }
 
     public async Task ClearAsync(CancellationToken token = default)
     {
         await _gate.WaitAsync(token).ConfigureAwait(false);
-        try { RequireConnected(); await _device.ClearAsync(token).ConfigureAwait(false); }
+        try { RequireConnected(); _frameWriter.Reset(); await _device.ClearAsync(token).ConfigureAwait(false); }
         finally { _gate.Release(); }
     }
 
@@ -179,7 +184,7 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
     public async Task WriteRawDisplayBytesAsync(int line, int column, byte[] bytes, CancellationToken token = default)
     {
         await _gate.WaitAsync(token).ConfigureAwait(false);
-        try { RequireConnected(); await _device.WriteRawDisplayBytesAsync(line, column, bytes, token).ConfigureAwait(false); }
+        try { RequireConnected(); _frameWriter.Reset(); await _device.WriteRawDisplayBytesAsync(line, column, bytes, token).ConfigureAwait(false); }
         finally { _gate.Release(); }
     }
 
