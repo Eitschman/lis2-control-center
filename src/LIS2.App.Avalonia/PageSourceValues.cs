@@ -17,6 +17,14 @@ public sealed class PageSourceValues : IAsyncDisposable
         var prefix = sourceId + ".";
         foreach (var key in _media.Keys.Where(k => k.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToArray())
             _media.Remove(key);
+        // Disconnected providers may retain their last metadata snapshot. Keep
+        // the connection flag, but never expose stale titles or artists to pages.
+        if (values.TryGetValue("Connected", out var connected) &&
+            connected is bool isConnected && !isConnected)
+        {
+            _media[prefix + "Connected"] = false;
+            return;
+        }
         foreach (var pair in values)
             _media[prefix + pair.Key] = pair.Value;
     }
