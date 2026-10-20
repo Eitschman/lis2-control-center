@@ -11,6 +11,8 @@ public partial class MainWindow
     private readonly DisplayRuntimeHost _runtime = new();
     private PageSourceValues _pageSources => _runtime.Sources;
     private bool _loadingPage;
+    private int? _loadedPageIndex;
+    private bool _handlingPageSelection;
     private readonly PageEditorPreview _editorPreview = new();
     private readonly DispatcherTimer _editorPreviewTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private bool _editorPreviewConfigured;
@@ -19,7 +21,7 @@ public partial class MainWindow
     {
         _editorPreviewTimer.Tick += (_, _) => TickEditorPreview();
         Closed += (_, _) => _editorPreviewTimer.Stop();
-        this.FindControl<ListBox>("PagesList")!.SelectionChanged += (_, _) => LoadPageEditor();
+        this.FindControl<ListBox>("PagesList")!.SelectionChanged += async (_, _) => await HandlePageSelectionAsync();
         this.FindControl<Button>("PageCreatePreset")!.Click += async (_, _) =>
         {
             try
@@ -217,6 +219,32 @@ public partial class MainWindow
         await SavePortableWorkspaceAsync();
     }
 
+    private async Task HandlePageSelectionAsync()
+    {
+        if (_loadingPage || _handlingPageSelection) return;
+        var next = SelectedPageIndex;
+        if (_loadedPageIndex == next) return;
+        _handlingPageSelection = true;
+        try
+        {
+            if (_loadedPageIndex is int previous && previous >= 0 && previous < _pages.Pages.Count)
+            {
+                if (!SavePageEditor(previous))
+                {
+                    // Invalid edits must not disappear when the user selects
+                    // another page. Keep the editor and selection together.
+                    _loadingPage = true;
+                    this.FindControl<ListBox>("PagesList")!.SelectedIndex = previous;
+                    _loadingPage = false;
+                    return;
+                }
+                await ReloadRunningPagesAsync();
+            }
+            LoadPageEditor();
+        }
+        finally { _handlingPageSelection = false; }
+    }
+
     private int? SelectedPageIndex =>
         this.FindControl<ListBox>("PagesList")!.SelectedIndex is int i && i >= 0 && i < _pages.Pages.Count ? i : null;
 
@@ -228,6 +256,7 @@ public partial class MainWindow
         list.ItemsSource = _pages.Pages.Select((p, index) => new PageListRow(index, p.Name, p.Enabled)).ToArray();
         list.SelectedIndex = selection;
         _loadingPage = false;
+        _loadedPageIndex = SelectedPageIndex;
         if (SelectedPageIndex is null)
         {
             ClearPageEditorPreview();
@@ -257,9 +286,11 @@ public partial class MainWindow
         if (_loadingPage) return;
         if (SelectedPageIndex is not int i)
         {
+            _loadedPageIndex = null;
             ClearPageEditorPreview();
             return;
         }
+        _loadedPageIndex = i;
         var p = _pages.Get(i);
         _loadingPage = true;
         this.FindControl<TextBox>("PageName")!.Text = p.Name;
@@ -378,9 +409,11 @@ public partial class MainWindow
             ? TimeSpan.FromMilliseconds(20) : delay;
     }
 
-    private bool SavePageEditor()
+    private bool SavePageEditor() => SelectedPageIndex is int index && SavePageEditor(index);
+
+    private bool SavePageEditor(int i)
     {
-        if (SelectedPageIndex is not int i) return false;
+        if (i < 0 || i >= _pages.Pages.Count) return false;
         try
         {
             var duration = int.Parse(this.FindControl<TextBox>("PageDuration")!.Text ?? "", CultureInfo.InvariantCulture);
