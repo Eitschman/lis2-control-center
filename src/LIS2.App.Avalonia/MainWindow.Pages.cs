@@ -86,31 +86,18 @@ public partial class MainWindow
         _ = StartPageSourcesAsync();
     }
 
-    private sealed record PagePresetSpec(
-        string Name, string Line1, string Line2, int Duration = 5,
-        string Visibility = "", string Overflow1 = "Truncate",
-        string Overflow2 = "Truncate", int ScrollStep = 250, int EdgePause = 800);
-
     private PagePresetSpec CreateWpfPagePreset(int choice)
     {
         return choice switch
         {
-            0 => new("Clock", "{Clock.Time}", "{Clock.Date}"),
-            1 => new("LIS2 Status", "LIS2 Control Center", "Ready"),
+            0 => PagePresetCatalog.Get(0),
+            1 => PagePresetCatalog.Get(1),
             2 => CreateHardwarePagePreset("CPU", "Load", "Temperature", "CPU", "Temp", "CPU", "Processor"),
             3 => CreateHardwarePagePreset("GPU", "Load", "Temperature", "GPU", "Temp", "GPU", "Graphics"),
             4 => CreateHardwarePagePreset("Memory", "Load", "Data", "RAM", "Used", "Memory", "RAM"),
             5 => CreateHardwarePagePreset("Temperatures", "Temperature", "Temperature", "T1", "T2"),
             6 => CreateHardwarePagePreset("Fans", "Fan", "Fan", "Fan1", "Fan2"),
-            7 => new("Winamp Now Playing", "{Winamp.Artist}", "{Winamp.Title}", 7,
-                "Winamp.State=Playing", "PingPong", "PingPong"),
-            8 => new("Winamp VU", "{Winamp.Title}", "{Winamp.Vu}", 7,
-                "Winamp.State=Playing", "PingPong"),
-            9 => new("Winamp Spectrum", "{Winamp.Artist}", "{Winamp.SpectrumGlyphs}", 7,
-                "Winamp.State=Playing", "PingPong"),
-            10 => new("Windows Media Now Playing", "{WindowsMedia.Artist|fallback:--}",
-                "{WindowsMedia.Title|fallback:--}", 7,
-                "WindowsMedia.State=Playing", "PingPong", "PingPong"),
+            7 or 8 or 9 or 10 => PagePresetCatalog.Get(choice),
             _ => throw new ArgumentOutOfRangeException(nameof(choice), "Unknown page preset.")
         };
     }

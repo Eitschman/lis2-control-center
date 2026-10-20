@@ -637,3 +637,7 @@ Implemented initial cross-screen package: common light shell/white card styling,
 
 ## Next package: five-language page variable browser (2026-10-20)
 - Completed dedicated browser translations for German, French, Turkish and Russian with English fallback, including title, search, categories, HA entity filter, details, favorites, insertion actions and counts. Stable English filter keys remain independent of UI labels. Page toolbar and count status follow selected language. Added translation/fallback/filter tests. Windows/Linux UI acceptance and current HEAD CI still required; no WPF removal or hardware changes.
+
+## WPF Pages preset contract parity package (2026-10-20)
+- Audited WPF CreatePagePresetDefinition against Avalonia. Corrected Winamp VU and Winamp Spectrum line-2 overflow to Truncate (previously incorrect PingPong). Extracted all six static WPF page presets into testable PagePresetCatalog with exact names, lines, visibility, duration, overflow and scroll timing. Dynamic hardware presets 2–6 retain existing sensor resolution. Added parameterized contract tests and explicit invalid-index guard.
+- This is source-level preset parity, not spectrum glyph provisioning parity or all-ten-view visual acceptance. Spectrum glyph replacement confirmation and physical-device programming remain open. CI and Windows/Linux desktop acceptance pending.
