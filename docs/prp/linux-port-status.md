@@ -715,3 +715,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Following green CI for a131752f, audited cross-transport page lifecycle and found ReloadRunningPagesAsync updated only the virtual sequence. Live serial playback kept its old schedule after page add/duplicate/delete/reorder/save/import/preset/media page creation or enabled-toggle.
 - Shared reload path now updates both active sequences independently, with transport-specific error reporting and immediate ticks. The underlying PageSequenceController still gates in-flight writes and retains actual device frame state. Serial connection is not restarted and fan authorization is unchanged.
 - Enabled checkbox handler now awaits schedule reload and portable workspace persistence instead of fire-and-forget tasks. Added headless tests for simultaneous virtual/serial workspace edits and transport independence. Commits a3148e6, ed41ace, 8db56b0. CI and physical serial/desktop verification pending.
+
+
+## Manual command / scheduled playback ownership (2026-10-20)
+- Following green CI at 37385ebe, audited manual command handover on both virtual and serial transports. Previously RunVirtualActionAsync and RunSerialActionAsync stopped playback synchronously but did not await scheduled-loop and sequence in-flight writes before manual display/glyph/brightness commands.
+- Both handlers now reserve their busy flag first, stop the sequence, await the adaptive loop drain and the PageSequenceController write drain, and only then execute the manual operation. This closes an ordering gap without changing fan authorization or protocol bytes. Existing UI status/failure reporting remains in place.
+- Added headless regression tests proving a manual takeover waits until a pending page write has finished and that failed scheduled writes can be drained for manual recovery. Commits b277297, 4367463, 55b786f. CI and hardware validation pending.
