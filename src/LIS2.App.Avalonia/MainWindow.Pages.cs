@@ -229,7 +229,7 @@ public partial class MainWindow
         {
             if (_loadedPageIndex is int previous && previous >= 0 && previous < _pages.Pages.Count)
             {
-                if (!SavePageEditor(previous))
+                if (!SavePageEditor(previous, refreshEditor: false))
                 {
                     // Invalid edits must not disappear when the user selects
                     // another page. Keep the editor and selection together.
@@ -411,7 +411,7 @@ public partial class MainWindow
 
     private bool SavePageEditor() => SelectedPageIndex is int index && SavePageEditor(index);
 
-    private bool SavePageEditor(int i)
+    private bool SavePageEditor(int i, bool refreshEditor = true)
     {
         if (i < 0 || i >= _pages.Pages.Count) return false;
         try
@@ -438,7 +438,7 @@ public partial class MainWindow
             p.Line1OverflowMode = OverflowName(this.FindControl<ComboBox>("PageOverflow1")!.SelectedIndex);
             p.Line2OverflowMode = OverflowName(this.FindControl<ComboBox>("PageOverflow2")!.SelectedIndex);
             p.Enabled = this.FindControl<CheckBox>("PageEnabled")!.IsChecked == true;
-            RefreshPageList(i);
+            if (refreshEditor) RefreshPageList(i);
             SetVirtualStatus($"Saved page '{p.Name}' in editor workspace.");
             _ = SavePortableWorkspaceAsync();
             return true;
