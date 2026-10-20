@@ -36,7 +36,8 @@ public partial class MainWindow
 
     private async Task StartPagePlaybackAsync()
     {
-        if (_virtualSequence?.IsRunning == true || _virtualSequence?.IsBusy == true) return;
+        if (_virtualSequence?.IsBusy == true) return;
+        if (_virtualSequence?.IsRunning == true && !_eventStartedVirtual) return;
         if (!_virtualDevice.IsConnected)
         {
             SetVirtualStatus("Connect the virtual LIS2 before starting the sequence.");
@@ -44,6 +45,17 @@ public partial class MainWindow
         }
         if (SelectedPageIndex is not null && !SavePageEditor()) return;
         _virtualSequence ??= CreateVirtualSequence();
+        if (_eventStartedVirtual && _virtualSequence.IsRunning)
+        {
+            // Promote the temporary event-only sequence to ordinary page playback.
+            // Keep the active overlay and the dispatcher's last frame intact.
+            if (!await _virtualSequence.ReloadAsync(_pages.Pages)) return;
+            _eventStartedVirtual = false;
+            UpdatePagePlaybackControls();
+            await TickPagePlaybackAsync();
+            return;
+        }
+        _eventStartedVirtual = false;
         if (!_virtualSequence.Start(_pages.Pages)) return;
         await _pageTimer.StopAndDrainAsync();
         _pageTimer.Start();
@@ -88,6 +100,7 @@ public partial class MainWindow
     {
         _pageTimer.Stop();
         _virtualSequence?.Stop();
+        _eventStartedVirtual = false;
         UpdatePagePlaybackControls();
         UpdateVirtualControls();
     }
