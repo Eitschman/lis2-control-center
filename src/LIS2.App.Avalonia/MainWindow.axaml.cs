@@ -20,6 +20,8 @@ public partial class MainWindow : Window
             this.FindControl<Button>($"NavButton{index}")!.Click += (_, _) => NavigateTo(index);
         }
         this.FindControl<Button>("OpenTransportSettings")!.Click += (_, _) => NavigateTo(7);
+        this.FindControl<Button>("OpenHelp")!.Click += async (_, _) => await OpenHelpAsync();
+        this.FindControl<Button>("OpenAbout")!.Click += async (_, _) => await OpenAboutAsync();
 
         this.FindControl<Button>("VirtualConnect")!.Click += async (_, _) =>
             await RunVirtualActionAsync(ConnectWithGlyphsAsync);
