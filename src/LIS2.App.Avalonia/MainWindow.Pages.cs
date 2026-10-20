@@ -254,7 +254,12 @@ public partial class MainWindow
 
     private void LoadPageEditor()
     {
-        if (_loadingPage || SelectedPageIndex is not int i) return;
+        if (_loadingPage) return;
+        if (SelectedPageIndex is not int i)
+        {
+            ClearPageEditorPreview();
+            return;
+        }
         var p = _pages.Get(i);
         _loadingPage = true;
         this.FindControl<TextBox>("PageName")!.Text = p.Name;
