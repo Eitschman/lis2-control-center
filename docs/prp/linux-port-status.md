@@ -721,3 +721,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Following green CI at 37385ebe, audited manual command handover on both virtual and serial transports. Previously RunVirtualActionAsync and RunSerialActionAsync stopped playback synchronously but did not await scheduled-loop and sequence in-flight writes before manual display/glyph/brightness commands.
 - Both handlers now reserve their busy flag first, stop the sequence, await the adaptive loop drain and the PageSequenceController write drain, and only then execute the manual operation. This closes an ordering gap without changing fan authorization or protocol bytes. Existing UI status/failure reporting remains in place.
 - Added headless regression tests proving a manual takeover waits until a pending page write has finished and that failed scheduled writes can be drained for manual recovery. Commits b277297, 4367463, 55b786f. CI and hardware validation pending.
+
+
+## Shared event overlay integration for virtual and serial LIS2 (2026-10-20)
+- After confirmed green CI for f9d0faaf, audited Events view against DisplayRuntimeHost. The UI previously maintained a separate EventQueue and wrote directly to virtual hardware, bypassing shared sequence priority handling; serial events never displayed.
+- Events view now uses the host's shared priority queue, so existing virtual/serial sequences display highest-priority overlays and automatically resume their page frame after expiry/cancel. If playback was stopped, connected transports can start an event-only empty-page sequence; on expiry the event frame is cleared and only these temporary sequences stop. No direct UI event display writes.
+- Event overlay updates are serialized at the UI handler, use the existing per-transport PageSequenceController output gates, and support both connected transports without changing fan authorization or serial protocol.
+- Added headless tests for both transport event delivery, priority preemption/cancellation, normal page resumption, and event-only expiry/clear. Commits 1caceb5, 05707a4. Desktop and physical verification deferred; CI pending.
