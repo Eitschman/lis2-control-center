@@ -239,6 +239,12 @@ public partial class MainWindow
             SavePageEditor(index, refreshEditor: false);
     }
 
+    /// <summary>Quellenaktionen verwenden denselben Entwurfsschutz und aktualisieren beide Transports.</summary>
+    private Task<bool> AddSourcePageAsync(Action<PageDefinition> configure) =>
+        new PageWorkspaceActions(_pages, CommitPendingPageEditor, RefreshPageList,
+            ReloadRunningPagesAsync, () => SavePortableWorkspaceAsync(), () => NavigateTo(2))
+            .AddSourcePageAsync(configure);
+
     private async Task HandlePageSelectionAsync()
     {
         if (_loadingPage || _handlingPageSelection) return;

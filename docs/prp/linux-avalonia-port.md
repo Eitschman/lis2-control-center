@@ -1,7 +1,7 @@
 # PRP: LIS2 Control Center mit Avalonia
 
 Stand: 20.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
-Geprüfte Codebasis: `71b72a8987a4f9b8a14a3807f94667569e28be43`.
+Implementierungsstand: PORT-01; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
 
@@ -19,7 +19,7 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Für die geprüfte Codebasis sind alle sieben Jobs im [Lauf 39435226116](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116) erfolgreich. Dieser Nachweis gilt für den genannten Code-Commit. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
+Builds, Tests und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 304/304 Avalonia-Tests auf Windows erfolgreich. Der [Status](linux-port-status.md) ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
 
 ## Implementierungsstand
 
@@ -29,12 +29,12 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | --- | --- | --- |
 | Projektstruktur | Avalonia 11.3.6, .NET 8, portable Bibliotheken und `LIS2.Runtime` vorhanden | Plattformverträge sind noch nicht durchgängig angebunden; UI-Code enthält weitere Orchestrierung |
 | Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen integriert | WPF-gleiche Bedienung und gemeinsamer Transportzugriff aller Displayaktionen prüfen |
-| Seiteneditor | Seitenpflege, Vorlagen, Bedingungen, Presets, animierte Vorschau, Variablenbrowser und validierter JSON-Import/-Export vorhanden | Quellenübergreifender Entwurfsschutz und HA-Seitenerstellung siehe TODO |
+| Seiteneditor | Seitenpflege, Vorlagen, Bedingungen, Presets, animierte Vorschau, Variablenbrowser, validierter JSON-Import/-Export und gemeinsamer Entwurfsschutz für Quellenaktionen vorhanden | GUI-Interaktionen und WPF-Bedienparität prüfen |
 | Glyphen | Acht 5x8-Slots, Dateien, Namen, Spektrumset und Ersetzungsdialog vorhanden | Physische Zeichenprüfung und UI-/Transportabgleich offen |
 | Sensoren | LibreHardwareMonitor auf Windows; procfs/sysfs/hwmon auf Linux; Aliase, Favoriten und fehlende Sensoren berücksichtigt | Stabile Identitäten und Rechte auf Zielsystemen prüfen |
 | Lüfter | Vier Modi plus Off, Kurven, Hysterese, Fail-safe, Simulation und freizugebende serielle Ausgabe vorhanden | Manuelle Dashboard-Ausgabe und WPF-Interaktionen abgleichen; Hardware bleibt ungeprüft |
 | Medien | Winamp, reflektiert geladener GSMTC-Anbieter und Linux-`playerctl` angebunden | MPRIS-Zeitposition, Playerwahl und echte Zielplayer offen; WMP Legacy weicht vom zurückgestellten Produktumfang ab |
-| Home Assistant | WebSocket-Quelle, Entitäten, Attribute, Aliase, Favoriten und Seitenaktionen vorhanden | Linux-Liveprüfung, Deaktivierung/Persistenz und Seitenübernahme prüfen |
+| Home Assistant | WebSocket-Quelle, Entitäten, Attribute, Aliase, Favoriten und Seitenaktionen mit Sequenz-Reload vorhanden | Linux-Liveprüfung und Deaktivierung/Persistenz prüfen |
 | Einstellungen | Workspace, Windows-Importlogik, Theme, Sprache und Windows-Tray/Autostart vorhanden | Transport-/Portpersistenz, Helligkeitsanwendung, sichtbarer Importzugang und Linux-Desktopintegration offen |
 | Hilfe und About | Kontextbezogene Hilfe mit zehn Themen, Live-Schlüsseln, Glyphenreferenz und About-Dialog vorhanden | WPF-Inhaltstiefe, Übersetzungen, Platzierung und Desktop-Bedienung offen |
 | Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Textexport vorhanden | Echtes Anwendungs-/Protokoll-Logging fehlt |
@@ -67,7 +67,9 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 - [x] Workspace und validierende Windows-Importlogik einschließlich Seiten, Glyphen und Lüfterkonfiguration vorhanden.
 - [x] Windows-DPAPI und Linux-`secret-tool` sind im Tokenstore angebunden.
 - [ ] Automatischen lokalen AES-Dateipfad bei fehlendem Secret Service gegen die verbindliche Freigabepolitik prüfen. Vorhandener Code ist keine Freigabe.
-- [ ] Fehlende Einstellungen, sichtbare Importbedienung und Wiederherstellung leerer Seitenlisten bearbeiten.
+- [x] Quellenaktionen übernehmen gültige Entwürfe und laden laufende Sequenzen neu; ungültige Entwürfe verhindern den Wechsel.
+- [x] Gespeicherte leere Seitenlisten ersetzen die Startseite; ohne Workspace-Datei bleibt sie erhalten.
+- [ ] Fehlende Einstellungen und sichtbare Importbedienung bearbeiten.
 
 ### Oberfläche und Verifikation
 

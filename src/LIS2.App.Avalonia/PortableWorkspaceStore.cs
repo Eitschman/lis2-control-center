@@ -16,6 +16,8 @@ public sealed class PortableWorkspaceStore
             "LIS2ControlCenter", "avalonia-workspace.json");
     }
 
+    public bool Exists => File.Exists(_path);
+
     public PortableWorkspace Load()
     {
         if (!File.Exists(_path)) return new PortableWorkspace();

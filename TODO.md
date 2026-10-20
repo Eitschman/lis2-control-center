@@ -1,8 +1,7 @@
 # TODO: Avalonia-Portierung
 
 Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
-Geprüfte Codebasis: `71b72a8987a4f9b8a14a3807f94667569e28be43`.
-[CI 39435226116](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116): sieben von sieben Jobs erfolgreich.
+Implementierungsstand: PORT-01. Lokal 304/304 Avalonia-Tests auf Windows erfolgreich; aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -22,17 +21,19 @@ Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md
 
 Abgehakt bedeutet vorhandener und im Status eingegrenzter Umfang, keine pauschale WPF- oder Hardwareparität.
 
-## Nächstes Arbeitspaket: Quellenaktionen und Seitenzustand
+## PORT-01: Quellenaktionen und Seitenzustand
 
-**PORT-01.** Seitenerzeugung aus HA/Media und Workspace-Wiederherstellung müssen denselben Entwurfsschutz und dieselbe Liveübernahme wie die normalen Seitenaktionen verwenden.
+Seitenerzeugung aus HA, Medien und Hardware-Presets verwendet `PageWorkspaceActions` für Entwurfsschutz, Auswahl, Liveübernahme und Speicherung.
 
-- [ ] `CreateHaPageAsync` muss laufende virtuelle und serielle Sequenzen nach Seitenerzeugung aktualisieren.
-- [ ] HA-/Media-Seitenerzeugung muss bestehende Editorentwürfe vor einem Listen-/Editorwechsel validieren und erhalten.
-- [ ] Eine gespeicherte leere Seitenliste muss beim Laden als leere Liste übernommen werden.
-- [ ] Regressionen für gültige/ungültige Entwürfe, beide Transports und leere Workspace-Wiederherstellung ergänzen.
+- [x] HA-, Medien- und Hardware-Seitenerzeugung aktualisiert laufende virtuelle und serielle Sequenzen.
+- [x] Quellenaktionen validieren und übernehmen Editorentwürfe vor einem Listen-/Editorwechsel; ungültige Entwürfe verhindern die Aktion.
+- [x] Gespeicherte leere Seitenliste beim Laden übernehmen; ohne Workspace-Datei die Startseite erhalten.
+- [x] Sieben Regressionstests für gültige/ungültige Entwürfe, beide Transports, gespeicherte leere Liste und ungültige gespeicherte Seiten. Gegenproben erkennen ausgelassenen Entwurfsschutz, fehlendes Reload und ignorierte leere Liste.
 - [ ] Aktuellen Windows-/Ubuntu-CI-Lauf prüfen und Nachweise in Status/Paritätsaudit aktualisieren.
 
-Betroffen: `MainWindow.HomeAssistant.cs`, `MainWindow.Media.cs`, `MainWindow.Pages.cs`, `MainWindow.Workspace.cs` und die vorhandenen Avalonia-Tests. Keine Erweiterung des Medienumfangs und keine Änderung der Lüfterfreigabe.
+Betroffen: `PageWorkspaceActions`, Quellenhandler, Workspace-Laden und Avalonia-Tests. Die Nachweise prüfen den gemeinsamen Ablauf headless, keine echten GUI-Klicks, HA-Verbindungen oder serielle Hardware.
+
+Nächstes Implementierungspaket: **PORT-02: Einstellungen und Gerätebedienung**.
 
 ## Weitere Implementierungs- und Prüfaufgaben
 

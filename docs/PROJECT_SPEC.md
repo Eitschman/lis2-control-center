@@ -10,7 +10,7 @@
 - Referenzanwendung: Windows-WPF unter `src/LIS2.App`.
 - Winamp plug-in: native Win32/x86
 - License: MIT
-- Geprüfte Codebasis: `71b72a8987a4f9b8a14a3807f94667569e28be43`, Stand 20.10.2026. Physische LIS2-Prüfung bleibt offen.
+- Implementierungsstand: PORT-01, Stand 20.10.2026; Prüfnachweise im [Status](prp/linux-port-status.md). Physische LIS2-Prüfung bleibt offen.
 
 Das [Avalonia-PRP](prp/linux-avalonia-port.md) bestimmt das Portierungsziel. [Status](prp/linux-port-status.md) und [Paritätsaudit](prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Nachweise und offene Oberflächen-/Hardwareprüfung. Die nachstehenden Funktionsabschnitte dienen als WPF-Funktionsreferenz; sie behaupten keine bereits nachgewiesene Gleichheit aller Avalonia-Pfade.
 

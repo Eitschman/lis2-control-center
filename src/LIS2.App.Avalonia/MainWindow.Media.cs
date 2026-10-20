@@ -168,14 +168,12 @@ public partial class MainWindow
 
     private async Task CreateMediaPageAsync(string sourceId, string title)
     {
-        var page = _pages.Add();
-        page.Name = title;
-        page.Line1Template = "{" + sourceId + ".Title}";
-        page.Line2Template = "{" + sourceId + ".Artist}";
-        RefreshPageList(_pages.Pages.Count - 1);
-        await ReloadRunningPagesAsync();
-        await SavePortableWorkspaceAsync();
-        NavigateTo(2);
+        await AddSourcePageAsync(page =>
+        {
+            page.Name = title;
+            page.Line1Template = "{" + sourceId + ".Title}";
+            page.Line2Template = "{" + sourceId + ".Artist}";
+        });
     }
 
     private async Task StopMediaAsync()

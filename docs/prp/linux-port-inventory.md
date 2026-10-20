@@ -1,11 +1,11 @@
 # Inventar des Avalonia-Branches
 
-Stand: 20.10.2026. Codebasis: `71b72a8987a4f9b8a14a3807f94667569e28be43`.
+Stand: 20.10.2026. Implementierungsstand: PORT-01.
 Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Konfiguration. Kein ZIP-Archiv als Implementierungsbaseline.
 
 ## Umfang und Projekte
 
-`git ls-files` erfasst 284 Dateien, darunter 217 C#-Dateien und 22 C#-Projektdateien. Es gibt neun Testprojekte. Das Avalonia-Testprojekt enthält 35 `*Tests.cs`-Dateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
+Der Quellbestand umfasst 286 Dateien, darunter 219 C#-Dateien und 22 C#-Projektdateien. Es gibt neun Testprojekte. Das Avalonia-Testprojekt enthält 36 `*Tests.cs`-Dateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
 
 | Gruppe | Projekte | Target |
 | --- | --- | --- |
@@ -30,7 +30,7 @@ Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin`
 | Verlinkte Runtime-Dateien | `DisplayRuntimeHost`, `PagePlayback`, `PageDefinition`, `PageFrameDispatcher`, `PageSourceValues`, `PageClockValues`, `PeriodicRuntimeLoop`, `PageSequenceController` liegen unter `src/LIS2.App.Avalonia` und werden von Runtime kompiliert |
 | Avalonia-Shell | `App.axaml(.cs)`, `Program.cs`, `MainWindow.axaml(.cs)`; zehn Views und partielle Handlerdateien |
 | Sessions | VirtualDeviceSession, SerialDisplaySession, UnifiedLis2Session, AuthorizedFanRuntimeSession und SafeSerialFanSession |
-| Workspace | PortableWorkspaceStore, PortableFanSettings, WindowsSettingsImporter, MainWindow.Workspace/WindowsImport |
+| Workspace | PortableWorkspaceStore, PortableFanSettings, WindowsSettingsImporter, MainWindow.Workspace/WindowsImport; PageWorkspaceActions verbindet Quellenaktionen, Editor, Sequenz-Reload und Persistenz |
 | Geheimnisse | PortableHaTokenStore, LegacyHaTokenStore; DPAPI, secret-tool und lokaler AES-Dateipfad |
 | Hardware | LinuxSystemSensors/LinuxHwmonFanSensors, WindowsHardwareFanSensors, HardwareSensorCatalog und HardwareDisplayPresetBuilder |
 | Medien | MainWindow.Media, WindowsMediaBridge und LinuxMprisSource; Originalquellen in Winamp, WindowsMedia und WmpLegacy |
@@ -71,6 +71,7 @@ Avalonia-Testgruppen:
 - Sensoren, Presets, fehlende Werte und Fan-Fail-safe.
 - Virtuelle/serielle Session, gemeinsame Ausgabe, Freigabe und Fehlereinspeisung.
 - Workspace, Windows-Import, Glyphendateien, Tokenstore und Hilfeinhalte.
+- Gemeinsame Quellenaktionen mit gültigen/ungültigen Entwürfen, beiden Sequenzen und persistierter leerer Seitenliste.
 
 Das sind Headless-Prüfungen. GUI-Start/-Navigation, Paketstart, echte DBus-/HA-/Player-/Sensorintegration und physische LIS2-Ausgabe sind damit nicht abgedeckt. Aktueller CI-Nachweis und Grenzen stehen im [Status](linux-port-status.md).
 

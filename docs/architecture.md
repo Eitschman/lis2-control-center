@@ -1,6 +1,6 @@
 # Architektur
 
-Stand: 20.10.2026. Geltungsbereich: `feature/linux-avalonia`, Codebasis `71b72a8`.
+Stand: 20.10.2026. Geltungsbereich: `feature/linux-avalonia`, Arbeitspaket PORT-01.
 Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md).
 
 ## Projekte und Abhängigkeiten
@@ -50,6 +50,8 @@ Clock / Hardware / HA / Winamp / WindowsMedia / Media
 
 `PagePlayback` verarbeitet Sichtbarkeit, Rotation, Vorlagen-Refresh und beide Scrollzeilen. `NextDelay` steuert `AdaptiveRuntimeLoop`; die UI-Anbindung erfolgt über `UiRuntimeDispatch`. Der Editor verwendet eine unabhängige `PageEditorPreview` und einen eigenen UI-Timer.
 
+`PageWorkspaceActions` verbindet die Seitenerzeugung aus HA, Medien und Hardware-Presets mit dem Editor und der Wiedergabe. Ungültige Editorentwürfe verhindern Änderungen an Liste, Auswahl und Persistenz. Gültige Entwürfe werden übernommen, danach folgen neue Seite, Auswahl, Reload beider laufender Sequenzen, Speicherung und Navigation zum Editor. Die UI liefert diese Aktionen als Delegates; der Ablauf wird mit echten Sequenzcontrollern und temporären Workspace-Dateien headless geprüft.
+
 `PageFrameDispatcher` unterdrückt identische ganze Frames und löscht bei leerer Ausgabe. Der Avalonia-Livepfad ruft `RenderBothAsync` auf und nutzt den differenziellen `DisplayFrameWriter` aus `LIS2.Display` nicht. Die in der WPF-/Displaybibliothek vorhandene Ausgabe geänderter Spannen ist deshalb kein Nachweis für diesen Pfad.
 
 Ereignisse können eine temporäre Sequenz starten. Nach Ablauf wird zur normalen Seite zurückgekehrt oder die nur für das Ereignis gestartete Ausgabe beendet. Manuelle Aktionen stoppen und leeren ausstehende Sequenzschreibvorgänge, bevor sie selbst schreiben.
@@ -76,7 +78,7 @@ Es gibt keinen automatischen seriellen Wiederverbindungsablauf. Displayverbindun
 
 `PortableWorkspaceStore` schreibt unter `Environment.SpecialFolder.LocalApplicationData/LIS2ControlCenter/avalonia-workspace.json`. Schreibvorgänge werden innerhalb der Store-Instanz serialisiert und über eine temporäre Datei ersetzt. Fehlerhaftes JSON wird umbenannt. Ein prozessübergreifendes Lock ist damit nicht implementiert.
 
-Der Workspace enthält Seiten, Glyphen, Lüftereinstellungen, HA-URL/-Präferenzen, Hardwarepräferenzen, Variablenfavoriten, Helligkeit, Theme, Sprache und Glyph-on-connect. Transportmodus, Port und eigener HA-Aktivierungszustand fehlen. Die gespeicherte Helligkeit wird im Livepfad noch nicht angewendet; eine leere Seitenliste wird beim UI-Laden nicht übernommen.
+Der Workspace enthält Seiten, Glyphen, Lüftereinstellungen, HA-URL/-Präferenzen, Hardwarepräferenzen, Variablenfavoriten, Helligkeit, Theme, Sprache und Glyph-on-connect. Transportmodus, Port und eigener HA-Aktivierungszustand fehlen. Die gespeicherte Helligkeit wird im Livepfad noch nicht angewendet. Vorhandene Workspace-Dateien ersetzen die Seiten auch mit einer leeren Liste. Ohne Datei bleibt die Startseite erhalten. Die Importvalidierung erfolgt vor Änderungen am geladenen Zustand.
 
 `WindowsSettingsImporter` validiert und übernimmt bekannte Felder, ohne Windows-Tokens zu importieren. Sein Button liegt in einem unsichtbaren erweiterten Settings-Container.
 

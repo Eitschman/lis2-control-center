@@ -230,16 +230,15 @@ public partial class MainWindow
         var preference = _haPreferences.FirstOrDefault(p => string.Equals(p.EntityId, id, StringComparison.OrdinalIgnoreCase));
         var displayName = string.IsNullOrWhiteSpace(preference?.Alias) ? entity.FriendlyName : preference.Alias;
         var key = attributeName is null ? HaEntityKey(entity.EntityId) : HaAttributeKey(entity.EntityId, attributeName);
-        var page = _pages.Add();
-        page.Name = attributeName is null ? displayName : displayName + " · " + attributeName;
-        page.Line1Template = displayName;
-        page.Line2Template = key.TrimEnd('}') + "|fallback:--}" + (attributeName is null ? entity.Unit : "");
-        page.DurationSeconds = 5;
-        page.Line1OverflowMode = "PingPong";
-        page.Line2OverflowMode = "Truncate";
-        RefreshPageList(_pages.Pages.Count - 1);
-        await SavePortableWorkspaceAsync();
-        NavigateTo(2);
+        await AddSourcePageAsync(page =>
+        {
+            page.Name = attributeName is null ? displayName : displayName + " · " + attributeName;
+            page.Line1Template = displayName;
+            page.Line2Template = key.TrimEnd('}') + "|fallback:--}" + (attributeName is null ? entity.Unit : "");
+            page.DurationSeconds = 5;
+            page.Line1OverflowMode = "PingPong";
+            page.Line2OverflowMode = "Truncate";
+        });
     }
 
     private void StopHomeAssistantUi() => _haUiTimer.Stop();

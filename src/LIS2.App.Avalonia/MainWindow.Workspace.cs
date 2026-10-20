@@ -17,8 +17,9 @@ public partial class MainWindow
     {
         try
         {
+            var restorePages = _workspaceStore.Exists;
             var saved = _workspaceStore.Load();
-            ApplyPortableWorkspace(saved);
+            ApplyPortableWorkspace(saved, restorePages);
             _workspaceLoaded = true;
         }
         catch (Exception ex)
@@ -28,14 +29,11 @@ public partial class MainWindow
         }
     }
 
-    private void ApplyPortableWorkspace(PortableWorkspace saved)
+    private void ApplyPortableWorkspace(PortableWorkspace saved, bool restorePages = true)
     {
         // Validate page data before mutating any live UI or workspace state.
-        if (saved.Pages.Count > 0)
-        {
-            var validation = new PageWorkspace();
-            validation.ImportJson(System.Text.Json.JsonSerializer.Serialize(saved.Pages));
-        }
+        var validation = new PageWorkspace();
+        if (restorePages) PageWorkspaceActions.RestorePages(validation, saved);
         this.FindControl<TextBox>("HaUrl")!.Text = saved.HomeAssistantUrl;
         try
         {
@@ -69,11 +67,9 @@ public partial class MainWindow
         _fanSettings = PortableFanSettings.Normalize(saved.Fans);
         RefreshFanEditor();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked = saved.ProgramCustomGlyphsOnConnect;
-        if (saved.Pages.Count > 0)
-        {
-            _pages.ImportJson(System.Text.Json.JsonSerializer.Serialize(saved.Pages));
-            RefreshPageList(0);
-        }
+        // Ohne Datei bleibt die Startseite erhalten; eine gespeicherte leere Liste ersetzt sie.
+        if (restorePages) PageWorkspaceActions.RestorePages(_pages, saved);
+        RefreshPageList(_pages.Pages.Count > 0 ? 0 : -1);
     }
 
     private PortableWorkspace CapturePortableWorkspace() => new()

@@ -13,11 +13,11 @@ LIS2 Control Center is an independent replacement for the obsolete VL System Mul
 
 ## Avalonia-Arbeitsstand
 
-Stand: 20.10.2026, Codebasis `71b72a8987a4f9b8a14a3807f94667569e28be43`. Die gemeinsame App unter `src/LIS2.App.Avalonia` enthält zehn Hauptansichten, Display-/Seiten-/Ereignisruntime, Glyphen, Windows-/Linux-Sensoren, Lüfterregelung mit ausdrücklicher serieller Freigabe, HA, Medien, Workspace, Hilfe und About. Der modale Variablenbrowser ist eine genehmigte Abweichung von WPF.
+Stand: 20.10.2026, Arbeitspaket PORT-01. Die gemeinsame App unter `src/LIS2.App.Avalonia` enthält zehn Hauptansichten, Display-/Seiten-/Ereignisruntime, Glyphen, Windows-/Linux-Sensoren, Lüfterregelung mit ausdrücklicher serieller Freigabe, HA, Medien, Workspace, Hilfe und About. Der modale Variablenbrowser ist eine genehmigte Abweichung von WPF.
 
-[CI 39435226116](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116) hat sieben erfolgreiche Jobs: Windows-/Ubuntu-Builds und Headless-Tests sowie Pakete für Windows x64 und Linux x64/ARM64. GUI-Smoke, extrahierter Paketstart, echte ARM64-Ausführung und physische LIS2-Prüfung sind damit nicht nachgewiesen.
+Lokal sind 304/304 Avalonia-Tests auf Windows erfolgreich. Der aktuelle CI-Nachweis steht im [Status](docs/prp/linux-port-status.md). GUI-Smoke, extrahierter Paketstart, echte ARM64-Ausführung und physische LIS2-Prüfung sind dadurch nicht nachgewiesen.
 
-Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. Nächstes Paket: HA-/Media-Seitenaktionen und Workspace-Wiederherstellung konsistent mit Editorentwürfen und laufenden Sequenzen verbinden.
+Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. HA-, Medien- und Hardware-Seitenaktionen verwenden gemeinsamen Entwurfsschutz und aktualisieren laufende Sequenzen. Gespeicherte leere Seitenlisten werden wiederhergestellt. Nächstes Paket: Einstellungen und Gerätebedienung (PORT-02).
 
 ## WPF-Funktionsreferenz
 

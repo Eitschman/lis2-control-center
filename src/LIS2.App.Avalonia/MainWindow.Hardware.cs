@@ -94,17 +94,16 @@ public partial class MainWindow
                         "No matching available sensors for " + selectedPreset + " preset.";
                     return;
                 }
-                var added = _pages.Add();
-                added.Name = page.Name;
-                added.Line1Template = page.Line1Template;
-                added.Line2Template = page.Line2Template;
-                added.DurationSeconds = 5;
-                added.Line1OverflowMode = "PingPong";
-                added.Line2OverflowMode = "PingPong";
-                RefreshPageList(_pages.Pages.Count - 1);
-                await SavePortableWorkspaceAsync();
-                NavigateTo(2);
-                SetVirtualStatus("Created " + selectedPreset + " display preset.");
+                if (await AddSourcePageAsync(added =>
+                {
+                    added.Name = page.Name;
+                    added.Line1Template = page.Line1Template;
+                    added.Line2Template = page.Line2Template;
+                    added.DurationSeconds = 5;
+                    added.Line1OverflowMode = "PingPong";
+                    added.Line2OverflowMode = "PingPong";
+                }))
+                    SetVirtualStatus("Created " + selectedPreset + " display preset.");
             };
         }
         RefreshHardwareSensors();

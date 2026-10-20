@@ -1,27 +1,21 @@
 # Avalonia-Portierung: aktueller Arbeitsstand
 
 Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
-Codebasis: `71b72a8987a4f9b8a14a3807f94667569e28be43`.
+Implementierungsstand: PORT-01.
 
 Diese Datei beschreibt den aktuellen Stand. Anforderungen stehen im [PRP](linux-avalonia-port.md), priorisierte Restarbeiten in [TODO](../../TODO.md), Plattform- und Projektgrenzen im [Inventar](linux-port-inventory.md).
 
-## Nachgewiesene CI
+## Aktuelle Verifikation
 
-[GitHub Actions 39435226116](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116) prüft die genannte Codebasis. Alle sieben Jobs sind erfolgreich:
+Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 
-| Job | Ergebnis |
-| --- | --- |
-| Avalonia shell (ubuntu-latest) | Build und Avalonia-Testprojekt erfolgreich |
-| Avalonia shell (windows-latest) | Build und Avalonia-Testprojekt erfolgreich |
-| .NET 8 shared libraries (ubuntu-latest) | Core-, Display- und Fans-Tests erfolgreich |
-| .NET 8 shared libraries (windows-latest) | Core-, Display- und Fans-Tests erfolgreich |
-| Portable Avalonia app (linux-x64) | Veröffentlichung, Paketprüfung und Upload erfolgreich |
-| Portable Avalonia app (linux-arm64) | Cross-Publish, Paketprüfung und Upload erfolgreich |
-| Portable Avalonia app (win-x64) | Veröffentlichung einschließlich GSMTC-DLL, Paketprüfung und Upload erfolgreich |
+- `dotnet.exe test tests/LIS2.App.Avalonia.Tests/LIS2.App.Avalonia.Tests.csproj -c Release --no-restore`: Exit 0, 304/304 Tests erfolgreich, keine übersprungenen Tests. Ergebnisdatei `TestResults/avalonia-port01.trx` im Testprojekt.
+- Sieben Fälle in `PageWorkspaceActionsTests`: gültiger/abgewiesener Editorentwurf, persistierte neue Seite, virtuelle/serielle/beide/keine laufende Sequenz, leere Workspace-Wiederherstellung und transaktionale Ablehnung ungültiger gespeicherter Seiten.
+- Gegenprobe ohne Entwurfsschutz und mit ignorierter leerer Liste: sechs fehlgeschlagene Tests. Isolierte Gegenprobe ohne Sequenz-Reload: drei fehlgeschlagene Tests für die aktiven Transportkombinationen. Regulären Code wiederhergestellt und gesamte Testsuite erfolgreich ausgeführt.
 
-Die Avalonia-Tests prüfen Headless-Klassen. Der Workflow startet keine Avalonia-Oberfläche. Die Paketprüfung kontrolliert Dateien und Größen; sie startet weder das extrahierte Programm noch ARM64 auf einem ARM64-System. WPF-Smoke-/Screenshottests aus dem Windows-Workflow sind kein Avalonia-Nachweis. Dokumentationsänderungen nach der genannten Codebasis wurden von diesem Lauf nicht geprüft.
+Der CI-Lauf für dieses Paket steht noch aus. Die vorhandene Branch-CI prüft Windows/Ubuntu mit .NET 8 und drei Pakete. Die Avalonia-Tests prüfen Headless-Klassen einschließlich des gemeinsamen Aktionsablaufs mit echten Sequenzcontrollern und temporären Workspace-Dateien. Die konkreten GUI-Controls und Quellenhandler werden nicht durch Klicktests geprüft.
 
-Die Logs dieses Laufs weisen je Betriebssystem 55/55 Core-, 48/48 Display-, 12/12 Fans- und 297/297 Avalonia-Tests als erfolgreich aus, jeweils ohne übersprungene Tests. Das sind 412 erfolgreiche Testausführungen je OS, keine Coverage-Angabe.
+Der Workflow startet keine Avalonia-Oberfläche. Die Paketprüfung kontrolliert Dateien und Größen; sie startet weder das extrahierte Programm noch ARM64 auf einem ARM64-System. WPF-Smoke-/Screenshottests aus dem Windows-Workflow sind kein Avalonia-Nachweis.
 
 ## Implementierung nach Codebefund
 
@@ -29,7 +23,7 @@ Die Logs dieses Laufs weisen je Betriebssystem 55/55 Core-, 48/48 Display-, 12/1
 | --- | --- | --- |
 | Runtime | `DisplayRuntimeHost`, `PageSequenceController`, `PagePlayback`, `PageSourceValues`, adaptive/periodische Schleifen; Tests für Ticks, Stop/Drain, Reload und fehlerhafte Ausgabe | Teilweise UI-Orchestrierung; Plattformverträge noch nicht durchgängig implementiert |
 | Display | Virtuelle und serielle Session, 20x2-Frames, Helligkeit, ROM-/Glyphenkommandos, unveränderte Frames werden unterdrückt | Keine physische Prüfung; Avalonia-Livepfad verwendet nicht den differenziellen `DisplayFrameWriter` |
-| Pages | Pflege, Reihenfolge, Aktivierung, Timing, Sichtbarkeit, Presets, JSON-Validierung, animierte Entwurfsvorschau, modaler Variablenbrowser | GUI-Interaktionen nicht automatisiert; Quellenaktionen schützen Entwürfe nicht durchgängig |
+| Pages | Pflege, Reihenfolge, Aktivierung, Timing, Sichtbarkeit, Presets, JSON-Validierung, animierte Entwurfsvorschau, Variablenbrowser; Quellenaktionen mit gemeinsamem Entwurfsschutz und Reload; leere Workspace-Liste | GUI-Interaktionen nicht automatisiert |
 | Events | Gemeinsame priorisierte Ereignisqueue für virtuelle und serielle Sequenzen, Ablauf/Abbruch, temporäre Sequenz und Übergang zu normalen Seiten | Dialog-/Bedienparität offen |
 | Glyphen | Acht Slots, Bitmap-Editor, benannte Schlüssel, Dateien, Spektrumset und Ersetzungsdialog; Workspace-/Protokolltests | Keine bestätigten physischen Zeichen |
 | Hardware | Windows LibreHardwareMonitor; Linux procfs/sysfs/hwmon; Katalog, Filter, Aliase, Favoriten, fehlende Sensoren und Presets | Hardware-/Treiberwechsel und Zielsystemrechte offen |
@@ -43,11 +37,8 @@ Die Logs dieses Laufs weisen je Betriebssystem 55/55 Core-, 48/48 Display-, 12/1
 
 ## Konkrete offene Integrationsbefunde
 
-Diese Befunde stammen aus dem Quellvergleich. Sie wurden in diesem Dokumentationsauftrag nicht durch eine GUI reproduziert.
+Diese Befunde stammen aus dem Quellvergleich. Sie wurden nicht durch eine GUI reproduziert.
 
-- `CreateHaPageAsync` erzeugt und speichert eine Seite, ruft jedoch `ReloadRunningPagesAsync` nicht auf.
-- `CreateHaPageAsync` und `CreateMediaPageAsync` verwenden vor dem Neuladen des Editors nicht `CommitPendingPageEditor`.
-- `ApplyPortableWorkspace` ersetzt Seiten nur bei `saved.Pages.Count > 0`; eine gespeicherte leere Liste wird nicht übernommen.
 - `PortableWorkspace` enthält weder Transportmodus/Port noch einen eigenen HA-Aktivierungszustand.
 - `_preferredBrightness` wird geladen und gespeichert; Display-/Serial-Helligkeitsaktionen aktualisieren dieses Feld nicht, und beim Verbindungsaufbau wird es nicht angewendet.
 - Die allgemeine Displaybedienung verwendet `_virtualDevice`; serielle Aktionen liegen in separaten, teilweise ausgeblendeten Controls. Einheitliche Bedienung des gewählten Transports ist damit nicht nachgewiesen.
@@ -55,9 +46,9 @@ Diese Befunde stammen aus dem Quellvergleich. Sie wurden in diesem Dokumentation
 
 ## Verifikation und Produktentscheidungen
 
-- **Automatisiert geprüft:** die oben genannten sieben CI-Jobs der Codebasis.
+- **Automatisiert geprüft:** 304/304 lokale Avalonia-Tests und die genannten Gegenproben.
 - **Quellseitig geprüft:** Projektziele, Workflow-Inhalt, Ansichten/Handler, Session- und Persistenzpfade sowie zugehörige Testdateien.
-- **Nicht in diesem Auftrag ausgeführt:** lokale .NET-Tests, Avalonia-GUI-Tests, Desktop-Sichtprüfung, Live-HA-/Player-/Sensorprüfung und physische LIS2-Prüfung.
+- **Nicht in diesem Auftrag ausgeführt:** Avalonia-GUI-Tests, Desktop-Sichtprüfung, Live-HA-/Player-/Sensorprüfung und physische LIS2-Prüfung.
 - **Verbindlich:** eine gemeinsame Avalonia-Oberfläche; WPF bleibt Referenz bis zur Paritätsabnahme. Modaler Variablenbrowser ist genehmigt. Physische Geräteprüfung wird getrennt ausgewiesen.
 - **Offene Widersprüche:** WMP Legacy aktiv trotz zurückgestelltem Umfang; automatischer lokaler Tokenstore-Pfad; zusätzliche oder versteckte Bedienelemente gegenüber WPF.
 
