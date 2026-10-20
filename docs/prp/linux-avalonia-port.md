@@ -292,3 +292,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Hardware template sensor-key tracking (2026-10-20)
 - The Hardware browser must track the base sensor key when a page template includes a numeric format suffix (e.g. `{Hardware.CPU.Load.Total:F1}`), including when the sensor is offline. Added regression coverage; commits `8f2a03a`, `f0f4b37`. CI and full WPF parity remain pending.
+
+## Hardware preset/catalog consistency (2026-10-20)
+- Generate CPU/GPU/Memory/Temperature/Fan presets from HardwareSensorCatalog validated available entries, using their unit metadata directly. This shares sensor validity/unit behavior with the Hardware browser. Regression tests cover case-insensitive unit keys and non-finite sensor rejection. Commits `385f4b1`, `ce0cf1d`; CI pending, broader WPF parity remains open.
