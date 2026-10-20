@@ -56,6 +56,9 @@ public partial class MainWindow
             LoadGlyphEditor();
         }
         _haPreferences = saved.HomeAssistantEntityPreferences.ToList();
+        _favoritePageVariables.Clear();
+        foreach (var key in saved.PageVariableFavorites.Where(key => !string.IsNullOrWhiteSpace(key)))
+            _favoritePageVariables.Add(key);
         _hardwarePreferences.Clear();
         _hardwarePreferences.AddRange(saved.HardwareSensorPreferences.Where(p => !string.IsNullOrWhiteSpace(p.Key)));
         FilterHardwareSensors();
@@ -89,6 +92,7 @@ public partial class MainWindow
         {
             EntityId = p.EntityId, Alias = p.Alias, IsFavorite = p.IsFavorite
         }).ToList(),
+        PageVariableFavorites = _favoritePageVariables.OrderBy(key => key, StringComparer.OrdinalIgnoreCase).ToList(),
         BrightnessPercent = _preferredBrightness,
         ThemeMode = _preferredTheme,
         LanguageMode = _preferredLanguage,
