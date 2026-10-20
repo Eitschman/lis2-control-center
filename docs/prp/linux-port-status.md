@@ -618,3 +618,7 @@ Implemented initial cross-screen package: common light shell/white card styling,
 ## Hardware preset/catalog consistency (2026-10-20)
 - Display preset generation now consumes the already validated HardwareSensorCatalog entries for availability and numeric finiteness rather than performing a separate numeric conversion. It also uses each catalog entry's unit directly, removing repeated snapshot scans and aligning preset unit semantics with the Hardware browser.
 - Added tests for case-insensitive unit metadata and rejection of NaN/infinite readings. Commits `385f4b1`, `ce0cf1d`; CI for current HEAD pending. Full hardware/WPF parity and owner desktop acceptance remain open.
+
+## Owner Windows Home Assistant acceptance and Hardware live-selection (2026-10-20)
+- Owner reports that Home Assistant connection works in the Avalonia Windows application. This is a manual Windows connectivity confirmation only, not an acceptance of all HA features or Linux behavior.
+- Hardware live-refresh now tracks selected sensor identity separately from the ListBox's transient SelectedItem while rebuilding grouped entries. This avoids losing the selected sensor when ItemsSource rebinding clears the selection before it can be restored. Commit `3675cec`. CI pending. Broader WPF parity and end-to-end hardware acceptance remain open.
