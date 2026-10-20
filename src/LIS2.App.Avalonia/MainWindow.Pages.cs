@@ -314,13 +314,16 @@ public partial class MainWindow
         var line2 = this.FindControl<TextBox>("PageLine2")!.Text ?? original.Line2Template;
         var overflow1 = OverflowName(this.FindControl<ComboBox>("PageOverflow1")!.SelectedIndex);
         var overflow2 = OverflowName(this.FindControl<ComboBox>("PageOverflow2")!.SelectedIndex);
+        var refreshText = this.FindControl<TextBox>("PageRefresh")!.Text;
+        var refresh = int.TryParse(refreshText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedRefresh)
+            && parsedRefresh > 0 ? parsedRefresh : original.RefreshIntervalMilliseconds;
         var stepText = this.FindControl<TextBox>("PageScrollStep")!.Text;
         var pauseText = this.FindControl<TextBox>("PageScrollPause")!.Text;
         var step = int.TryParse(stepText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedStep)
             && parsedStep > 0 ? parsedStep : original.ScrollStepMilliseconds;
         var pause = int.TryParse(pauseText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedPause)
             && parsedPause >= 0 ? parsedPause : original.ScrollEdgePauseMilliseconds;
-        _editorPreview.Configure(line1, line2, overflow1, overflow2, step, pause);
+        _editorPreview.Configure(line1, line2, overflow1, overflow2, step, pause, refresh);
         _editorPreviewConfigured = true;
         TickEditorPreview();
         UpdateEditorPreviewVisibility();
