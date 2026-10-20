@@ -73,7 +73,7 @@ public partial class MainWindow
                 content.Children.Add(new TextBlock
                 {
                     Text = BrowserText(text), TextWrapping = TextWrapping.Wrap,
-                    FontFamily = text.Contains('{') ? FontFamily.Parse("Consolas") : FontFamily.Default
+                    FontFamily = text.Contains('{') ? new FontFamily("Consolas") : FontFamily.Default
                 });
             }
             scroll.Offset = new Vector(0, 0);
