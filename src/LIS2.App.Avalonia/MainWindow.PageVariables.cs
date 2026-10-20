@@ -70,13 +70,13 @@ public partial class MainWindow
         var entityPicker = new ComboBox { MinWidth = 160 };
         var results = new ListBox { MinHeight = 240 };
         var count = new TextBlock();
-        var details = new TextBlock { TextWrapping = Avalonia.Media.TextWrapping.Wrap };
+        var details = new TextBlock { TextWrapping = global::Avalonia.Media.TextWrapping.Wrap };
         var favorite = new Button { Content = "☆ Add favorite" };
         var insert1 = new Button { Content = "Insert into line 1" };
         var insert2 = new Button { Content = "Insert into line 2" };
         var close = new Button { Content = "Close" };
         var refresh = new Button { Content = "Refresh values" };
-        var layout = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto,Auto,Auto,Auto"), RowSpacing = 10, Margin = new Avalonia.Thickness(16) };
+        var layout = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto,Auto,Auto,Auto"), RowSpacing = 10, Margin = new global::Avalonia.Thickness(16) };
         var filters = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         filters.Children.Add(search);
         filters.Children.Add(category);
