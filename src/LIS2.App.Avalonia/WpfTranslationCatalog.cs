@@ -1055,8 +1055,18 @@ internal static class WpfTranslationCatalog
             }
         };
 
+    private static readonly Dictionary<string, string> NavigationAliases = new(StringComparer.Ordinal)
+    {
+        ["Genel Bakış"] = "Dashboard",
+        ["Обзор"] = "Dashboard",
+        ["Tableau de bord"] = "Dashboard",
+        ["Übersicht"] = "Dashboard"
+    };
+
     internal static string FindEnglishSource(string value)
     {
+        if (NavigationAliases.TryGetValue(value, out var navigationKey))
+            return navigationKey;
         if (string.IsNullOrEmpty(value)) return value;
         foreach (var language in Translations.Values)
         {
