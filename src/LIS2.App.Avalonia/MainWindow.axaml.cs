@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using LIS2.Core;
+using LIS2.Runtime;
 using System.Globalization;
 
 namespace LIS2.App.Avalonia;
@@ -9,9 +10,24 @@ public partial class MainWindow : Window
 {
     private readonly VirtualDeviceSession _virtualDevice = new();
     private bool _busy;
+    private readonly bool _startBackgroundSources;
+    private readonly Func<string, SerialDisplaySession> _serialSessionFactory;
 
-    public MainWindow()
+    public MainWindow() : this(new PortableWorkspaceStore(), new PortableHaTokenStore(), true,
+        port => new SerialDisplaySession(port)) { }
+
+    /// <summary>Erlaubt isolierte UI-Prüfungen mit eigenem Workspace und simuliertem Transport.</summary>
+    internal MainWindow(PortableWorkspaceStore workspaceStore, PortableHaTokenStore tokenStore,
+        bool startBackgroundSources, Func<string, SerialDisplaySession> serialSessionFactory)
     {
+        _workspaceStore = workspaceStore;
+        _haTokenStore = tokenStore;
+        _startBackgroundSources = startBackgroundSources;
+        _serialSessionFactory = serialSessionFactory;
+        _liveFanSensors = !startBackgroundSources ? new SimulatedFanSensors() :
+            OperatingSystem.IsLinux() ? new LinuxSystemSensors() :
+            OperatingSystem.IsWindows() ? new WindowsHardwareFanSensors() :
+            new SnapshotFanSensors(() => new Dictionary<string, object?>());
         InitializeComponent();
 
         for (var i = 0; i < SectionNames.Length; i++)
@@ -26,7 +42,7 @@ public partial class MainWindow : Window
         this.FindControl<Button>("VirtualConnect")!.Click += async (_, _) =>
             await RunVirtualActionAsync(ConnectWithGlyphsAsync);
         this.FindControl<Button>("VirtualDemo")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.WriteDemoAsync());
+            await RunSelectedDisplayActionAsync(session => session.RenderBothAsync("LIS2 Control Center", "Windows / Linux"));
         this.FindControl<Button>("VirtualDisconnect")!.Click += async (_, _) =>
             await RunVirtualActionAsync(async () => { StopPagePlayback(); await _virtualDevice.DisconnectAsync(); });
 
@@ -34,40 +50,39 @@ public partial class MainWindow : Window
         this.FindControl<Button>("OpenFanControl")!.Click += (_, _) => NavigateTo(6);
 
         this.FindControl<Button>("SendLine1")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.WriteLineAsync(1, this.FindControl<TextBox>("Line1TextBox")!.Text ?? ""));
+            await RunSelectedDisplayActionAsync(session => session.WriteLineAsync(1, this.FindControl<TextBox>("Line1TextBox")!.Text ?? ""));
         this.FindControl<Button>("SendLine2")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.WriteLineAsync(2, this.FindControl<TextBox>("Line2TextBox")!.Text ?? ""));
+            await RunSelectedDisplayActionAsync(session => session.WriteLineAsync(2, this.FindControl<TextBox>("Line2TextBox")!.Text ?? ""));
         this.FindControl<Button>("RenderBoth")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.RenderBothAsync(
+            await RunSelectedDisplayActionAsync(session => session.RenderBothAsync(
                 this.FindControl<TextBox>("Line1TextBox")!.Text ?? "",
                 this.FindControl<TextBox>("Line2TextBox")!.Text ?? ""));
         this.FindControl<Button>("ClearDisplay")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.ClearAsync());
-        foreach (var (name, brightness) in new[]
+            await RunSelectedDisplayActionAsync(session => session.ClearAsync());
+        foreach (var (name, percent) in new[]
         {
-            ("Brightness100", Lis2Brightness.Percent100),
-            ("Brightness75", Lis2Brightness.Percent75),
-            ("Brightness50", Lis2Brightness.Percent50),
-            ("Brightness25", Lis2Brightness.Percent25)
+            ("Brightness100", 100), ("Brightness75", 75),
+            ("Brightness50", 50), ("Brightness25", 25)
         })
         {
             this.FindControl<Button>(name)!.Click += async (_, _) =>
-                await RunVirtualActionAsync(() => _virtualDevice.SetBrightnessAsync(brightness));
+                await SetSelectedBrightnessAsync(percent);
         }
 
         this.FindControl<Button>("SendSpecialCharacterTest")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.SendSpecialCharacterTestAsync());
+            await RunSelectedDisplayActionAsync(session => session.RenderBothAsync("ÄÖÜ äöü ß ° µ ± £", "← → Ω π Σ √ ∞ × ÷"));
         this.FindControl<Button>("SendCharacterRomRange")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.SendCharacterRomRangeAsync(ParseCharacterRomStart()));
+            await SendSelectedCharacterRomAsync(ParseCharacterRomStart());
         this.FindControl<Button>("CharacterRomPrevious")!.Click += (_, _) => ChangeCharacterRomRange(-0x28);
         this.FindControl<Button>("CharacterRomNext")!.Click += (_, _) => ChangeCharacterRomRange(0x28);
 
         this.FindControl<Button>("SendGlyphSlot")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.ProgramGlyphAsync(
+            await RunSelectedDisplayActionAsync(session => session.ProgramGlyphAsync(
                 this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1,
                 GlyphBitmap.Parse(this.FindControl<TextBox>("GlyphBitmapEditor")!.Text)));
 
         InitializeSerialDisplay();
+        InitializeDashboardFans();
         InitializeFanEditor();
         InitializeHardwareBrowser();
         InitializeDiagnostics();
@@ -87,20 +102,24 @@ public partial class MainWindow : Window
             ApplyPageLocalization();
             // Respect the selected transport: opening the window must never
             // connect the virtual simulator while serial mode is selected.
-            if (this.FindControl<ComboBox>("TransportModeComboBox")?.SelectedIndex == 0)
-            {
-                if (!_virtualDevice.IsConnected)
-                    await RunVirtualActionAsync(ConnectWithGlyphsAsync);
-                // WPF starts page rendering automatically after transport connection.
-                if (_virtualDevice.IsConnected)
-                    await StartPagePlaybackAsync();
-            }
+            // WPF starts page rendering automatically after transport connection.
+            await ApplySettingsTransportAsync();
         };
         UpdateSection();
         UpdateVirtualControls();
     }
 
+    internal Task ShutdownCompletion { get; private set; } = Task.CompletedTask;
+    private bool _windowClosed;
+
     private async void OnWindowClosed(object? sender, EventArgs e)
+    {
+        _windowClosed = true;
+        ShutdownCompletion = ShutdownRuntimeAsync();
+        await ShutdownCompletion;
+    }
+
+    private async Task ShutdownRuntimeAsync()
     {
         StopPagePlayback();
         _eventTimer.Stop();
@@ -188,8 +207,10 @@ public partial class MainWindow : Window
         if (first is null || second is null)
             return;
 
-        first.Text = _virtualDevice.IsConnected ? _virtualDevice.State.Line1 : new string(' ', 20);
-        second.Text = _virtualDevice.IsConnected ? _virtualDevice.State.Line2 : new string(' ', 20);
+        first.Text = SerialSelected ? _serialDisplay?.LastLine1 ?? new string(' ', 20)
+            : _virtualDevice.IsConnected ? _virtualDevice.State.Line1 : new string(' ', 20);
+        second.Text = SerialSelected ? _serialDisplay?.LastLine2 ?? new string(' ', 20)
+            : _virtualDevice.IsConnected ? _virtualDevice.State.Line2 : new string(' ', 20);
         RefreshDiagnostics();
     }
 
@@ -198,30 +219,41 @@ public partial class MainWindow : Window
         var status = this.FindControl<TextBlock>("VirtualStatus");
         if (status is not null)
             status.Text = message;
+        this.FindControl<TextBlock>("DeviceActionStatus")!.Text = message;
     }
 
     private void UpdateVirtualControls()
     {
-        var connected = _virtualDevice.IsConnected;
-        var playbackBusy = _virtualSequence?.IsBusy == true;
-        var playbackRunning = _virtualSequence?.IsRunning == true;
-        this.FindControl<Button>("VirtualConnect")!.IsEnabled = !_busy && !playbackBusy && !connected;
-        this.FindControl<Button>("VirtualDemo")!.IsEnabled = !_busy && !playbackBusy && !playbackRunning && connected;
-        this.FindControl<Button>("VirtualDisconnect")!.IsEnabled = !_busy && !playbackBusy && connected;
+        var connected = SelectedDisplay?.IsConnected == true;
+        var playbackBusy = (SerialSelected ? _serialSequence : _virtualSequence)?.IsBusy == true;
+        this.FindControl<Button>("VirtualConnect")!.IsEnabled = !_busy && !playbackBusy && !_virtualDevice.IsConnected;
+        this.FindControl<Button>("VirtualDemo")!.IsEnabled = !_busy && !_serialBusy && !_settingsTransportBusy && !playbackBusy && connected;
+        this.FindControl<Button>("VirtualDisconnect")!.IsEnabled = !_busy && !playbackBusy && _virtualDevice.IsConnected;
         foreach (var name in new[] { "SendLine1", "SendLine2", "RenderBoth", "ClearDisplay",
                                     "Brightness100", "Brightness75", "Brightness50", "Brightness25",
                                     "SendSpecialCharacterTest", "SendCharacterRomRange", "SendGlyphSlot", "SendAllGlyphs" })
-            this.FindControl<Button>(name)!.IsEnabled = !_busy && !playbackBusy && !playbackRunning && connected;
+            this.FindControl<Button>(name)!.IsEnabled = !_busy && !_serialBusy && !_settingsTransportBusy && !playbackBusy && connected;
         var badge = this.FindControl<TextBlock>("ConnectionText");
         if (badge is not null)
-            badge.Text = connected ? "Connected (Virtual)" : "Disconnected";
+            badge.Text = connected ? SerialSelected ? "Connected (Serial)" : "Connected (Virtual)" : "Disconnected";
+        this.FindControl<TextBlock>("TransportSummaryText")!.Text = SerialSelected ? "Serial: " + _preferredPortName : "Virtual LIS2";
+        this.FindControl<Button>("SettingsApplyTransport")!.IsEnabled = !_settingsTransportBusy && !_serialBusy && !_busy && !_dashboardFansBusy;
+        this.FindControl<Button>("ImportWindowsSettings")!.IsEnabled = !_settingsTransportBusy && !_serialBusy && !_busy && !_dashboardFansBusy;
+        this.FindControl<Button>("SettingsDisconnectTransport")!.IsEnabled = connected && !_settingsTransportBusy && !_serialBusy && !_busy && !_dashboardFansBusy;
+        this.FindControl<ComboBox>("TransportModeComboBox")!.IsEnabled = !_settingsTransportBusy;
+        this.FindControl<ComboBox>("SettingsPortComboBox")!.IsEnabled = !_settingsTransportBusy && this.FindControl<ComboBox>("TransportModeComboBox")!.SelectedIndex == 1;
+        this.FindControl<Button>("PageTest")!.IsEnabled = connected && !_settingsTransportBusy && !_serialBusy && !_busy;
+        UpdatePagePlaybackControls();
+        UpdateDashboardFanControls();
         var virtualState = this.FindControl<TextBlock>("VirtualStateText");
         if (virtualState is not null)
-            virtualState.Text = CurrentUiLanguage() == "de"
-                ? connected
+            virtualState.Text = SerialSelected
+                ? connected ? "LIS2 verbunden: " + _preferredPortName : "LIS2 getrennt: " + _preferredPortName
+                : CurrentUiLanguage() == "de"
+                ? _virtualDevice.IsConnected
                     ? $"Virtueller LIS2 verbunden. Befehle: {_virtualDevice.CommandCount}."
                     : "Status verfügbar, wenn der virtuelle Transport aktiv ist."
-                : connected
+                : _virtualDevice.IsConnected
                     ? $"Virtual LIS2 connected. Commands: {_virtualDevice.CommandCount}."
                     : "State available when Virtual transport is active.";
     }
@@ -282,6 +314,8 @@ public partial class MainWindow : Window
             }
         }
 
+        if (description is not null)
+            description.IsVisible = section is not ("Dashboard" or "Display" or "Settings");
         if (description is not null)
             description.Text = TranslateSectionDescription(section, section switch
             {

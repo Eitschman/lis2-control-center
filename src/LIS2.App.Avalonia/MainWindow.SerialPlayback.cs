@@ -29,30 +29,33 @@ public partial class MainWindow
                 }, cancellationToken);
                 return _serialSequence?.NextDelay ?? TimeSpan.FromSeconds(1);
             });
-        this.FindControl<Button>("SerialPlaybackStart")!.Click += async (_, _) =>
-        {
-            if (_serialDisplay?.IsConnected != true || _serialBusy || _serialSequence?.IsBusy == true ||
-                (_serialSequence?.IsRunning == true && !_eventStartedSerial)) return;
-            if (SelectedPageIndex is not null && !SavePageEditor()) return;
-            _serialSequence ??= CreateSerialSequence();
-            if (_eventStartedSerial && _serialSequence.IsRunning)
-            {
-                // Preserve the active event while promoting temporary playback.
-                if (!await _serialSequence.ReloadAsync(_pages.Pages)) return;
-                _eventStartedSerial = false;
-                UpdateSerialControls();
-                await TickSerialPlaybackAsync();
-                return;
-            }
-            _eventStartedSerial = false;
-            if (!_serialSequence.Start(_pages.Pages)) return;
-            await _serialPlaybackTimer.StopAndDrainAsync();
-            _serialPlaybackTimer.Start();
-            UpdateSerialControls();
-            await TickSerialPlaybackAsync();
-        };
+        this.FindControl<Button>("SerialPlaybackStart")!.Click += async (_, _) => await StartSerialPlaybackAsync();
         this.FindControl<Button>("SerialPlaybackStop")!.Click += (_, _) => StopSerialPlayback();
         UpdateSerialPlaybackStatus();
+    }
+
+    /// <summary>Startet die serielle Seitenfolge auch über die gemeinsame Gerätebedienung.</summary>
+    private async Task StartSerialPlaybackAsync()
+    {
+        if (_serialDisplay?.IsConnected != true || _serialBusy || _serialSequence?.IsBusy == true ||
+            (_serialSequence?.IsRunning == true && !_eventStartedSerial)) return;
+        if (SelectedPageIndex is not null && !SavePageEditor()) return;
+        _serialSequence ??= CreateSerialSequence();
+        if (_eventStartedSerial && _serialSequence.IsRunning)
+        {
+            // Preserve the active event while promoting temporary playback.
+            if (!await _serialSequence.ReloadAsync(_pages.Pages)) return;
+            _eventStartedSerial = false;
+            UpdateSerialControls();
+            await TickSerialPlaybackAsync();
+            return;
+        }
+        _eventStartedSerial = false;
+        if (!_serialSequence.Start(_pages.Pages)) return;
+        await _serialPlaybackTimer.StopAndDrainAsync();
+        _serialPlaybackTimer.Start();
+        UpdateSerialControls();
+        await TickSerialPlaybackAsync();
     }
 
     private void StopSerialPlayback()
@@ -82,6 +85,7 @@ public partial class MainWindow
         try
         {
             await _runtime.TickAsync(_serialSequence);
+            UpdatePreview();
             UpdateSerialPlaybackStatus();
         }
         catch (Exception ex)

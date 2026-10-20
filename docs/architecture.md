@@ -1,6 +1,6 @@
 # Architektur
 
-Stand: 20.10.2026. Geltungsbereich: `feature/linux-avalonia`, Arbeitspaket PORT-01.
+Stand: 20.10.2026. Geltungsbereich: `feature/linux-avalonia`, Arbeitspaket PORT-02.
 Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md).
 
 ## Projekte und Abhängigkeiten
@@ -58,6 +58,10 @@ Ereignisse können eine temporäre Sequenz starten. Nach Ablauf wird zur normale
 
 ## Gerätezugriff und Lüfter
 
+`IDisplaySession` bündelt Displaybefehle beider Sessions. `MainWindow.DeviceActions` wählt das Ziel anhand des angewendeten, gespeicherten Transportmodus. Änderungen der Transportauswahl werden erst beim Anwenden wirksam. Der Wechsel speichert zuerst, drainiert beide Sequenzen, trennt alte Sessions und verbindet genau den gewählten Transport. Helligkeit und konfigurierte Glyphen werden beim Verbinden angewendet. Die serielle Vorschau zeigt erfolgreich gesendete Inhalte, keine Hardware-Rückmeldung.
+
+Die Dashboard-Handausgabe verwendet `PortableFanSettings.CalculateManualOutputs` und `FanController` für Minimum, Maximum und AllowStop. Der gespeicherte Regelmodus bleibt erhalten. `SerialDisplaySession.ApplyManualFansAsync` benötigt ausdrückliche Freigabe, teilt das Lifecycle-Gate mit Start/Stop/Disconnect und lehnt parallele automatische Regelung ab. Erstfreigabe schreibt 100 Prozent; Stop, Trennen und Schreibfehler entziehen die Freigabe und versuchen die Sicherheitsausgabe. Die UI verbraucht jede manuelle Freigabe nach einer Aktion.
+
 `UnifiedLis2Session` schützt serielle Display-, Glyphen-, Helligkeits- und Lüfterkommandos mit einem gemeinsamen Semaphore-Gate. Die normale Verbindung startet ohne Lüfterfreigabe. `SerialDisplaySession.StartFansAsync` setzt nach ausdrücklichem UI-Consent zuerst vier 100-%-Werte, aktiviert die `FanRuntime` und startet die zweisekündige `FanRuntimeLoop`.
 
 Die Freigabe wird nicht gespeichert. Stop/Fehler/Disconnect sollen die Regelung leeren, die Freigabe widerrufen und den Sicherheitsframe anfordern. Ein gescheiterter Hardware-Schreibvorgang ist keine Garantie für den tatsächlichen Lüfterzustand. Virtuelle Fehlereinspeisung prüft Reihenfolge und Softwareverhalten.
@@ -78,9 +82,9 @@ Es gibt keinen automatischen seriellen Wiederverbindungsablauf. Displayverbindun
 
 `PortableWorkspaceStore` schreibt unter `Environment.SpecialFolder.LocalApplicationData/LIS2ControlCenter/avalonia-workspace.json`. Schreibvorgänge werden innerhalb der Store-Instanz serialisiert und über eine temporäre Datei ersetzt. Fehlerhaftes JSON wird umbenannt. Ein prozessübergreifendes Lock ist damit nicht implementiert.
 
-Der Workspace enthält Seiten, Glyphen, Lüftereinstellungen, HA-URL/-Präferenzen, Hardwarepräferenzen, Variablenfavoriten, Helligkeit, Theme, Sprache und Glyph-on-connect. Transportmodus, Port und eigener HA-Aktivierungszustand fehlen. Die gespeicherte Helligkeit wird im Livepfad noch nicht angewendet. Vorhandene Workspace-Dateien ersetzen die Seiten auch mit einer leeren Liste. Ohne Datei bleibt die Startseite erhalten. Die Importvalidierung erfolgt vor Änderungen am geladenen Zustand.
+Der Workspace enthält Seiten, Glyphen, Lüftereinstellungen, Transportmodus, Port, HA-Aktivierung/-URL/-Präferenzen, Hardwarepräferenzen, Variablenfavoriten, Helligkeit, Theme, Sprache und Glyph-on-connect. Explizites HA-Aus wird unabhängig vom Token wiederhergestellt; bei fehlendem Aktivierungsfeld bleibt das tokenbasierte Verhalten erhalten. Vorhandene Workspace-Dateien ersetzen die Seiten auch mit einer leeren Liste. Ohne Datei bleibt die Startseite erhalten. Die Importvalidierung erfolgt vor Änderungen am geladenen Zustand.
 
-`WindowsSettingsImporter` validiert und übernimmt bekannte Felder, ohne Windows-Tokens zu importieren. Sein Button liegt in einem unsichtbaren erweiterten Settings-Container.
+`WindowsSettingsImporter` validiert bekannte Felder einschließlich Geräteauswahl, HA-Aktivierung und Hardwarepräferenzen, ohne Windows-Tokens zu importieren. Sein Button ist unter Einstellungen sichtbar. Der UI-Ablauf speichert vor dem Anwenden, drainiert und trennt bisherige Geräte und beendet die HA-Verbindung. Anschließend verbindet er den importierten Gerätetransport; HA wird bei Bedarf ausdrücklich neu verbunden.
 
 `PortableHaTokenStore` verwendet Windows DPAPI bzw. Linux `secret-tool`. Bei fehlendem Secret Service schreibt der Linux-Pfad automatisch AES-GCM-Chiffretext und einen lokalen Schlüssel. Migration in den nativen Store wird versucht. Dieser vorhandene Ausweichpfad ist ein offener Freigabe-/Sicherheitsbefund, keine zugesicherte Gleichwertigkeit zum nativen Store.
 

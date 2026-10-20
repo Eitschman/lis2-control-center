@@ -1,6 +1,6 @@
 # WPF-/Avalonia-Paritätsaudit
 
-Stand: 20.10.2026. Implementierungsstand: PORT-01.
+Stand: 20.10.2026. Implementierungsstand: PORT-02.
 
 Referenz: [WPF-XAML](../../src/LIS2.App/MainWindow.xaml), [WPF-Code](../../src/LIS2.App/MainWindow.xaml.cs), [Avalonia-AXAML](../../src/LIS2.App.Avalonia/MainWindow.axaml) und zugehörige partielle Dateien. Vorhandene Ansichten oder identische Controlnamen sind keine Verhaltens- oder Darstellungsabnahme.
 
@@ -8,16 +8,16 @@ Referenz: [WPF-XAML](../../src/LIS2.App/MainWindow.xaml), [WPF-Code](../../src/L
 
 | Ansicht | Vorhandener Avalonia-Pfad | Offene Unterschiede und Prüfungen |
 | --- | --- | --- |
-| Dashboard | VFD-Vorschau, Status, Navigation und vier Fan-Anzeigen; MainWindow.axaml.cs / DashboardConnectionState | DashboardFan1Slider bis DashboardFan4Slider und DashboardFansApply sind deaktiviert; manuelle WPF-Ausgabe fehlt. Transportstatus und Vorschau bei serieller Ausgabe prüfen |
-| Display | Zwei Zeilen, Clear, Sonderzeichen-/ROM-Test, Glypheneditor/-dateien, Helligkeit; MainWindow.Glyphs/GlyphFiles/Serial | Allgemeine Buttons verwenden virtuelle Session; serielle Sonderaktionen sind getrennt und teilweise ausgeblendet. Gewählten Transport, Fehler und Persistenz abgleichen |
+| Dashboard | VFD-Vorschau und Status am angewendeten Transport; vier manuelle Fan-Regler mit WPF-Grenzen und AllowStop, serielle Freigabe je Aktion | Automatische Regelung sperrt Handausgabe. Physische Ausgabe und weiterer Live-/WPF-Abgleich offen |
+| Display | Gemeinsame Zeilen-, Clear-, Sonderzeichen-/ROM-, Glyphen- und Helligkeitsaktionen über IDisplaySession; Helligkeit gespeichert und beim Verbinden angewendet | Headless-Controltests und Sichtprüfung vorhanden; physische Zeichen und native Glyphen-Dateidialoge offen |
 | Pages | Liste, Presets, Dauer/Refresh, zwei Templates/Überlaufmodi, Sichtbarkeit, Scrolling, Vorschau, Dateifunktionen und Variablenbrowser; Quellenaktionen mit Entwurfsschutz/Reload, Wiederherstellung leerer Seitenlisten | Gemeinsamer Aktionsablauf headless getestet; GUI-Klicks nicht automatisiert. Zusätzliche Start/Stop-/Dateiaktionen gegen WPF-Umfang prüfen; genehmigten Variablenbrowser erhalten |
 | Media | WindowsMedia-, Winamp-, WmpLegacy- und Linux-Karte; MainWindow.Media / WindowsMediaBridge / LinuxMprisSource | WMP Legacy wird entgegen der zurückgestellten Produktentscheidung gestartet. Linux: playerctl-Metadaten, keine Position/Playerwahl. Fehler-/Navigations-GUI-Smoke fehlt |
 | Events | Eingabe, Priority/Lifetime, Queue, Test, Cancel/Clear; MainWindow.Events und gemeinsame Runtime-EventQueue | Prioritäts-/Ablaufmodelle headless getestet; Auswahl-, Fehlereingaben und WPF-gleiche GUI-Aktionen offen |
 | Hardware | Gruppierte Liste, Suche/Typfilter, Details, Aliase/Favoriten, Fan-Zuordnung und Presets; MainWindow.Hardware | Reale Sensor-/Treiberidentität, Rechte, Auswahl-/Liveverhalten, Plattformschlüssel und exakte WPF-Bedienung prüfen |
 | Fan Control | Vier Kanäle, Modi, Grenzen, Hysterese, Kurventext/-vorschau, Dry-run, virtuelle und serielle Regelung; MainWindow.Fans | Separate Test-/Freigabeaktionen gegenüber WPF abgleichen. Sicherheit erhalten; Tastatur, fehlerhafte Kurven, Status und Werte bei aktivem Runtimepfad prüfen |
-| Settings | Device/Transport, Appearance, Windows-Startup; MainWindow.Settings/Workspace/WindowsImport | Transport/Port/HA-Aktivierung nicht im Workspace. Helligkeit gespeichert, aber nicht mit Liveänderung/Connect verbunden. Import- und erweiterte Serial-Controls unsichtbar. Linux-Tray/Autostart fehlen |
+| Settings | Transport/Port/HA-Aktivierung gespeichert, explizites Anwenden/Trennen, Helligkeit beim Connect, sichtbarer Windows-Import einschließlich Hardwarepräferenzen | Nativer Import-Dateidialog und Linux-Tray/Autostart offen; erweiterte Serial-Testcontrols bleiben ausgeblendet |
 | Diagnostics | Snapshot, virtueller Zustand, dekodierte Historie, Refresh und Export; MainWindow.Diagnostics | Echtes Protokolllog fehlt. Serielle Livezustände und Dateifehler/Exportformat gegen WPF prüfen |
-| Home Assistant | Eigene View mit Enable/URL/Token/Test/Save, Entitäten, Filter, Details, Aliase/Favoriten, Attribute, Copy/Create; MainWindow.HomeAssistant nutzt gemeinsamen Entwurfsschutz und Sequenz-Reload | Nicht mehr in Pages eingebettet. Tokenstore-Ausweichpfad und HA-Deaktivierung/Persistenz offen |
+| Home Assistant | Eigene View mit Enable/URL/Token/Test/Save, Entitäten, Attributen, Copy/Create; Entwurfsschutz/Reload und eigenes persistiertes Aktivierungsfeld | Nicht in Pages eingebettet. Tokenstore-Ausweichpfad, echte Deaktivierung/Wiederverbindung und Linux-Liveprüfung offen |
 
 Alle zehn Views sind im AXAML vorhanden und über die Navigation angebunden. „Media, Events und Home Assistant fehlen“ beschreibt diesen Code nicht.
 
@@ -37,7 +37,7 @@ Physische Lüfterausgabe erfordert eine ausdrückliche, nicht persistierte Freig
 
 ## Prüfnachweise und verbleibende Abnahme
 
-Lokal sind 304/304 Avalonia-Tests auf Windows erfolgreich. [CI 39440198251](https://github.com/Eitschman/lis2-control-center/actions/runs/39440198251) für Code-Commit `f372ed0` meldet alle sieben Jobs erfolgreich, einschließlich 304/304 Avalonia-Tests je OS und der drei Pakete. Sieben neue Fälle prüfen den gemeinsamen Quellenaktionsablauf und die Workspace-Wiederherstellung; die Gegenproben erkennen fehlenden Entwurfsschutz, fehlendes Reload und ignorierte leere Seitenlisten. Details und Grenzen stehen im [Status](linux-port-status.md). Es gibt keinen Avalonia-GUI-Smoke oder automatisierten Avalonia-Screenshotvergleich.
+Lokal sind 326/326 Avalonia-Tests auf Windows erfolgreich. `DeviceUiTests` prüft tatsächliche Controls mit isolierten Stores und simuliertem seriellen Gerät: Start, Displayaktionen, Seitenpreview/-start, Helligkeit/Neuverbindung, Transportwechsel, HA-Aktivierung, Import und manuelle Lüfter. Eine Tastaturprüfung trennt per Leertaste. Dashboard, Display und Settings wurden bei 1305 × 893 und 950 × 600 Pixeln mit Skia headless gerendert und angesehen, einschließlich unterer Scrollbereiche und serieller Freigabe. Fünf gezielte Gegenproben erkennen fehlende Helligkeitsanwendung, falsche Transportzuordnung, ignorierten Import-Port sowie umgangene Lüftergrenzen/Freigabe. Aktueller CI-Nachweis und Grenzen stehen im [Status](linux-port-status.md). Ein systemweiter Desktop-Smoke und automatisierter Screenshotvergleich fehlen.
 
 Für jede Ansicht bleiben die semantischen Fehler-/Leer-/Auswahl-/Speicherpfade und die Darstellung auf Windows/Linux zu prüfen. Manuelle Benutzerabnahme erfolgt nach dem vereinbarten Portierungsumfang; physische LIS2-Prüfung bleibt getrennt. WPF wird bis zur Paritätsabnahme erhalten. Prioritäten stehen in [TODO](../../TODO.md).
 

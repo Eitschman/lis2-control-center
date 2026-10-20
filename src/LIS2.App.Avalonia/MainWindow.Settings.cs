@@ -9,6 +9,7 @@ namespace LIS2.App.Avalonia;
 public partial class MainWindow
 {
     private bool _loadingSettings;
+    private bool _settingsTransportBusy;
     private const string StartupKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string StartupValue = "LIS2 Control Center";
 
@@ -18,10 +19,10 @@ public partial class MainWindow
         var mode = this.FindControl<ComboBox>("TransportModeComboBox")!;
         var port = this.FindControl<ComboBox>("SettingsPortComboBox")!;
         mode.SelectionChanged += (_, _) => port.IsEnabled = mode.SelectedIndex == 1;
-        mode.SelectedIndex = 0;
-        port.IsEnabled = false;
+        port.IsEnabled = mode.SelectedIndex == 1;
         this.FindControl<Button>("SettingsRefreshPorts")!.Click += (_, _) => RefreshSettingsPorts();
         this.FindControl<Button>("SettingsApplyTransport")!.Click += async (_, _) => await ApplySettingsTransportAsync();
+        this.FindControl<Button>("SettingsDisconnectTransport")!.Click += async (_, _) => await DisconnectSelectedTransportAsync();
 
         var theme = this.FindControl<ComboBox>("ThemeModeComboBox")!;
         theme.SelectionChanged += (_, _) =>
@@ -60,13 +61,15 @@ public partial class MainWindow
                 catch (Exception ex) { SetStartupStatus("Windows startup error: " + ex.Message); }
             };
         }
-        RefreshSettingsPorts();
+        LoadSettingsPreferences();
         _loadingSettings = false;
     }
 
     private void LoadSettingsPreferences()
     {
         _loadingSettings = true;
+        this.FindControl<ComboBox>("TransportModeComboBox")!.SelectedIndex = SerialSelected ? 1 : 0;
+        RefreshSettingsPorts(true);
         this.FindControl<ComboBox>("ThemeModeComboBox")!.SelectedIndex =
             _preferredTheme.Equals("Light", StringComparison.OrdinalIgnoreCase) ? 1 :
             _preferredTheme.Equals("Dark", StringComparison.OrdinalIgnoreCase) ? 2 : 0;
@@ -110,15 +113,18 @@ public partial class MainWindow
 
     }
 
-    private void RefreshSettingsPorts()
+    private void RefreshSettingsPorts(bool restorePreference = false)
     {
         try
         {
             var picker = this.FindControl<ComboBox>("SettingsPortComboBox")!;
-            var previous = picker.SelectedItem as string;
+            var previous = restorePreference ? _preferredPortName : picker.SelectedItem as string ?? _preferredPortName;
             var ports = SerialPortDiscovery.GetAvailablePorts();
-            picker.ItemsSource = ports;
-            picker.SelectedItem = ports.Contains(previous) ? previous : ports.FirstOrDefault();
+            // Ein gespeicherter, gerade fehlender Port darf nicht durch einen anderen ersetzt werden.
+            var choices = ports.ToList();
+            if (!string.IsNullOrWhiteSpace(previous) && !choices.Contains(previous)) choices.Add(previous);
+            picker.ItemsSource = choices;
+            picker.SelectedItem = previous ?? ports.FirstOrDefault();
             this.FindControl<TextBlock>("SettingsTransportStatus")!.Text =
                 ports.Count == 0 ? "No serial ports found." : $"{ports.Count} serial port(s) found.";
         }
@@ -130,39 +136,70 @@ public partial class MainWindow
 
     private async Task ApplySettingsTransportAsync()
     {
+        if (_settingsTransportBusy || _serialBusy || _busy || _dashboardFansBusy) return;
         var status = this.FindControl<TextBlock>("SettingsTransportStatus")!;
         var serial = this.FindControl<ComboBox>("TransportModeComboBox")!.SelectedIndex == 1;
-        if (!serial)
-        {
-            if (_serialDisplay is not null)
-            {
-                status.Text = "Disconnect the serial display before switching to Virtual.";
-                return;
-            }
-            if (!_virtualDevice.IsConnected)
-                await RunVirtualActionAsync(ConnectWithGlyphsAsync);
-            status.Text = _virtualDevice.IsConnected ? "Virtual LIS2 connected." : "Virtual LIS2 connection failed.";
-            return;
-        }
-
         var port = this.FindControl<ComboBox>("SettingsPortComboBox")!.SelectedItem as string;
-        if (string.IsNullOrWhiteSpace(port))
+        if (serial && string.IsNullOrWhiteSpace(port))
         {
-            status.Text = "Select a COM port first.";
+            status.Text = "Bitte zuerst einen seriellen Port auswählen.";
             return;
         }
-        if (_serialDisplay is not null)
+        _settingsTransportBusy = true;
+        UpdateVirtualControls();
+        try
         {
-            status.Text = "Serial display is already connected. Disconnect it before reconnecting.";
-            return;
+            // Erst speichern, dann die Verbindung wechseln: ein Schreibfehler verändert kein Gerät.
+            var beforeMode = _preferredTransportMode;
+            var beforePort = _preferredPortName;
+            _preferredTransportMode = serial ? "Serial" : "Virtual";
+            _preferredPortName = port;
+            try { await SavePortableWorkspaceAsync(true); }
+            catch { _preferredTransportMode = beforeMode; _preferredPortName = beforePort; throw; }
+            await DisconnectTransportsAsync();
+            if (serial)
+            {
+                await ConnectSerialAsync(port);
+                if (_serialDisplay?.IsConnected == true) await StartSerialPlaybackAsync();
+            }
+            else
+            {
+                await RunVirtualActionAsync(ConnectWithGlyphsAsync);
+                if (_virtualDevice.IsConnected) await StartPagePlaybackAsync();
+            }
+            status.Text = SelectedDisplay?.IsConnected == true
+                ? serial ? "LIS2 verbunden: " + port : "Virtueller LIS2 verbunden."
+                : "Verbindungsaufbau fehlgeschlagen. " + this.FindControl<TextBlock>(serial ? "SerialStatus" : "VirtualStatus")!.Text;
         }
-        var serialPicker = this.FindControl<ComboBox>("SerialPortPicker")!;
-        RefreshSerialPorts();
-        serialPicker.SelectedItem = port;
-        if (_virtualDevice.IsConnected)
-            await RunVirtualActionAsync(async () => { StopPagePlayback(); await _virtualDevice.DisconnectAsync(); });
-        await ConnectSerialAsync();
-        status.Text = _serialDisplay?.IsConnected == true ? "Serial LIS2 connected to " + port + "." : "Serial connection failed; see serial status below.";
+        catch (Exception ex) { status.Text = "Verbindungsfehler: " + ex.Message; }
+        finally { _settingsTransportBusy = false; UpdateVirtualControls(); UpdateSerialControls(); }
+    }
+
+    /// <summary>Verbindungswechsel drainiert beide Ausgabeläufe und verwirft jede Lüfterfreigabe.</summary>
+    private async Task DisconnectTransportsAsync()
+    {
+        this.FindControl<CheckBox>("FanHardwareConsent")!.IsChecked = false;
+        this.FindControl<CheckBox>("DashboardFanConsent")!.IsChecked = false;
+        StopPagePlayback();
+        await _pageTimer.StopAndDrainAsync();
+        if (_virtualSequence is not null) await _virtualSequence.StopAndDrainAsync();
+        await CloseSerialDisplayAsync();
+        if (_virtualDevice.IsConnected) await _virtualDevice.DisconnectAsync();
+        UpdatePreview();
+    }
+
+    private async Task DisconnectSelectedTransportAsync()
+    {
+        if (_settingsTransportBusy || _serialBusy || _busy || _dashboardFansBusy) return;
+        _settingsTransportBusy = true;
+        UpdateVirtualControls();
+        try
+        {
+            await DisconnectTransportsAsync();
+            this.FindControl<TextBlock>("SettingsTransportStatus")!.Text = "LIS2 getrennt.";
+        }
+        catch (Exception ex) { SetVirtualStatus("Trennen fehlgeschlagen: " + ex.Message); }
+        finally { _settingsTransportBusy = false; UpdateVirtualControls(); UpdateSerialControls(); }
     }
 
     private static bool IsWindowsStartupEnabled()

@@ -14,15 +14,30 @@ public sealed class PortableWorkspaceStoreTests
             await store.SaveAsync(new PortableWorkspace
             {
                 HomeAssistantUrl = "http://ha.local:8123",
+                HomeAssistantEnabled = false, TransportMode = "Serial", PortName = "TEST-PORT", BrightnessPercent = 50,
                 Pages = new List<PageDefinition> { new() { Name = "Clock", Line1Template = "{Clock.Time}" } }
             });
             var loaded = store.Load();
             Assert.Equal("http://ha.local:8123", loaded.HomeAssistantUrl);
+            Assert.False(loaded.HomeAssistantEnabled);
+            Assert.Equal("Serial", loaded.TransportMode);
+            Assert.Equal("TEST-PORT", loaded.PortName);
+            Assert.Equal(50, loaded.BrightnessPercent);
             Assert.Single(loaded.Pages);
             Assert.Equal("{Clock.Time}", loaded.Pages[0].Line1Template);
             Assert.DoesNotContain("AccessToken", await File.ReadAllTextAsync(path));
         }
         finally { if (File.Exists(path)) File.Delete(path); }
+    }
+
+    [Fact]
+    public void MissingDeviceFieldsKeepCompatibleDefaults()
+    {
+        var workspace = System.Text.Json.JsonSerializer.Deserialize<PortableWorkspace>("{\"Pages\":[]}")!;
+        Assert.Equal("Virtual", workspace.TransportMode);
+        Assert.Null(workspace.PortName);
+        Assert.Null(workspace.HomeAssistantEnabled);
+        Assert.Equal(100, workspace.BrightnessPercent);
     }
 
     [Fact]

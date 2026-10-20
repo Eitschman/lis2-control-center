@@ -7,6 +7,90 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class SerialDisplaySessionTests
 {
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    public async Task FailedManualWriteRevokesAuthorizationAndRestoresSafeOutput(int failAt)
+    {
+        var transport = new FailingManualTransport(failAt);
+        await using var session = new SerialDisplaySession(transport);
+        await session.ConnectAsync();
+        await Assert.ThrowsAsync<IOException>(() => session.ApplyManualFansAsync(new[] { 40, 40, 40, 40 }, true));
+        Assert.False(session.FansRunning);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Inner.Writes[^1]);
+        await session.DisconnectAsync();
+        await Assert.ThrowsAsync<InvalidOperationException>(() => session.ApplyManualFansAsync(new[] { 40, 40, 40, 40 }, true));
+    }
+
+    private sealed class FailingManualTransport(int failAt) : ILis2Transport
+    {
+        public VirtualLis2Transport Inner { get; } = new();
+        public bool IsOpen => Inner.IsOpen;
+        public Task OpenAsync(CancellationToken cancellationToken = default) => Inner.OpenAsync(cancellationToken);
+        public Task CloseAsync(CancellationToken cancellationToken = default) => Inner.CloseAsync(cancellationToken);
+        public async Task WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+        {
+            await Inner.WriteAsync(data, cancellationToken);
+            // Auch ein nach angenommener Ausgabe gemeldeter Fehler erfordert die Sicherheitsausgabe.
+            if (Inner.Writes.Count == failAt) throw new IOException("Simulierter Schreibfehler.");
+        }
+        public ValueTask DisposeAsync() => Inner.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task ManualFansRejectMissingConsentAndInvalidOutputsBeforeAnyWrite()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var session = new SerialDisplaySession(transport);
+        await session.ConnectAsync();
+        await Assert.ThrowsAsync<InvalidOperationException>(() => session.ApplyManualFansAsync(new[] { 40, 40, 40, 40 }, false));
+        await Assert.ThrowsAsync<ArgumentException>(() => session.ApplyManualFansAsync(new[] { -1, 40, 40, 40 }, true));
+        await Assert.ThrowsAsync<ArgumentException>(() => session.ApplyManualFansAsync(new[] { 101, 40, 40, 40 }, true));
+        await Assert.ThrowsAsync<ArgumentException>(() => session.ApplyManualFansAsync(new[] { 40 }, true));
+        Assert.Empty(transport.Writes);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ManualFansWriteSafeFrameFirstAndRestoreOnStopOrDisconnect(bool disconnect)
+    {
+        var transport = new VirtualLis2Transport();
+        await using var session = new SerialDisplaySession(transport);
+        await session.ConnectAsync();
+        await session.ApplyManualFansAsync(new[] { 40, 50, 60, 70 }, true);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[0]);
+        Assert.Equal(Lis2Protocol.SetFans(40, 50, 60, 70), transport.Writes[1]);
+        Assert.True(session.FansRunning);
+        Assert.False(session.AutomaticFansRunning);
+        await session.ApplyManualFansAsync(new[] { 45, 55, 65, 75 }, true);
+        Assert.Equal(3, transport.Writes.Count);
+        if (disconnect) await session.DisconnectAsync();
+        else await session.StopFansAsync();
+        Assert.False(session.FansRunning);
+        Assert.Equal(!disconnect, session.IsConnected);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
+        if (!disconnect)
+        {
+            await session.ApplyManualFansAsync(new[] { 40, 40, 40, 40 }, true);
+            Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^2]);
+        }
+    }
+
+    [Fact]
+    public async Task ManualAndAutomaticFansCannotOwnTheSameSession()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var session = new SerialDisplaySession(transport);
+        await session.ConnectAsync();
+        var channels = new PortableFanSettings().ToRuntimeChannels();
+        await session.StartFansAsync(new SimulatedFanSensors(), channels);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => session.ApplyManualFansAsync(new[] { 40, 40, 40, 40 }, true));
+        await session.StopFansAsync();
+        await session.ApplyManualFansAsync(new[] { 40, 40, 40, 40 }, true);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => session.StartFansAsync(new SimulatedFanSensors(), channels));
+    }
+
     [Fact]
     public async Task FanControlSharesDisplayPortAndCanStopWithoutDisconnecting()
     {

@@ -7,6 +7,20 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class PortableFanSettingsTests
 {
     [Fact]
+    public void ManualOutputHonorsLimitsAndStopWithoutChangingConfiguredModes()
+    {
+        var settings = new PortableFanSettings();
+        settings.Channels[0].Mode = "Curve";
+        settings.Channels[0].MinimumPercent = 40;
+        settings.Channels[1].MaximumPercent = 70;
+        settings.Channels[2].AllowStop = true;
+        Assert.Equal(new[] { 40, 70, 0, 30 }, settings.CalculateManualOutputs(new[] { 0, 100, 0, 0 }));
+        Assert.Equal("Curve", settings.Channels[0].Mode);
+        Assert.Throws<ArgumentException>(() => settings.CalculateManualOutputs(new[] { 0, 100, 0 }));
+        Assert.Throws<ArgumentException>(() => settings.CalculateManualOutputs(new[] { 0, 100, 0, 101 }));
+    }
+
+    [Fact]
     public void FourWpfCompatibleDefaults()
     {
         var settings = new PortableFanSettings();

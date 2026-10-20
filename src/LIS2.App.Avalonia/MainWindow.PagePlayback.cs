@@ -29,8 +29,16 @@ public partial class MainWindow
         _pageTimer = CreatePageTimer();
         // The timer runs headlessly; UI and source snapshots stay on the UI thread.
 
-        this.FindControl<Button>("PagePlaybackStart")!.Click += async (_, _) => await StartPagePlaybackAsync();
-        this.FindControl<Button>("PagePlaybackStop")!.Click += (_, _) => StopPagePlayback();
+        this.FindControl<Button>("PagePlaybackStart")!.Click += async (_, _) =>
+        {
+            if (SerialSelected) await StartSerialPlaybackAsync();
+            else await StartPagePlaybackAsync();
+        };
+        this.FindControl<Button>("PagePlaybackStop")!.Click += (_, _) =>
+        {
+            if (SerialSelected) StopSerialPlayback();
+            else StopPagePlayback();
+        };
         UpdatePagePlaybackControls();
     }
 
@@ -107,11 +115,13 @@ public partial class MainWindow
 
     private void UpdatePagePlaybackControls()
     {
-        var running = _virtualSequence?.IsRunning == true;
-        this.FindControl<Button>("PagePlaybackStart")!.IsEnabled = (!running || _eventStartedVirtual) && _virtualSequence?.IsBusy != true;
+        var sequence = SerialSelected ? _serialSequence : _virtualSequence;
+        var running = sequence?.IsRunning == true;
+        this.FindControl<Button>("PagePlaybackStart")!.IsEnabled = !_busy && !_serialBusy && !_settingsTransportBusy && !_dashboardFansBusy &&
+            (!running || (SerialSelected ? _eventStartedSerial : _eventStartedVirtual)) && sequence?.IsBusy != true && SelectedDisplay?.IsConnected == true;
         this.FindControl<Button>("PagePlaybackStop")!.IsEnabled = running;
         this.FindControl<TextBlock>("PagePlaybackStatus")!.Text = running
-            ? $"Sequence running: {_virtualSequence?.CurrentPageId ?? "waiting for visible page"}"
+            ? $"Sequence running: {sequence?.CurrentPageId ?? "waiting for visible page"}"
             : "Sequence stopped";
     }
 

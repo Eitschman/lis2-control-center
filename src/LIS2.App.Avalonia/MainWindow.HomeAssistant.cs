@@ -84,7 +84,7 @@ public partial class MainWindow
                 if (_virtualSequence?.IsRunning == true) RefreshPagePreview();
                 return Task.CompletedTask;
             }, cancellationToken));
-        _haUiTimer.Start();
+        if (_startBackgroundSources) _haUiTimer.Start();
         RefreshHaEntities();
     }
 

@@ -1,0 +1,287 @@
+using Avalonia.Controls;
+using Avalonia;
+using Avalonia.Headless;
+using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using Avalonia.Input.Raw;
+using Avalonia.Interactivity;
+using LIS2.App.Avalonia;
+using LIS2.Core;
+
+namespace LIS2.App.Avalonia.Tests;
+
+public sealed class DeviceUiTests
+{
+    [AvaloniaFact]
+    public async Task SerialStartupAndCommonActionsUseSavedDeviceAndBrightness()
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace
+        {
+            TransportMode = "Serial", PortName = "LIS2-TEST-MISSING", BrightnessPercent = 50,
+            ProgramCustomGlyphsOnConnect = true,
+            CustomGlyphs = Enumerable.Range(1, 8).Select(index => new CustomGlyphSettings
+                { Name = "Test " + index, Rows = Enumerable.Repeat((byte)index, 8).ToArray() }).ToList()
+        });
+        var transport = Assert.Single(ui.SerialTransports);
+        Assert.Equal("LIS2-TEST-MISSING", ui.Control<ComboBox>("SettingsPortComboBox").SelectedItem);
+        Assert.Equal(Lis2Brightness.Percent50, transport.State.Brightness);
+        Assert.Equal((byte)8, transport.State.CustomCharacters[7][0]);
+        Assert.DoesNotContain(transport.Writes, IsFanCommand);
+        ui.Click("NavButton1");
+        ui.Control<TextBox>("Line1TextBox").Text = "ÄÖÜ LIS2";
+        ui.Control<TextBox>("Line2TextBox").Text = "Selected serial";
+        await ui.ClickAndWaitAsync("RenderBoth");
+        Assert.StartsWith("ÄÖÜ LIS2", transport.State.Line1);
+        Assert.StartsWith("Selected serial", transport.State.Line2);
+        Assert.Equal(transport.State.Line1, ui.Control<TextBlock>("PreviewLine1").Text);
+        await ui.ClickAndWaitAsync("ClearDisplay");
+        Assert.Equal(new string(' ', 20), transport.State.Line1);
+        await ui.ClickAndWaitAsync("SendLine1");
+        await ui.ClickAndWaitAsync("SendLine2");
+        Assert.StartsWith("Selected serial", transport.State.Line2);
+        await ui.ClickAndWaitAsync("SendSpecialCharacterTest");
+        Assert.StartsWith("ÄÖÜ", transport.State.Line1);
+        ui.Control<TextBox>("CharacterRomStartTextBox").Text = "20";
+        await ui.ClickAndWaitAsync("SendCharacterRomRange");
+        Assert.Contains(transport.Writes, command => command.SequenceEqual(
+            Lis2Protocol.WriteRawLine(1, 0, Enumerable.Range(0x20, 20).Select(value => (byte)value).ToArray())));
+        await ui.ClickAndWaitAsync("SendGlyphSlot");
+        await ui.ClickAndWaitAsync("SendAllGlyphs");
+        await ui.ClickAndWaitAsync("Brightness25");
+        Assert.Equal(25, ui.Store.Load().BrightnessPercent);
+        Assert.Equal(Lis2Brightness.Percent25, transport.State.Brightness);
+        ui.Click("NavButton7");
+        await ui.ClickAndWaitAsync("SettingsApplyTransport");
+        Assert.False(transport.IsOpen);
+        Assert.Equal(2, ui.SerialTransports.Count);
+        Assert.Equal(Lis2Brightness.Percent25, ui.SerialTransports[1].State.Brightness);
+        Assert.All(ui.SerialTransports, item => Assert.DoesNotContain(item.Writes, IsFanCommand));
+        ui.Click("NavButton2");
+        ui.Click("PageAdd");
+        ui.Control<TextBox>("PageLine1").Text = "Serial page preview";
+        await ui.ClickAndWaitAsync("PageTest");
+        Assert.StartsWith("Serial page preview", ui.SerialTransports[1].State.Line1);
+        await ui.ClickAndWaitAsync("PagePlaybackStart");
+        Assert.True(ui.Control<Button>("PagePlaybackStop").IsEnabled);
+        ui.Click("PagePlaybackStop");
+    }
+
+    [AvaloniaFact]
+    public async Task TransportChoiceAppliesExplicitlyAndDisconnectClearsConsent()
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace());
+        Assert.Empty(ui.SerialTransports);
+        ui.Click("NavButton7");
+        ui.Control<ComboBox>("TransportModeComboBox").SelectedIndex = 1;
+        var ports = ui.Control<ComboBox>("SettingsPortComboBox");
+        ports.ItemsSource = new[] { "SERIAL-TEST" };
+        ports.SelectedIndex = 0;
+        ui.Click("NavButton0");
+        await ui.ClickAndWaitAsync("VirtualDemo");
+        Assert.Empty(ui.SerialTransports);
+        Assert.Equal("Virtual", ui.Store.Load().TransportMode);
+        ui.Click("NavButton7");
+        await ui.ClickAndWaitAsync("SettingsApplyTransport");
+        var serial = Assert.Single(ui.SerialTransports);
+        Assert.True(serial.IsOpen);
+        Assert.Equal("Serial", ui.Store.Load().TransportMode);
+        Assert.Equal("SERIAL-TEST", ui.Store.Load().PortName);
+        ui.Control<CheckBox>("DashboardFanConsent").IsChecked = true;
+        ui.Control<CheckBox>("FanHardwareConsent").IsChecked = true;
+        await ui.ClickAndWaitAsync("SettingsDisconnectTransport");
+        Assert.False(serial.IsOpen);
+        Assert.False(ui.Control<CheckBox>("DashboardFanConsent").IsChecked);
+        Assert.False(ui.Control<CheckBox>("FanHardwareConsent").IsChecked);
+        Assert.False(ui.Control<Button>("RenderBoth").IsEnabled);
+        ui.Control<ComboBox>("TransportModeComboBox").SelectedIndex = 0;
+        await ui.ClickAndWaitAsync("SettingsApplyTransport");
+        Assert.Equal("Virtual", ui.Store.Load().TransportMode);
+        Assert.Single(ui.SerialTransports);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(false, false)]
+    [InlineData(true, true)]
+    [InlineData(null, true)]
+    public async Task HomeAssistantActivationIsIndependentOfStoredToken(bool? enabled, bool expected)
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace { HomeAssistantEnabled = enabled }, true);
+        Assert.Equal(expected, ui.Control<CheckBox>("HaEnabled").IsChecked);
+        Assert.Equal(expected, ui.Store.Load().HomeAssistantEnabled);
+        Assert.Equal("isolated-test-token", ui.TokenStore.Load());
+    }
+
+    [AvaloniaFact]
+    public async Task WindowsImportUpdatesVisibleSettingsAndKeepsTokenSeparate()
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace
+            { TransportMode = "Serial", PortName = "OLD-PORT" }, true);
+        ui.Click("NavButton7");
+        Assert.True(ui.Control<Button>("ImportWindowsSettings").IsEffectivelyVisible);
+        await ui.Window.ImportWindowsSettingsAsync("""
+            {"TransportMode":"Serial","PortName":"IMPORTED-PORT","BrightnessPercent":75,
+             "Pages":[],"HomeAssistant":{"Enabled":false,"Url":"https://ha.example.test",
+             "AccessToken":"NEVER-IMPORT"},"HardwareSensorPreferences":[
+             {"Key":"Hardware.cpu.temp","Alias":"CPU","IsFavorite":true}]}
+            """);
+        Assert.Equal("IMPORTED-PORT", ui.Control<ComboBox>("SettingsPortComboBox").SelectedItem);
+        Assert.False(ui.Control<CheckBox>("HaEnabled").IsChecked);
+        Assert.Equal("https://ha.example.test", ui.Control<TextBox>("HaUrl").Text);
+        Assert.Equal("isolated-test-token", ui.TokenStore.Load());
+        var saved = ui.Store.Load();
+        Assert.Equal("CPU", Assert.Single(saved.HardwareSensorPreferences).Alias);
+        Assert.Equal(75, saved.BrightnessPercent);
+        Assert.Empty(saved.Pages);
+        Assert.False(ui.SerialTransports[0].IsOpen);
+        Assert.Equal(Lis2Brightness.Percent75, ui.SerialTransports[1].State.Brightness);
+        var before = File.ReadAllText(ui.StorePath);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => ui.Window.ImportWindowsSettingsAsync(
+            "{\"TransportMode\":\"Unknown\",\"PortName\":\"BROKEN\"}"));
+        Assert.Equal(before, File.ReadAllText(ui.StorePath));
+        Assert.Equal("IMPORTED-PORT", ui.Control<ComboBox>("SettingsPortComboBox").SelectedItem);
+    }
+
+    [AvaloniaFact]
+    public async Task DashboardManualFansRequireFreshConsentAndRestoreSafety()
+    {
+        var settings = new PortableWorkspace { TransportMode = "Serial", PortName = "FAN-TEST", LanguageMode = "German" };
+        settings.Fans.Channels[0].Mode = "Curve";
+        settings.Fans.Channels[0].MinimumPercent = 40;
+        settings.Fans.Channels[1].MaximumPercent = 70;
+        settings.Fans.Channels[2].AllowStop = true;
+        await using var ui = await Fixture.OpenAsync(settings);
+        var transport = Assert.Single(ui.SerialTransports);
+        ui.Control<Slider>("DashboardFan1Slider").Value = 0;
+        ui.Control<Slider>("DashboardFan2Slider").Value = 90;
+        ui.Control<Slider>("DashboardFan3Slider").Value = 0;
+        ui.Control<Slider>("DashboardFan4Slider").Value = 55;
+        Assert.False(ui.Control<Button>("DashboardFansApply").IsEnabled);
+        Assert.DoesNotContain(transport.Writes, IsFanCommand);
+        ui.Control<CheckBox>("DashboardFanConsent").IsChecked = true;
+        ui.Window.Width = 950;
+        ui.Window.Height = 600;
+        await ui.CaptureAsync("port02-serial-consent-950x600");
+        ui.Control<ScrollViewer>("DashboardView").Offset = new Vector(0, 1000);
+        await ui.CaptureAsync("port02-serial-consent-bottom-950x600");
+        await ui.ClickAndWaitAsync("DashboardFansApply");
+        var writes = transport.Writes.Where(IsFanCommand).ToArray();
+        Assert.Equal(2, writes.Length);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), writes[0]);
+        Assert.Equal(Lis2Protocol.SetFans(40, 70, 0, 55), writes[1]);
+        Assert.False(ui.Control<Button>("DashboardFansApply").IsEnabled);
+        Assert.False(ui.Control<CheckBox>("DashboardFanConsent").IsChecked);
+        Assert.Equal("Curve", ui.Store.Load().Fans.Channels[0].Mode);
+        Assert.Equal(0, ui.Store.Load().Fans.Channels[0].FixedPercent);
+        ui.Click("NavButton7");
+        await ui.ClickAndWaitAsync("SettingsDisconnectTransport");
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[^1]);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(1305, 893)]
+    [InlineData(950, 600)]
+    public async Task RenderAffectedViewsAtNormalAndMinimumSize(int width, int height)
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace { LanguageMode = "German" });
+        ui.Window.Width = width;
+        ui.Window.Height = height;
+        await ui.ClickAndWaitAsync("VirtualDemo");
+        foreach (var section in new[] { 0, 1, 7 })
+        {
+            ui.Click("NavButton" + section);
+            await ui.CaptureAsync($"port02-{section}-{width}x{height}");
+            var scroll = ui.Control<ScrollViewer>(section switch { 0 => "DashboardView", 1 => "DisplayView", _ => "SettingsView" });
+            scroll.Offset = new Vector(0, scroll.Extent.Height);
+            await ui.CaptureAsync($"port02-{section}-bottom-{width}x{height}");
+            scroll.Offset = default;
+        }
+        ui.Click("NavButton7");
+        ui.Control<Button>("SettingsDisconnectTransport").Focus();
+        ui.Window.KeyPressQwerty(PhysicalKey.Space, RawInputModifiers.None);
+        ui.Window.KeyReleaseQwerty(PhysicalKey.Space, RawInputModifiers.None);
+        await Fixture.WaitUntilAsync(() => !ui.Control<Button>("SettingsDisconnectTransport").IsEnabled);
+        Assert.Equal("Disconnected", ui.Control<TextBlock>("ConnectionText").Text);
+    }
+
+    private static bool IsFanCommand(byte[] bytes) => bytes.Length > 0 && bytes[0] == 0xAE;
+
+    [AvaloniaFact]
+    public async Task VirtualManualOutputNeedsNoSerialConsentAndPersistsRequestedValues()
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace());
+        Assert.False(ui.Control<CheckBox>("DashboardFanConsent").IsVisible);
+        ui.Control<Slider>("DashboardFan1Slider").Value = 10;
+        await ui.ClickAndWaitAsync("DashboardFansApply");
+        Assert.Equal(30, ui.Control<Slider>("DashboardFan1Slider").Value);
+        Assert.Equal(10, ui.Store.Load().Fans.Channels[0].FixedPercent);
+        Assert.Empty(ui.SerialTransports);
+    }
+
+    private sealed class Fixture : IAsyncDisposable
+    {
+        private readonly string _directory = Path.Combine(Path.GetTempPath(), "lis2-ui-" + Guid.NewGuid().ToString("N"));
+        public string StorePath => Path.Combine(_directory, "workspace.json");
+        public PortableWorkspaceStore Store { get; }
+        public PortableHaTokenStore TokenStore { get; }
+        public MainWindow Window { get; private set; } = null!;
+        public List<VirtualLis2Transport> SerialTransports { get; } = new();
+
+        private Fixture()
+        {
+            Store = new PortableWorkspaceStore(StorePath);
+            TokenStore = new PortableHaTokenStore(_directory, "lis2-no-keyring-for-tests");
+        }
+
+        public static async Task<Fixture> OpenAsync(PortableWorkspace saved, bool token = false)
+        {
+            // Erst nach Erstellen der isolierten Datei darf das Fenster seinen Workspace laden.
+            var ui = new Fixture();
+            await ui.Store.SaveAsync(saved);
+            if (token) ui.TokenStore.Save("isolated-test-token");
+            ui.Window = new MainWindow(ui.Store, ui.TokenStore, false, _ =>
+            {
+                var transport = new VirtualLis2Transport();
+                ui.SerialTransports.Add(transport);
+                return new SerialDisplaySession(transport);
+            });
+            ui.Window.Show();
+            await WaitUntilAsync(() => ui.Control<TextBlock>("ConnectionText").Text?.StartsWith("Connected") == true &&
+                ui.Control<Button>("SettingsApplyTransport").IsEnabled);
+            return ui;
+        }
+
+        public T Control<T>(string name) where T : Control => Window.FindControl<T>(name)!;
+        public void Click(string name) => Control<Button>(name).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        public async Task ClickAndWaitAsync(string name)
+        {
+            Assert.True(Control<Button>(name).IsEnabled, name + " ist gesperrt.");
+            Click(name);
+            await WaitUntilAsync(() => Control<Button>("SettingsApplyTransport").IsEnabled);
+        }
+        public async Task CaptureAsync(string name)
+        {
+            await Task.Delay(40);
+            Window.UpdateLayout();
+            using var frame = Window.CaptureRenderedFrame();
+            Assert.NotNull(frame);
+            var directory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../TestResults/screenshots"));
+            Directory.CreateDirectory(directory);
+            frame.Save(Path.Combine(directory, name + ".png"));
+        }
+        public static async Task WaitUntilAsync(Func<bool> predicate)
+        {
+            var timeout = DateTime.UtcNow.AddSeconds(10);
+            while (!predicate())
+            {
+                Assert.True(DateTime.UtcNow < timeout, "UI-Aktion hat das Zeitlimit überschritten.");
+                await Task.Delay(10);
+            }
+        }
+        public async ValueTask DisposeAsync()
+        {
+            Window.Close();
+            await Window.ShutdownCompletion;
+            if (Directory.Exists(_directory)) Directory.Delete(_directory, true);
+        }
+    }
+}

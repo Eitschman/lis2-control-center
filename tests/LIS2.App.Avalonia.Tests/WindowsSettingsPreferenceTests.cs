@@ -1,12 +1,11 @@
 using LIS2.App.Avalonia;
-using System.Text.Json;
 
 namespace LIS2.App.Avalonia.Tests;
 
 public sealed class WindowsSettingsPreferenceTests
 {
     [Fact]
-    public void ImportsOriginalSettingsWithoutInventingUnsupportedBehavior()
+    public void ImportsOriginalDeviceAndAppearanceSettings()
     {
         var imported = WindowsSettingsImporter.Import("""
         {
@@ -22,7 +21,8 @@ public sealed class WindowsSettingsPreferenceTests
         Assert.True(imported.ProgramCustomGlyphsOnConnect);
         Assert.Equal("Dark", imported.ThemeMode);
         Assert.Equal("de", imported.LanguageMode);
-        Assert.DoesNotContain("COM3", JsonSerializer.Serialize(imported));
+        Assert.Equal("Serial", imported.TransportMode);
+        Assert.Equal("COM3", imported.PortName);
     }
 
     [Fact]

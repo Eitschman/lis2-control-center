@@ -34,7 +34,7 @@
         </StackPanel>
       </Grid>
     </Border>
-    <Grid Grid.Column="1" Margin="20" RowDefinitions="Auto,*">
+    <Grid Grid.Column="1" Margin="20" RowDefinitions="Auto,*,Auto">
       <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,18">
         <StackPanel Grid.Column="0" Spacing="5">
           <StackPanel Orientation="Horizontal" Spacing="12">
@@ -54,10 +54,10 @@
               <StackPanel Spacing="12">
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
                 <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6"
-                        Width="402" Height="112" HorizontalAlignment="Left" ClipToBounds="True" Padding="8,12">
-                  <StackPanel Width="384" HorizontalAlignment="Left" Spacing="0">
-                    <TextBlock Name="PreviewLine1" Text="                    " Width="384" FontFamily="Consolas" FontSize="30" Foreground="#F7FBFF" TextWrapping="NoWrap" />
-                    <TextBlock Name="PreviewLine2" Text="                    " Width="384" FontFamily="Consolas" FontSize="30" Foreground="#F7FBFF" TextWrapping="NoWrap" />
+                        MaxWidth="402" Height="112" HorizontalAlignment="Stretch" ClipToBounds="True" Padding="8,12">
+                  <StackPanel HorizontalAlignment="Left" Spacing="0">
+                    <TextBlock Name="PreviewLine1" Text="                    " FontFamily="Consolas" FontSize="24" Foreground="#F7FBFF" TextWrapping="NoWrap" />
+                    <TextBlock Name="PreviewLine2" Text="                    " FontFamily="Consolas" FontSize="24" Foreground="#F7FBFF" TextWrapping="NoWrap" />
                   </StackPanel>
                 </Border>
                 <Button Name="VirtualDemo" Content="Send demo display" IsEnabled="False" HorizontalAlignment="Left" />
@@ -103,13 +103,12 @@
                 <Slider Name="DashboardFan4Slider" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="6,0,10,0" IsEnabled="False" />
                 <TextBlock Name="DashboardFan4Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
               </Grid>
-                <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Name="DashboardFansApply" Content="Apply" HorizontalAlignment="Right" MinWidth="110" IsEnabled="False" />
+                <WrapPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right">
+                  <CheckBox Name="DashboardFanConsent" Content="Serielle Lüfterausgabe freigeben" IsVisible="False" Margin="0,0,12,0"/>
+                  <Button Name="DashboardFansApply" Content="Apply" MinWidth="110" IsEnabled="False"/>
+                </WrapPanel>
               </Grid>
-              <TextBlock Text="Manual fan outputs require an authorized LIS2 connection. Use Fan Control to configure and authorize hardware operation." Opacity="0.65" TextWrapping="Wrap" />
             </StackPanel>
-          </Border>
-          <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12,9">
-            <TextBlock Text="💡  Tip: Use the navigation on the left to access display settings, page editor, Winamp integration, hardware and fan control." TextWrapping="Wrap" />
           </Border>
         </StackPanel>
       </ScrollViewer>
@@ -118,7 +117,6 @@
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="12">
             <TextBlock Text="Display controls" FontWeight="SemiBold" FontSize="18" />
-            <TextBlock Text="Send individual lines or both lines to the selected LIS2 transport." Opacity="0.7" TextWrapping="Wrap"/>
             <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
               <TextBlock Grid.Row="0" Text="Line 1" VerticalAlignment="Center" Margin="0,0,10,9" />
               <TextBox Name="Line1TextBox" Grid.Row="0" Grid.Column="1" Text="LIS2 Control Center" Margin="0,0,10,9" />
@@ -136,7 +134,6 @@
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Character ROM / Special Characters" FontWeight="SemiBold" FontSize="18" />
-            <TextBlock Text="Native LIS2 characters use the uPD16314 ROM. Test the mapped Unicode set or inspect raw ROM bytes on the real display." TextWrapping="Wrap" Opacity="0.7" />
             <WrapPanel>
               <Button Name="SendSpecialCharacterTest" Content="Send special-character test" Margin="0,0,8,0" />
               <TextBlock Text="Ä Ö Ü  ä ö ü  ß  °  µ  ±  £  ×  ÷  ← →  Ω π Σ √ ∞" FontFamily="Consolas" />
@@ -171,7 +168,6 @@
               <Border Grid.Column="3" Background="#07190E" CornerRadius="5" Padding="16">
                 <StackPanel Spacing="10">
                   <TextBlock Name="GlyphPixelPreview" Text="·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····" FontFamily="Consolas" FontSize="22" Foreground="#F7FBFF" />
-                  <TextBlock Text="20x2 template preview" />
                 </StackPanel>
               </Border>
             </Grid>
@@ -183,7 +179,6 @@
               <Button Name="SaveGlyphSet" Content="Save set..." />
               <Button Name="LoadExampleGlyphs" Content="Load examples" />
             </WrapPanel>
-            <TextBlock Text="{}Use {Glyph.Name} or {Glyph.1} through {Glyph.8} in page templates." Opacity="0.7" />
           </StackPanel>
         </Border>
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
@@ -725,19 +720,20 @@
           <Border BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Name="SettingsDeviceHeading" Text="Device / Transport" FontWeight="SemiBold" FontSize="18"/>
-              <Grid ColumnDefinitions="100,190,100,180,*" ColumnSpacing="8">
-                <TextBlock Grid.Column="0" Name="SettingsTransportLabel" Text="Transport" VerticalAlignment="Center"/>
-                <ComboBox Grid.Column="1" Name="TransportModeComboBox" SelectedIndex="0">
+              <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="10">
+                <TextBlock Grid.Row="0" Name="SettingsTransportLabel" Text="Transport" VerticalAlignment="Center"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" Name="TransportModeComboBox" SelectedIndex="0" Width="220" HorizontalAlignment="Left">
                   <ComboBoxItem Content="Virtual"/>
                   <ComboBoxItem Content="Serial"/>
                 </ComboBox>
-                <TextBlock Grid.Column="2" Name="SettingsPortLabel" Text="COM port" VerticalAlignment="Center"/>
-                <ComboBox Grid.Column="3" Name="SettingsPortComboBox"/>
-                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="7">
-                  <Button Name="SettingsRefreshPorts" Content="Refresh"/>
-                  <Button Name="SettingsApplyTransport" Content="Apply / reconnect"/>
-                </StackPanel>
+                <TextBlock Grid.Row="1" Name="SettingsPortLabel" Text="COM port" VerticalAlignment="Center"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" Name="SettingsPortComboBox" Width="220" HorizontalAlignment="Left"/>
               </Grid>
+              <WrapPanel>
+                <Button Name="SettingsRefreshPorts" Content="Refresh" Margin="0,0,8,0"/>
+                <Button Name="SettingsApplyTransport" Content="Apply / reconnect" Margin="0,0,8,0"/>
+                <Button Name="SettingsDisconnectTransport" Content="Trennen"/>
+              </WrapPanel>
               <TextBlock Name="SettingsTransportStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
           </Border>
@@ -751,7 +747,6 @@
                   <ComboBoxItem Content="Light"/>
                   <ComboBoxItem Content="Dark"/>
                 </ComboBox>
-                <TextBlock Grid.Row="0" Grid.Column="2" Name="SettingsThemeHint" Text="System default follows the operating system theme." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
                 <TextBlock Grid.Row="1" Name="SettingsLanguageLabel" Text="Language" VerticalAlignment="Center"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" Name="LanguageModeComboBox">
                   <ComboBoxItem Content="System default"/>
@@ -761,7 +756,6 @@
                   <ComboBoxItem Content="Turkish"/>
                   <ComboBoxItem Content="Russian"/>
                 </ComboBox>
-                <TextBlock Grid.Row="1" Grid.Column="2" Name="SettingsLanguageHint" Text="System default uses the operating system display language." VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.65"/>
               </Grid>
               <TextBlock Name="SettingsAppearanceStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
@@ -773,13 +767,14 @@
               <TextBlock Name="SettingsStartupStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
           </Border>
-          <StackPanel IsVisible="False" Spacing="10">
-          <Separator Margin="0,10,0,2"/>
-          <TextBlock Text="Advanced / Diagnostics" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Windows settings import" FontSize="18" FontWeight="SemiBold"/>
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Windows-Einstellungen" FontSize="18" FontWeight="SemiBold"/>
             <Button Name="ImportWindowsSettings" Content="Import Windows settings.json..." />
-            <TextBlock Name="WindowsImportStatus" Text="Existing Windows settings remain unchanged." VerticalAlignment="Center" Opacity="0.7" TextWrapping="Wrap" />
+            <TextBlock Name="WindowsImportStatus" Opacity="0.7" TextWrapping="Wrap" />
           </StackPanel>
+          </Border>
+          <StackPanel IsVisible="False" Spacing="10">
           <TextBlock Name="VirtualStatus" Text="Disconnected" TextWrapping="Wrap" Opacity="0.75"/>
           <Separator Margin="0,12,0,4"/>
           <TextBlock Text="Device / Transport" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Experimental serial and virtual transport diagnostics. No hardware fan authorization is implied." TextWrapping="Wrap"/>          <Separator Margin="4,18,4,16" />
@@ -815,6 +810,7 @@
       
           </StackPanel>
 </StackPanel></ScrollViewer>
+      <TextBlock Grid.Row="2" Name="DeviceActionStatus" TextWrapping="Wrap" Margin="0,10,0,0"/>
     </Grid>
   </Grid>
 </Window>

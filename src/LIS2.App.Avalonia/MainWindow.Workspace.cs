@@ -4,13 +4,15 @@ namespace LIS2.App.Avalonia;
 
 public partial class MainWindow
 {
-    private readonly PortableWorkspaceStore _workspaceStore = new();
-    private readonly PortableHaTokenStore _haTokenStore = new();
+    private readonly PortableWorkspaceStore _workspaceStore;
+    private readonly PortableHaTokenStore _haTokenStore;
     private bool _workspaceLoaded;
     private List<PortableHaEntityPreference> _haPreferences = new();
     private int _preferredBrightness = 100;
     private string _preferredTheme = "System";
     private string _preferredLanguage = "System";
+    private string _preferredTransportMode = "Virtual";
+    private string? _preferredPortName;
     private PortableFanSettings _fanSettings = new();
 
     private void LoadPortableWorkspace()
@@ -31,17 +33,23 @@ public partial class MainWindow
 
     private void ApplyPortableWorkspace(PortableWorkspace saved, bool restorePages = true)
     {
+        if (saved.TransportMode is not ("Serial" or "Virtual"))
+            throw new InvalidOperationException("Invalid transport mode.");
+        _ = BrightnessFromPercent(saved.BrightnessPercent);
         // Validate page data before mutating any live UI or workspace state.
         var validation = new PageWorkspace();
         if (restorePages) PageWorkspaceActions.RestorePages(validation, saved);
         this.FindControl<TextBox>("HaUrl")!.Text = saved.HomeAssistantUrl;
+        this.FindControl<CheckBox>("HaEnabled")!.IsChecked = saved.HomeAssistantEnabled == true;
         try
         {
             var token = _haTokenStore.Load();
             if (!string.IsNullOrWhiteSpace(token))
             {
                 this.FindControl<TextBox>("HaToken")!.Text = token;
-                this.FindControl<CheckBox>("HaEnabled")!.IsChecked = true;
+                // Bestehende Workspaces ohne Aktivierungsfeld behalten ihr tokenbasiertes Verhalten.
+                if (saved.HomeAssistantEnabled is null)
+                    this.FindControl<CheckBox>("HaEnabled")!.IsChecked = true;
             }
         }
         catch (Exception ex)
@@ -61,6 +69,8 @@ public partial class MainWindow
         _hardwarePreferences.AddRange(saved.HardwareSensorPreferences.Where(p => !string.IsNullOrWhiteSpace(p.Key)));
         FilterHardwareSensors();
         _preferredBrightness = saved.BrightnessPercent;
+        _preferredTransportMode = saved.TransportMode;
+        _preferredPortName = saved.PortName;
         _preferredTheme = saved.ThemeMode;
         _preferredLanguage = saved.LanguageMode;
         LoadSettingsPreferences();
@@ -74,6 +84,9 @@ public partial class MainWindow
 
     private PortableWorkspace CapturePortableWorkspace() => new()
     {
+        TransportMode = _preferredTransportMode,
+        PortName = _preferredPortName,
+        HomeAssistantEnabled = this.FindControl<CheckBox>("HaEnabled")!.IsChecked == true,
         Pages = System.Text.Json.JsonSerializer.Deserialize<List<PageDefinition>>(_pages.ExportJson()) ?? new(),
         HomeAssistantUrl = this.FindControl<TextBox>("HaUrl")!.Text ?? string.Empty,
         CustomGlyphs = _glyphs.Glyphs.Select(g => new CustomGlyphSettings

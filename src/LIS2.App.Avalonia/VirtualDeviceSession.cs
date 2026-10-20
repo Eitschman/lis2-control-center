@@ -6,7 +6,7 @@ namespace LIS2.App.Avalonia;
 /// A hardware-free LIS2 session used while porting the shared UI.
 /// Real serial and fan control must be added through a separate, safety-reviewed service.
 /// </summary>
-public sealed class VirtualDeviceSession : IAsyncDisposable
+public sealed class VirtualDeviceSession : IDisplaySession
 {
     private readonly VirtualLis2Transport _transport = new();
     private readonly Lis2Device _device;
@@ -58,6 +58,12 @@ public sealed class VirtualDeviceSession : IAsyncDisposable
 
     public Task ClearAsync(CancellationToken cancellationToken = default) =>
         _device.ClearAsync(cancellationToken);
+
+    public Task WriteRawDisplayBytesAsync(int line, int column, byte[] bytes, CancellationToken cancellationToken = default) =>
+        _device.WriteRawDisplayBytesAsync(line, column, bytes, cancellationToken);
+
+    public Task SetFansAsync(IReadOnlyList<int> outputs) =>
+        _device.SetFansAsync(outputs[0], outputs[1], outputs[2], outputs[3]);
 
     public Task SetBrightnessAsync(Lis2Brightness brightness, CancellationToken cancellationToken = default) =>
         _device.SetBrightnessAsync(brightness, cancellationToken);

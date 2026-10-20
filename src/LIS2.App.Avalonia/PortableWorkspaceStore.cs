@@ -60,6 +60,9 @@ public sealed class PortableWorkspaceStore
 
 public sealed class PortableWorkspace
 {
+    public string TransportMode { get; set; } = "Virtual";
+    public string? PortName { get; set; }
+    public bool? HomeAssistantEnabled { get; set; }
     public List<PageDefinition> Pages { get; set; } = new();
     public PortableFanSettings Fans { get; set; } = new();
     public string HomeAssistantUrl { get; set; } = string.Empty;

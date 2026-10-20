@@ -25,12 +25,12 @@ internal static class HelpReferenceCatalog
             case 0:
                 Add("Dashboard", "The Dashboard shows the current 20x2 VFD preview, connection status, recent commands and direct fan outputs.");
                 Add("VFD preview", "The preview displays the normalized 20-character lines. Long text may scroll during page playback.");
-                Add("Fan outputs", "Manual controls obey configured safety limits. Use Fan Control to configure the four channels.");
+                Add("Fan outputs", "Manuelle Ausgaben beachten Minimum, Maximum und AllowStop der vier Kanäle. Bei serieller Ausgabe ist jede Aktion erneut freizugeben. Die erste Ausgabe setzt 100 Prozent; Trennen oder Stoppen stellt 100 Prozent wieder her. Während automatischer Regelung bleibt die Handausgabe gesperrt.");
                 Add("Quick links", "Open Display for manual output or Fan Control for regulation and sensor assignments.");
                 break;
             case 1:
                 Add("Display", "Use the Display section for direct physical or virtual LIS2 output. Manual commands interrupt page scheduling.");
-                Add("Lines and brightness", "Render both lines writes a 20x2 frame. Brightness supports 100%, 75%, 50% and 25%.");
+                Add("Lines and brightness", "Zeilen, Zeichen und Helligkeit werden an den angewendeten Transport gesendet. Helligkeit unterstützt 100%, 75%, 50% und 25%, wird gespeichert und beim Verbinden erneut angewendet. Die serielle Vorschau zeigt gesendete Inhalte, keine Display-Rückmeldung.");
                 Add("Custom glyphs", "Eight programmable 5x8 slots are available. Use {Glyph.1} through {Glyph.8} in templates.");
                 foreach (var name in glyphNames.Where(n => !string.IsNullOrWhiteSpace(n)))
                     Add("Named glyph", "{Glyph." + NormalizeGlyphName(name) + "}");
@@ -74,7 +74,8 @@ internal static class HelpReferenceCatalog
                 break;
             case 7:
                 Add("Settings", "Select Virtual LIS2 or a serial port. Configure language, appearance and device startup preferences.");
-                Add("Transport", "Disconnect the active transport before switching. Serial operation requires a reachable LIS2 device.");
+                Add("Transport", "Transport und Port werden beim Anwenden gespeichert. Die Anwendung trennt die bisherige Verbindung und verbindet den gewählten Transport neu. Ein fehlender gespeicherter Port bleibt ausgewählt und wird nicht automatisch ersetzt. Serielle Displaybedienung aktiviert keine Lüfter.");
+                Add("Windows-Import", "Der sichtbare Import in den Einstellungen liest settings.json, ohne die Quelldatei zu ändern. Transport, Port, Helligkeit, Glyphen, Seiten, Lüfter und Sensorpräferenzen werden übernommen. Home-Assistant-Aktivierung und URL werden übernommen, der Token bleibt getrennt. Home Assistant danach bei Bedarf neu verbinden.");
                 Add("Appearance", "The system, light and dark themes are supported. Language changes apply to the application interface.");
                 Add("Windows startup", "Automatic startup is only available on Windows.");
                 break;

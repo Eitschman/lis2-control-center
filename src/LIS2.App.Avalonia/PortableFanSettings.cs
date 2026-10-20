@@ -22,6 +22,21 @@ public sealed class PortableFanSettings
 
     public FanChannelConfiguration[] ToRuntimeChannels() =>
         Normalize(this).Channels.Select(x => x.ToRuntime()).ToArray();
+
+    /// <summary>Die Dashboard-Handausgabe verwendet dieselben Kanalgrenzen wie WPF.</summary>
+    public int[] CalculateManualOutputs(IReadOnlyList<int> requested)
+    {
+        if (requested.Count != 4 || requested.Any(value => value is < 0 or > 100))
+            throw new ArgumentException("Exactly four fan percentages from 0 to 100 are required.", nameof(requested));
+        var controller = new FanController();
+        return Normalize(this).Channels.Select((channel, index) =>
+        {
+            var configuration = channel.ToRuntime();
+            configuration.Mode = FanMode.Fixed;
+            configuration.FixedPercent = requested[index];
+            return controller.CalculateOutput(configuration);
+        }).ToArray();
+    }
 }
 
 public sealed class PortableFanChannel

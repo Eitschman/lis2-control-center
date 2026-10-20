@@ -1,7 +1,7 @@
 # TODO: Avalonia-Portierung
 
 Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-01. Lokal 304/304 Avalonia-Tests auf Windows erfolgreich; aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
+Implementierungsstand: PORT-02. Lokal 326/326 Avalonia-Tests auf Windows erfolgreich; aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -33,17 +33,18 @@ Seitenerzeugung aus HA, Medien und Hardware-Presets verwendet `PageWorkspaceActi
 
 Betroffen: `PageWorkspaceActions`, Quellenhandler, Workspace-Laden und Avalonia-Tests. Die Nachweise prüfen den gemeinsamen Ablauf headless, keine echten GUI-Klicks, HA-Verbindungen oder serielle Hardware.
 
-Nächstes Implementierungspaket: **PORT-02: Einstellungen und Gerätebedienung**.
+Nächstes Implementierungspaket: **PORT-03: Diagnose und Laufzeitlebenszyklus**.
 
 ## Weitere Implementierungs- und Prüfaufgaben
 
 ### PORT-02: Einstellungen und Gerätebedienung
 
-- [ ] Transportmodus, gewählten Port und HA-Aktivierung gemäß WPF-Verhalten speichern und wiederherstellen.
-- [ ] Helligkeitsänderungen mit gespeicherter Einstellung und Verbindungsaufbau verbinden.
-- [ ] Allgemeine Display-/Glyphen-/Helligkeitsaktionen an den ausgewählten Transport anbinden; separate versteckte Serial-Controls ersetzen keine WPF-Bedienparität.
-- [ ] Windows-Importer: übernommene Felder und fehlende Hardwarepräferenzen abgleichen. Importlogik existiert, der UI-Zugang liegt in einem unsichtbaren Container.
-- [ ] WPF-Parität der Dashboard-Handausgabe klären/umsetzen; Slider und Apply sind derzeit deaktiviert. Lüfterfreigabe bleibt verbindlich.
+- [x] Transportmodus, gewählten Port und HA-Aktivierung speichern und wiederherstellen. Fehlender gespeicherter Port bleibt ausgewählt; explizites HA-Aus bleibt auch bei vorhandenem Token erhalten.
+- [x] Helligkeitsänderungen speichern und beim Verbinden anwenden, ebenso konfigurierte Glyphen.
+- [x] Allgemeine Zeilen-, Clear-, Demo-, ROM-, Glyphen-, Helligkeits- und Seitenaktionen an den angewendeten Transport anbinden. Ein noch nicht angewendeter ComboBox-Wechsel ändert das Ziel nicht.
+- [x] Windows-Import sichtbar in Settings; Transport, Port, HA-Aktivierung und Hardwarepräferenzen zusätzlich übernehmen. Token bleibt getrennt; bestehende HA-Verbindung wird beendet und bei Bedarf ausdrücklich neu verbunden.
+- [x] Dashboard-Handausgabe mit WPF-Kanalgrenzen und AllowStop, ohne Änderung des gespeicherten Regelmodus. Serielle Freigabe je Aktion, erster Fan-Befehl 100 Prozent und Sicherheitswiederherstellung bei Stop/Trennen. Keine Handausgabe parallel zur automatischen Regelung.
+- [x] Regressionen für Persistenz, Import, Transportzuordnung, manuelle Lüfter und Fehlerpfade; tatsächliche Controls, Tastatur-Trennen und gerenderte Dashboard-/Display-/Settings-Ansichten bei Normal- und Mindestgröße. Desktop-/Hardwareprüfungen bleiben getrennt offen.
 
 ### PORT-03: Diagnose und Laufzeitlebenszyklus
 
@@ -74,6 +75,7 @@ Nächstes Implementierungspaket: **PORT-02: Einstellungen und Gerätebedienung**
 - [ ] Hilfeinhalt/-tiefe und Übersetzungen gegen die WPF-Referenz prüfen; neue Avalonia-Hilfetexte sind überwiegend Englisch.
 - [ ] Hilfeplatzierung, Tray-Menütexte und weitere hart codierte Laufzeittexte abgleichen.
 - [ ] Themes, Tastatur/Fokus, DPI, Fenstergrenzen und lange Texte in allen fünf Sprachen prüfen.
+- [ ] Bestehenden Display-Formatierungstest kulturfest formulieren: deutscher Windows-Lauf ergibt korrektes Komma, Test erwartet fest einen Dezimalpunkt; invarianter Lauf besteht mit 48/48. Produktformatierung nach `CurrentCulture` erhalten.
 - [ ] Zusätzliche Bedienflächen und nicht ausdrücklich geforderte Titelzusätze im bearbeiteten UI-Bereich bereinigen; genehmigten Variablenbrowser erhalten.
 - [ ] Linux-Tray, Autostart, Single Instance und Splash gegenüber dem PRP-Ziel bearbeiten.
 - [ ] WPF erst nach Funktions-/Darstellungsabgleich und Benutzerabnahme entfernen.

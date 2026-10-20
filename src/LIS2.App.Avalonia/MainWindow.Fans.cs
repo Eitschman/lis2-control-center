@@ -10,10 +10,7 @@ public partial class MainWindow
 {
     private readonly SimulatedFanSensors _fanPreviewSensors = new();
     private readonly SimulatedFanOutput _fanPreviewSink = new();
-    private readonly IFanSensorSource _liveFanSensors = OperatingSystem.IsLinux()
-        ? new LinuxSystemSensors()
-        : OperatingSystem.IsWindows() ? new WindowsHardwareFanSensors()
-        : new SnapshotFanSensors(() => new Dictionary<string, object?>());
+    private readonly IFanSensorSource _liveFanSensors;
     private AuthorizedFanRuntimeSession? _virtualFanSession;
     private VirtualLis2Transport? _virtualFanTransport;
     private CancellationTokenSource? _fanMonitorStop;
@@ -155,7 +152,7 @@ public partial class MainWindow
         this.FindControl<Button>("FanHardwareStart")!.Click += async (_, _) =>
         {
             var session = _serialDisplay;
-            if (_serialBusy || session is null || !session.IsConnected ||
+            if (_serialBusy || _settingsTransportBusy || _dashboardFansBusy || session is null || !session.IsConnected ||
                 this.FindControl<CheckBox>("FanHardwareConsent")!.IsChecked != true) return;
             try
             {
@@ -230,9 +227,10 @@ public partial class MainWindow
         var session = _serialDisplay;
         var connected = session?.IsConnected == true;
         var running = session?.FansRunning == true;
-        start.IsEnabled = connected && !running && session?.FansBusy != true && !_serialBusy &&
+        start.IsEnabled = connected && !running && session?.FansBusy != true && !_serialBusy && !_settingsTransportBusy && !_dashboardFansBusy &&
             this.FindControl<CheckBox>("FanHardwareConsent")?.IsChecked == true;
         stop.IsEnabled = connected && running && session?.FansBusy != true && !_serialBusy;
+        UpdateDashboardFanControls();
         if (session?.FanFault is { } fault)
             SetFanStatus("HARDWARE FAN CONTROL FAILED; safety restoration attempted: " + fault.Message);
     }

@@ -92,7 +92,7 @@ public partial class MainWindow
             if (SelectedPageIndex is not int i) return;
             if (!SavePageEditor()) return;
             var frame = _pages.Preview(i, PagePreviewValues());
-            await RunVirtualActionAsync(() => _virtualDevice.RenderBothAsync(frame.Line1, frame.Line2));
+            await RunSelectedDisplayActionAsync(session => session.RenderBothAsync(frame.Line1, frame.Line2));
         };
         foreach (var name in new[] { "PageLine1", "PageLine2", "PageDuration", "PageRefresh", "PageScrollStep", "PageScrollPause" })
             this.FindControl<TextBox>(name)!.TextChanged += (_, _) => RefreshPagePreview();
@@ -106,7 +106,7 @@ public partial class MainWindow
         InitializeHomeAssistant();
         LoadPortableWorkspace();
         InitializeWindowsSettingsImport();
-        _ = StartPageSourcesAsync();
+        if (_startBackgroundSources) _ = StartPageSourcesAsync();
     }
 
 
@@ -151,8 +151,8 @@ public partial class MainWindow
         _glyphs.Replace(BuiltInGlyphSets.CreateSpectrumSet());
         LoadGlyphEditor();
         await SavePortableWorkspaceAsync();
-        if (_virtualDevice.IsConnected)
-            await _virtualDevice.ProgramAllGlyphsAsync(_glyphs.Glyphs);
+        if (SelectedDisplay?.IsConnected == true)
+            await RunSelectedDisplayActionAsync(session => session.ProgramAllGlyphsAsync(_glyphs.Glyphs));
         return true;
     }
 
@@ -385,7 +385,8 @@ public partial class MainWindow
 
     private void RefreshPagePreview()
     {
-        if (_loadingPage) return;
+        // TextChanged kann bereits vor Closed in der Dispatcherqueue liegen.
+        if (_loadingPage || _windowClosed) return;
         if (SelectedPageIndex is not int i)
         {
             ClearPageEditorPreview();

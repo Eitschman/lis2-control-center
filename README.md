@@ -13,11 +13,11 @@ LIS2 Control Center is an independent replacement for the obsolete VL System Mul
 
 ## Avalonia-Arbeitsstand
 
-Stand: 20.10.2026, Arbeitspaket PORT-01. Die gemeinsame App unter `src/LIS2.App.Avalonia` enthält zehn Hauptansichten, Display-/Seiten-/Ereignisruntime, Glyphen, Windows-/Linux-Sensoren, Lüfterregelung mit ausdrücklicher serieller Freigabe, HA, Medien, Workspace, Hilfe und About. Der modale Variablenbrowser ist eine genehmigte Abweichung von WPF.
+Stand: 20.10.2026, Arbeitspaket PORT-02. Die gemeinsame App unter `src/LIS2.App.Avalonia` enthält zehn Hauptansichten, Display-/Seiten-/Ereignisruntime, Glyphen, Windows-/Linux-Sensoren, Lüfterregelung mit ausdrücklicher serieller Freigabe, HA, Medien, Workspace, Hilfe und About. Der modale Variablenbrowser ist eine genehmigte Abweichung von WPF.
 
-Lokal sind 304/304 Avalonia-Tests auf Windows erfolgreich. Der aktuelle CI-Nachweis steht im [Status](docs/prp/linux-port-status.md). GUI-Smoke, extrahierter Paketstart, echte ARM64-Ausführung und physische LIS2-Prüfung sind dadurch nicht nachgewiesen.
+Lokal sind 326/326 Avalonia-Tests auf Windows erfolgreich. Gerätebedienung und Einstellungen werden auch mit tatsächlichen Avalonia-Controls und Skia-Rendering headless geprüft. Die betroffenen Ansichten wurden bei 1305 × 893 und 950 × 600 Pixeln angesehen. Der aktuelle CI-Nachweis steht im [Status](docs/prp/linux-port-status.md). Ein systemweiter Desktop-Smoke, extrahierter Paketstart, echte ARM64-Ausführung und physische LIS2-Prüfung sind dadurch nicht nachgewiesen.
 
-Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. HA-, Medien- und Hardware-Seitenaktionen verwenden gemeinsamen Entwurfsschutz und aktualisieren laufende Sequenzen. Gespeicherte leere Seitenlisten werden wiederhergestellt. Nächstes Paket: Einstellungen und Gerätebedienung (PORT-02).
+Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. Transport, Port, HA-Aktivierung und Helligkeit werden gespeichert. Gemeinsame Displayaktionen verwenden den angewendeten Transport. Der Windows-Import ist sichtbar; manuelle Lüfterausgaben beachten Kanalgrenzen und benötigen bei serieller Ausgabe je Aktion eine Freigabe. Nächstes Paket: Diagnose und Laufzeitlebenszyklus (PORT-03).
 
 ## WPF-Funktionsreferenz
 

@@ -23,14 +23,14 @@ public partial class MainWindow
         this.FindControl<Border>("WindowsMediaCard")!.IsVisible = OperatingSystem.IsWindows();
         _mediaTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _mediaTimer.Tick += (_, _) => RefreshMedia();
-        _mediaTimer.Start();
+        if (_startBackgroundSources) _mediaTimer.Start();
         this.FindControl<Button>("WindowsMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("WindowsMedia", "Windows Media Player");
         this.FindControl<Button>("WinampMediaPage")!.Click += async (_, _) =>
             await CreateMediaPageAsync("Winamp", "Winamp");
         this.FindControl<Button>("LinuxMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("Media", "Linux media");
         this.FindControl<Button>("WmpLegacyMediaPage")!.Click += async (_, _) =>
             await CreateMediaPageAsync("WmpLegacy", "Windows Media Player Legacy");
-        _ = StartMediaAsync();
+        if (_startBackgroundSources) _ = StartMediaAsync();
     }
 
     private async Task StartMediaAsync()

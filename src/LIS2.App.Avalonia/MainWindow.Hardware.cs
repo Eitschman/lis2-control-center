@@ -106,8 +106,11 @@ public partial class MainWindow
                     SetVirtualStatus("Created " + selectedPreset + " display preset.");
             };
         }
-        RefreshHardwareSensors();
-        _hardwareRefreshTimer.Start();
+        if (_startBackgroundSources)
+        {
+            RefreshHardwareSensors();
+            _hardwareRefreshTimer.Start();
+        }
     }
 
     private void SetHardwareFanAssignmentEnabled(bool enabled)

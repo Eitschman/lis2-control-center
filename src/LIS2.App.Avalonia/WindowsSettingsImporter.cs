@@ -13,6 +13,18 @@ public static class WindowsSettingsImporter
             throw new InvalidOperationException("Windows settings must be a JSON object.");
 
         var result = existing is null ? new PortableWorkspace() : JsonSerializer.Deserialize<PortableWorkspace>(JsonSerializer.Serialize(existing))!;
+        if (root.TryGetProperty("TransportMode", out var transport))
+        {
+            if (transport.ValueKind != JsonValueKind.String || transport.GetString() is not ("Serial" or "Virtual"))
+                throw new InvalidOperationException("Invalid Windows transport mode.");
+            result.TransportMode = transport.GetString()!;
+        }
+        if (root.TryGetProperty("PortName", out var port))
+        {
+            if (port.ValueKind is not (JsonValueKind.String or JsonValueKind.Null))
+                throw new InvalidOperationException("Invalid Windows port name.");
+            result.PortName = port.GetString();
+        }
         if (root.TryGetProperty("BrightnessPercent", out var brightness) &&
             brightness.ValueKind == JsonValueKind.Number &&
             brightness.TryGetInt32(out var percent) &&
@@ -59,6 +71,12 @@ public static class WindowsSettingsImporter
 
         if (root.TryGetProperty("HomeAssistant", out var ha) && ha.ValueKind == JsonValueKind.Object)
         {
+            if (ha.TryGetProperty("Enabled", out var enabled))
+            {
+                if (enabled.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
+                    throw new InvalidOperationException("Invalid Home Assistant enabled setting.");
+                result.HomeAssistantEnabled = enabled.GetBoolean();
+            }
             if (ha.TryGetProperty("Url", out var url) && url.ValueKind == JsonValueKind.String)
                 result.HomeAssistantUrl = url.GetString() ?? string.Empty;
             if (ha.TryGetProperty("EntityPreferences", out var preferences) &&
@@ -72,6 +90,17 @@ public static class WindowsSettingsImporter
                     .GroupBy(p => p.EntityId, StringComparer.OrdinalIgnoreCase)
                     .Select(g => g.Last()).ToList();
             }
+        }
+
+        if (root.TryGetProperty("HardwareSensorPreferences", out var hardware))
+        {
+            if (hardware.ValueKind != JsonValueKind.Array)
+                throw new InvalidOperationException("Windows hardware preferences must be an array.");
+            result.HardwareSensorPreferences =
+                (JsonSerializer.Deserialize<List<PortableHardwareSensorPreference>>(hardware.GetRawText()) ?? new())
+                .Where(preference => preference is not null && !string.IsNullOrWhiteSpace(preference.Key))
+                .GroupBy(preference => preference.Key, StringComparer.OrdinalIgnoreCase)
+                .Select(group => group.Last()).ToList();
         }
 
         if (root.TryGetProperty("Fans", out var fans))

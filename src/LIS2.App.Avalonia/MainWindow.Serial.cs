@@ -70,16 +70,22 @@ public partial class MainWindow
                 };
                 await (_serialDisplay ?? throw new InvalidOperationException("Serial display not connected."))
                     .SetBrightnessAsync(brightness);
+                _preferredBrightness = brightness switch
+                {
+                    Lis2Brightness.Percent100 => 100, Lis2Brightness.Percent75 => 75,
+                    Lis2Brightness.Percent50 => 50, _ => 25
+                };
+                await SavePortableWorkspaceAsync(true);
                 SetSerialStatus("Serial LIS2 brightness updated.");
             });
         InitializeSerialPlayback();
         RefreshSerialPorts();
     }
 
-    private async Task ConnectSerialAsync()
+    private async Task ConnectSerialAsync(string? requestedPort = null)
     {
             if (_serialDisplay is not null || _serialBusy) return;
-            var port = this.FindControl<ComboBox>("SerialPortPicker")!.SelectedItem as string;
+            var port = requestedPort ?? this.FindControl<ComboBox>("SerialPortPicker")!.SelectedItem as string;
             if (string.IsNullOrWhiteSpace(port))
             {
                 SetSerialStatus("Select a serial port first.");
@@ -91,8 +97,9 @@ public partial class MainWindow
             SerialDisplaySession? session = null;
             try
             {
-                session = new SerialDisplaySession(port);
+                session = _serialSessionFactory(port);
                 await session.ConnectAsync();
+                await ApplyConnectedDisplaySettingsAsync(session);
                 _serialDisplay = session;
                 session.FanFaulted += ex => global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 {
@@ -145,7 +152,7 @@ public partial class MainWindow
             await action();
         }
         catch (Exception ex) { SetSerialStatus($"Serial display error: {ex.Message}"); }
-        finally { _serialBusy = false; UpdateSerialControls(); }
+        finally { _serialBusy = false; UpdatePreview(); UpdateSerialControls(); }
     }
 
     private void UpdateSerialControls()
@@ -162,17 +169,22 @@ public partial class MainWindow
         this.FindControl<Button>("SerialPlaybackStop")!.IsEnabled = (_serialSequence?.IsRunning == true);
         UpdateSerialPlaybackStatus();
         UpdateHardwareFanControls();
+        UpdateVirtualControls();
         this.FindControl<Button>("SerialSendPage")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
         this.FindControl<Button>("SerialSendGlyphs")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
         this.FindControl<Button>("SerialApplyBrightness")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
     }
 
-    private void SetSerialStatus(string message) =>
+    private void SetSerialStatus(string message)
+    {
         this.FindControl<TextBlock>("SerialStatus")!.Text = message;
+        if (SerialSelected) this.FindControl<TextBlock>("DeviceActionStatus")!.Text = message;
+    }
 
     private async Task CloseSerialDisplayAsync()
     {
         StopSerialPlayback();
+        await _serialPlaybackTimer.StopAndDrainAsync();
         var session = _serialDisplay;
         if (_serialSequence is not null) await _serialSequence.StopAndDrainAsync();
         if (session is not null) await session.DisposeAsync();

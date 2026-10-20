@@ -1,7 +1,7 @@
 # PRP: LIS2 Control Center mit Avalonia
 
 Stand: 20.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-01; genaue Prüfnachweise im [Status](linux-port-status.md).
+Implementierungsstand: PORT-02; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
 
@@ -19,7 +19,7 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 304/304 Avalonia-Tests auf Windows erfolgreich. Der [Status](linux-port-status.md) ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
+Builds, Tests und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 326/326 Avalonia-Tests auf Windows erfolgreich, einschließlich Geräte-UI-Tests mit tatsächlichen Controls und Skia-Rendering. Der [Status](linux-port-status.md) ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
 
 ## Implementierungsstand
 
@@ -28,14 +28,14 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Bereich | Stand | Offener Umfang |
 | --- | --- | --- |
 | Projektstruktur | Avalonia 11.3.6, .NET 8, portable Bibliotheken und `LIS2.Runtime` vorhanden | Plattformverträge sind noch nicht durchgängig angebunden; UI-Code enthält weitere Orchestrierung |
-| Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen integriert | WPF-gleiche Bedienung und gemeinsamer Transportzugriff aller Displayaktionen prüfen |
+| Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen; gemeinsame Geräteaktionen am angewendeten Transport | Physische Ausgabe und differenzielle Schreibspannen offen |
 | Seiteneditor | Seitenpflege, Vorlagen, Bedingungen, Presets, animierte Vorschau, Variablenbrowser, validierter JSON-Import/-Export und gemeinsamer Entwurfsschutz für Quellenaktionen vorhanden | GUI-Interaktionen und WPF-Bedienparität prüfen |
 | Glyphen | Acht 5x8-Slots, Dateien, Namen, Spektrumset und Ersetzungsdialog vorhanden | Physische Zeichenprüfung und UI-/Transportabgleich offen |
 | Sensoren | LibreHardwareMonitor auf Windows; procfs/sysfs/hwmon auf Linux; Aliase, Favoriten und fehlende Sensoren berücksichtigt | Stabile Identitäten und Rechte auf Zielsystemen prüfen |
-| Lüfter | Vier Modi plus Off, Kurven, Hysterese, Fail-safe, Simulation und freizugebende serielle Ausgabe vorhanden | Manuelle Dashboard-Ausgabe und WPF-Interaktionen abgleichen; Hardware bleibt ungeprüft |
+| Lüfter | Vier Modi plus Off, Kurven, Hysterese, Fail-safe, Simulation, freizugebende serielle Regelung und Dashboard-Handausgabe mit Kanalgrenzen | Weitere WPF-Interaktionen abgleichen; Hardware bleibt ungeprüft |
 | Medien | Winamp, reflektiert geladener GSMTC-Anbieter und Linux-`playerctl` angebunden | MPRIS-Zeitposition, Playerwahl und echte Zielplayer offen; WMP Legacy weicht vom zurückgestellten Produktumfang ab |
 | Home Assistant | WebSocket-Quelle, Entitäten, Attribute, Aliase, Favoriten und Seitenaktionen mit Sequenz-Reload vorhanden | Linux-Liveprüfung und Deaktivierung/Persistenz prüfen |
-| Einstellungen | Workspace, Windows-Importlogik, Theme, Sprache und Windows-Tray/Autostart vorhanden | Transport-/Portpersistenz, Helligkeitsanwendung, sichtbarer Importzugang und Linux-Desktopintegration offen |
+| Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache und Windows-Tray/Autostart | Nativer Dateidialog und Linux-Desktopintegration offen |
 | Hilfe und About | Kontextbezogene Hilfe mit zehn Themen, Live-Schlüsseln, Glyphenreferenz und About-Dialog vorhanden | WPF-Inhaltstiefe, Übersetzungen, Platzierung und Desktop-Bedienung offen |
 | Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Textexport vorhanden | Echtes Anwendungs-/Protokoll-Logging fehlt |
 | CI und Pakete | Windows-/Ubuntu-Builds, vier Testprojekte je OS und drei selbstständige Pakete mit Prüfsummen vorhanden | Avalonia-GUI-Smoke, Archivstart und echte ARM64-Ausführung fehlen |
@@ -69,7 +69,8 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 - [ ] Automatischen lokalen AES-Dateipfad bei fehlendem Secret Service gegen die verbindliche Freigabepolitik prüfen. Vorhandener Code ist keine Freigabe.
 - [x] Quellenaktionen übernehmen gültige Entwürfe und laden laufende Sequenzen neu; ungültige Entwürfe verhindern den Wechsel.
 - [x] Gespeicherte leere Seitenlisten ersetzen die Startseite; ohne Workspace-Datei bleibt sie erhalten.
-- [ ] Fehlende Einstellungen und sichtbare Importbedienung bearbeiten.
+- [x] Transport, Port, HA-Aktivierung und Helligkeit speichern/wiederherstellen; Windows-Import sichtbar und um Hardwarepräferenzen ergänzt.
+- [x] Gemeinsame Displayaktionen und sichere Dashboard-Handausgabe an den angewendeten Transport anbinden; Geräte-UI-Tests und Sichtprüfung bei Normal-/Mindestgröße.
 
 ### Oberfläche und Verifikation
 

@@ -5,6 +5,16 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class WindowsSettingsImporterTests
 {
+    [Theory]
+    [InlineData("{\"TransportMode\":42}")]
+    [InlineData("{\"TransportMode\":\"Unknown\"}")]
+    [InlineData("{\"PortName\":42}")]
+    [InlineData("{\"HomeAssistant\":{\"Enabled\":\"true\"}}")]
+    public void InvalidDeviceSettingsAreRejected(string json)
+    {
+        Assert.Throws<InvalidOperationException>(() => WindowsSettingsImporter.Import(json));
+    }
+
     [Fact]
     public void ImportsOriginalPagesGlyphsAndPreferencesButNeverToken()
     {

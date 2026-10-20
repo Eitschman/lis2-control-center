@@ -19,7 +19,7 @@ public partial class MainWindow
             _ = SavePortableWorkspaceAsync();
         };
         this.FindControl<Button>("SendAllGlyphs")!.Click += async (_, _) =>
-            await RunVirtualActionAsync(() => _virtualDevice.ProgramAllGlyphsAsync(_glyphs.Glyphs));
+            await RunSelectedDisplayActionAsync(session => session.ProgramAllGlyphsAsync(_glyphs.Glyphs));
         this.FindControl<Button>("SaveGlyphSet")!.Click += async (_, _) =>
             await RunGlyphFileActionAsync(SaveGlyphSetAsync);
         this.FindControl<Button>("LoadGlyphSet")!.Click += async (_, _) =>
@@ -53,8 +53,7 @@ public partial class MainWindow
     private async Task ConnectWithGlyphsAsync()
     {
         await _virtualDevice.ConnectAsync();
-        if (this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true)
-            await _virtualDevice.ProgramAllGlyphsAsync(_glyphs.Glyphs);
+        await ApplyConnectedDisplaySettingsAsync(_virtualDevice);
     }
 
     private void LoadGlyphEditor()

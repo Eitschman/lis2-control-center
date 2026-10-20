@@ -1,11 +1,11 @@
 # Inventar des Avalonia-Branches
 
-Stand: 20.10.2026. Implementierungsstand: PORT-01.
+Stand: 20.10.2026. Implementierungsstand: PORT-02.
 Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Konfiguration. Kein ZIP-Archiv als Implementierungsbaseline.
 
 ## Umfang und Projekte
 
-Der Quellbestand umfasst 286 Dateien, darunter 219 C#-Dateien und 22 C#-Projektdateien. Es gibt neun Testprojekte. Das Avalonia-Testprojekt enthält 36 `*Tests.cs`-Dateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
+Der Quellbestand umfasst 291 Dateien, darunter 224 C#-Dateien und 22 C#-Projektdateien. Es gibt neun Testprojekte. Das Avalonia-Testprojekt enthält 37 `*Tests.cs`-Dateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
 
 | Gruppe | Projekte | Target |
 | --- | --- | --- |
@@ -29,7 +29,7 @@ Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin`
 | Runtime | `src/LIS2.Runtime`: SourceRuntime, AdaptiveRuntimeLoop, FanRuntime/FanRuntimeLoop, PlatformContracts und Linux-Sensoren |
 | Verlinkte Runtime-Dateien | `DisplayRuntimeHost`, `PagePlayback`, `PageDefinition`, `PageFrameDispatcher`, `PageSourceValues`, `PageClockValues`, `PeriodicRuntimeLoop`, `PageSequenceController` liegen unter `src/LIS2.App.Avalonia` und werden von Runtime kompiliert |
 | Avalonia-Shell | `App.axaml(.cs)`, `Program.cs`, `MainWindow.axaml(.cs)`; zehn Views und partielle Handlerdateien |
-| Sessions | VirtualDeviceSession, SerialDisplaySession, UnifiedLis2Session, AuthorizedFanRuntimeSession und SafeSerialFanSession |
+| Sessions | IDisplaySession, VirtualDeviceSession, SerialDisplaySession, UnifiedLis2Session, AuthorizedFanRuntimeSession und SafeSerialFanSession; MainWindow.DeviceActions/DashboardFans für die gemeinsame Bedienung |
 | Workspace | PortableWorkspaceStore, PortableFanSettings, WindowsSettingsImporter, MainWindow.Workspace/WindowsImport; PageWorkspaceActions verbindet Quellenaktionen, Editor, Sequenz-Reload und Persistenz |
 | Geheimnisse | PortableHaTokenStore, LegacyHaTokenStore; DPAPI, secret-tool und lokaler AES-Dateipfad |
 | Hardware | LinuxSystemSensors/LinuxHwmonFanSensors, WindowsHardwareFanSensors, HardwareSensorCatalog und HardwareDisplayPresetBuilder |
@@ -54,9 +54,9 @@ Die `IPlatform*`-Verträge haben derzeit keine entsprechenden Adapterimplementie
 
 ## Persistierte Daten und Grenzen
 
-`PortableWorkspace` enthält Pages, Fans, HomeAssistantUrl, CustomGlyphs, HomeAssistantEntityPreferences, HardwareSensorPreferences, PageVariableFavorites, BrightnessPercent, ProgramCustomGlyphsOnConnect, ThemeMode und LanguageMode.
+`PortableWorkspace` enthält TransportMode, PortName, HomeAssistantEnabled, Pages, Fans, HomeAssistantUrl, CustomGlyphs, HomeAssistantEntityPreferences, HardwareSensorPreferences, PageVariableFavorites, BrightnessPercent, ProgramCustomGlyphsOnConnect, ThemeMode und LanguageMode.
 
-Nicht enthalten sind Transportmodus, Port und HA-Aktivierungsflag. Der Windows-Importer übernimmt Seiten, Glyphen, HA-URL/-Präferenzen, Fans, Helligkeit, Glyph-on-connect, Theme und Sprache; Windows-Tokens und andere unbekannte Felder werden nicht übertragen. Hardwarepräferenzen werden aktuell nicht aus Windows importiert. Der Importbutton ist in einem unsichtbaren Settings-Bereich angelegt.
+Der Windows-Importer übernimmt Transportmodus/Port, Seiten, Glyphen, HA-Aktivierung/-URL/-Präferenzen, Hardwarepräferenzen, Fans, Helligkeit, Glyph-on-connect, Theme und Sprache; Windows-Tokens und andere unbekannte Felder werden nicht übertragen. Der Importbutton ist in den Einstellungen sichtbar. Ein fehlender gespeicherter Port bleibt in der Auswahl erhalten. Helligkeit und konfigurierte Glyphen werden beim Verbinden angewendet.
 
 ## Testumfang und CI
 
@@ -73,7 +73,7 @@ Avalonia-Testgruppen:
 - Workspace, Windows-Import, Glyphendateien, Tokenstore und Hilfeinhalte.
 - Gemeinsame Quellenaktionen mit gültigen/ungültigen Entwürfen, beiden Sequenzen und persistierter leerer Seitenliste.
 
-Das sind Headless-Prüfungen. GUI-Start/-Navigation, Paketstart, echte DBus-/HA-/Player-/Sensorintegration und physische LIS2-Ausgabe sind damit nicht abgedeckt. Aktueller CI-Nachweis und Grenzen stehen im [Status](linux-port-status.md).
+`DeviceUiTests` startet zusätzlich das tatsächliche Fenster mit isolierten Stores und simuliertem seriellen Transport über Avalonia.Headless.XUnit und Skia. Geprüft werden Geräte-Buttons, Einstellungen/Import, manuelle Lüfter, Transportwechsel und Trennen per Tastatur. Dashboard, Display und Settings werden in Normal-/Mindestgröße gerendert. Hintergrundquellen sind in dieser Fixture ausdrücklich abgeschaltet. Paketstart, echter Desktop-/Tray-Lebenszyklus, DBus-/HA-/Player-/Sensorintegration und physische LIS2-Ausgabe sind damit nicht abgedeckt. Aktueller CI-Nachweis und Grenzen stehen im [Status](linux-port-status.md).
 
 ## Referenzen
 
