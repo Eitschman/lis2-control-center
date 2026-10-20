@@ -676,3 +676,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Reconfiguring an identical draft is now a no-op to avoid unnecessarily resetting the scroller. Changed draft settings still reset the isolated preview; no persisted page or live sequence is modified.
 - Added tests for delayed source updates, unchanged-draft scroll continuity, and refresh-cadence changes; adjusted earlier live-value test to explicitly request 250 ms refresh.
 - Commits d733e89, b7b59ed, cd5ec3f. Latest CI pending; visual Windows/Linux sign-off remains pending.
+
+
+## Pages import/export validation hardening (2026-10-20)
+- After green CI for 1e2ac61, hardened Avalonia page workspace JSON import: unsupported or null overflow modes for either display line now fail before the existing workspace is replaced, rather than silently falling back during playback.
+- Added tests for valid overflow roundtrips, invalid modes on both lines, refresh and scroll timing boundaries, and case-insensitive duplicate IDs. Invalid imports retain the original workspace.
+- Commits da3251a, 55dba0f, b39cd65. New CI pending; no physical device or desktop sign-off claimed.
