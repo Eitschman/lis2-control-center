@@ -54,12 +54,14 @@ public sealed class PageWorkspace
     {
         var pages = JsonSerializer.Deserialize<List<PageDefinition>>(json)
             ?? throw new InvalidOperationException("Invalid page configuration.");
-        if (pages.Any(p => string.IsNullOrWhiteSpace(p.Id) || p.DurationSeconds <= 0 ||
+        if (pages.Any(p => p is null || string.IsNullOrWhiteSpace(p.Id) || p.DurationSeconds <= 0 ||
                            p.RefreshIntervalMilliseconds is < 100 or > 60000 ||
                            p.ScrollStepMilliseconds <= 0 || p.ScrollEdgePauseMilliseconds < 0 ||
                            (!string.IsNullOrWhiteSpace(p.VisibilityExpression) &&
                             !VisibilityEvaluator.TryParse(p.VisibilityExpression, out _, out _, out _))))
             throw new InvalidOperationException("Page configuration contains invalid timing or identifiers.");
+        if (pages.Select(p => p.Id).Distinct(StringComparer.OrdinalIgnoreCase).Count() != pages.Count)
+            throw new InvalidOperationException("Page configuration contains duplicate page identifiers.");
         _pages.Clear();
         _pages.AddRange(pages);
     }

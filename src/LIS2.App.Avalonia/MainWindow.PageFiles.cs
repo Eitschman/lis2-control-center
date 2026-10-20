@@ -12,6 +12,9 @@ public partial class MainWindow
         this.FindControl<ComboBox>("PageConditionOperator")!.SelectedIndex = 0;
         this.FindControl<Button>("PageApplyCondition")!.Click += (_, _) => ApplyPageCondition();
         this.FindControl<TextBox>("PageVisibility")!.TextChanged += (_, _) => UpdateConditionStatus();
+        this.FindControl<TextBox>("PageConditionKey")!.TextChanged += (_, _) => UpdateConditionStatus();
+        this.FindControl<TextBox>("PageConditionValue")!.TextChanged += (_, _) => UpdateConditionStatus();
+        this.FindControl<ComboBox>("PageConditionOperator")!.SelectionChanged += (_, _) => UpdateConditionStatus();
         this.FindControl<Button>("PageImport")!.Click += async (_, _) => await RunPageFileActionAsync(LoadPagesAsync);
         this.FindControl<Button>("PageExport")!.Click += async (_, _) => await RunPageFileActionAsync(SavePagesAsync);
     }
@@ -35,9 +38,28 @@ public partial class MainWindow
         var expression = this.FindControl<TextBox>("PageVisibility")!.Text;
         var valid = string.IsNullOrWhiteSpace(expression) ||
                     VisibilityEvaluator.TryParse(expression, out _, out _, out _);
-        this.FindControl<TextBlock>("PageConditionStatus")!.Text = valid
-            ? "Condition syntax valid (runtime values not connected yet)."
-            : "Invalid condition syntax.";
+        var status = this.FindControl<TextBlock>("PageConditionStatus")!;
+        if (!valid)
+        {
+            status.Text = BrowserText("Invalid condition syntax.");
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(expression))
+        {
+            status.Text = BrowserText("No visibility condition (always visible).");
+            return;
+        }
+        try
+        {
+            var visible = new VisibilityEvaluator().IsVisible(expression, PagePreviewValues());
+            status.Text = visible
+                ? BrowserText("Condition currently matches.")
+                : BrowserText("Condition currently does not match.");
+        }
+        catch (Exception)
+        {
+            status.Text = BrowserText("Condition cannot be evaluated with current values.");
+        }
     }
 
     private async Task RunPageFileActionAsync(Func<Task> action)

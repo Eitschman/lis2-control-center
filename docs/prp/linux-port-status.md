@@ -644,3 +644,7 @@ Implemented initial cross-screen package: common light shell/white card styling,
 
 ## Spectrum glyph confirmation parity (2026-10-20)
 - Winamp Spectrum page preset now checks whether the eight custom slots contain the spectrum bar set; if not, shows an owner-modal confirmation before replacing them. Cancel leaves the glyph workspace and page list untouched. On confirmation replaces all eight levels, refreshes the glyph editor, saves portable workspace, and programs connected virtual LIS2. If already a spectrum set, skips replacement and confirmation. No hardware tests claimed. Added spectrum bitmap, JSON persistence and virtual-device programming tests. UI strings for this new confirmation use browser translation catalog in all five languages.
+
+## Pages validation and live visibility diagnostics (2026-10-20)
+- Replaced misleading Pages condition status claiming runtime values are disconnected: now evaluates the configured expression against current PagePreviewValues(), reports match/mismatch, empty condition, malformed expression and evaluation failure, localized in all five languages. Condition editor key/value/operator changes also refresh diagnostics.
+- Page JSON import now rejects null page entries and case-insensitive duplicate IDs without replacing existing workspace; regression tests cover transactional preservation and valid multi-page roundtrip. Original WPF page schema remains unchanged. CI and desktop verification pending.

@@ -5,6 +5,11 @@ public static class PageVariableBrowserLocalization
 {
     private static readonly IReadOnlyDictionary<string, string[]> Texts = new Dictionary<string, string[]>(StringComparer.Ordinal)
     {
+        ["Invalid condition syntax."] = ["Ungültige Bedingung.", "Syntaxe de condition invalide.", "Geçersiz koşul sözdizimi.", "Неверный синтаксис условия."],
+        ["No visibility condition (always visible)."] = ["Keine Sichtbarkeitsbedingung (immer sichtbar).", "Aucune condition (toujours visible).", "Görünürlük koşulu yok (her zaman görünür).", "Нет условия (всегда видно)."],
+        ["Condition currently matches."] = ["Bedingung ist aktuell erfüllt.", "La condition est actuellement remplie.", "Koşul şu anda sağlanıyor.", "Условие сейчас выполняется."],
+        ["Condition currently does not match."] = ["Bedingung ist aktuell nicht erfüllt.", "La condition n’est actuellement pas remplie.", "Koşul şu anda sağlanmıyor.", "Условие сейчас не выполняется."],
+        ["Condition cannot be evaluated with current values."] = ["Bedingung kann mit aktuellen Werten nicht ausgewertet werden.", "Impossible d’évaluer la condition avec les valeurs actuelles.", "Koşul mevcut değerlerle değerlendirilemiyor.", "Невозможно оценить условие по текущим значениям."],
         ["Replace custom glyphs?"] = ["Sonderzeichen ersetzen?", "Remplacer les caractères personnalisés ?", "Özel karakterler değiştirilsin mi?", "Заменить пользовательские символы?"],
         ["The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"] = ["Das VFD-Spektrum benötigt alle acht Sonderzeichenplätze. Den aktuellen Zeichensatz durch die acht Spektrumbalken ersetzen?", "Le spectre VFD utilise les huit caractères personnalisés. Remplacer les caractères actuels par les huit niveaux du spectre ?", "VFD spektrumu sekiz özel karakter yuvasının tamamını kullanır. Mevcut karakterler sekiz spektrum çubuğuyla değiştirilsin mi?", "Спектр VFD использует все восемь пользовательских символов. Заменить текущий набор восемью уровнями спектра?"],
         ["Replace glyphs"] = ["Zeichen ersetzen", "Remplacer", "Karakterleri değiştir", "Заменить символы"],
