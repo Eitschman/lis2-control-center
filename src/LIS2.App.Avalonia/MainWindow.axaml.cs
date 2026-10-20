@@ -229,6 +229,7 @@ public partial class MainWindow : Window
         if (index < 0 || index >= SectionNames.Length) return;
         _selectedSection = index;
         UpdateSection();
+        UpdateEditorPreviewVisibility();
         // Some pages populate their controls only when selected. Localize those
         // newly realized controls without altering live/bound telemetry values.
         ApplyPageLocalization();
