@@ -728,3 +728,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Events view now uses the host's shared priority queue, so existing virtual/serial sequences display highest-priority overlays and automatically resume their page frame after expiry/cancel. If playback was stopped, connected transports can start an event-only empty-page sequence; on expiry the event frame is cleared and only these temporary sequences stop. No direct UI event display writes.
 - Event overlay updates are serialized at the UI handler, use the existing per-transport PageSequenceController output gates, and support both connected transports without changing fan authorization or serial protocol.
 - Added headless tests for both transport event delivery, priority preemption/cancellation, normal page resumption, and event-only expiry/clear. Commits 1caceb5, 05707a4. Desktop and physical verification deferred; CI pending.
+
+
+## Event-to-page playback lifecycle: virtual and serial (2026-10-20)
+- After green CI at 0d0497b3, found a follow-on interaction gap: while an event-only temporary sequence was active, the normal Start buttons were disabled, and handlers rejected Start because a sequence was already running. Users could not enable ordinary page playback until the alert expired.
+- Both transports now support promoting an active event-only sequence to normal page playback using PageSequenceController.ReloadAsync. The event stays visible until its normal expiry, then the selected page resumes. No transport reconnect, sequence restart, or duplicate event frame write is required.
+- Virtual and serial Start buttons remain enabled for this specific transition; manual Stop clears the temporary ownership flag, avoiding accidental cleanup of user-started playback. Added headless tests for event-only promotion and independent transport behavior. Commits 10ac0f0, 0365e21, 3dba241, 79bf169, 47c8bc3. CI pending; physical/UI validation deferred.
