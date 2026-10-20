@@ -630,3 +630,7 @@ Implemented initial cross-screen package: common light shell/white card styling,
 ## Page variable browser completion pass (2026-10-20)
 - Fixed HA categorization for actual runtime `HA.` keys (rather than only `HomeAssistant.`). Added friendly-name labels from connected HA entities, per-entity filtering that exposes state and attribute variables, multi-term search across keys and friendly labels, and persistent favorites through PortableWorkspace.PageVariableFavorites. Existing page template keys remain unchanged.
 - Commits `9fe4fbd`, `fd77ab2`, `e66573a`, `c24c345`, `c0bcfcf`. Added HA entity/attribute label tests. Latest HEAD CI pending. The UI has not yet been manually accepted on Windows/Linux; do not resume WPF parity work until this browser passes CI and desktop acceptance.
+
+## Variable browser screenshot review (2026-10-20)
+- User tested Windows UI with 22,570 variables. Reported English-only modal and status, redundant page toolbar buttons, missing modal icon, resizing search field.
+- Removed redundant main-page insert/refresh actions; modal retains insertion and refresh. Modal inherits main icon, search has fixed width, German UI text and filter labels follow CurrentUiLanguage(), and main toolbar/status update when language changes. Other languages still use English fallback; complete five-language parity remains outstanding. No desktop acceptance claimed.
