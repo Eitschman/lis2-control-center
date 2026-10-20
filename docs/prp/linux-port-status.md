@@ -734,3 +734,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - After green CI at 0d0497b3, found a follow-on interaction gap: while an event-only temporary sequence was active, the normal Start buttons were disabled, and handlers rejected Start because a sequence was already running. Users could not enable ordinary page playback until the alert expired.
 - Both transports now support promoting an active event-only sequence to normal page playback using PageSequenceController.ReloadAsync. The event stays visible until its normal expiry, then the selected page resumes. No transport reconnect, sequence restart, or duplicate event frame write is required.
 - Virtual and serial Start buttons remain enabled for this specific transition; manual Stop clears the temporary ownership flag, avoiding accidental cleanup of user-started playback. Added headless tests for event-only promotion and independent transport behavior. Commits 10ac0f0, 0365e21, 3dba241, 79bf169, 47c8bc3. CI pending; physical/UI validation deferred.
+
+
+## Page editor navigation and validation (2026-10-20)
+- After green CI at cc69f451, reviewed Avalonia page editor navigation. Selecting a different page previously called LoadPageEditor directly and discarded unsaved text/timing/visibility edits without validation or persistence.
+- The selection handler now tracks the currently loaded editor page, validates and saves it before loading a different page, refreshes active virtual and serial schedules, and rejects selection changes when validation fails. Invalid edits remain visible for correction. The normal explicit Save path remains available.
+- Added a separate save path that avoids resetting the new list selection while committing the old page. Commits 8524ddd, c6c3104. CI and UI validation pending.
