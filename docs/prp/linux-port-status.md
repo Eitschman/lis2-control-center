@@ -740,3 +740,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - After green CI at cc69f451, reviewed Avalonia page editor navigation. Selecting a different page previously called LoadPageEditor directly and discarded unsaved text/timing/visibility edits without validation or persistence.
 - The selection handler now tracks the currently loaded editor page, validates and saves it before loading a different page, refreshes active virtual and serial schedules, and rejects selection changes when validation fails. Invalid edits remain visible for correction. The normal explicit Save path remains available.
 - Added a separate save path that avoids resetting the new list selection while committing the old page. Commits 8524ddd, c6c3104. CI and UI validation pending.
+
+
+## Page editor: protect drafts across workspace actions (2026-10-20)
+- Previous selection-save package 31d74579 passed CI. Further review found that add/duplicate/delete/reorder/preset creation and list-row enabled toggles still refreshed the page editor without committing the current draft, silently discarding unsaved changes.
+- All those page workspace mutations now call the common CommitPendingPageEditor guard. Valid pending values are saved before mutation; invalid values abort the action without changing workspace. Checkbox toggles revert to their persisted value when validation fails. Existing live virtual/serial schedule reload and portable persistence paths remain in place.
+- No new headless UI test harness was added in this package; code review completed, CI and final desktop UI behavior pending. Commits 7ccc5a0, 7275ebe.
