@@ -2,7 +2,7 @@
 
 Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
 Implementierungsstand: PORT-02.
-Lokal geprüfte Codebasis: PORT-02-Arbeitsstand; neuer GitHub-CI-Nachweis steht noch aus.
+Geprüfter Code-Commit: `ac97be566664eefb70adf7a8a6f4275f7def9717`.
 
 Diese Datei beschreibt den aktuellen Stand. Anforderungen stehen im [PRP](linux-avalonia-port.md), priorisierte Restarbeiten in [TODO](../../TODO.md), Plattform- und Projektgrenzen im [Inventar](linux-port-inventory.md).
 
@@ -16,7 +16,7 @@ Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 - Gegenproben: Vier gezielte Tests schlagen bei fehlender Helligkeitsanwendung, ignoriertem Import-Port, umgangenen Lüftergrenzen und fehlender Freigabeprüfung fehl. Ein weiterer Test schlägt bei falscher Transportzuordnung fehl. Regulären Code wiederhergestellt und gesamte Suite erfolgreich ausgeführt. Ergebnisse: `port02-negative.trx` und `port02-negative-routing.trx`.
 - Core: 55/55, Fans: 12/12 erfolgreich. Display: unter deutscher Windows-Kultur 47/48; `Render_FormatsNumberPercentBytesAndAffixes` erwartet einen Dezimalpunkt, während die Implementierung gemäß `CurrentCulture` ein Komma ausgibt. Mit `--environment DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1` bestehen 48/48. Ergebnisdateien: `port02-core.trx`, `port02-fans.trx`, `port02-display.trx` und `port02-display-invariant.trx` in den jeweiligen Testprojekten. Produktcode und bestehender Test wurden dafür nicht verändert.
 
-Der GitHub-CI-Nachweis für PORT-02 wird nach dem Push diesem Code-Commit zugeordnet. Vorherige Läufe belegen den neuen Arbeitsstand nicht.
+[CI 39446107884](https://github.com/Eitschman/lis2-control-center/actions/runs/39446107884) prüft den genannten Code-Commit mit .NET 8. Alle sieben Jobs sind erfolgreich: Avalonia-Build/Tests und Core-/Display-/Fans-Tests jeweils auf Windows und Ubuntu sowie Veröffentlichung/Paketprüfung für `win-x64`, `linux-x64` und `linux-arm64`. Die aktuellen Joblogs weisen je OS 326/326 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests aus, ohne Fehler oder übersprungene Tests. Beide Avalonia-Jobs haben je 14 gerenderte Ansichten hochgeladen. Nachfolgende reine Dokumentationscommits ändern den hier geprüften Code nicht; der genannte Lauf gehört zum angegebenen Commit.
 
 Dashboard, Display und Settings wurden bei 1305 × 893 und 950 × 600 Pixeln mit Skia im Headless-Modus gerendert und angesehen, einschließlich unterer Scrollbereiche, gefüllter VFD-Vorschau und serieller Fan-Freigabe. Ein Tastaturtest trennt über die fokussierte Schaltfläche per Leertaste. Screenshots liegen unter `TestResults/screenshots/port02-*.png`; CI exportiert sie als `Avalonia-device-views-Windows` bzw. `Avalonia-device-views-Linux`. Es gibt keinen automatisierten Bildvergleich.
 
@@ -48,7 +48,7 @@ Gerätebedienung und Einstellungen verwenden den angewendeten Transport; ein noc
 
 ## Verifikation und Produktentscheidungen
 
-- **Automatisiert geprüft:** 326/326 lokale Avalonia-Tests und die genannten Gegenproben. CI für diesen Stand steht noch aus.
+- **Automatisiert geprüft:** 326/326 lokale Avalonia-Tests, die genannten Gegenproben und alle sieben CI-Jobs des angegebenen Code-Commits. Der separat ausgewiesene lokale Kulturfehler im bestehenden Display-Test bleibt offen.
 - **Quellseitig geprüft:** Projektziele, Workflow-Inhalt, Ansichten/Handler, Session- und Persistenzpfade sowie zugehörige Testdateien.
 - **Nicht in diesem Auftrag ausgeführt:** nativer Desktop-/Tray-Smoke, Live-HA-/Player-/Sensorprüfung, nativer Dateidialog und physische LIS2-Prüfung.
 - **Verbindlich:** eine gemeinsame Avalonia-Oberfläche; WPF bleibt Referenz bis zur Paritätsabnahme. Modaler Variablenbrowser ist genehmigt. Physische Geräteprüfung wird getrennt ausgewiesen.
