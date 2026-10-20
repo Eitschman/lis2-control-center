@@ -15,7 +15,7 @@ public partial class MainWindow
     private void InitializePageVariables()
     {
         this.FindControl<Button>("PageVariableBrowser")!.Click += async (_, _) => await ShowPageVariableBrowserAsync();
-        this.FindControl<Button>("PageVariableBrowser")!.Content = BrowserText("Browse variables…", "Variablen durchsuchen…");
+        this.FindControl<Button>("PageVariableBrowser")!.Content = BrowserText("Browse variables…");
         RefreshPageVariables();
     }
 
@@ -23,9 +23,14 @@ public partial class MainWindow
     {
         var count = PagePreviewValues().Count;
         this.FindControl<TextBlock>("PageVariableStatus")!.Text =
-            CurrentUiLanguage() == "de"
-                ? $"{count} Variablen verfügbar. Zum Suchen den Variablen-Browser öffnen."
-                : $"{count} variables available. Browse to search by category and name.";
+            CurrentUiLanguage() switch
+            {
+                "de" => $"{count} Variablen verfügbar. Zum Suchen den Variablen-Browser öffnen.",
+                "fr" => $"{count} variables disponibles. Ouvrez le navigateur pour rechercher.",
+                "tr" => $"{count} değişken mevcut. Aramak için değişken tarayıcısını açın.",
+                "ru" => $"Доступно переменных: {count}. Откройте поиск переменных.",
+                _ => $"{count} variables available. Browse to search by category and name."
+            };
         RefreshPagePreview();
     }
 
@@ -51,7 +56,7 @@ public partial class MainWindow
         RefreshPagePreview();
     }
 
-    private string BrowserText(string english, string german) => CurrentUiLanguage() == "de" ? german : english;
+    private string BrowserText(string english) => PageVariableBrowserLocalization.Translate(english, CurrentUiLanguage());
 
     private async Task ShowPageVariableBrowserAsync(string? insertTarget = null)
     {
@@ -60,30 +65,28 @@ public partial class MainWindow
         var keys = snapshot.Keys.ToArray();
         var dialog = new Window
         {
-            Title = BrowserText("Browse template variables", "Vorlagenvariablen durchsuchen"), Icon = Icon,
+            Title = BrowserText("Browse template variables"), Icon = Icon,
             Width = 850, Height = 630,
             MinWidth = 580, MinHeight = 420, WindowStartupLocation = WindowStartupLocation.CenterOwner
         };
-        var search = new TextBox { Width = 275, MinWidth = 275, MaxWidth = 275,
-            Watermark = BrowserText("Search variable keys (multiple words)…", "Variablen suchen (mehrere Wörter)…") };
+        var search = new TextBox { Width = 260, MinWidth = 260, MaxWidth = 260,
+            Watermark = BrowserText("Search variable keys (multiple words)…") };
         var categoryKeys = new[] { "All", "Favorites", "Home Assistant", "Hardware", "Clock", "Media / Other" };
         var category = new ComboBox
         {
-            ItemsSource = CurrentUiLanguage() == "de"
-                ? new[] { "Alle", "Favoriten", "Home Assistant", "Hardware", "Uhrzeit", "Medien / Sonstige" }
-                : categoryKeys,
-            SelectedIndex = 0, MinWidth = 150
+            ItemsSource = categoryKeys.Select(BrowserText).ToArray(),
+            SelectedIndex = 0, Width = 160
         };
-        var entityPicker = new ComboBox { MinWidth = 160 };
+        var entityPicker = new ComboBox { Width = 160 };
         var results = new ListBox { MinHeight = 240 };
         var count = new TextBlock();
-        var german = CurrentUiLanguage() == "de";
+        var language = CurrentUiLanguage();
         var details = new TextBlock { TextWrapping = global::Avalonia.Media.TextWrapping.Wrap };
-        var favorite = new Button { Content = BrowserText("☆ Add favorite", "☆ Favorit hinzufügen") };
-        var insert1 = new Button { Content = BrowserText("Insert into line 1", "In Zeile 1 einfügen") };
-        var insert2 = new Button { Content = BrowserText("Insert into line 2", "In Zeile 2 einfügen") };
-        var close = new Button { Content = BrowserText("Close", "Schließen") };
-        var refresh = new Button { Content = BrowserText("Refresh values", "Werte aktualisieren") };
+        var favorite = new Button { Content = BrowserText("☆ Add favorite") };
+        var insert1 = new Button { Content = BrowserText("Insert into line 1") };
+        var insert2 = new Button { Content = BrowserText("Insert into line 2") };
+        var close = new Button { Content = BrowserText("Close") };
+        var refresh = new Button { Content = BrowserText("Refresh values") };
         var layout = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto,Auto,Auto,Auto"), RowSpacing = 10, Margin = new global::Avalonia.Thickness(16) };
         var filters = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         filters.Children.Add(search);
@@ -104,7 +107,7 @@ public partial class MainWindow
         void RefreshEntities()
         {
             var old = entityPicker.SelectedItem as string;
-            var allEntities = BrowserText("All entities", "Alle Entitäten");
+            var allEntities = BrowserText("All entities");
             var entities = new[] { allEntities }.Concat(keys.Where(key => PageVariableBrowserCatalog.Category(key) == "Home Assistant")
                 .Select(PageVariableBrowserCatalog.Entity).Where(entity => entity.Length > 0)
                 .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(entity => entity, StringComparer.OrdinalIgnoreCase)).ToArray();
@@ -114,13 +117,13 @@ public partial class MainWindow
         void UpdateDetails()
         {
             var key = Selected();
-            if (key is null) { details.Text = BrowserText("Select a variable to inspect its current value and exact template key.", "Variable auswählen, um Wert und Vorlagenschlüssel anzuzeigen."); return; }
+            if (key is null) { details.Text = BrowserText("Select a variable to inspect its current value and exact template key."); return; }
             snapshot.TryGetValue(key, out var value);
-            details.Text = key + Environment.NewLine + BrowserText("Current value: ", "Aktueller Wert: ") + (value?.ToString() ?? BrowserText("(unavailable)", "(nicht verfügbar)")) +
-                Environment.NewLine + BrowserText("Template: {", "Vorlage: {") + key + "}";
+            details.Text = key + Environment.NewLine + BrowserText("Current value: ") + (value?.ToString() ?? BrowserText("(unavailable)")) +
+                Environment.NewLine + BrowserText("Template: {") + key + "}";
             favorite.Content = _favoritePageVariables.Contains(key)
-                ? BrowserText("★ Remove favorite", "★ Favorit entfernen")
-                : BrowserText("☆ Add favorite", "☆ Favorit hinzufügen");
+                ? BrowserText("★ Remove favorite")
+                : BrowserText("☆ Add favorite");
             _chosenPageVariable = key;
         }
         void Filter()
@@ -131,16 +134,21 @@ public partial class MainWindow
                 key.Contains(term, StringComparison.OrdinalIgnoreCase) ||
                 PageVariableBrowserCatalog.Label(key, friendlyNames).Contains(term, StringComparison.OrdinalIgnoreCase)));
             var entity = entityPicker.SelectedItem as string;
-            if (!string.IsNullOrEmpty(entity) && entity != BrowserText("All entities", "Alle Entitäten"))
+            if (!string.IsNullOrEmpty(entity) && entity != BrowserText("All entities"))
                 matching = matching.Where(key => string.Equals(PageVariableBrowserCatalog.Entity(key), entity, StringComparison.OrdinalIgnoreCase));
             var filtered = PageVariableBrowserCatalog.Search(matching, null, categoryKeys[Math.Clamp(category.SelectedIndex, 0, categoryKeys.Length - 1)],
                 _favoritePageVariables);
             var rows = filtered.Select(key => new VariableRow(key, PageVariableBrowserCatalog.Label(key, friendlyNames))).ToArray();
             results.ItemsSource = rows;
             results.SelectedItem = rows.FirstOrDefault(row => string.Equals(row.Key, selected, StringComparison.OrdinalIgnoreCase)) ?? rows.FirstOrDefault();
-            count.Text = german
-                ? $"{rows.Length} angezeigt (maximal 50) von {keys.Length} verfügbaren Variablen"
-                : $"{rows.Length} shown (maximum 50) of {keys.Length} available variables";
+            count.Text = language switch
+            {
+                "de" => $"{rows.Length} angezeigt (maximal 50) von {keys.Length} verfügbaren Variablen",
+                "fr" => $"{rows.Length} affichées (maximum 50) sur {keys.Length} variables disponibles",
+                "tr" => $"{keys.Length} değişkenden {rows.Length} gösteriliyor (en fazla 50)",
+                "ru" => $"Показано {rows.Length} (максимум 50) из {keys.Length} переменных",
+                _ => $"{rows.Length} shown (maximum 50) of {keys.Length} available variables"
+            };
             UpdateDetails();
         }
         search.TextChanged += (_, _) => Filter();
@@ -168,7 +176,7 @@ public partial class MainWindow
         RefreshEntities();
         Filter();
         if (insertTarget is "PageLine1" or "PageLine2")
-            details.Text = BrowserText("Select a variable, then insert it into the requested line.", "Variable auswählen und in die gewünschte Zeile einfügen.");
+            details.Text = BrowserText("Select a variable, then insert it into the requested line.");
         await dialog.ShowDialog(this);
     }
 }

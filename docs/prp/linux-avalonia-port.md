@@ -305,3 +305,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Variable browser completion pass (2026-10-20)
 - HA runtime keys now categorized using `HA.`; HA friendly-name labels and per-entity state/attribute filtering added; search matches keys and friendly labels. Favorites are persisted in the portable workspace and reloaded at startup. Regression tests cover real HA key shape and attribute labeling. Commits `9fe4fbd`, `fd77ab2`, `e66573a`, `c24c345`, `c0bcfcf`. CI pending, desktop acceptance outstanding.
+
+## Next package: five-language page variable browser (2026-10-20)
+- Completed dedicated browser translations for German, French, Turkish and Russian with English fallback, including title, search, categories, HA entity filter, details, favorites, insertion actions and counts. Stable English filter keys remain independent of UI labels. Page toolbar and count status follow selected language. Added translation/fallback/filter tests. Windows/Linux UI acceptance and current HEAD CI still required; no WPF removal or hardware changes.

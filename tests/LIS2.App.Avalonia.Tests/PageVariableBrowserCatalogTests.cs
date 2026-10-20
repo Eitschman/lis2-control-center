@@ -4,6 +4,29 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class PageVariableBrowserCatalogTests
 {
+    [Theory]
+    [InlineData("de", "Variablen durchsuchen…")]
+    [InlineData("fr", "Parcourir les variables…")]
+    [InlineData("tr", "Değişkenlere göz at…")]
+    [InlineData("ru", "Просмотр переменных…")]
+    [InlineData("en", "Browse variables…")]
+    public void BrowserLocalizationRespectsLanguageAndEnglishFallback(string language, string expected)
+    {
+        Assert.Equal(expected, PageVariableBrowserLocalization.Translate("Browse variables…", language));
+        Assert.Equal("Unknown key", PageVariableBrowserLocalization.Translate("Unknown key", language));
+    }
+
+    [Theory]
+    [InlineData("de", "Alle")]
+    [InlineData("fr", "Toutes")]
+    [InlineData("tr", "Tümü")]
+    [InlineData("ru", "Все")]
+    public void LocalizedFiltersDoNotChangeCanonicalCategoryKeys(string language, string label)
+    {
+        Assert.Equal(label, PageVariableBrowserLocalization.Translate("All", language));
+        Assert.Equal("Clock.Time", Assert.Single(PageVariableBrowserCatalog.Search(["Clock.Time"], null, "All", null)));
+    }
+
     [Fact]
     public void RealHomeAssistantKeysExposeEntityAndAttributeLabels()
     {

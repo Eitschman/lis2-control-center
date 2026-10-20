@@ -190,7 +190,7 @@ public partial class MainWindow
         }
         ApplyPageLocalization();
         if (this.FindControl<Button>("PageVariableBrowser") is { } browser)
-            browser.Content = BrowserText("Browse variables…", "Variablen durchsuchen…");
+            browser.Content = BrowserText("Browse variables…");
         if (this.FindControl<TextBlock>("PageVariableStatus") is not null)
             RefreshPageVariables();
         UpdateSection();

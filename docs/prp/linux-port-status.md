@@ -634,3 +634,6 @@ Implemented initial cross-screen package: common light shell/white card styling,
 ## Variable browser screenshot review (2026-10-20)
 - User tested Windows UI with 22,570 variables. Reported English-only modal and status, redundant page toolbar buttons, missing modal icon, resizing search field.
 - Removed redundant main-page insert/refresh actions; modal retains insertion and refresh. Modal inherits main icon, search has fixed width, German UI text and filter labels follow CurrentUiLanguage(), and main toolbar/status update when language changes. Other languages still use English fallback; complete five-language parity remains outstanding. No desktop acceptance claimed.
+
+## Next package: five-language page variable browser (2026-10-20)
+- Completed dedicated browser translations for German, French, Turkish and Russian with English fallback, including title, search, categories, HA entity filter, details, favorites, insertion actions and counts. Stable English filter keys remain independent of UI labels. Page toolbar and count status follow selected language. Added translation/fallback/filter tests. Windows/Linux UI acceptance and current HEAD CI still required; no WPF removal or hardware changes.
