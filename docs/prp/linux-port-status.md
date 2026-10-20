@@ -703,3 +703,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Creating a media page from WindowsMedia, Winamp, WmpLegacy or Linux MPRIS now requests a live virtual schedule reload, matching other page-creation paths; the new template can appear without disconnect/reconnect.
 - Media startup/refresh errors invalidate only the failed provider's cached page-template namespace to avoid continuing to display stale song metadata. Other provider snapshots remain intact.
 - Added headless tests for provider namespace isolation and fresh media template values. Physical/desktop behavior not claimed. Commits 83ca68f, d5e5da9; current CI pending.
+
+
+## Cross-platform media page lifecycle consistency (2026-10-20)
+- After green CI for a3c0a7d, tightened the cross-view media-to-pages workflow: all four media-page buttons now await live schedule reload and portable workspace persistence before navigating to Pages, rather than starting both operations fire-and-forget.
+- Shared PageSourceValues.UpdateMedia now treats explicit Connected=false snapshots as disconnected even if the provider retains stale Title/Artist metadata: it publishes Connected=false only and removes prior media template keys. Reconnection with Connected=true restores fresh values; other provider namespaces are unaffected.
+- Added headless tests for disconnected stale metadata, recovery, and cross-provider isolation. No WPF or fan/serial safety changes; CI and desktop parity pending. Commits ebe6ba0, 99b9482, 0bacf0f.
