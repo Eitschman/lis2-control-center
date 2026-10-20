@@ -77,4 +77,46 @@ public sealed class PageSourceValuesTests
         await sources.StartAsync();
         Assert.NotEmpty(sources.Snapshot(DateTimeOffset.Now));
     }
+
+    [Fact]
+    public async Task FailedMediaProviderClearsOnlyItsOwnTemplateNamespace()
+    {
+        await using var sources = new PageSourceValues();
+        sources.UpdateMedia("Winamp", new Dictionary<string, object?>
+        {
+            ["Connected"] = true, ["Title"] = "Old song"
+        });
+        sources.UpdateMedia("Media", new Dictionary<string, object?>
+        {
+            ["Connected"] = true, ["Title"] = "Other player"
+        });
+        sources.UpdateMedia("Winamp", new Dictionary<string, object?>());
+        var snapshot = sources.Snapshot(DateTimeOffset.UnixEpoch);
+        Assert.False(snapshot.ContainsKey("Winamp.Title"));
+        Assert.False(snapshot.ContainsKey("Winamp.Connected"));
+        Assert.Equal("Other player", snapshot["Media.Title"]);
+    }
+
+    [Fact]
+    public async Task MediaPageTemplateReflectsFreshProviderValues()
+    {
+        await using var sources = new PageSourceValues();
+        var workspace = new PageWorkspace();
+        var page = workspace.Add();
+        page.Line1Template = "{Media.Title}";
+        page.Line2Template = "{Media.Artist}";
+        sources.UpdateMedia("Media", new Dictionary<string, object?>
+        {
+            ["Title"] = "Track A", ["Artist"] = "Artist A"
+        });
+        Assert.Equal("Track A".PadRight(20),
+            workspace.Preview(0, sources.Snapshot(DateTimeOffset.UnixEpoch)).Line1);
+        sources.UpdateMedia("Media", new Dictionary<string, object?>
+        {
+            ["Title"] = "Track B", ["Artist"] = "Artist B"
+        });
+        var frame = workspace.Preview(0, sources.Snapshot(DateTimeOffset.UnixEpoch));
+        Assert.Equal("Track B".PadRight(20), frame.Line1);
+        Assert.Equal("Artist B".PadRight(20), frame.Line2);
+    }
 }
