@@ -83,11 +83,16 @@ public partial class MainWindow : Window
             // The visual tree is not fully attached in the constructor; translate
             // page controls after Opened so system-language defaults reach them.
             ApplyPageLocalization();
-            if (!_virtualDevice.IsConnected)
-                await RunVirtualActionAsync(ConnectWithGlyphsAsync);
-            // WPF starts page rendering automatically after transport connection.
-            if (_virtualDevice.IsConnected)
-                await StartPagePlaybackAsync();
+            // Respect the selected transport: opening the window must never
+            // connect the virtual simulator while serial mode is selected.
+            if (this.FindControl<ComboBox>("TransportModeComboBox")?.SelectedIndex == 0)
+            {
+                if (!_virtualDevice.IsConnected)
+                    await RunVirtualActionAsync(ConnectWithGlyphsAsync);
+                // WPF starts page rendering automatically after transport connection.
+                if (_virtualDevice.IsConnected)
+                    await StartPagePlaybackAsync();
+            }
         };
         UpdateSection();
         UpdateVirtualControls();
