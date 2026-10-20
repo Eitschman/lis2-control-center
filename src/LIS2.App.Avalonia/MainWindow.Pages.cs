@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Layout;
 using System.Globalization;
 
 namespace LIS2.App.Avalonia;
@@ -13,12 +14,13 @@ public partial class MainWindow
     private void InitializePagesEditor()
     {
         this.FindControl<ListBox>("PagesList")!.SelectionChanged += (_, _) => LoadPageEditor();
-        this.FindControl<Button>("PageCreatePreset")!.Click += (_, _) =>
+        this.FindControl<Button>("PageCreatePreset")!.Click += async (_, _) =>
         {
             try
             {
                 var choice = this.FindControl<ComboBox>("PagePresetPicker")!.SelectedIndex;
                 var preset = CreateWpfPagePreset(choice);
+                if (choice == 9 && !await EnsureSpectrumGlyphsAsync()) return;
                 _pages.Add();
                 var index = _pages.Pages.Count - 1;
                 var page = _pages.Get(index);
@@ -84,6 +86,53 @@ public partial class MainWindow
         LoadPortableWorkspace();
         InitializeWindowsSettingsImport();
         _ = StartPageSourcesAsync();
+    }
+
+
+    private async Task<bool> EnsureSpectrumGlyphsAsync()
+    {
+        if (BuiltInGlyphSets.IsSpectrumSet(_glyphs.Glyphs))
+            return true;
+
+        var dialog = new Window
+        {
+            Title = BrowserText("Replace custom glyphs?"),
+            Icon = Icon,
+            Width = 550,
+            Height = 210,
+            MinWidth = 450,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        };
+        var message = new TextBlock
+        {
+            Text = BrowserText("The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"),
+            TextWrapping = global::Avalonia.Media.TextWrapping.Wrap
+        };
+        var confirm = new Button { Content = BrowserText("Replace glyphs") };
+        var cancel = new Button { Content = BrowserText("Cancel") };
+        var actions = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Spacing = 10
+        };
+        actions.Children.Add(cancel);
+        actions.Children.Add(confirm);
+        var content = new StackPanel { Margin = new global::Avalonia.Thickness(20), Spacing = 18 };
+        content.Children.Add(message);
+        content.Children.Add(actions);
+        dialog.Content = content;
+        confirm.Click += (_, _) => dialog.Close(true);
+        cancel.Click += (_, _) => dialog.Close(false);
+        if (!await dialog.ShowDialog<bool>(this))
+            return false;
+
+        _glyphs.Replace(BuiltInGlyphSets.CreateSpectrumSet());
+        LoadGlyphEditor();
+        await SavePortableWorkspaceAsync();
+        if (_virtualDevice.IsConnected)
+            await _virtualDevice.ProgramAllGlyphsAsync(_glyphs.Glyphs);
+        return true;
     }
 
     private PagePresetSpec CreateWpfPagePreset(int choice)

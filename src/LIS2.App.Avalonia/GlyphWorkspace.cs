@@ -27,6 +27,10 @@ public sealed class GlyphWorkspace
 
     public void LoadExamples() => Replace(BuiltInGlyphSets.CreateExampleSet());
 
+    public bool IsSpectrumSet => BuiltInGlyphSets.IsSpectrumSet(_glyphs);
+
+    public void LoadSpectrumSet() => Replace(BuiltInGlyphSets.CreateSpectrumSet());
+
     public void Replace(IEnumerable<CustomGlyphSettings> glyphs)
     {
         var copy = glyphs.Select(g => new CustomGlyphSettings

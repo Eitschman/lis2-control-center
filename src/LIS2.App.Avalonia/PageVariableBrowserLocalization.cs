@@ -5,6 +5,10 @@ public static class PageVariableBrowserLocalization
 {
     private static readonly IReadOnlyDictionary<string, string[]> Texts = new Dictionary<string, string[]>(StringComparer.Ordinal)
     {
+        ["Replace custom glyphs?"] = ["Sonderzeichen ersetzen?", "Remplacer les caractères personnalisés ?", "Özel karakterler değiştirilsin mi?", "Заменить пользовательские символы?"],
+        ["The VFD spectrum uses all eight custom character slots. Replace the current glyph set with the eight spectrum bar levels?"] = ["Das VFD-Spektrum benötigt alle acht Sonderzeichenplätze. Den aktuellen Zeichensatz durch die acht Spektrumbalken ersetzen?", "Le spectre VFD utilise les huit caractères personnalisés. Remplacer les caractères actuels par les huit niveaux du spectre ?", "VFD spektrumu sekiz özel karakter yuvasının tamamını kullanır. Mevcut karakterler sekiz spektrum çubuğuyla değiştirilsin mi?", "Спектр VFD использует все восемь пользовательских символов. Заменить текущий набор восемью уровнями спектра?"],
+        ["Replace glyphs"] = ["Zeichen ersetzen", "Remplacer", "Karakterleri değiştir", "Заменить символы"],
+        ["Cancel"] = ["Abbrechen", "Annuler", "İptal", "Отмена"],
         ["Browse variables…"] = ["Variablen durchsuchen…", "Parcourir les variables…", "Değişkenlere göz at…", "Просмотр переменных…"],
         ["Browse template variables"] = ["Vorlagenvariablen durchsuchen", "Parcourir les variables de modèle", "Şablon değişkenlerine göz at", "Просмотр переменных шаблона"],
         ["Search variable keys (multiple words)…"] = ["Variablen suchen (mehrere Wörter)…", "Rechercher des variables (plusieurs mots)…", "Değişken ara (birden çok sözcük)…", "Поиск переменных (несколько слов)…"],
