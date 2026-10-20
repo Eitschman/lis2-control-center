@@ -614,3 +614,7 @@ Implemented initial cross-screen package: common light shell/white card styling,
 ## Hardware templates: formatted sensor references and offline tracking (2026-10-20)
 - HardwareSensorCatalog.ExtractTrackedKeys now removes template format specifiers such as `:F1` or `:0` before recording hardware keys. Previously formatted page placeholders could be tracked as invalid sensor IDs, hiding the actual disconnected sensor in the Hardware browser.
 - Added regression test for mixed formatted/unformatted references, deduplication, unrelated Home Assistant placeholders, and offline/unavailable sensor entries. Commits `8f2a03a`, `f0f4b37`; HEAD CI pending. This is a bounded template/browser integration fix, not complete WPF hardware or UI parity.
+
+## Hardware preset/catalog consistency (2026-10-20)
+- Display preset generation now consumes the already validated HardwareSensorCatalog entries for availability and numeric finiteness rather than performing a separate numeric conversion. It also uses each catalog entry's unit directly, removing repeated snapshot scans and aligning preset unit semantics with the Hardware browser.
+- Added tests for case-insensitive unit metadata and rejection of NaN/infinite readings. Commits `385f4b1`, `ce0cf1d`; CI for current HEAD pending. Full hardware/WPF parity and owner desktop acceptance remain open.
