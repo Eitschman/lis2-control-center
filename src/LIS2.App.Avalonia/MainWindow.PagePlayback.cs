@@ -53,16 +53,34 @@ public partial class MainWindow
 
     private async Task ReloadRunningPagesAsync()
     {
-        if (_virtualSequence?.IsRunning != true) return;
-        try
+        // Both transports consume the same PageWorkspace. A page edit must
+        // update whichever transport is active, without reconnecting either.
+        if (_virtualSequence?.IsRunning == true)
         {
-            if (await _virtualSequence.ReloadAsync(_pages.Pages))
-                await TickPagePlaybackAsync();
+            try
+            {
+                if (await _virtualSequence.ReloadAsync(_pages.Pages))
+                    await TickPagePlaybackAsync();
+            }
+            catch (Exception ex)
+            {
+                StopPagePlayback();
+                SetVirtualStatus($"Page sequence reload failed: {ex.Message}");
+            }
         }
-        catch (Exception ex)
+
+        if (_serialSequence?.IsRunning == true)
         {
-            StopPagePlayback();
-            SetVirtualStatus($"Page sequence reload failed: {ex.Message}");
+            try
+            {
+                if (await _serialSequence.ReloadAsync(_pages.Pages))
+                    await TickSerialPlaybackAsync();
+            }
+            catch (Exception ex)
+            {
+                StopSerialPlayback();
+                SetSerialStatus($"Serial page sequence reload failed: {ex.Message}");
+            }
         }
     }
 
