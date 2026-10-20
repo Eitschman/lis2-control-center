@@ -224,6 +224,9 @@ public partial class MainWindow : Window
         if (index < 0 || index >= SectionNames.Length) return;
         _selectedSection = index;
         UpdateSection();
+        // Some pages populate their controls only when selected. Localize those
+        // newly realized controls without altering live/bound telemetry values.
+        ApplyPageLocalization();
     }
 
     private void UpdateSection()
