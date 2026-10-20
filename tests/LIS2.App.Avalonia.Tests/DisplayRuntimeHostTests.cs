@@ -75,4 +75,85 @@ public sealed class DisplayRuntimeHostTests
         Assert.False(sequence.IsBusy);
         Assert.Throws<ObjectDisposedException>(() => runtime.Snapshot());
     }
+
+    [Fact]
+    public async Task SharedEventsReachBothTransportsAndNormalPagesResume()
+    {
+        var now = DateTimeOffset.UnixEpoch;
+        var virtualFrames = new List<string>();
+        var serialFrames = new List<string>();
+        await using var runtime = new DisplayRuntimeHost(clock: () => now);
+        var virtualSequence = runtime.CreateSequence(
+            (frame, _) => { virtualFrames.Add(frame.Line1.Trim()); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        var serialSequence = runtime.CreateSequence(
+            (frame, _) => { serialFrames.Add(frame.Line1.Trim()); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        var pages = new[] { new PageDefinition { Line1Template = "NORMAL", DurationSeconds = 10 } };
+        Assert.True(virtualSequence.Start(pages));
+        Assert.True(serialSequence.Start(pages));
+        await runtime.TickAsync(virtualSequence);
+        await runtime.TickAsync(serialSequence);
+        runtime.EnqueueEvent(new DisplayEvent("alert", DisplayFrame.Create("ALERT", ""), 100, now.AddSeconds(3)));
+        await runtime.TickAsync(virtualSequence);
+        await runtime.TickAsync(serialSequence);
+        Assert.Equal("ALERT", virtualFrames[^1]);
+        Assert.Equal("ALERT", serialFrames[^1]);
+        now = now.AddSeconds(4);
+        await runtime.TickAsync(virtualSequence);
+        await runtime.TickAsync(serialSequence);
+        Assert.Equal(new[] { "NORMAL", "ALERT", "NORMAL" }, virtualFrames);
+        Assert.Equal(new[] { "NORMAL", "ALERT", "NORMAL" }, serialFrames);
+        Assert.True(virtualSequence.IsRunning);
+        Assert.True(serialSequence.IsRunning);
+    }
+
+    [Fact]
+    public async Task EventOnlySequenceClearsAfterExpiryWithoutShowingRegularPages()
+    {
+        var now = DateTimeOffset.UnixEpoch;
+        var written = new List<string>();
+        var clears = 0;
+        await using var runtime = new DisplayRuntimeHost(clock: () => now);
+        var sequence = runtime.CreateSequence(
+            (frame, _) => { written.Add(frame.Line1.Trim()); return Task.CompletedTask; },
+            _ => { clears++; return Task.CompletedTask; });
+        runtime.EnqueueEvent(new DisplayEvent("one", DisplayFrame.Create("ALERT", ""), 100, now.AddSeconds(2)));
+        Assert.True(sequence.Start(Array.Empty<PageDefinition>()));
+        Assert.True(await runtime.TickAsync(sequence));
+        Assert.Equal("ALERT", written.Single());
+        now = now.AddSeconds(3);
+        Assert.True(await runtime.TickAsync(sequence));
+        Assert.Equal(1, clears);
+        await sequence.StopAndDrainAsync();
+        Assert.False(sequence.IsRunning);
+    }
+
+    [Fact]
+    public async Task HigherPriorityEventPreemptsOnBothSequencesAndCancelRestoresLowerPriority()
+    {
+        var now = DateTimeOffset.UnixEpoch;
+        var virtualFrames = new List<string>();
+        var serialFrames = new List<string>();
+        await using var runtime = new DisplayRuntimeHost(clock: () => now);
+        var virtualSequence = runtime.CreateSequence(
+            (frame, _) => { virtualFrames.Add(frame.Line1.Trim()); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        var serialSequence = runtime.CreateSequence(
+            (frame, _) => { serialFrames.Add(frame.Line1.Trim()); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        Assert.True(virtualSequence.Start(Array.Empty<PageDefinition>()));
+        Assert.True(serialSequence.Start(Array.Empty<PageDefinition>()));
+        runtime.EnqueueEvent(new DisplayEvent("low", DisplayFrame.Create("LOW", ""), 10, now.AddSeconds(20)));
+        runtime.EnqueueEvent(new DisplayEvent("high", DisplayFrame.Create("HIGH", ""), 100, now.AddSeconds(20)));
+        await runtime.TickAsync(virtualSequence);
+        await runtime.TickAsync(serialSequence);
+        Assert.Equal("HIGH", virtualFrames[^1]);
+        Assert.Equal("HIGH", serialFrames[^1]);
+        Assert.True(runtime.Events.Remove("high"));
+        await runtime.TickAsync(virtualSequence);
+        await runtime.TickAsync(serialSequence);
+        Assert.Equal("LOW", virtualFrames[^1]);
+        Assert.Equal("LOW", serialFrames[^1]);
+    }
 }
