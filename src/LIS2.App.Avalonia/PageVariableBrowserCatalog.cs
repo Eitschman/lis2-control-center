@@ -34,7 +34,7 @@ public static class PageVariableBrowserCatalog
             var suffix = key[(prefix.Length + entity.Length)..];
             return name + (suffix.Length == 0 ? " · State" : " · " + suffix.TrimStart('.').Replace('_', ' '));
         }
-        return key.Replace('_', ' ').Replace('.', ' · ');
+        return key.Replace('_', ' ').Replace(".", " · ");
     }
 
     public static IReadOnlyList<string> Search(IEnumerable<string> keys, string? query,
