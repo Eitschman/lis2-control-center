@@ -223,4 +223,44 @@ public sealed class PageWorkspaceTests
         Assert.Same(existing, workspace.Get(0));
         Assert.Equal("Keep existing draft", workspace.Get(0).Line1Template);
     }
+
+    [Fact]
+    public void ImportValidationRejectsMalformedFileWithoutReplacingActivePages()
+    {
+        var active = new PageWorkspace();
+        var first = active.Add();
+        first.Name = "Active";
+        first.Line1Template = "KEEP";
+        var invalidFile = """[{"Id":"incoming","Name":"Invalid","DurationSeconds":0}]""";
+        var candidate = new PageWorkspace();
+        Assert.Throws<InvalidOperationException>(() => candidate.ImportJson(invalidFile));
+        Assert.Single(active.Pages);
+        Assert.Equal("KEEP", active.Get(0).Line1Template);
+        Assert.Equal(first.Id, active.Get(0).Id);
+    }
+
+    [Fact]
+    public void ValidatedImportCanReplaceWorkspaceWithMultiplePagesAndTheirSettings()
+    {
+        var active = new PageWorkspace();
+        active.Add().Name = "Old";
+        var incoming = new PageWorkspace();
+        var first = incoming.Add();
+        first.Name = "CPU";
+        first.Line1Template = "{Hardware.Cpu.Load}";
+        first.RefreshIntervalMilliseconds = 500;
+        var second = incoming.Add();
+        second.Name = "Warning";
+        second.Enabled = false;
+        second.VisibilityExpression = "Clock.Hour=12";
+        var json = incoming.ExportJson();
+        var candidate = new PageWorkspace();
+        candidate.ImportJson(json);
+        active.ImportJson(json);
+        Assert.Equal(new[] { "CPU", "Warning" }, active.Pages.Select(p => p.Name));
+        Assert.Equal(500, active.Get(0).RefreshIntervalMilliseconds);
+        Assert.Equal("{Hardware.Cpu.Load}", active.Get(0).Line1Template);
+        Assert.False(active.Get(1).Enabled);
+        Assert.Equal("Clock.Hour=12", active.Get(1).VisibilityExpression);
+    }
 }
