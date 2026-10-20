@@ -29,6 +29,7 @@ public partial class MainWindow
                 var choice = this.FindControl<ComboBox>("PagePresetPicker")!.SelectedIndex;
                 var preset = CreateWpfPagePreset(choice);
                 if (choice == 9 && !await EnsureSpectrumGlyphsAsync()) return;
+                if (!CommitPendingPageEditor()) return;
                 _pages.Add();
                 var index = _pages.Pages.Count - 1;
                 var page = _pages.Get(index);
@@ -52,6 +53,7 @@ public partial class MainWindow
         };
         this.FindControl<Button>("PageAdd")!.Click += async (_, _) =>
         {
+            if (!CommitPendingPageEditor()) return;
             _pages.Add();
             RefreshPageList(_pages.Pages.Count - 1);
             await ReloadRunningPagesAsync();
@@ -61,6 +63,7 @@ public partial class MainWindow
         {
             if (SelectedPageIndex is int i)
             {
+                if (!CommitPendingPageEditor()) return;
                 _pages.Duplicate(i);
                 RefreshPageList(i + 1);
                 await ReloadRunningPagesAsync();
@@ -71,6 +74,7 @@ public partial class MainWindow
         {
             if (SelectedPageIndex is int i)
             {
+                if (!CommitPendingPageEditor()) return;
                 _pages.Delete(i);
                 RefreshPageList(Math.Min(i, _pages.Pages.Count - 1));
                 await ReloadRunningPagesAsync();
@@ -219,6 +223,13 @@ public partial class MainWindow
         await SavePortableWorkspaceAsync();
     }
 
+    private bool CommitPendingPageEditor()
+    {
+        return _loadedPageIndex is not int index ||
+            index < 0 || index >= _pages.Pages.Count ||
+            SavePageEditor(index, refreshEditor: false);
+    }
+
     private async Task HandlePageSelectionAsync()
     {
         if (_loadingPage || _handlingPageSelection) return;
@@ -229,7 +240,7 @@ public partial class MainWindow
         {
             if (_loadedPageIndex is int previous && previous >= 0 && previous < _pages.Pages.Count)
             {
-                if (!SavePageEditor(previous, refreshEditor: false))
+                if (!CommitPendingPageEditor())
                 {
                     // Invalid edits must not disappear when the user selects
                     // another page. Keep the editor and selection together.
@@ -276,6 +287,7 @@ public partial class MainWindow
     private async Task MovePageAsync(int offset)
     {
         if (SelectedPageIndex is not int i) return;
+        if (!CommitPendingPageEditor()) return;
         RefreshPageList(_pages.Move(i, offset));
         await ReloadRunningPagesAsync();
         _ = SavePortableWorkspaceAsync();
