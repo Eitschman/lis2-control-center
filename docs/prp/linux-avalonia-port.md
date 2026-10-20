@@ -302,3 +302,6 @@ Owner explicitly requires WPF-equivalent location and behavior for every menu, n
 
 ## Approved deviation: page variable browser (2026-10-20)
 - Owner authorized replacing the multi-thousand-entry WPF-style variable ComboBox with an Avalonia modal browser. Search is bounded to 50 results, supports multiple search terms and categories, favorites (session only), current-value preview and insertion into line 1/2 without changing stored template syntax. Tests added for search, filtering, favorites, and large catalogs. Commits `52e29fd`, `8b11d48`, `8bbe024`, `e1966a4`. CI pending. Follow-ups: persistent favorites, richer friendly labels and HA entity/attribute hierarchy, desktop acceptance.
+
+## Variable browser completion pass (2026-10-20)
+- HA runtime keys now categorized using `HA.`; HA friendly-name labels and per-entity state/attribute filtering added; search matches keys and friendly labels. Favorites are persisted in the portable workspace and reloaded at startup. Regression tests cover real HA key shape and attribute labeling. Commits `9fe4fbd`, `fd77ab2`, `e66573a`, `c24c345`, `c0bcfcf`. CI pending, desktop acceptance outstanding.
