@@ -746,3 +746,9 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - Previous selection-save package 31d74579 passed CI. Further review found that add/duplicate/delete/reorder/preset creation and list-row enabled toggles still refreshed the page editor without committing the current draft, silently discarding unsaved changes.
 - All those page workspace mutations now call the common CommitPendingPageEditor guard. Valid pending values are saved before mutation; invalid values abort the action without changing workspace. Checkbox toggles revert to their persisted value when validation fails. Existing live virtual/serial schedule reload and portable persistence paths remain in place.
 - No new headless UI test harness was added in this package; code review completed, CI and final desktop UI behavior pending. Commits 7ccc5a0, 7275ebe.
+
+
+## Page JSON import/export and editor draft consistency (2026-10-20)
+- After CI success at fc408f38, reviewed page file actions. Export previously serialized the workspace without first committing pending page-editor changes; import replaced the editor/workspace without validating the active draft.
+- Export now validates/commits the pending editor before showing the file picker. Import first validates the entire JSON into a temporary PageWorkspace, then validates/commits the pending editor before replacing the workspace, reloading running virtual/serial sequences and saving the portable workspace. Invalid imports do not mutate active pages; invalid drafts abort import/export without discarding editor input.
+- Added PageWorkspace regression coverage for malformed-file isolation and complete multi-page import including refresh, enabled flags and visibility. Commits 5aa0722, df5e78e. CI pending; desktop acceptance deferred under PRP.
