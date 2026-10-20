@@ -216,6 +216,15 @@ public partial class MainWindow
         if (row.Index < 0 || row.Index >= _pages.Pages.Count)
             return;
 
+        if (!CommitPendingPageEditor())
+        {
+            // Restore the checkbox from the unchanged model when the current
+            // editor contains invalid data.
+            _loadingPage = true;
+            checkbox.IsChecked = _pages.Get(row.Index).Enabled;
+            _loadingPage = false;
+            return;
+        }
         _pages.Get(row.Index).Enabled = checkbox.IsChecked == true;
         var selectedIndex = SelectedPageIndex ?? row.Index;
         RefreshPageList(selectedIndex);
