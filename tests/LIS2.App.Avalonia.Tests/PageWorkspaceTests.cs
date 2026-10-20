@@ -135,4 +135,37 @@ public sealed class PageWorkspaceTests
         Assert.Throws<InvalidOperationException>(() => workspace.ImportJson("[{\"Id\":\"bad\",\"DurationSeconds\":0}]"));
         Assert.Single(workspace.Pages);
     }
+
+    [Theory]
+    [InlineData("Unknown", "PingPong")]
+    [InlineData("PingPong", "Invalid")]
+    [InlineData(null, "Truncate")]
+    [InlineData("Marquee", null)]
+    public void InvalidOverflowImportPreservesExistingWorkspace(string? first, string? second)
+    {
+        var source = new PageWorkspace();
+        var page = source.Add();
+        page.Line1OverflowMode = first!;
+        page.Line2OverflowMode = second!;
+        var target = new PageWorkspace();
+        var original = target.Add();
+        original.Name = "Keep me";
+        Assert.Throws<InvalidOperationException>(() => target.ImportJson(source.ExportJson()));
+        Assert.Single(target.Pages);
+        Assert.Equal("Keep me", target.Get(0).Name);
+        Assert.Equal(original.Id, target.Get(0).Id);
+    }
+
+    [Theory]
+    [InlineData("PingPong")]
+    [InlineData("Marquee")]
+    [InlineData("Truncate")]
+    public void SupportedOverflowModesSurviveImport(string mode)
+    {
+        var source = new PageWorkspace();
+        source.Add().Line1OverflowMode = mode;
+        var target = new PageWorkspace();
+        target.ImportJson(source.ExportJson());
+        Assert.Equal(mode, target.Get(0).Line1OverflowMode);
+    }
 }
