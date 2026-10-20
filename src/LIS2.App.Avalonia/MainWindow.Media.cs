@@ -24,7 +24,7 @@ public partial class MainWindow
         _mediaTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _mediaTimer.Tick += (_, _) => RefreshMedia();
         _mediaTimer.Start();
-        this.FindControl<Button>("WindowsMediaPage")!.Click += (_, _) => CreateMediaPage("WindowsMedia", "Windows Media Player");
+        this.FindControl<Button>("WindowsMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("WindowsMedia", "Windows Media Player");
         this.FindControl<Button>("WinampMediaPage")!.Click += (_, _) =>
             CreateMediaPage("Winamp", "Winamp");
         this.FindControl<Button>("LinuxMediaPage")!.Click += (_, _) => CreateMediaPage("Media", "Linux media");
@@ -166,15 +166,15 @@ public partial class MainWindow
         this.FindControl<TextBlock>(prefix + "Telemetry")!.Text = "VU: " + Read("Vu") + "  Spectrum: " + Read("Spectrum");
     }
 
-    private void CreateMediaPage(string sourceId, string title)
+    private async Task CreateMediaPageAsync(string sourceId, string title)
     {
         var page = _pages.Add();
         page.Name = title;
         page.Line1Template = "{" + sourceId + ".Title}";
         page.Line2Template = "{" + sourceId + ".Artist}";
         RefreshPageList(_pages.Pages.Count - 1);
-        _ = ReloadRunningPagesAsync();
-        _ = SavePortableWorkspaceAsync();
+        await ReloadRunningPagesAsync();
+        await SavePortableWorkspaceAsync();
         NavigateTo(2);
     }
 
