@@ -2,6 +2,25 @@ using LIS2.App.Avalonia;
 namespace LIS2.App.Avalonia.Tests;
 public sealed class HardwareSensorCatalogTests
 {
+    [Fact]
+    public void FormattedPageTemplatesTrackOriginalOfflineSensorKeys()
+    {
+        const string temperature = "Hardware.CPU.Temperature.Package";
+        const string load = "Hardware.CPU.Load.Total";
+        var tracked = HardwareSensorCatalog.ExtractTrackedKeys(
+            new[] { "CPU {" + temperature + ":F1} / {" + load + ":0}%",
+                    "Again {" + temperature + "} and unrelated {HomeAssistant.sensor.temp}" },
+            Array.Empty<string>());
+        Assert.Equal(2, tracked.Count);
+        Assert.Contains(temperature, tracked);
+        Assert.Contains(load, tracked);
+        var entries = HardwareSensorCatalog.Build(new Dictionary<string, object?>(),
+            Array.Empty<PortableHardwareSensorPreference>(), trackedKeys: tracked);
+        Assert.Equal(2, entries.Count);
+        Assert.All(entries, entry => Assert.False(entry.IsAvailable));
+    }
+
+
     [Theory]
     [InlineData(0, "All types")]
     [InlineData(1, "Favorites")]
