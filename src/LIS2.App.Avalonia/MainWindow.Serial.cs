@@ -132,10 +132,18 @@ public partial class MainWindow
     {
         if (_serialBusy) return;
         if ((_serialSequence?.IsBusy == true)) return;
-        StopSerialPlayback();
+        // Manual writes, brightness and glyph programming must never race a
+        // queued playback write, even when the sequence is already stopped.
         _serialBusy = true;
+        StopSerialPlayback();
         UpdateSerialControls();
-        try { await action(); }
+        try
+        {
+            await _serialPlaybackTimer.StopAndDrainAsync();
+            if (_serialSequence is not null)
+                await _serialSequence.StopAndDrainAsync();
+            await action();
+        }
         catch (Exception ex) { SetSerialStatus($"Serial display error: {ex.Message}"); }
         finally { _serialBusy = false; UpdateSerialControls(); }
     }
