@@ -108,6 +108,21 @@ public sealed class RuntimeHardeningTests
         Assert.True(DateTimeOffset.TryParse(lines[0].Split(' ')[0], out _));
     }
 
+    [Fact]
+    public async Task ReconnectingUnifiedFanSessionSendsSafetyAndFullFrameAgain()
+    {
+        var transport = new VirtualLis2Transport();
+        await using var session = new UnifiedLis2Session(transport);
+        await session.ConnectWithFanSafetyAsync([100, 100, 100, 100]);
+        await session.RenderBothAsync("same", "frame");
+        await session.DisconnectAsync();
+        var count = transport.Writes.Count;
+        await session.ConnectWithFanSafetyAsync([100, 100, 100, 100]);
+        await session.RenderBothAsync("same", "frame");
+        Assert.Equal(count + 3, transport.Writes.Count);
+        Assert.Equal(Lis2Protocol.SetFans(100, 100, 100, 100), transport.Writes[count]);
+    }
+
     [AvaloniaFact]
     public async Task AllViewsDialogsDiagnosticsAndMissingProviderUseActualControls()
     {

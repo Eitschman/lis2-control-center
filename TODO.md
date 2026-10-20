@@ -1,7 +1,7 @@
 # TODO: Avalonia-Portierung
 
 Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-03. Lokal 332/332 Avalonia-Tests und nativer Windows-Smoke erfolgreich; aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
+Implementierungsstand: PORT-03. Lokal 333/333 Avalonia-Tests und nativer Windows-Smoke erfolgreich; aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 

@@ -52,6 +52,7 @@ public sealed class UnifiedLis2Session : IFanOutputSink, IAsyncDisposable
             if (IsConnected) throw new InvalidOperationException("Already connected.");
             _authorized = false;
             _safeFrame = null;
+            _frameWriter.Reset();
             await _device.ConnectAsync(token).ConfigureAwait(false);
             try
             {

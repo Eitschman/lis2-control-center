@@ -9,9 +9,10 @@ Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](..
 
 Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 
-- Avalonia: 332/332 Tests erfolgreich, Exit 0, keine übersprungenen Tests. Frischer Lauf `TestResults/port03-all.trx`.
-- Sechs Fälle in `RuntimeHardeningTests` prüfen verzögerten erfolgreichen/fehlgeschlagenen Start gegen Shutdown, Fortsetzung nach Cleanup-Fehlern, differenzielle serielle/virtuelle Frames, Teilfehler, manuelle Cacheinvalidierung, Reconnect, begrenztes Journal sowie tatsächliche Ansichten und Dialoge.
+- Avalonia: 333/333 Tests erfolgreich, Exit 0, keine übersprungenen Tests. Frischer Lauf `TestResults/port03-all.trx`.
+- Sieben Fälle in `RuntimeHardeningTests` prüfen verzögerten erfolgreichen/fehlgeschlagenen Start gegen Shutdown, Fortsetzung nach Cleanup-Fehlern, differenzielle serielle/virtuelle Frames, Teilfehler, manuelle Cacheinvalidierung, Reconnect mit/ohne Lüfterfreigabe, begrenztes Journal sowie tatsächliche Ansichten und Dialoge.
 - Gegenprobe: ausgelassener Start-Drain, fehlendes Cache-Reset nach Teilfehler und still ignorierte Provider-DLL führen zu vier gezielt fehlgeschlagenen Tests, Exit 1 (`port03-negative.trx`). Regulären Code wiederhergestellt und gesamte Suite mit Exit 0 geprüft.
+- Wiederverbindung mit Lüfterfreigabe: fehlendes Cache-Reset reproduziert, 1/1 gezielter Test fehlgeschlagen (`port03-reconnect-negative.trx`); beide Connect-Pfade invalidieren den Cache.
 - Nativer Windows-Desktopprozess: Exit 0; zehn Views, Hilfe/About, sichtbarer Fehler einer fehlenden GSMTC-DLL, Diagnosebericht und Shutdown-Drain. Ergebnisse unter `TestResults/native-smoke-checked`. Isolierte Stores und virtuelles Gerät; keine produktiven Quellen gestartet.
 - Display: 48/48, Exit 0 (`port03-display.trx`, `-m:1 --environment DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1`). Der vorhandene Test `Render_FormatsNumberPercentBytesAndAffixes` erwartet einen Dezimalpunkt; die Produktimplementierung folgt `CurrentCulture`. Dieser Kulturkonflikt bleibt in PORT-06 offen. Der lokale MSBuild-Mehrknotenlauf brach mit MSB4166 ab; der Einzelknotenlauf besteht.
 

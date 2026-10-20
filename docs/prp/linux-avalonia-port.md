@@ -19,7 +19,7 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 332/332 Avalonia-Tests sowie der native Windows-Smoke erfolgreich. Der [Status](linux-port-status.md) ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
+Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 333/333 Avalonia-Tests sowie der native Windows-Smoke erfolgreich. Der [Status](linux-port-status.md) ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
 
 ## Implementierungsstand
 
