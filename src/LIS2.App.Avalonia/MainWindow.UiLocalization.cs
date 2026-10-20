@@ -70,8 +70,6 @@ public partial class MainWindow
         ["Hardware monitoring"] = "Hardwareüberwachung",
         ["Read-only sensors from the current operating system. Refresh to capture a new snapshot; no LIS2 hardware commands are sent."] = "Schreibgeschützte Systemsensoren. Aktualisieren liest neue Werte ein; es werden keine LIS2-Hardwarebefehle gesendet.",
         ["Select a sensor above."] = "Bitte oben einen Sensor auswählen.",
-        ["Read-only sensors from the current operating system. Refresh to capture a new snapshot; no LIS2 hardware commands are sent."] = "Schreibgeschützte Sensorwerte des Betriebssystems. Aktualisieren liest neue Messwerte ein; es werden keine LIS2-Hardwarebefehle gesendet.",
-        ["Select a sensor above."] = "Oben einen Sensor auswählen.",
         ["Sensor"] = "Sensor",
         ["Type"] = "Typ",
         ["Value"] = "Wert",
@@ -190,8 +188,6 @@ public partial class MainWindow
     private static readonly Dictionary<string, string> GermanCheckBoxLabels = new(StringComparer.Ordinal)
     {
         ["Automatic control"] = "Automatische Steuerung",
-        ["Favorites only"] = "Nur Favoriten",
-        ["Favorite"] = "Favorit",
         ["Favorites only"] = "Nur Favoriten",
         ["Favorite"] = "Favorit",
         ["Enable or disable this page"] = "Seite aktivieren oder deaktivieren",
