@@ -153,10 +153,20 @@ public partial class MainWindow
         }
     }
 
+    // Filter by the stable option index, not translated ComboBoxItem.Content.
+    // Language changes must never alter which physical sensor types are shown.
+    internal static string HardwareTypeFilterKey(int selectedIndex) => selectedIndex switch
+    {
+        1 => "Favorites", 2 => "Unavailable", 3 => "Temperature",
+        4 => "Load", 5 => "Fan", 6 => "Clock", 7 => "Voltage",
+        8 => "Power", 9 => "Data", 10 => "Throughput", 11 => "Other",
+        _ => "All types"
+    };
+
     private void FilterHardwareSensors()
     {
         var search = this.FindControl<TextBox>("HardwareSearch")!.Text?.Trim() ?? "";
-        var typeFilter = (this.FindControl<ComboBox>("HardwareTypeFilter")!.SelectedItem as ComboBoxItem)?.Content?.ToString();
+        var typeFilter = HardwareTypeFilterKey(this.FindControl<ComboBox>("HardwareTypeFilter")!.SelectedIndex);
         var tracked = HardwareSensorCatalog.ExtractTrackedKeys(
             _pages.Pages.SelectMany(page => new[] { page.Line1Template, page.Line2Template }),
             _fanSettings.Channels.Select(channel => channel.SensorKey));
