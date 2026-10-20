@@ -4,6 +4,36 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class HardwareDisplayPresetBuilderTests
 {
+    [Fact]
+    public void UnitMetadataIsCaseInsensitiveAndRetainedInGeneratedTemplates()
+    {
+        var sensors = new Dictionary<string, object?>
+        {
+            ["Hardware.CPU.Load.Total"] = 45d,
+            ["hardware.cpu.load.total.unit"] = "%",
+            ["Hardware.CPU.Temperature.Package"] = 61d,
+            ["hardware.cpu.temperature.package.unit"] = "°C"
+        };
+        var page = HardwareDisplayPresetBuilder.Build("CPU", sensors,
+            Array.Empty<PortableHardwareSensorPreference>());
+        Assert.NotNull(page);
+        Assert.Equal("CPU {Hardware.CPU.Load.Total}%", page.Line1Template);
+        Assert.Equal("Temp {Hardware.CPU.Temperature.Package}°C", page.Line2Template);
+    }
+
+    [Fact]
+    public void NonFiniteReadingsCannotBeUsedToGenerateDisplayPages()
+    {
+        var sensors = new Dictionary<string, object?>
+        {
+            ["Hardware.CPU.Load.Total"] = double.NaN,
+            ["Hardware.CPU.Temperature.Package"] = double.PositiveInfinity
+        };
+        Assert.Null(HardwareDisplayPresetBuilder.Build("CPU", sensors,
+            Array.Empty<PortableHardwareSensorPreference>()));
+    }
+
+
     private static readonly IReadOnlyDictionary<string, object?> Sensors = new Dictionary<string, object?>
     {
         ["Hardware.CPU.Load.Total"] = 45d,
