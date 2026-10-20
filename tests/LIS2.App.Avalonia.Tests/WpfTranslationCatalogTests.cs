@@ -61,6 +61,27 @@ public class WpfTranslationCatalogTests
     public void GermanAvaloniaOverridesAreRecognized()
         => Assert.True(MainWindow.IsLocalizedStaticText("VFD-Vorschau", "VFD Preview", "VFD-Vorschau"));
 
+    [Theory]
+    [InlineData("Dashboard")]
+    [InlineData("Fan Control")]
+    [InlineData("System Status")]
+    [InlineData("VFD Preview")]
+    public void OriginalEnglishCatalogKeysAreStable(string key)
+        => Assert.Equal(key, WpfTranslationCatalog.FindEnglishSource(key));
+
+    [Theory]
+    [InlineData("de")]
+    [InlineData("fr")]
+    [InlineData("tr")]
+    [InlineData("ru")]
+    public void WpfTranslationsRoundTripAcrossLanguages(string language)
+    {
+        const string key = "Dashboard";
+        var localized = WpfTranslationCatalog.Translate(key, language);
+        Assert.Equal(key, WpfTranslationCatalog.FindEnglishSource(localized));
+        Assert.Equal(key, WpfTranslationCatalog.Translate(localized, "en"));
+    }
+
     [Fact]
     public void WpfPrefixPreservesDecorativeMarkers()
         => Assert.Equal("• Übersicht", WpfTranslationCatalog.Translate("• Dashboard", "de"));
