@@ -1063,20 +1063,32 @@ internal static class WpfTranslationCatalog
         ["Übersicht"] = "Dashboard"
     };
 
+    // Build once: UI localization visits hundreds of controls on navigation and
+    // language changes. Scanning every language dictionary per label is expensive.
+    private static readonly HashSet<string> EnglishKeys = Translations.Values
+        .SelectMany(dictionary => dictionary.Keys)
+        .ToHashSet(StringComparer.Ordinal);
+
+    private static readonly Dictionary<string, string> EnglishByTranslation = BuildReverseCatalog();
+
+    private static Dictionary<string, string> BuildReverseCatalog()
+    {
+        var reverse = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var dictionary in Translations.Values)
+            foreach (var pair in dictionary)
+                reverse.TryAdd(pair.Value, pair.Key);
+        return reverse;
+    }
+
     internal static string FindEnglishSource(string value)
     {
+        if (string.IsNullOrEmpty(value)) return value;
         if (NavigationAliases.TryGetValue(value, out var navigationKey))
             return navigationKey;
-        if (string.IsNullOrEmpty(value)) return value;
-        foreach (var language in Translations.Values)
-        {
-            foreach (var pair in language)
-            {
-                if (string.Equals(pair.Value, value, StringComparison.Ordinal))
-                    return pair.Key;
-            }
-        }
-        return value;
+        // Never mistake an English catalog key for a translation that happens
+        // to have the same spelling in another language.
+        if (EnglishKeys.Contains(value)) return value;
+        return EnglishByTranslation.TryGetValue(value, out var source) ? source : value;
     }
 
     internal static string Translate(string value, string language)
