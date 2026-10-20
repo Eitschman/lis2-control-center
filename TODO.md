@@ -33,7 +33,12 @@ Seitenerzeugung aus HA, Medien und Hardware-Presets verwendet `PageWorkspaceActi
 
 Betroffen: `PageWorkspaceActions`, Quellenhandler, Workspace-Laden und Avalonia-Tests. Die Nachweise prüfen den gemeinsamen Ablauf headless, keine echten GUI-Klicks, HA-Verbindungen oder serielle Hardware.
 
-Nächstes Implementierungspaket: **PORT-04: Medien und Produktgrenzen**.
+Erster Schritt bei der nächsten Fortsetzung, vor PORT-04: **Übersetzungen auf allen zehn Menüseiten prüfen und fehlende Übersetzungen korrigieren**. Benutzerbefund aus der GUI: Auf allen Seiten stehen noch viele Texte auf Englisch. Die lokalisierte Hilfe belegt keine Übersetzungsabdeckung der übrigen Oberfläche.
+
+- [ ] Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics und Home Assistant einzeln mit deutscher Sprache durchgehen. Navigation, Beschriftungen, Buttons, Tooltips, Dialoge sowie Leer-, Status- und Fehlermeldungen berücksichtigen.
+- [ ] Fehlende Übersetzungen in den unterstützten Sprachkatalogen ergänzen; gespeicherte Sprache, Systemstandard und Sprachwechsel einschließlich dynamischer Texte prüfen. Technische Schlüssel und Nutzerdaten unverändert lassen. Betroffene Ansichten rendern und ansehen.
+
+Danach folgt **PORT-04: Medien und Produktgrenzen**.
 
 ## Weitere Implementierungs- und Prüfaufgaben
 

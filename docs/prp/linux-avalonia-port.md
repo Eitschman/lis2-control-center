@@ -74,6 +74,8 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 
 ### Oberfläche und Verifikation
 
+Priorität für die nächste Fortsetzung: Vor PORT-04 die Übersetzungen aller zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und Dialoge prüfen und fehlende Übersetzungen korrigieren. Laut Benutzerprüfung stehen auf allen Seiten noch viele Texte auf Englisch. Die bereits geprüfte Hilfelokalisierung ist kein Nachweis für die übrige Oberfläche; die konkrete Aufgabenliste steht in [TODO](../../TODO.md).
+
 - [x] Zehn Hauptansichten, Hilfe und About sind angelegt und angebunden.
 - [x] System/Light/Dark sowie System/English/German/French/Turkish/Russian sind auswählbar.
 - [x] Variablenbrowser enthält Suche, Kategorien, HA-Filter, Livewerte, persistente Favoriten und Einfügen in beide Zeilen.

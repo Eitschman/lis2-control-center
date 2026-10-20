@@ -48,4 +48,6 @@ Eine gemeinsame Avalonia-Oberfläche bleibt das Ziel; WPF bleibt Referenz bis zu
 
 Native Dateiauswahl, Tray-Menübedienung, OS-Abmeldung, DPI-/Theme-/Sprachmatrix, Live-HA-/Player-/Sensorintegration, extrahierter Paketstart, ARM64-Ausführung auf ARM64 und physische LIS2-Ausgabe sind durch den Smoke nicht nachgewiesen.
 
-Nächstes Paket: **PORT-04: Medien und Produktgrenzen**. Plattformverträge und ihre konkreten Abweichungen sind im Inventar abgeglichen; neue Linux-Desktopdienste gehören zu PORT-06.
+Erster Schritt bei der nächsten Fortsetzung, vor PORT-04: **Übersetzungen auf allen zehn Menüseiten prüfen und fehlende Übersetzungen korrigieren**. Benutzerbefund aus der GUI: Auf allen Seiten stehen noch viele Texte auf Englisch. Der Nachweis für die lokalisierte Hilfe gilt nicht für die übrige Oberfläche. Umfang und Prüfschritte stehen in [TODO](../../TODO.md).
+
+Danach folgt **PORT-04: Medien und Produktgrenzen**. Plattformverträge und ihre konkreten Abweichungen sind im Inventar abgeglichen; neue Linux-Desktopdienste gehören zu PORT-06.
