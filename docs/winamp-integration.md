@@ -2,6 +2,14 @@
 
 Winamp is a first-class LIS2 Control Center data source.
 
+## Plattformumfang des Avalonia-Branches
+
+Stand 20.10.2026, Codebasis `71b72a8`: Die gemeinsame App startet unter Windows den vorhandenen Winamp-Named-Pipe-Anbieter. `Winamp.*` bleibt erhalten. GSMTC wird separat aus `LIS2.WindowsMedia.dll` geladen und liefert `WindowsMedia.*`; die Windows-Paketierung kopiert Provider und DLL-Abhängigkeiten. Reale Player-/Paketstarts sind durch den erfolgreichen [Headless-/Paket-CI-Lauf](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116) nicht belegt.
+
+Linux fragt über `playerctl metadata --format` periodisch Status, Titel, Interpret, Album und Dauer ab. Die Werte erscheinen unter `Media.*`. Eine eigene D-Bus-Subscription, Zeitposition und Playerauswahl sind nicht implementiert. Linux-Metadaten liefern kein Winamp-VU-/Spektrumsignal. VLC/Plexamp und Wine/Winamp sind nicht als aktuelle Laufzeitnachweise dokumentiert.
+
+Die Avalonia-App startet unter Windows derzeit auch `WmpLegacyDataSource` und zeigt deren Karte. Das widerspricht dem zurückgestellten Legacy-Produktumfang; die Aktivierung gilt nicht als Freigabe. Native Legacy-Artefakte sind nicht Bestandteil der Avalonia-Branch-CI. Offene Abgleiche und Entwurfsschutz bei Seitenerzeugung stehen in [TODO](../TODO.md).
+
 ## Architecture
 
 ```text

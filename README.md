@@ -1,17 +1,27 @@
 # LIS2 Control Center
 
-Modern Windows control software for the **VL System L.I.S. 2** 20x2 VFD display and four-channel fan controller.
+Steuerungssoftware für das **VL System L.I.S. 2** mit 20x2-VFD und vier Lüfterkanälen.
 
-> **Status:** Software feature freeze / release-candidate hardening — physical LIS2 validation remains  
-> **Target:** Windows 11 x64  
-> **Implementation:** C# / .NET 8, WPF, native Win32 Winamp plug-in  
+> **Status:** Avalonia-Portierung auf `feature/linux-avalonia`; WPF bleibt die Funktionsreferenz<br>
+> **Zielplattformen:** Windows x64, Linux x64 und Linux ARM64<br>
+> **Implementierung:** C# / .NET 8, Avalonia 11.3.6; Winamp-Plug-in als natives Win32/x86-Modul<br>
 > **License:** MIT
 
 LIS2 Control Center is an independent replacement for the obsolete VL System Multimedia Control Center (MCC). It combines direct LIS2 hardware control with programmable display pages, PC hardware monitoring, Winamp and Windows 11 Media Player telemetry, Home Assistant data and fan control.
 
 > **Preserve the hardware. Replace the limitations of its software.**
 
-## What works today
+## Avalonia-Arbeitsstand
+
+Stand: 20.10.2026, Codebasis `71b72a8987a4f9b8a14a3807f94667569e28be43`. Die gemeinsame App unter `src/LIS2.App.Avalonia` enthält zehn Hauptansichten, Display-/Seiten-/Ereignisruntime, Glyphen, Windows-/Linux-Sensoren, Lüfterregelung mit ausdrücklicher serieller Freigabe, HA, Medien, Workspace, Hilfe und About. Der modale Variablenbrowser ist eine genehmigte Abweichung von WPF.
+
+[CI 39435226116](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116) hat sieben erfolgreiche Jobs: Windows-/Ubuntu-Builds und Headless-Tests sowie Pakete für Windows x64 und Linux x64/ARM64. GUI-Smoke, extrahierter Paketstart, echte ARM64-Ausführung und physische LIS2-Prüfung sind damit nicht nachgewiesen.
+
+Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. Nächstes Paket: HA-/Media-Seitenaktionen und Workspace-Wiederherstellung konsistent mit Editorentwürfen und laufenden Sequenzen verbinden.
+
+## WPF-Funktionsreferenz
+
+Die folgenden Funktionsbeschreibungen beziehen sich auf die vorhandene Windows-WPF-Anwendung. Die Avalonia-App übernimmt diesen Umfang schrittweise; vorhandener Code ist keine pauschale Paritätsabnahme. Windows-Tray-/GSMTC-Funktionen gelten nicht automatisch auf Linux.
 
 ### LIS2 / display
 
@@ -73,7 +83,7 @@ The modern Windows 11 Media Player is integrated directly through **Global Syste
 - ready-made Now Playing page preset
 - dedicated Media-page card alongside Winamp
 
-Windows Media Player Legacy support has been researched and prototyped separately, but its COM/background/visualization plug-ins and UI/runtime integration are currently **disabled and deferred**. The implementation remains in the repository for possible later work.
+Windows Media Player Legacy bleibt im Produktumfang zurückgestellt; die WPF-Integration und nativen Legacy-CI-Artefakte sind deaktiviert. Der Avalonia-Code startet unter Windows derzeit dennoch die Legacy-Quelle und zeigt ihre Karte. Dieser Widerspruch ist als offene Arbeit erfasst und bedeutet keine Freigabe des Legacy-Umfangs.
 
 ### Home Assistant
 
@@ -147,6 +157,8 @@ The projects are deliberately separated:
 - `src/LIS2.Winamp` — named-pipe host, Winamp snapshots and display-value formatting
 - `src/LIS2.WindowsMedia` — Windows 11 GSMTC session source and Windows Media display values
 - `src/LIS2.App` — WPF UI, settings, pages, presets, tray, themes and localization
+- `src/LIS2.App.Avalonia`: gemeinsame Desktop-App und Plattformadapter für Windows/Linux.
+- `src/LIS2.Runtime`: UI-unabhängige Runtime, Schleifen, Linux-Sensoren und Plattformverträge; Details in [architecture.md](docs/architecture.md).
 - `tools/LIS2.ProtocolTester` — low-level protocol testing
 - `tools/LIS2.WinampSimulator` — Winamp testing without Winamp
 - `native/LIS2.WinampPlugin` — native x86 Winamp plug-in
@@ -208,7 +220,7 @@ See [docs/protocol.md](docs/protocol.md) and [docs/reverse-engineering.md](docs/
 
 ## Building
 
-Requirements for a normal development build:
+Die folgenden Befehle bauen die Windows-Solution einschließlich WPF-Referenz. Voraussetzungen:
 
 - Windows
 - .NET 8 SDK
@@ -221,9 +233,18 @@ dotnet build .\LIS2ControlCenter.sln -c Release
 dotnet test .\LIS2ControlCenter.sln -c Release --no-build
 ```
 
+Die Avalonia-Branch-CI baut und prüft stattdessen gezielt die portable App und deren Testprojekt:
+
+```text
+dotnet build src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release
+dotnet test tests/LIS2.App.Avalonia.Tests/LIS2.App.Avalonia.Tests.csproj --configuration Release
+```
+
+Diese Befehle sind im genannten GitHub-Lauf auf Windows und Ubuntu erfolgreich ausgeführt worden; in diesem Dokumentationsauftrag wurde kein lokaler Build gestartet. Für GSMTC enthält das Windows-Publish zusätzliche Schritte.
+
 ## CI and development artifacts
 
-GitHub Actions currently:
+Der Windows-Workflow für `main` und der Tag-Releaseworkflow verwenden die WPF-Solution:
 
 1. restores and builds the complete .NET solution on Windows;
 2. runs the Core, Display, Sources, Fans, Winamp, Windows Media and application reliability tests;
@@ -241,8 +262,14 @@ Development artifacts:
 
 Tagged releases additionally contain portable ZIP packages and `SHA256SUMS.txt`. See [Release process](docs/release.md).
 
+Der separate Workflow `linux-portable.yml` prüft `feature/linux-avalonia` und erzeugt `LIS2-Avalonia-win-x64`, `LIS2-Avalonia-linux-x64` und `LIS2-Avalonia-linux-arm64`. Jedes Artefakt enthält ein Archiv und eine SHA-256-Datei; die Aufbewahrung beträgt 14 Tage. Tag-Releases veröffentlichen derzeit weiterhin WPF. Der Avalonia-Workflow führt keine WPF- oder Avalonia-GUI-Smoke-Tests aus.
+
 ## Documentation
 
+- [Avalonia-PRP](docs/prp/linux-avalonia-port.md)
+- [Aktueller Portierungsstatus](docs/prp/linux-port-status.md)
+- [Projekt- und Plattforminventar](docs/prp/linux-port-inventory.md)
+- [WPF-/Avalonia-Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md)
 - [Project specification](docs/PROJECT_SPEC.md)
 - [Architecture](docs/architecture.md)
 - [Protocol notes](docs/protocol.md)

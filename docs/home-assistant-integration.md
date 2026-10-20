@@ -2,6 +2,14 @@
 
 LIS2 Control Center can use Home Assistant as a live display data source.
 
+## Avalonia-Branch
+
+Stand 20.10.2026, Codebasis `71b72a8`: Avalonia verwendet die gemeinsame WebSocket-Quelle und bietet eine eigene Home-Assistant-Ansicht mit Entitäten, Attributen, Alias/Favorit, Schlüsseln und Seitenerzeugung. Der Quellen-Snapshot fließt in Seiten und den Variablenbrowser. Automatische Tests im [CI-Lauf](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116) prüfen unter anderem Konvertierung/Schlüssel und Workspace-Helfer, keine aktuelle echte HA-Verbindung. Eine Benutzerbestätigung betrifft Windows-Konnektivität; Linux-Liveprüfung bleibt offen.
+
+Die URL und Präferenzen werden im Workspace gespeichert. Der HA-Aktivierungszustand besitzt dort kein eigenes Feld. Tokens stehen außerhalb des Workspace: `PortableHaTokenStore` verwendet DPAPI auf Windows und `secret-tool` auf Linux. Bei fehlendem Secret Service schreibt der Linux-Code automatisch AES-GCM-Chiffretext und einen lokalen Schlüssel mit eingeschränkten Unix-Rechten. Die Dateien schützen nicht gegen Zugriff mit demselben Benutzerkonto. Dieser Ausweichpfad ist als offene Abweichung von der Freigabepolitik erfasst, keine nachgewiesene Gleichwertigkeit zum nativen Store. Der Windows-Importer übernimmt vorhandene Windows-Tokens nicht.
+
+Offene Integration: `CreateHaPageAsync` speichert neue Seiten, lädt laufende Sequenzen jedoch nicht neu. Gemeinsamer Editorentwurfsschutz sowie Deaktivierung/Persistenz sind in [TODO](../TODO.md) erfasst. Die nachstehenden Protokoll- und Schlüsselbeschreibungen gelten weiterhin; die Konfigurationsaktionen sind gegen die jeweilige Oberfläche zu prüfen.
+
 ## Transport
 
 The integration uses Home Assistant's WebSocket API at `/api/websocket`.

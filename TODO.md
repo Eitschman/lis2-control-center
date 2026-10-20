@@ -1,326 +1,104 @@
-# TODO / Roadmap
-
-This file tracks **remaining work** for LIS2 Control Center as implemented on `main`. Completed areas are summarized where useful, but old planning items that have already become normal product functionality are no longer presented as future work.
-
-Protocol uncertainties belong in `docs/protocol.md` / `docs/reverse-engineering.md`.
-
-## Current implementation baseline
-
-The following larger feature areas are already implemented:
-
-- [x] Serial and virtual LIS2 transports.
-- [x] 20x2 display runtime, page scheduler and differential display writes.
-- [x] Page editor with reorder, duplicate, enable/disable, duration and live preview.
-- [x] Ping-pong, marquee and truncate overflow modes with configurable timing.
-- [x] Simple source-value conditional visibility.
-- [x] Page presets: Clock, Status, CPU, GPU, Memory, Temperatures, Fans, Winamp Now Playing, VU and Spectrum.
-- [x] Event/overlay queue with priority/lifetime and application UI.
-- [x] Eight-slot custom-character manager and graphical CG Builder.
-- [x] Save/load custom glyph sets and named template references.
-- [x] Native uPD16314 character mapping including umlauts and common symbols.
-- [x] Character-ROM/raw-byte testing UI.
-- [x] LibreHardwareMonitor browser with grouping, search/filter, aliases, favorites and missing-sensor handling.
-- [x] Four-channel fan control with Fixed, Curve, Follow, External and Off modes.
-- [x] Fan curves, live values, min/max/fail-safe and hysteresis.
-- [x] Native Winamp x86 plug-in, simulator, metadata, VU and spectrum telemetry.
-- [x] Windows 11 Media Player telemetry via GSMTC without a player plug-in, including media-page UI, display variables and Now Playing page preset.
-- [x] Eight-level custom-glyph Winamp spectrum.
-- [x] Home Assistant WebSocket source with entity browser, aliases/favorites and page creation.
-- [x] Home Assistant entity attributes exposed as template values and browsable in the UI.
-- [x] Tray/autostart, themes, localization and About/version UI.
-- [x] Windows CI, unit tests, self-contained artifacts and WPF startup/tab smoke test.
-- [x] Automated WPF UI-regression run in GitHub Actions with layout assertions and screenshot artifacts across Light/Dark and all supported languages.
-- [x] Context-sensitive, fully localized in-app help for every main page.
-- [x] Coalesced asynchronous display rendering.
-
-## Display pages / runtime
-
-- [x] Improve the **conditional visibility editor UX** with live variable selection and `=`, `!=`, `>`, `>=`, `<`, `<=` operators.
-- [x] Add general template formatting helpers: number, percent, bytes, prefix/suffix and case conversion.
-- [x] Add per-variable `fallback:` text for missing, `unknown` and `unavailable` values.
-- [ ] Consider page transitions only if they produce a useful effect on a 20x2 character VFD.
-- [x] Review source snapshot/thread-safety semantics; concurrent snapshot publication is covered by tests. Revisit only if a future dedicated background/event-driven source introduces new concurrency requirements.
-
-## Home Assistant
-
-Implemented today:
-
-- [x] WebSocket authentication and automatic reconnect.
-- [x] Initial `get_states` snapshot and live `state_changed` events.
-- [x] Search and domain filtering.
-- [x] Entity aliases and favorites.
-- [x] Entity state/unit/friendly-name variables.
-- [x] All entity attributes exposed as `{HA.<entity>.attribute.<name>}`.
-- [x] Alias-based attribute variables.
-- [x] Attribute browser.
-- [x] Direct display-page creation from entities and attributes.
-- [x] Read-only integration by design.
-
-Remaining:
-
-- [x] Cover primitive, null, large array and object attributes with automated conversion tests.
-- [ ] Validate behavior with a wider range of real HA integrations on the actual installation.
-- [ ] Consider friendlier formatting for JSON array/object attributes only if real integrations make that useful.
-- [x] Protect the Home Assistant long-lived token at rest with Windows DPAPI (CurrentUser), including transparent migration from legacy plaintext settings.
-- [ ] Keep service calls/control out of scope unless there is a concrete LIS2 use case.
-
-## Hardware monitoring
-
-Implemented:
-
-- [x] LibreHardwareMonitor source and live sensor browser.
-- [x] Search/filter and grouping by hardware.
-- [x] Values, units and template keys.
-- [x] Aliases and favorites with persistence.
-- [x] Configured-but-disappeared sensors remain visible as unavailable.
-- [x] Direct fan-channel assignment.
-- [x] CPU/GPU/Memory/Temperatures/Fans display presets.
-
-Remaining:
-
-- [ ] Continue validating sensor identity stability across LibreHardwareMonitor/driver updates.
-- [ ] Improve formatting/fallback helpers at the display layer rather than adding backend-specific formatting.
-
-## Fan control / safety
-
-Implemented:
-
-- [x] Four channels.
-- [x] Fixed, Curve, Follow, External and Off modes.
-- [x] Minimum/maximum/fail-safe outputs.
-- [x] Missing/invalid sensor handling.
-- [x] Hardware sensor selection.
-- [x] Fan-curve editor/preview.
-- [x] Live input/output values.
-- [x] Optional hysteresis.
-
-Remaining:
-
-- [ ] Add a clearer low-output safety warning/confirmation in the UI.
-- [ ] Add explicit emergency/fail-safe indication in the UI.
-- [ ] Document the historical reported channel rating of 12 V / 10 W / approximately 0.83 A while clearly identifying the source and verification status.
-- [ ] Preserve original MCC low-speed behavior only as historical guidance, not as an electrical requirement.
-- [ ] Validate safe minimum outputs and stop behavior on real connected fans before choosing stronger defaults.
-
-## Windows Media Player
-
-Status: **modern Windows 11 integration active; Windows Media Player Legacy deferred / disabled**. The modern player is integrated directly through Windows GSMTC without a player plug-in. Legacy COM/background/visualization implementation work is intentionally retained in the repository, but its UI/runtime integration and native plug-in CI artifacts remain disabled until the Legacy approach is revisited.
-
-Research completed:
-
-- [x] Research integration options for Windows Media Player Legacy and the current Windows 11 Media Player before implementation.
-- [x] Windows Media Player Legacy still exposes the legacy COM plug-in model: background UI plug-ins can monitor player state/metadata, while visualization plug-ins receive timed waveform/frequency data and an `IWMPCore` pointer.
-- [x] Windows Media Player Legacy exposes current media metadata, playback state, position/duration and playlist information through the WMP COM SDK; visualization plug-ins can receive 1024-bin stereo frequency and waveform snapshots.
-- [x] The current Windows 11 Media Player can be observed through Windows Global System Media Transport Controls (GSMTC): media properties, playback state, timeline/position and source-app identity are available. No documented modern Media Player-specific plug-in API was found.
-- [x] Treat VU/spectrum as a Legacy-only capability unless a supported equivalent is discovered for the modern Media Player app.
-
-Implementation plan:
-
-- [x] Add a Windows media-session source based on GSMTC for the current Windows 11 Media Player, filtered to the Microsoft.ZuneMusic session and telemetry-only.
-- [x] Add a native Windows Media Player Legacy background COM bridge for metadata/state plus a separate optional visualization component for VU/spectrum telemetry.
-- [x] Build matching x86 and x64 Legacy background/visualization plug-in variants in GitHub Actions and package them for releases.
-- [ ] Define `Media.*` provider-neutral variables only if multiple modern providers make it worthwhile; existing `Winamp.*` and new `WindowsMedia.*` variables remain explicit and compatible.
-- [x] Keep Legacy-specific variables under `WmpLegacy.*`; reserve `WindowsMedia.*` for the modern Windows Media Player provider.
-- [x] Keep the Windows Media Player Legacy integrations telemetry-only; neither native component has direct LIS2 hardware access or playback-control commands.
-- [x] Add automated tests, dual-pipe simulator, Help/localization and GitHub CI coverage for the WMP Legacy provider.
-- [ ] Validate WMP Legacy background plug-in registration, metadata telemetry, active visualization VU/spectrum and x86/x64 selection on a real Windows Media Player Legacy installation.
-- [x] Add automated tests, Help/localization and GitHub CI coverage for the modern Windows Media Player provider.
-- [x] Validate the GSMTC provider against the real Windows 11 Media Player on a user machine; live metadata, playback state and timeline telemetry have been confirmed in the application UI.
-- [ ] Revisit additional GSMTC edge cases only if real-world use exposes a concrete problem (for example unusual session lifecycle or metadata behavior).
-
-## Winamp
-
-Implemented:
-
-- [x] Native x86 `gen_lis2.dll`.
-- [x] Named-pipe transport.
-- [x] Playback state and metadata.
-- [x] Elapsed/duration, playlist position/count, bitrate/sample rate.
-- [x] Winamp simulator.
-- [x] Stale/disconnect/reconnect handling.
-- [x] Now Playing preset and scrolling.
-- [x] VU telemetry/display.
-- [x] 20-band analyzer/spectrum telemetry.
-- [x] Eight-level custom-glyph VFD spectrum preset.
-
-Remaining:
-
-- [ ] Keep VU/spectrum deliberately modest in update rate; the LIS2 is a character VFD, not a high-frame-rate visualizer.
-- [ ] Keep the Winamp plug-in metadata/telemetry-only. It must not gain direct LIS2 hardware access.
-
-## Custom characters / character ROM
-
-Implemented:
-
-- [x] Graphical editor for all eight 5x8 slots.
-- [x] Live preview and one/all-slot programming.
-- [x] Glyph-set save/load.
-- [x] Template references.
-- [x] Built-in independently created glyph sets.
-- [x] Spectrum bar glyph set.
-- [x] Native uPD16314 ROM-code-002 mapping for Latin-1 and selected useful Unicode symbols.
-- [x] Raw 40-byte ROM range tester.
-
-Remaining:
+# TODO: Avalonia-Portierung
 
-- [ ] Validate all eight custom-character slots on physical LIS2 hardware.
-- [ ] Validate the newly mapped extended character ROM against the physical display and record any deviations.
-- [ ] Record confirmed physical-ROM findings in `docs/protocol.md`.
+Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
+Geprüfte Codebasis: `71b72a8987a4f9b8a14a3807f94667569e28be43`.
+[CI 39435226116](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116): sieben von sieben Jobs erfolgreich.
 
-## LIS2 protocol / hardware validation
+Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
-Implemented in production code:
+## Vorhandene Basis
 
-- [x] Serial 19200 baud, 8N1.
-- [x] Virtual transport/interpreter.
-- [x] `A0` clear/reset.
-- [x] `A1/A2 <column> A7 ...` line writes.
-- [x] Brightness commands for 100/75/50/25%.
-- [x] `AE F0 ...` four-channel fan writes.
-- [x] `AB <slot> <row> <bitmap>` custom-character programming.
-- [x] Native display-character encoding.
-- [x] Raw display-byte writes for explicit testing.
-
-Still unresolved / requiring real hardware:
-
-- [ ] Validate the complete supported command set on physical LIS2 hardware.
-- [ ] Resolve MCC full-line trailing `00` behavior.
-- [ ] Resolve display-off/brightness-off behavior.
-- [ ] Validate all custom-character operations.
-- [ ] Investigate safe device detection without speculative writes.
-- [ ] Determine whether the device returns useful identification/version information.
-- [ ] Keep MPlay-specific commands out of automatic LIS2 initialization.
-- [ ] Record each newly confirmed command with confidence level and test evidence.
-
-## Application / UX
-
-Implemented:
-
-- [x] WPF application and tray operation.
-- [x] Windows autostart.
-- [x] Light, Dark and System themes.
-- [x] Runtime localization: System, English, German, French, Turkish and Russian with English fallback.
-- [x] Localized tray menu and LIS2 app/tray/taskbar icon.
-- [x] Startup diagnostics.
-- [x] About/version information.
-- [x] Hardware and Home Assistant browser/table layout cleanup.
-- [x] Page-list selection and enabled/disabled state use separate interactions; only the checkbox toggles page activation.
-- [x] Card-header actions/status are visually separated from headings in Fan Control, Diagnostics and media integrations.
-- [x] Reorganize the Media page around provider-specific cards: modern Windows Media Player first, Winamp with its playback/VU/spectrum/plugin details grouped together, and provider-separated page variables.
-- [x] Help-button placement, help scrollbar spacing and Home Assistant minimum-window layout have been corrected from real-world UI review.
-- [x] Theme the native Windows title bar consistently with the selected application theme.
-- [x] Complete a full Light/Dark control review, including input, selection, focus, disabled and resizable-pane states.
-
-Remaining:
-
-- [ ] Continue UI polish only when real-world data exposes a concrete layout problem.
-- [ ] Consider profile support only if multiple machine/use-case configurations actually need it.
-
-Deliberately omitted:
-
-- [x] First-run wizard — **not needed**.
-- [x] Settings import/export — **not needed**.
-- [x] Restore-defaults workflow — **not needed**.
-
-## Virtual LIS2 / diagnostics
-
-Implemented:
-
-- [x] Virtual transport and protocol interpreter/state.
-- [x] Protocol tester.
-- [x] Runtime diagnostics/logging.
-- [x] Virtual decoding of native international display characters.
-
-Remaining:
-
-- [x] Expand virtual-device diagnostics so display, fan, brightness and glyph state can be inspected together.
-- [x] Add decoded command history for the virtual transport.
-- [x] Add an exportable diagnostic report.
-- [ ] Add optional raw serial capture for reverse-engineering sessions.
-- [ ] Never send unknown/experimental commands automatically.
-
-## Additional data sources
-
-Home Assistant is the preferred **universal integration layer** for values that already exist in HA. A dedicated LIS2 source must provide a concrete capability beyond simply exposing the same values again.
-
-Examples that should normally come through Home Assistant include:
-
-- OctoPrint printer/job/temperature values
-- Plex media/player values
-- Beszel, Docker and server monitoring
-- DWD/weather data
-- network/device integrations
-- Zigbee and other smart-home sensors
-
-Consequently:
-
-- [x] OctoPrint dedicated source — **not needed; use Home Assistant**.
-- [x] Generic Docker/server-monitoring source — **not needed; use Home Assistant**.
-- [x] Plex dedicated source — **not needed; use Home Assistant**.
-- [ ] Generic HTTP/JSON source — only if there is a real data source that cannot reasonably be exposed through HA.
-- [ ] Additional media-player integrations — only for capabilities that justify a dedicated source.
-
-Do not add one-off integrations merely because a system has an API. Prefer the existing HA source whenever HA already exposes the required state and attributes.
-
-## Engineering / quality
-
-Implemented:
-
-- [x] Windows CI.
-- [x] Core, Display, Sources, Fans and Winamp tests.
-- [x] Self-contained Windows x64 application artifact.
-- [x] Self-contained protocol-tester artifact.
-- [x] Native Winamp x86 artifact.
-- [x] WPF startup/tab smoke test.
-- [x] GitHub Actions WPF UI-regression test covering all 10 main pages and their Help views in Light/Dark and English/German/French/Turkish/Russian.
-- [x] UI-regression screenshot/report artifact is uploaded even when layout assertions fail.
-- [x] Critical layout assertions cover page-header controls, Home Assistant detail/action regions and Help layout/scrollbar spacing.
-- [x] Serialized/coalesced display rendering.
-
-Remaining:
-
-- [x] Exercise Light and Dark theme resource loading in the WPF startup/tab smoke test.
-- [x] Add tests for settings migration/defaulting, corrupt-file recovery and save/load round trips.
-- [x] Add more fan safety edge-case tests, including non-finite sensor values and fail-safe clamping.
-- [x] Add virtual-device end-to-end tests from display runtime through transport/state.
-- [x] Review data-source snapshot semantics and add concurrent snapshot publication coverage.
-- [x] Add tagged release/versioning workflow with portable ZIP packages and SHA-256 checksums.
-
-## In-app help
-
-- [x] Add a context-sensitive Help entry to every main application page.
-- [x] Document page configuration, overflow modes, formatting pipeline and visibility operators.
-- [x] Document all static Clock, Winamp and Glyph variables.
-- [x] Show current dynamic Hardware variables without hard-coding machine-specific sensors.
-- [x] Explain Home Assistant variable patterns with concrete state, Unit, FriendlyName, alias, attribute, formatting, visibility and structured-attribute examples.
-- [x] Keep the HA help example-based instead of dumping every entity from large installations.
-- [x] Fully localize Help content in English, German, French, Turkish and Russian and validate translation-key coverage automatically.
-- [x] Include every Help section in the WPF startup/theme smoke test.
-- [x] Include Help windows in the GitHub UI-regression screenshots/layout checks.
-
-## Software feature freeze
-
-The software-only implementation is considered feature-complete for the first physical-hardware validation cycle.
-
-Until real LIS2 hardware testing produces evidence for a required change:
-
-- do not add speculative protocol commands;
-- do not add one-off data sources already covered by Home Assistant;
-- do not expand the Winamp plug-in beyond metadata/telemetry;
-- prefer regression tests and fixes over new features;
-- treat new UI work as bug fixing for concrete real-world layout failures;
-- keep portable ZIP distribution as the primary release format.
-
-The next major milestone is physical LIS2 validation followed by release-candidate fixes.
-
-## Research / guardrails
-
-- Do not redistribute proprietary VL System software, installers or artwork.
-- Do not blindly clone MCC's UI.
-- Do not send unknown protocol commands because they appear in an old binary.
-- Keep LIS2 and MPlay assumptions separate.
-- Keep fan safety independent from display/media/network integrations.
-- Keep the Winamp plug-in separated from hardware access.
-- Treat physical LIS2 validation as authoritative for protocol behavior.
-
-Historical references and reverse-engineering evidence belong in `docs/reverse-engineering.md`.
+- [x] Gemeinsame Avalonia-App für Windows/Linux und portable .NET-8-Bibliotheken.
+- [x] Headless Seiten-/Ereignisruntime, adaptive Schleifen und virtuelle/serielle Sessionintegration.
+- [x] Seiteneditor mit Presets, Sichtbarkeit, Scrolling, Entwurfsvorschau und validiertem JSON-Import/-Export.
+- [x] Genehmigter modaler Variablenbrowser mit Suche, Livewerten und persistenten Favoriten.
+- [x] Glypheneditor, Dateien, acht Slots und Spektrum-Ersetzungsdialog.
+- [x] Windows-/Linux-Sensoren, Aliase, Favoriten und fehlende Sensoren im Katalog.
+- [x] Lüfterruntime mit Grenzen, Fail-safe, Hysterese, Simulation und ausdrücklich freizugebender serieller Ausgabe.
+- [x] Winamp, Windows GSMTC, HA-WebSocket-Quelle und Linux-Metadaten über `playerctl`.
+- [x] Workspace, Windows-Importlogik, Theme-/Sprachauswahl, Windows-Tray und Autostart.
+- [x] Hilfe mit zehn Themen, About-Dialog, virtuelle Diagnose und Textexport.
+- [x] Windows-/Ubuntu-Builds und vier Testprojekte je OS; Pakete für `win-x64`, `linux-x64`, `linux-arm64` mit SHA-256.
+
+Abgehakt bedeutet vorhandener und im Status eingegrenzter Umfang, keine pauschale WPF- oder Hardwareparität.
+
+## Nächstes Arbeitspaket: Quellenaktionen und Seitenzustand
+
+**PORT-01.** Seitenerzeugung aus HA/Media und Workspace-Wiederherstellung müssen denselben Entwurfsschutz und dieselbe Liveübernahme wie die normalen Seitenaktionen verwenden.
+
+- [ ] `CreateHaPageAsync` muss laufende virtuelle und serielle Sequenzen nach Seitenerzeugung aktualisieren.
+- [ ] HA-/Media-Seitenerzeugung muss bestehende Editorentwürfe vor einem Listen-/Editorwechsel validieren und erhalten.
+- [ ] Eine gespeicherte leere Seitenliste muss beim Laden als leere Liste übernommen werden.
+- [ ] Regressionen für gültige/ungültige Entwürfe, beide Transports und leere Workspace-Wiederherstellung ergänzen.
+- [ ] Aktuellen Windows-/Ubuntu-CI-Lauf prüfen und Nachweise in Status/Paritätsaudit aktualisieren.
+
+Betroffen: `MainWindow.HomeAssistant.cs`, `MainWindow.Media.cs`, `MainWindow.Pages.cs`, `MainWindow.Workspace.cs` und die vorhandenen Avalonia-Tests. Keine Erweiterung des Medienumfangs und keine Änderung der Lüfterfreigabe.
+
+## Weitere Implementierungs- und Prüfaufgaben
+
+### PORT-02: Einstellungen und Gerätebedienung
+
+- [ ] Transportmodus, gewählten Port und HA-Aktivierung gemäß WPF-Verhalten speichern und wiederherstellen.
+- [ ] Helligkeitsänderungen mit gespeicherter Einstellung und Verbindungsaufbau verbinden.
+- [ ] Allgemeine Display-/Glyphen-/Helligkeitsaktionen an den ausgewählten Transport anbinden; separate versteckte Serial-Controls ersetzen keine WPF-Bedienparität.
+- [ ] Windows-Importer: übernommene Felder und fehlende Hardwarepräferenzen abgleichen. Importlogik existiert, der UI-Zugang liegt in einem unsichtbaren Container.
+- [ ] WPF-Parität der Dashboard-Handausgabe klären/umsetzen; Slider und Apply sind derzeit deaktiviert. Lüfterfreigabe bleibt verbindlich.
+
+### PORT-03: Diagnose und Laufzeitlebenszyklus
+
+- [ ] Echtes Anwendungs-/Protokoll-Logging einschließlich Export implementieren.
+- [ ] Avalonia-GUI-Smoke für Start, zehn Ansichten, Hilfe/About, fehlende Medienanbieter und geordnetes Beenden auf Windows/Linux ergänzen.
+- [ ] Start-/Stop-/Drain-Pfade aller Quellen und Timer einschließlich verzögertem Medienstart gegen Shutdown prüfen.
+- [ ] Differenzielle Display-Schreibspannen im Avalonia-Livepfad nachweisen; derzeit werden nur identische ganze Frames unterdrückt.
+- [ ] Vorhandene `IPlatform*`-Verträge, Adapter und UI-Orchestrierungen gegen die Zielarchitektur abgleichen.
+
+### PORT-04: Medien und Produktgrenzen
+
+- [ ] Linux-MPRIS-Position, Playerauswahl, Lifecycle und Fehleranzeige ergänzen. Aktuell periodische `playerctl`-Metadatenabfrage, keine eigene D-Bus-Subscription.
+- [ ] VLC und Plexamp einzeln auf realen Zielsystemen prüfen.
+- [ ] GSMTC-Paket auf Windows mit/ohne Player und fehlender Provider-DLL starten.
+- [ ] WMP-Legacy-Aktivierung gegen den zurückgestellten Produktumfang korrigieren oder ausdrücklich entscheiden lassen. Der Avalonia-Code startet die Quelle und zeigt ihre Karte unter Windows.
+- [ ] Keine Linux-VU-/Spektrumanalyse aus MPRIS-Metadaten ableiten. Wine/Winamp bleibt optional.
+
+### PORT-05: Home Assistant und Tokenstore
+
+- [ ] HA-Verbindung, Reconnect, Attribute/Aliase, Deaktivierung und Persistenz unter Linux sowie Windows gezielt prüfen.
+- [ ] Automatischen AES-Dateipfad bei fehlendem Secret Service gegen die Freigabepolitik klären; aktuelle Implementierung nicht als genehmigte Produktentscheidung behandeln.
+- [ ] `secret-tool`-/DBus-/Keyring-Voraussetzungen und erkennbare Fehlerzustände auf den Zielsystemen prüfen.
+- [ ] Migration/Entfernung alter Tokendateien und Zugriffsrechte mit gültigen und fehlerhaften Fällen absichern.
+
+### PORT-06: WPF-Abgleich und Desktopintegration
+
+- [ ] Die zehn Ansichten anhand der [aktuellen Matrix](docs/prp/wpf-avalonia-parity-audit.md) semantisch prüfen, einschließlich Fehler-, Leer-, Auswahl- und Speicherpfaden.
+- [ ] Hilfeinhalt/-tiefe und Übersetzungen gegen die WPF-Referenz prüfen; neue Avalonia-Hilfetexte sind überwiegend Englisch.
+- [ ] Hilfeplatzierung, Tray-Menütexte und weitere hart codierte Laufzeittexte abgleichen.
+- [ ] Themes, Tastatur/Fokus, DPI, Fenstergrenzen und lange Texte in allen fünf Sprachen prüfen.
+- [ ] Zusätzliche Bedienflächen und nicht ausdrücklich geforderte Titelzusätze im bearbeiteten UI-Bereich bereinigen; genehmigten Variablenbrowser erhalten.
+- [ ] Linux-Tray, Autostart, Single Instance und Splash gegenüber dem PRP-Ziel bearbeiten.
+- [ ] WPF erst nach Funktions-/Darstellungsabgleich und Benutzerabnahme entfernen.
+
+### PORT-07: Pakete und Zielsysteme
+
+- [ ] Extrahierte Windows-/Linux-Pakete starten; GUI-Smoke ergänzt die bestehende Dateiprüfung.
+- [ ] Linux ARM64 auf echter ARM64-Laufzeit prüfen. Cross-Publish allein zählt nicht als Laufzeitnachweis.
+- [ ] Debian/KDE und Raspberry Pi 5 mit Distribution, Architektur, DPI, Displayserver und Abhängigkeiten protokollieren.
+- [ ] GTK-/X11-/Wayland-/DBus-/Keyring-Abhängigkeiten und serielle Zugriffsrechte anhand tatsächlicher Zielsysteme dokumentieren.
+- [ ] Support- und Lizenzstatus der eingesetzten .NET-/Avalonia-Versionen vor Release anhand offizieller Quellen prüfen; die Versionsangaben im Projekt sind dafür kein Nachweis.
+- [ ] Avalonia-Releaseumschaltung und Versionsmetadaten erst nach den PRP-Abnahmekriterien vornehmen; Tag-Releases veröffentlichen derzeit WPF.
+
+## Physische Validierung, getrennt von Softwarepaketen
+
+Diese Prüfungen sind offen. Mangels LIS2-Gerät sind sie kein Blocker für rein softwareseitige Arbeitspakete.
+
+- [ ] Unterstützte Befehle mit 19200 Baud/8N1, Display, Helligkeit und acht Glyphenslots prüfen.
+- [ ] Trailing-`00`, Display-off und sichere Geräteidentifikation ausschließlich anhand bestätigter Befunde entscheiden.
+- [ ] Sichere Lüfterausgänge, Stopverhalten, Sensorverlust sowie Disconnect/Reconnect kontrolliert prüfen.
+- [ ] Sensoridentität nach Geräte-/Treiberwechsel und tatsächliche Windows-/Linux-Zugriffsrechte prüfen.
+- [ ] Bestätigte Protokollbefunde in [protocol.md](docs/protocol.md) festhalten.
+- [ ] Historische Kanalbelastbarkeit nur mit Quelle und Verifikationsstatus dokumentieren.
+
+## Geltende Produktgrenzen
+
+Keine unbekannten automatischen Protokollkommandos. Kein direkter Gerätezugriff aus Player-Plug-ins. HA bleibt lesend. Keine eigenen OctoPrint-/Plex-/Docker-Quellen für bereits über HA verfügbare Werte. Kein First-run-Wizard und kein Restore-defaults-Workflow. Der vorhandene Windows-Migrationsimport ist von einem allgemeinen Einstellungsimport/-export zu unterscheiden.
+
+Optionale spätere Ideen wie Seitenübergänge, Profile, generische HTTP-Datenquellen, rohe serielle Mitschnitte oder schönere JSON-Attributdarstellung sind keine Voraussetzungen der Portierung und werden nur bei konkretem Bedarf beauftragt.

@@ -1,17 +1,18 @@
-# LIS2 Control Center — Project Specification
+# LIS2 Control Center: Projektspezifikation
 
 ## Project status
 
-**LIS2 Control Center** is an actively developed Windows 11 control application for the **VL System L.I.S. 2** 20x2 VFD display and four-channel fan controller.
+**LIS2 Control Center** steuert das **VL System L.I.S. 2** mit 20x2-VFD und vier Lüfterkanälen. Auf `feature/linux-avalonia` wird eine gemeinsame Windows-/Linux-App entwickelt. Die WPF-App bleibt bis zum Paritätsnachweis die Referenz.
 
 - Repository: `Eitschman/lis2-control-center`
-- Target: Windows 11 x64
-- Main application: C# / .NET 8 / WPF
+- Zielplattformen: Windows x64, Linux x64 und Linux ARM64.
+- Gemeinsame Anwendung: C# / .NET 8 / Avalonia 11.3.6.
+- Referenzanwendung: Windows-WPF unter `src/LIS2.App`.
 - Winamp plug-in: native Win32/x86
 - License: MIT
-- State: functional development application; physical-hardware validation is still ongoing for some protocol details
+- Geprüfte Codebasis: `71b72a8987a4f9b8a14a3807f94667569e28be43`, Stand 20.10.2026. Physische LIS2-Prüfung bleibt offen.
 
-The project is no longer in its original planning/protocol-tester phase. Serial/virtual LIS2 control, display pages, hardware monitoring, fan control, Winamp and Home Assistant are implemented.
+Das [Avalonia-PRP](prp/linux-avalonia-port.md) bestimmt das Portierungsziel. [Status](prp/linux-port-status.md) und [Paritätsaudit](prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Nachweise und offene Oberflächen-/Hardwareprüfung. Die nachstehenden Funktionsabschnitte dienen als WPF-Funktionsreferenz; sie behaupten keine bereits nachgewiesene Gleichheit aller Avalonia-Pfade.
 
 ## Mission
 
@@ -48,6 +49,10 @@ src/
   LIS2.Sources/
   LIS2.Fans/
   LIS2.Winamp/
+  LIS2.WindowsMedia/
+  LIS2.WmpLegacy/
+  LIS2.Runtime/
+  LIS2.App.Avalonia/
   LIS2.App/
 
 tests/
@@ -56,13 +61,20 @@ tests/
   LIS2.Sources.Tests/
   LIS2.Fans.Tests/
   LIS2.Winamp.Tests/
+  LIS2.WindowsMedia.Tests/
+  LIS2.WmpLegacy.Tests/
+  LIS2.App.Tests/
+  LIS2.App.Avalonia.Tests/
 
 tools/
   LIS2.ProtocolTester/
   LIS2.WinampSimulator/
+  LIS2.WmpLegacySimulator/
 
 native/
   LIS2.WinampPlugin/
+  LIS2.WmpLegacyPlugin/
+  LIS2.WmpLegacyVisualization/
 ```
 
 ### LIS2.Core
@@ -282,38 +294,24 @@ Aliases also propagate to attribute variables.
 
 ## Application model
 
-The application runs in the interactive Windows session and supports tray operation rather than a Windows service. This is appropriate for Winamp integration, WPF UI and user-session hardware monitoring.
+Die Anwendungen laufen in der interaktiven Benutzersitzung. Avalonia implementiert Windows-Tray, Schließen/Minimieren ins Tray und Windows-Run-Autostart. Linux-Tray/Autostart, Single Instance und Splash sind im Avalonia-Pfad offen. Die tatsächliche Aufteilung von Runtime, UI und Plattformadaptern steht in [architecture.md](architecture.md).
 
-Settings are persisted as JSON in the user's local application-data directory.
+Avalonia speichert den Workspace als `avalonia-workspace.json` im lokalen Anwendungsdatenverzeichnis. Transport/Port und HA-Aktivierungsflag fehlen darin. Helligkeit wird gespeichert, aber noch nicht mit dem Livepfad verbunden. Tokenstore und dessen offenen Linux-Ausweichpfad beschreibt [home-assistant-integration.md](home-assistant-integration.md).
 
 Deliberate UX decisions:
 
 - no first-run wizard
-- no settings import/export
+- Kein allgemeiner Einstellungsimport/-export. Ein Windows-Migrationsimport ist im Code vorhanden, sein UI-Zugang liegt in einem ausgeblendeten Bereich.
 - no restore-defaults workflow
 
 ## Quality / CI
 
-GitHub Actions on Windows currently:
+Der Avalonia-Workflow prüft Core-, Display-, Fans- und Avalonia-Tests auf Windows/Ubuntu und publiziert Windows x64 sowie Linux x64/ARM64. [CI 39435226116](https://github.com/Eitschman/lis2-control-center/actions/runs/39435226116) ist für die genannte Codebasis mit sieben erfolgreichen Jobs nachgewiesen. Dies umfasst Headless-Prüfungen und Paketdateiprüfungen, keinen Avalonia-GUI-Start oder echten ARM64-Lauf.
 
-- restores/builds the .NET solution
-- runs all test projects
-- runs a WPF startup/tab smoke test
-- publishes self-contained x64 application and protocol-tester artifacts
-- builds the native x86 Winamp plug-in
-
-The display render path is serialized/coalesced to prevent overlapping asynchronous writes.
+Der getrennte Windows-Workflow baut/testet die Solution und führt WPF-Smoke-/UI-Regression aus. Getaggte Releases veröffentlichen weiterhin WPF. Auslöser und Prüflücken stehen in [release.md](release.md).
 
 ## Remaining scope
 
-The authoritative remaining work is tracked in `TODO.md`. The main themes are now:
+Die priorisierte Restarbeit steht in [TODO.md](../TODO.md): Seiten-/Quellenintegration, Einstellungen und gewählter Transport, Protokolllog/GUI-Smoke, Medien-/Tokenstore-Grenzen, WPF-Parität und Zielsystemprüfung. WMP Legacy wird in Avalonia unter Windows aktuell gestartet, obwohl der Produktumfang zurückgestellt ist; dieser Widerspruch ist offen.
 
-- physical LIS2 protocol validation
-- fan-safety UX/real-hardware validation
-- formatting/fallback helpers for display variables
-- continued theme/layout polish
-- diagnostics improvements
-- selected engineering tests
-- optional future data sources only where they add value beyond Home Assistant
-
-This document describes the implemented architecture. Byte-level confidence and unresolved protocol questions remain in `protocol.md` and `reverse-engineering.md`.
+Physische Geräteprüfung wird getrennt ausgewiesen und blockiert keine rein softwareseitigen Pakete. Bytegenaue Protokollunsicherheiten bleiben in [protocol.md](protocol.md) und [reverse-engineering.md](reverse-engineering.md).

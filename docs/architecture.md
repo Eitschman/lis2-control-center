@@ -1,191 +1,97 @@
-# Architecture
+# Architektur
 
-## Core principle
+Stand: 20.10.2026. Geltungsbereich: `feature/linux-avalonia`, Codebasis `71b72a8`.
+Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md).
 
-LIS2 Control Center separates data acquisition, rendering, device control and serial transport.
+## Projekte und Abhängigkeiten
 
-```text
-Data Sources
-    |
-    v
-Display Engine
-    |
-    v
-LIS2 Device Abstraction
-    |
-    v
-Serialized Command Queue
-    |
-    v
-Serial Transport
-    |
-    v
-VL System L.I.S. 2
-```
+`LIS2.App.Avalonia` ist die gemeinsame Desktopanwendung für Windows und Linux. `LIS2.App` enthält die WPF-Referenz und bleibt bis zur Paritätsabnahme erhalten. WPF wird nicht an die neue Runtime angebunden.
 
-Only `LIS2.Core` knows protocol bytes such as `0xA1`, `0xAB` or `0xAE`.
+| Projekt | Tatsächliche Zuständigkeit |
+| --- | --- |
+| `LIS2.Core` | Protokoll, Zeichenkodierung, `Lis2Device`, serielle/virtuelle Transporte, Glyphen und virtueller Interpreter |
+| `LIS2.Display` | Vorlagen, Sichtbarkeit, Scheduler, Scrolling, Ereignisse und `DisplayFrameWriter` |
+| `LIS2.Fans` | Berechnung von Fixed/Curve/Follow/External/Off, Grenzen und Hysterese |
+| `LIS2.Sources` | `IDataSource`, Registry, Clock, HA-WebSocket und LibreHardwareMonitor-Quellcode |
+| `LIS2.Runtime` | Quellenlebenszyklus, Lüfterruntime/-schleife, Linux-Sensoren, Plattformverträge und verlinkte Display-Runtime |
+| `LIS2.Winamp` / `LIS2.WmpLegacy` | Named-Pipe-Quellen, Snapshots und Variablen |
+| `LIS2.WindowsMedia` | Windows-GSMTC-Anbieter, separat gebaut und für Windows-Pakete mitgeliefert |
+| `LIS2.App.Avalonia` | AXAML, partielle MainWindow-Dateien, Plattformadapter, Workspace, Tokenstore, Hilfe/About und UI-Integration |
 
-## Planned projects
+Die portablen Projekte verwenden `net8.0`. `Directory.Build.props` gibt weiterhin `net8.0-windows10.0.19041.0` vor; portable Projekte überschreiben diesen Wert. WPF, GSMTC und mehrere Windows-Test-/Toolprojekte erben das Windows-Ziel.
 
-- `LIS2.Core` — serial transport, protocol encoding, connection state, display commands, brightness, custom characters and fans.
-- `LIS2.Display` — logical 20x2 canvas, templates, variables, clipping, alignment, scrolling, pages and event overlays.
-- `LIS2.Sources` — normalized data-provider abstractions and built-in sources.
-- `LIS2.App` — Windows UI, tray application, settings, profiles and diagnostics.
-- `LIS2.Winamp` — host-side Winamp integration.
-- `LIS2.ProtocolTester` — focused hardware bring-up and protocol-validation tool.
+Mehrere UI-unabhängige Dateien liegen physisch unter `src/LIS2.App.Avalonia` und werden in `LIS2.Runtime.csproj` per `Compile Include/Link` eingebunden. Die App schließt deren eigene Kompilierung mit `Compile Remove` aus. Diese Klassen behalten teilweise den Namespace `LIS2.App.Avalonia`, die Runtime referenziert jedoch kein Avalonia-Paket. Eine andere physische Ablage oder ein durchgängiges ViewModel-/DI-Modell ist kein bereits umgesetzter Zustand.
 
-## Device abstraction
-
-The intended device API should expose operations conceptually equivalent to:
-
-```csharp
-bool IsConnected { get; }
-
-Task ConnectAsync(...);
-Task DisconnectAsync();
-
-Task ClearAsync();
-Task WriteLineAsync(...);
-Task WriteAsync(...);
-Task SetBrightnessAsync(...);
-Task SetFansAsync(...);
-Task ProgramCharacterAsync(...);
-```
-
-The public API must express device semantics rather than raw command bytes.
-
-## Serialized hardware access
-
-All serial writes pass through one serialized command queue. Display rendering, fan control and custom-character management must never write independently to the COM port.
-
-Commands should be atomic from the perspective of the queue.
-
-Optional protocol logging records both hexadecimal traffic and semantic intent.
-
-## Display engine
-
-The renderer owns a logical 20x2 character canvas and supports:
-
-- templates and variables
-- clipping and padding
-- alignment
-- scrolling
-- page rotation
-- custom characters
-- event overlays
-- visibility conditions
-- differential updates
-
-A rendered line is always exactly 20 cells.
-
-Initial implementations may rewrite complete lines. Later versions should send only changed spans when safe.
-
-## Data sources
-
-Data providers expose normalized values and know nothing about the serial protocol.
-
-A conceptual interface:
-
-```csharp
-interface IDataSource
-{
-    string Id { get; }
-    Task StartAsync(...);
-    Task StopAsync(...);
-    IReadOnlyDictionary<string, object?> Values { get; }
-    event EventHandler? Changed;
-}
-```
-
-Providers may internally use polling, events, WebSockets, named pipes, HTTP or Windows APIs.
-
-## Fan controller
-
-Fan regulation is a safety-critical subsystem and remains independent from display rendering.
-
-Planned modes:
-
-- Fixed
-- Curve
-- Follow
-- External
-- Off (explicitly permitted only)
-
-Sensor loss, invalid values or controller errors immediately invoke fail-safe output.
-
-## Winamp
-
-Winamp is a first-class integration.
-
-Preferred architecture:
+## Displaypfad
 
 ```text
-Winamp
-  |
-  v
-gen_lis2.dll
-  |
-  | Windows Named Pipe
-  v
-LIS2 Control Center
+Clock / Hardware / HA / Winamp / WindowsMedia / Media
+                       |
+                 PageSourceValues
+                       |
+                DisplayRuntimeHost
+                 /             \
+ PageSequenceController     gemeinsame EventQueue
+          |
+     PagePlayback
+          |
+ PageFrameDispatcher
+      /       \
+ VirtualDeviceSession   SerialDisplaySession
+                              |
+                       UnifiedLis2Session
+                              |
+                          Lis2Device
+                              |
+                     ILis2Transport
 ```
 
-Preferred pipe:
+`DisplayRuntimeHost` besitzt Quellen, Ereignisqueue und erzeugte Sequenzen. Jede Sequenz serialisiert Ticks, Reload und ausstehende Schreibvorgänge. Virtuelle und serielle Wiedergabe haben getrennte Sequenzen und Ausgabeläufe, verwenden aber denselben Seitenworkspace und dieselben priorisierten Ereignisse.
 
-```text
-\\.\pipe\LIS2ControlCenter.Winamp
-```
+`PagePlayback` verarbeitet Sichtbarkeit, Rotation, Vorlagen-Refresh und beide Scrollzeilen. `NextDelay` steuert `AdaptiveRuntimeLoop`; die UI-Anbindung erfolgt über `UiRuntimeDispatch`. Der Editor verwendet eine unabhängige `PageEditorPreview` und einen eigenen UI-Timer.
 
-The plugin collects normalized metadata and playback events. It does not control LIS2 hardware.
+`PageFrameDispatcher` unterdrückt identische ganze Frames und löscht bei leerer Ausgabe. Der Avalonia-Livepfad ruft `RenderBothAsync` auf und nutzt den differenziellen `DisplayFrameWriter` aus `LIS2.Display` nicht. Die in der WPF-/Displaybibliothek vorhandene Ausgabe geänderter Spannen ist deshalb kein Nachweis für diesen Pfad.
 
-## Hardware monitoring
+Ereignisse können eine temporäre Sequenz starten. Nach Ablauf wird zur normalen Seite zurückgekehrt oder die nur für das Ereignis gestartete Ausgabe beendet. Manuelle Aktionen stoppen und leeren ausstehende Sequenzschreibvorgänge, bevor sie selbst schreiben.
 
-LibreHardwareMonitor is the initial hardware sensor backend.
+## Gerätezugriff und Lüfter
 
-A shared sensor registry feeds both display variables and fan control, while preserving separation between display failures and fan safety.
+`UnifiedLis2Session` schützt serielle Display-, Glyphen-, Helligkeits- und Lüfterkommandos mit einem gemeinsamen Semaphore-Gate. Die normale Verbindung startet ohne Lüfterfreigabe. `SerialDisplaySession.StartFansAsync` setzt nach ausdrücklichem UI-Consent zuerst vier 100-%-Werte, aktiviert die `FanRuntime` und startet die zweisekündige `FanRuntimeLoop`.
 
-## Application model
+Die Freigabe wird nicht gespeichert. Stop/Fehler/Disconnect sollen die Regelung leeren, die Freigabe widerrufen und den Sicherheitsframe anfordern. Ein gescheiterter Hardware-Schreibvorgang ist keine Garantie für den tatsächlichen Lüfterzustand. Virtuelle Fehlereinspeisung prüft Reihenfolge und Softwareverhalten.
 
-The initial application runs in the interactive Windows user session as a tray application rather than a Windows service.
+Zusätzlich existieren `AuthorizedFanRuntimeSession`, `SafeSerialFanSession`, Dry-run und eine separate virtuelle Lüftertestsession. Die UI ist kein Beleg dafür, dass alle Helfer denselben produktiven Pfad verwenden. Quellenverlust und ungültige Sensorwerte werden in der Runtime gegen Fail-safe ausgewertet.
 
-Reasons include:
+Es gibt keinen automatischen seriellen Wiederverbindungsablauf. Displayverbindungen können bereits vor der späteren Lüfterfreigabe genutzt werden. Die Architektur behauptet deshalb keine sichere Lüfterinitialisierung vor jeder Displayausgabe beim normalen Connect.
 
-- Winamp integration
-- user-session APIs
-- hardware-monitoring behavior
-- avoiding Session 0 complexity
+## Datenquellen und Plattformen
 
-Closing the configuration window does not terminate the controller.
+- `PageSourceValues` verwendet die gemeinsame Registry, Clock und HA sowie ergänzte Hardware-/Mediensnapshots. Die vorhandenen Template-Namensräume bleiben erhalten.
+- Windows-Hardwaresnapshots stammen aus `WindowsHardwareFanSensors` mit LibreHardwareMonitor; Linux nutzt `LinuxSystemSensors` und `LinuxHwmonFanSensors`.
+- Windows startet Winamp, den per Reflection geladenen GSMTC-Anbieter und derzeit auch WMP Legacy. Letzteres widerspricht der zurückgestellten Produktentscheidung und ist als offener Punkt geführt.
+- Linux fragt mit `playerctl metadata --format` periodisch Status/Titel/Interpret/Album/Dauer ab. Das ist keine eigene MPRIS-D-Bus-Subscription; Zeitposition und Playerwahl fehlen.
+- Die `IPlatform*`-Schnittstellen sind definiert. Konkrete Adapter werden momentan direkt benutzt und implementieren diese Verträge nicht.
 
-## Reconnection
+## Persistenz und Geheimnisse
 
-Connection lifecycle:
+`PortableWorkspaceStore` schreibt unter `Environment.SpecialFolder.LocalApplicationData/LIS2ControlCenter/avalonia-workspace.json`. Schreibvorgänge werden innerhalb der Store-Instanz serialisiert und über eine temporäre Datei ersetzt. Fehlerhaftes JSON wird umbenannt. Ein prozessübergreifendes Lock ist damit nicht implementiert.
 
-```text
-Disconnected
-    -> Connecting
-    -> Connected
-    -> Faulted
-    -> WaitingForReconnect
-    -> Connecting
-```
+Der Workspace enthält Seiten, Glyphen, Lüftereinstellungen, HA-URL/-Präferenzen, Hardwarepräferenzen, Variablenfavoriten, Helligkeit, Theme, Sprache und Glyph-on-connect. Transportmodus, Port und eigener HA-Aktivierungszustand fehlen. Die gespeicherte Helligkeit wird im Livepfad noch nicht angewendet; eine leere Seitenliste wird beim UI-Laden nicht übernommen.
 
-After reconnect, restore state in a controlled order with fan safety taking priority:
+`WindowsSettingsImporter` validiert und übernimmt bekannte Felder, ohne Windows-Tokens zu importieren. Sein Button liegt in einem unsichtbaren erweiterten Settings-Container.
 
-1. safe fan state
-2. brightness
-3. custom glyph set
-4. display frame
-5. normal fan regulation
+`PortableHaTokenStore` verwendet Windows DPAPI bzw. Linux `secret-tool`. Bei fehlendem Secret Service schreibt der Linux-Pfad automatisch AES-GCM-Chiffretext und einen lokalen Schlüssel. Migration in den nativen Store wird versucht. Dieser vorhandene Ausweichpfad ist ein offener Freigabe-/Sicherheitsbefund, keine zugesicherte Gleichwertigkeit zum nativen Store.
 
-## Virtual LIS2
+## Desktop und Lebenszyklus
 
-A virtual transport must exist alongside the serial transport. It should simulate:
+Windows-Tray, Minimieren/Schließen ins Tray und Run-Autostart mit `--minimized` sind in `App.axaml.cs` und `MainWindow.Settings.cs` implementiert. Linux erhält diese Tray-/Autostartanbindung derzeit nicht. Single Instance und Splash sind im Avalonia-Pfad nicht umgesetzt.
 
-- 20x2 VFD contents
-- brightness
-- custom glyph slots
-- four fan outputs
-- connection/fault behavior
+`MainWindow` initialisiert Quellen/Timer und räumt sie im asynchronen `Closed`-Handler auf. UI-Medienrefresh, Hardwareanzeige, Ereignisanzeige und Editorpreview enthalten weiterhin Dispatcher-Timer. Die Existenz von Stop/Drain-Methoden ersetzt keinen GUI-Prozessende-Test.
 
-This enables most development and automated testing without physical hardware.
+Theme-Ressourcen und fünf Sprachkataloge existieren. Die Hilfe wird aus `HelpReferenceCatalog` mit zehn Kontextthemen aufgebaut; About zeigt Version, Runtime, Architektur, OS und Datenverzeichnis. Vollständige Übersetzungs-/Darstellungsparität ist nicht nachgewiesen.
+
+## Diagnose und Prüfung
+
+Virtueller Zustand, dekodierte letzte 200 Kommandos und Textexport sind vorhanden. Die Avalonia-Diagnose erfasst noch kein echtes Anwendungs-/Protokolllog.
+
+GitHub Actions prüft Core, Display, Fans und Avalonia-Headless-Tests auf Windows und Ubuntu und publiziert drei Pakete. GUI-Navigation, extrahierter Paketstart, ARM64-Ausführung und physisches LIS2 sind davon nicht abgedeckt. Konkrete Restarbeiten stehen in [TODO](../TODO.md).
