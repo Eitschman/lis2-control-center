@@ -323,12 +323,23 @@ public partial class MainWindow
         _editorPreview.Configure(line1, line2, overflow1, overflow2, step, pause);
         _editorPreviewConfigured = true;
         TickEditorPreview();
+        UpdateEditorPreviewVisibility();
+    }
+
+    private void UpdateEditorPreviewVisibility()
+    {
+        if (_selectedSection != 2 || !_editorPreviewConfigured || SelectedPageIndex is null)
+        {
+            _editorPreviewTimer.Stop();
+            return;
+        }
         if (!_editorPreviewTimer.IsEnabled) _editorPreviewTimer.Start();
+        TickEditorPreview();
     }
 
     private void TickEditorPreview()
     {
-        if (!_editorPreviewConfigured || _loadingPage || SelectedPageIndex is null)
+        if (_selectedSection != 2 || !_editorPreviewConfigured || _loadingPage || SelectedPageIndex is null)
         {
             _editorPreviewTimer.Stop();
             return;
