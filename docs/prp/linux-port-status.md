@@ -696,3 +696,10 @@ Implemented initial cross-screen package: common light shell/white card styling,
 - ReloadAsync now preserves the dispatcher and its last-successful-output state while replacing only the scheduler. A fresh dispatcher is still created on a new Start, and the existing tick gate continues to serialize reload with in-flight output.
 - Added four deterministic headless tests: unchanged-frame deduplication, clear exactly once after empty schedule, clear after disabled-only schedule, and replacement-frame write without intermediate clear. Applies to both virtual and serial playback adapters; no fan control or WPF modifications.
 - Commits e1d8827 and 84fc5b9. Latest CI and final Windows/Linux desktop parity remain pending.
+
+
+## Media-provider to live page runtime integration (2026-10-20)
+- After green CI for 10be4a8, inspected cross-platform media UI and shared source adapter rather than adding further Pages editor polish.
+- Creating a media page from WindowsMedia, Winamp, WmpLegacy or Linux MPRIS now requests a live virtual schedule reload, matching other page-creation paths; the new template can appear without disconnect/reconnect.
+- Media startup/refresh errors invalidate only the failed provider's cached page-template namespace to avoid continuing to display stale song metadata. Other provider snapshots remain intact.
+- Added headless tests for provider namespace isolation and fresh media template values. Physical/desktop behavior not claimed. Commits 83ca68f, d5e5da9; current CI pending.
