@@ -198,4 +198,29 @@ public sealed class PageWorkspaceTests
         Assert.Throws<InvalidOperationException>(() => target.ImportJson(source.ExportJson()));
         Assert.Equal(original.Id, Assert.Single(target.Pages).Id);
     }
+
+    [Fact]
+    public void EmptyPageImportRemovesAllPagesAndCanBeRepopulated()
+    {
+        var workspace = new PageWorkspace();
+        workspace.Add().Name = "Previous";
+        workspace.ImportJson("[]");
+        Assert.Empty(workspace.Pages);
+        var replacement = workspace.Add();
+        Assert.Equal("Page 1", replacement.Name);
+        Assert.Single(workspace.Pages);
+    }
+
+    [Fact]
+    public void InvalidOverflowImportDoesNotChangeExistingPageReferences()
+    {
+        var workspace = new PageWorkspace();
+        var existing = workspace.Add();
+        existing.Line1Template = "Keep existing draft";
+        var source = new PageWorkspace();
+        source.Add().Line1OverflowMode = "Unsupported";
+        Assert.Throws<InvalidOperationException>(() => workspace.ImportJson(source.ExportJson()));
+        Assert.Same(existing, workspace.Get(0));
+        Assert.Equal("Keep existing draft", workspace.Get(0).Line1Template);
+    }
 }
