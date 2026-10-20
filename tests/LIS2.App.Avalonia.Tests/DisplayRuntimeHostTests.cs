@@ -156,4 +156,56 @@ public sealed class DisplayRuntimeHostTests
         Assert.Equal("LOW", virtualFrames[^1]);
         Assert.Equal("LOW", serialFrames[^1]);
     }
+
+    [Fact]
+    public async Task EventOnlySequenceCanBePromotedToPagePlaybackWithoutLosingOverlay()
+    {
+        var now = DateTimeOffset.UnixEpoch;
+        var writes = new List<string>();
+        await using var runtime = new DisplayRuntimeHost(clock: () => now);
+        var sequence = runtime.CreateSequence(
+            (frame, _) => { writes.Add(frame.Line1.Trim()); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        runtime.EnqueueEvent(new DisplayEvent("alert", DisplayFrame.Create("ALERT", ""), 100, now.AddSeconds(5)));
+        Assert.True(sequence.Start(Array.Empty<PageDefinition>()));
+        Assert.True(await runtime.TickAsync(sequence));
+        Assert.True(await sequence.ReloadAsync(new[]
+        {
+            new PageDefinition { Id = "normal", Line1Template = "NORMAL", DurationSeconds = 20 }
+        }));
+        Assert.False(await runtime.TickAsync(sequence));
+        Assert.Equal(new[] { "ALERT" }, writes);
+        now = now.AddSeconds(6);
+        Assert.True(await runtime.TickAsync(sequence));
+        Assert.Equal(new[] { "ALERT", "NORMAL" }, writes);
+        Assert.Equal("normal", sequence.CurrentPageId);
+        Assert.True(sequence.IsRunning);
+    }
+
+    [Fact]
+    public async Task BothEventOnlyTransportsCanPromoteIndependently()
+    {
+        var now = DateTimeOffset.UnixEpoch;
+        await using var runtime = new DisplayRuntimeHost(clock: () => now);
+        var virtualFrames = new List<string>();
+        var serialFrames = new List<string>();
+        var virtualSequence = runtime.CreateSequence(
+            (frame, _) => { virtualFrames.Add(frame.Line1.Trim()); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        var serialSequence = runtime.CreateSequence(
+            (frame, _) => { serialFrames.Add(frame.Line1.Trim()); return Task.CompletedTask; },
+            _ => Task.CompletedTask);
+        runtime.EnqueueEvent(new DisplayEvent("alert", DisplayFrame.Create("ALERT", ""), 50, now.AddSeconds(2)));
+        Assert.True(virtualSequence.Start(Array.Empty<PageDefinition>()));
+        Assert.True(serialSequence.Start(Array.Empty<PageDefinition>()));
+        await runtime.TickAsync(virtualSequence);
+        await runtime.TickAsync(serialSequence);
+        Assert.True(await virtualSequence.ReloadAsync(new[] { new PageDefinition { Line1Template = "VIRTUAL" } }));
+        Assert.True(await serialSequence.ReloadAsync(new[] { new PageDefinition { Line1Template = "SERIAL" } }));
+        now = now.AddSeconds(3);
+        await runtime.TickAsync(virtualSequence);
+        await runtime.TickAsync(serialSequence);
+        Assert.Equal(new[] { "ALERT", "VIRTUAL" }, virtualFrames);
+        Assert.Equal(new[] { "ALERT", "SERIAL" }, serialFrames);
+    }
 }
