@@ -3,6 +3,39 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class HardwareSensorCatalogTests
 {
     [Theory]
+    [InlineData(0, "All types")]
+    [InlineData(1, "Favorites")]
+    [InlineData(2, "Unavailable")]
+    [InlineData(3, "Temperature")]
+    [InlineData(4, "Load")]
+    [InlineData(5, "Fan")]
+    [InlineData(6, "Clock")]
+    [InlineData(7, "Voltage")]
+    [InlineData(8, "Power")]
+    [InlineData(9, "Data")]
+    [InlineData(10, "Throughput")]
+    [InlineData(11, "Other")]
+    public void HardwareFilterUsesStableKeysIndependentOfLocalizedLabels(int index, string expected)
+        => Assert.Equal(expected, MainWindow.HardwareTypeFilterKey(index));
+
+    [Fact]
+    public void StableFilterKeysPreserveSensorResults()
+    {
+        var values = new Dictionary<string, object?>
+        {
+            ["Hardware.CPU.Temperature.Package"] = 55d,
+            ["Hardware.CPU.Load.Total"] = 32d
+        };
+        var preferences = Array.Empty<PortableHardwareSensorPreference>();
+        Assert.Single(HardwareSensorCatalog.Build(values, preferences,
+            typeFilter: MainWindow.HardwareTypeFilterKey(3)));
+        Assert.Single(HardwareSensorCatalog.Build(values, preferences,
+            typeFilter: MainWindow.HardwareTypeFilterKey(4)));
+        Assert.Equal(2, HardwareSensorCatalog.Build(values, preferences,
+            typeFilter: MainWindow.HardwareTypeFilterKey(0)).Count);
+    }
+
+    [Theory]
     [InlineData("Hardware.CPU.Temperature.Package", 45d, "°C", "45 °C")]
     [InlineData("Hardware.CPU.Load.Total", 25d, "%", "25 %")]
     [InlineData("Hardware.CPU.Fan.Fan1", 1200d, "RPM", "1200 RPM")]
