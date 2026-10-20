@@ -1055,15 +1055,32 @@ internal static class WpfTranslationCatalog
             }
         };
 
-    internal static string Translate(string value, string language)
+    internal static string FindEnglishSource(string value)
     {
-        if (language == "en" || string.IsNullOrEmpty(value) || !Translations.TryGetValue(language, out var dictionary)) return value;
-        if (dictionary.TryGetValue(value, out var translated)) return translated;
-        foreach (var pair in dictionary)
+        if (string.IsNullOrEmpty(value)) return value;
+        foreach (var language in Translations.Values)
         {
-            if (value.EndsWith(pair.Key, StringComparison.Ordinal) && value[..^pair.Key.Length].All(c => !char.IsLetterOrDigit(c)))
-                return value[..^pair.Key.Length] + pair.Value;
+            foreach (var pair in language)
+            {
+                if (string.Equals(pair.Value, value, StringComparison.Ordinal))
+                    return pair.Key;
+            }
         }
         return value;
+    }
+
+    internal static string Translate(string value, string language)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+        var source = FindEnglishSource(value);
+        if (language == "en" || !Translations.TryGetValue(language, out var dictionary)) return source;
+        if (dictionary.TryGetValue(source, out var translated)) return translated;
+        foreach (var pair in dictionary)
+        {
+            if (source.EndsWith(pair.Key, StringComparison.Ordinal) &&
+                source[..^pair.Key.Length].All(c => !char.IsLetterOrDigit(c)))
+                return source[..^pair.Key.Length] + pair.Value;
+        }
+        return source;
     }
 }
