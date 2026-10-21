@@ -73,6 +73,7 @@ Danach folgt **PORT-04: Medien und Produktgrenzen**.
 - [x] WMP Legacy bleibt zurückgestellt: Avalonia startet die Quelle nicht, zeigt keine Karte und referenziert das Legacy-Projekt nicht.
 - [x] Linux liefert keine VU-/Spektrumanalyse aus MPRIS-Metadaten; Regressionstest prüft diese Grenze. Wine/Winamp bleibt optional.
 - [x] Avalonia-Branch-CI baut zusätzlich den selbständigen Windows-Protokolltester und das native Win32/x86-Winamp-Plug-in; eigene Artefakte wie auf main.
+- [x] [CI 39569558081](https://github.com/Eitschman/lis2-control-center/actions/runs/39569558081) für `cd4b779`: neun Jobs erfolgreich, je OS 375/375 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes, drei App-Pakete, GSMTC-Paketstart, Protokolltester und Winamp-DLL erfolgreich.
 
 ### PORT-05: Home Assistant und Tokenstore
 
