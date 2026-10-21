@@ -87,6 +87,8 @@ Nächstes Paket ist **PORT-07: Pakete und Zielsysteme**. Offene Zielsystem- und 
 
 ### PORT-06: WPF-Abgleich und Desktopintegration
 
+Technischer Nachweis: [CI 39581947442](https://github.com/Eitschman/lis2-control-center/actions/runs/39581947442) für `35a2df0`, neun erfolgreiche Jobs. Linux 417/417 Avalonia-Fälle, Windows 416 erfolgreich und ein übersprungener Linux-Fall; je OS Core 55/55, Display 50/50 und Fans 12/12. Native Smokes einschließlich minimiertem Start, zweitem Prozess und Linux bei 150 Prozent; drei App-Pakete, Protokolltester und Winamp-DLL geprüft. Die offenen manuellen Abnahmepunkte bleiben unten erfasst.
+
 - [ ] Die zehn Ansichten anhand der [aktuellen Matrix](docs/prp/wpf-avalonia-parity-audit.md) semantisch prüfen, einschließlich Fehler-, Leer-, Auswahl- und Speicherpfaden.
 - [x] Zehn Hilfethemen einschließlich Titel, Navigation und Absätzen in fünf Sprachen; gespeicherte Sprache, Systemstandard und Wechsel im offenen Dialog mit Controls geprüft.
 - [x] Hilfetexte gegen den Avalonia-Code prüfen: Lüftermodi/-Sicherheitsgrenzen, Medien je Plattform, numerische Glyphenreferenzen, Variablenliste, Formatierung und Sichtbarkeit.
@@ -96,7 +98,8 @@ Nächstes Paket ist **PORT-07: Pakete und Zielsysteme**. Offene Zielsystem- und 
 - [x] Zehn Ansichten in fünf Sprachen mit Hell/Dunkel/System bei 950 × 600, Titelgrenzen, Fokus und F1 prüfen; abgeschnittene Port-/Glyphen-/Lüftertexte korrigieren.
 - [ ] Tatsächlichen OS-Themewechsel, Monitor-/DPI-Wechsel und native Tastaturbedienung auf den Ziel-Desktops prüfen.
 - [x] Display-Formatierung in en-US, de-DE und fr-FR prüfen; Produktformatierung nach `CurrentCulture` erhalten. Lokaler Lauf: 50/50.
-- [ ] Zusätzliche Bedienflächen und nicht ausdrücklich geforderte Titelzusätze im bearbeiteten UI-Bereich bereinigen; genehmigten Variablenbrowser erhalten.
+- [x] Redundante zusätzliche Seitenüberschrift entfernen und genehmigten Variablenbrowser erhalten.
+- [ ] Zusätzliche Start-/Stop-, Datei- und Testaktionen gegenüber WPF im manuellen Bedienungsabgleich bewerten.
 - [x] Windows-/Linux-Tray, XDG-Autostart, Single Instance mit Fensteraktivierung und Splash anbinden. Wiederanzeigen startet die Geräteverbindung nicht erneut; Gegenprobe und Regression vorhanden.
 - [ ] Tray-Menübedienung und Anmeldung mit Autostart auf realen Windows-/Linux-Desktops prüfen. Linux minimiert in die Taskleiste und beendet beim Schließen; Windows minimiert/schließt in den Infobereich. Plattformabweichung bei der Benutzerabnahme prüfen.
 - [ ] WPF erst nach Funktions-/Darstellungsabgleich und Benutzerabnahme entfernen.
