@@ -131,10 +131,12 @@ public sealed record HardwareSensorEntry(string Key, object? Value, string Alias
         Environment.NewLine + Key;
     public string Markers => (IsFavorite ? "★" : "") + (!IsAvailable ? " !" : "");
     public string SensorType => HardwareSensorCatalog.GetSensorType(Key);
+    internal string Language { get; init; } = "en";
+    public string DisplaySensorType => UiTranslations.Translate(SensorType, Language);
     public string DisplayValue => IsAvailable
         ? (Convert.ToString(Value, CultureInfo.InvariantCulture) ?? "") +
           (string.IsNullOrWhiteSpace(Unit) ? "" : " " + Unit.Trim())
-        : "Unavailable";
+        : UiTranslations.Translate("Unavailable", Language);
 
     public static IReadOnlyList<object> GroupForDisplay(IEnumerable<HardwareSensorEntry> entries)
     {

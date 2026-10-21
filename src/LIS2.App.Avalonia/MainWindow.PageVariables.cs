@@ -22,15 +22,7 @@ public partial class MainWindow
     private void RefreshPageVariables()
     {
         var count = PagePreviewValues().Count;
-        this.FindControl<TextBlock>("PageVariableStatus")!.Text =
-            CurrentUiLanguage() switch
-            {
-                "de" => $"{count} Variablen verfügbar. Zum Suchen den Variablen-Browser öffnen.",
-                "fr" => $"{count} variables disponibles. Ouvrez le navigateur pour rechercher.",
-                "tr" => $"{count} değişken mevcut. Aramak için değişken tarayıcısını açın.",
-                "ru" => $"Доступно переменных: {count}. Откройте поиск переменных.",
-                _ => $"{count} variables available. Browse to search by category and name."
-            };
+        SetUiText("PageVariableStatus", $"{count} variables available.");
         RefreshPagePreview();
     }
 
@@ -56,7 +48,7 @@ public partial class MainWindow
         RefreshPagePreview();
     }
 
-    private string BrowserText(string english) => PageVariableBrowserLocalization.Translate(english, CurrentUiLanguage());
+    private string BrowserText(string english) => UiText(english);
 
     private async Task ShowPageVariableBrowserAsync(string? insertTarget = null)
     {

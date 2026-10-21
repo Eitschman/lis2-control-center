@@ -1,8 +1,8 @@
 # Avalonia-Portierung: aktueller Arbeitsstand
 
-Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-03.
-Geprüfter Code-Commit: `d2d2defdf4d92d0f868daca47ef8ab4bdc402e5e`.
+Stand: 21.10.2026. Branch: `feature/linux-avalonia`.
+Implementierungsstand: PORT-03 mit lokalisiertem Menüumfang vor PORT-04.
+Geprüfter lokaler Arbeitsstand: Übersetzungspaket vor PORT-04. Der CI-Nachweis für diesen Stand wird über den zugehörigen Commit-Lauf ergänzt.
 
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
@@ -10,7 +10,8 @@ Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](..
 
 Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 
-- Avalonia: 345/345 Tests erfolgreich, Exit 0, keine übersprungenen Tests. Frischer Lauf `TestResults/help-all.trx`; Hilfedialog zusätzlich in `help-sidebar.trx` mit 6/6 Fällen geprüft.
+- Avalonia: 359/359 Tests erfolgreich, Exit 0, keine übersprungenen Tests (`TestResults/menu-release.trx`). Die 14 neuen Katalog-/Sprachfälle betreffen statische AXAML-Texte, fünf Sprachen und Systemstandard, zehn Ansichten, About, Sprachwechsel, Statusmeldungen, unveränderte Daten, Lüftermodi und Formatargumente.
+- Gegenproben: Die deutsche Lüfterüberschrift blieb vor der Ergänzung englisch (`menu-language-negative.trx`). Musiktitel wie Connected wurden vor der Eingrenzung der statischen Übersetzung verändert; 6/6 Fälle erkennen das (`menu-data-negative.trx`, Exit 1). Ein falscher französischer Formatindex wird vom Katalogtest erkannt (`menu-placeholder-negative.trx`, 1/1 fehlgeschlagen). Regulären Stand wiederhergestellt und gesamte Suite mit Exit 0 geprüft.
 - Hilfe: fünf Sprachen, Systemstandard und Sprachwechsel im offenen Dialog mit echten Controls geprüft. Katalogtests decken alle zehn Themen, leere und gefüllte Variablenlisten, unveränderte technische Schlüssel sowie die Ausführung von HA-Formatierungs-/Sichtbarkeitsbeispielen und numerischen Glyphenreferenzen ab. Die Gegenprobe vor der Korrektur scheiterte bei deutscher Sprache am englischen Dialogtitel (`help-language-negative.trx`, Exit 1).
 - Sieben Fälle in `RuntimeHardeningTests` prüfen verzögerten erfolgreichen/fehlgeschlagenen Start gegen Shutdown, Fortsetzung nach Cleanup-Fehlern, differenzielle serielle/virtuelle Frames, Teilfehler, manuelle Cacheinvalidierung, Reconnect mit/ohne Lüfterfreigabe, begrenztes Journal sowie tatsächliche Ansichten und Dialoge.
 - Gegenprobe: ausgelassener Start-Drain, fehlendes Cache-Reset nach Teilfehler und still ignorierte Provider-DLL führen zu vier gezielt fehlgeschlagenen Tests, Exit 1 (`port03-negative.trx`). Regulären Code wiederhergestellt und gesamte Suite mit Exit 0 geprüft.
@@ -20,9 +21,11 @@ Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 
 Diagnose, Hilfe/About und Medienfehler wurden unter Windows und Linux gerendert und angesehen. Die Linux-Ansichten stammen aus dem nativen X11-Smoke; die korrigierte Fehlermeldung benennt das fehlende playerctl mit Installationshinweis. Die Fehleranzeige verwendet Textumbruch und rote Schrift. Screenshots liegen unter `TestResults/screenshots/port03-*.png` und in den nativen Smoke-Artefakten. Die Geräte-UI-Tests aus PORT-02 prüfen zusätzlich Dashboard/Display/Settings bei 1305 × 893 und 950 × 600 Pixeln sowie Trennen per Tastatur. Ein automatisierter Bildvergleich besteht nicht.
 
-[CI 39455194970](https://github.com/Eitschman/lis2-control-center/actions/runs/39455194970) prüft den angegebenen Code-Commit mit .NET 8. Alle sieben Jobs sind erfolgreich: je OS 345/345 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests sowie die drei Pakete `win-x64`, `linux-x64` und `linux-arm64`. Windows-Desktop-Smoke und Linux-X11-Smoke über Xvfb bestehen einschließlich Prozessende mit Exit 0. Beide verwenden Zeitlimits und isolierte Stores ohne physisches LIS2.
+Der GitHub-Nachweis des Übersetzungspakets steht bis zum zugehörigen Branch-Lauf noch aus. Lokale Tests ersetzen keinen Windows-/Linux-CI-Nachweis oder Paketstart.
 
 Artefakte: `Avalonia-device-views-Windows`/`Linux`, `Avalonia-desktop-smoke-Windows`/`Linux` sowie drei `LIS2-Avalonia-*`-Pakete. Die Desktop-Smokes enthalten je 13 gerenderte Ansichten, Diagnose vor/nach Shutdown und `result.txt`. WPF wird durch diesen Workflow nicht geprüft. Nachfolgende reine Dokumentationscommits ändern den hier geprüften Code nicht; der verlinkte Lauf gehört ausdrücklich zum angegebenen Commit.
+
+Menü-Sichtprüfung unter Windows mit Skia: zehn Ansichten auf Deutsch bei 1305 × 893 und 950 × 600 einschließlich gescrollter Inhalte; zusätzliche französische und russische Menüseiten und About bei langen Übersetzungen. Screenshots: `TestResults/screenshots/menu-*.png`. Die Pixelmaße der schmalen Ansichten werden auf 950 × 600 geprüft. Aktionszeilen umbrechen; der Seiteneditor stapelt Liste und Eigenschaften bei schmalen Fenstern. Die Metadatenfelder und Listeneinträge sind von der statischen Übersetzung ausgenommen. Diagnosebeschriftungen sind lokalisiert; rohe Protokollbefehle, Journale und fremde Ausnahmeinformationen bleiben technische Originaldaten. Native Dateidialoge und Trayaktionen sind nicht über die Spracheinstellungen hinweg bedient worden.
 
 ## Implementierung nach Codebefund
 
@@ -39,7 +42,7 @@ Lokalisierte Hilfedialoge wurden unter Windows mit Skia bei 840 × 600 Pixeln ge
 | Home Assistant | WebSocket, Entitäten/Attribute, Aliase/Favoriten, Clipboard und Seitenerzeugung | Keine eigene aktuelle Liveprüfung oder Linux-Abnahme |
 | Einstellungen | Persistierter Transport/Port/HA-Aktivierung, Helligkeit, Windows-Import, Theme/Sprache, Windows-Tray/Autostart | Native Dateiauswahl und Linux-Desktopintegration offen |
 | Tokenstore | DPAPI, secret-tool, lokaler AES-Dateipfad und Migration | Automatischer AES-Ausweichpfad in PORT-05 zu klären |
-| Hilfe/About | Kontextauswahl und zehn Themen in fünf Sprachen; gespeicherte Sprache, Systemstandard und offener Dialog geprüft; Inhalte gegen Code korrigiert; About mit Versions-/Laufzeitdaten und tatsächlichem Workspace-Ordner | Weitere WPF-Inhaltstiefe, About-Übersetzungen und Hilfeplatzierung offen; Runtime unterstützt nur numerische Glyphenschlüssel |
+| Hilfe/About | Kontextauswahl und zehn Themen in fünf Sprachen; gespeicherte Sprache, Systemstandard und offener Dialog geprüft; Inhalte gegen Code korrigiert; About mit Versions-/Laufzeitdaten und tatsächlichem Workspace-Ordner | Weitere WPF-Inhaltstiefe, Hilfeplatzierung offen; Runtime unterstützt nur numerische Glyphenschlüssel |
 | Diagnose | UTC-Journal für Anwendung und tatsächliche virtuelle/serielle Transportergebnisse, OK/ERROR, dekodierte Befehle, aktueller Export | Maximal 1000 Einträge pro Journal und zehn serielle Sitzungen; kein persistentes Logarchiv |
 
 ## Verbindliche Grenzen und Weiterarbeit
@@ -48,6 +51,4 @@ Eine gemeinsame Avalonia-Oberfläche bleibt das Ziel; WPF bleibt Referenz bis zu
 
 Native Dateiauswahl, Tray-Menübedienung, OS-Abmeldung, DPI-/Theme-/Sprachmatrix, Live-HA-/Player-/Sensorintegration, extrahierter Paketstart, ARM64-Ausführung auf ARM64 und physische LIS2-Ausgabe sind durch den Smoke nicht nachgewiesen.
 
-Erster Schritt bei der nächsten Fortsetzung, vor PORT-04: **Übersetzungen auf allen zehn Menüseiten prüfen und fehlende Übersetzungen korrigieren**. Benutzerbefund aus der GUI: Auf allen Seiten stehen noch viele Texte auf Englisch. Der Nachweis für die lokalisierte Hilfe gilt nicht für die übrige Oberfläche. Umfang und Prüfschritte stehen in [TODO](../../TODO.md).
-
-Danach folgt **PORT-04: Medien und Produktgrenzen**. Plattformverträge und ihre konkreten Abweichungen sind im Inventar abgeglichen; neue Linux-Desktopdienste gehören zu PORT-06.
+Das vorgezogene Übersetzungspaket ist implementiert und lokal geprüft. Nächstes Paket: **PORT-04: Medien und Produktgrenzen**. Plattformverträge und ihre konkreten Abweichungen sind im Inventar abgeglichen; neue Linux-Desktopdienste gehören zu PORT-06.

@@ -30,7 +30,7 @@ public partial class MainWindow
     private async Task RunGlyphFileActionAsync(Func<Task> action)
     {
         try { await action(); }
-        catch (Exception ex) { SetVirtualStatus($"Glyph file error: {ex.Message}"); }
+        catch (Exception ex) { SetVirtualStatus($"Glyph file error: {(UiMessage)ex.Message}"); }
     }
 
     private void SaveGlyphEditor()
@@ -46,7 +46,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            SetVirtualStatus($"Glyph error: {ex.Message}");
+            SetVirtualStatus($"Glyph error: {(UiMessage)ex.Message}");
         }
     }
 
@@ -78,7 +78,7 @@ public partial class MainWindow
         }
         catch (ArgumentException)
         {
-            this.FindControl<TextBlock>("GlyphPixelPreview")!.Text = "Invalid 5x8 bitmap";
+            SetUiText("GlyphPixelPreview", "Invalid 5x8 bitmap");
         }
     }
 }

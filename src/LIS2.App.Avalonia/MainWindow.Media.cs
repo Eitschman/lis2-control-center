@@ -75,7 +75,7 @@ public partial class MainWindow
             var status = this.FindControl<TextBlock>(controlName);
             if (status is not null)
             {
-                status.Text = "Provider startup error: " + MediaErrorMessage(provider, ex);
+                SetUiText(status, $"Provider startup error: {MediaErrorMessage(provider, ex)}");
                 status.TextWrapping = global::Avalonia.Media.TextWrapping.Wrap;
                 status.MaxWidth = 280;
                 status.Foreground = global::Avalonia.Media.Brushes.DarkRed;
@@ -119,7 +119,7 @@ public partial class MainWindow
             _pageSources.UpdateMedia(provider, new Dictionary<string, object?>());
             var statusControl = this.FindControl<TextBlock>(status);
             if (statusControl is not null)
-                statusControl.Text = "Provider error: " + message;
+                SetUiText(statusControl, $"Provider error: {message}");
         }
     }
 
@@ -128,11 +128,11 @@ public partial class MainWindow
         var values = _windowsMedia.Values;
         _pageSources.UpdateMedia("WindowsMedia", values);
         string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
-        this.FindControl<TextBlock>("WindowsMediaStatus")!.Text = Read("Connected") == "True" ? "Connected" : "Disconnected";
+        SetUiText("WindowsMediaStatus", Read("Connected") == "True" ? "Connected" : "Disconnected");
         this.FindControl<TextBlock>("WindowsMediaTitle")!.Text = Read("Title");
         this.FindControl<TextBlock>("WindowsMediaArtist")!.Text = Read("Artist");
         this.FindControl<TextBlock>("WindowsMediaAlbum")!.Text = Read("Album");
-        this.FindControl<TextBlock>("WindowsMediaPlayback")!.Text = Read("State");
+        SetUiText("WindowsMediaPlayback", Read("State"));
         this.FindControl<TextBlock>("WindowsMediaTime")!.Text = Read("Elapsed") + " / " + Read("Duration");
     }
 
@@ -146,11 +146,11 @@ public partial class MainWindow
             if (_mediaStopping) return;
             _pageSources.UpdateMedia("Media", values);
             string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
-            this.FindControl<TextBlock>("LinuxMediaStatus")!.Text = Read("Connected") == "True" ? "Connected" : "Disconnected";
+            SetUiText("LinuxMediaStatus", Read("Connected") == "True" ? "Connected" : "Disconnected");
             this.FindControl<TextBlock>("LinuxMediaTitle")!.Text = Read("Title");
             this.FindControl<TextBlock>("LinuxMediaArtist")!.Text = Read("Artist");
             this.FindControl<TextBlock>("LinuxMediaAlbum")!.Text = Read("Album");
-            this.FindControl<TextBlock>("LinuxMediaPlayback")!.Text = Read("State");
+            SetUiText("LinuxMediaPlayback", Read("State"));
             this.FindControl<TextBlock>("LinuxMediaDuration")!.Text = Read("Duration");
         }
         catch (Exception ex)
@@ -160,7 +160,7 @@ public partial class MainWindow
             System.Diagnostics.Trace.TraceError("Linux MPRIS refresh failed: {0}", ex);
             _pageSources.UpdateMedia("Media", new Dictionary<string, object?>());
             var status = this.FindControl<TextBlock>("LinuxMediaStatus");
-            if (status is not null) status.Text = "Provider error: " + MediaErrorMessage("Media", ex);
+            if (status is not null) SetUiText(status, $"Provider error: {MediaErrorMessage("Media", ex)}");
         }
         finally { _mprisRefreshing = false; }
     }
@@ -170,11 +170,11 @@ public partial class MainWindow
         _pageSources.UpdateMedia(id, values);
         var prefix = id == "Winamp" ? "WinampMedia" : "WmpLegacyMedia";
         string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
-        this.FindControl<TextBlock>(prefix + "Status")!.Text = Read("Connected") == "True" ? "Connected" : "Disconnected";
-        this.FindControl<TextBlock>(prefix + "Title")!.Text = string.IsNullOrWhiteSpace(Read("Title")) ? "Nothing playing" : Read("Title");
+        SetUiText(prefix + "Status", Read("Connected") == "True" ? "Connected" : "Disconnected");
+        SetUiText(prefix + "Title", string.IsNullOrWhiteSpace(Read("Title")) ? "Nothing playing" : (UiMessage)$"{Read("Title")}");
         this.FindControl<TextBlock>(prefix + "Artist")!.Text = Read("Artist");
         this.FindControl<TextBlock>(prefix + "Album")!.Text = Read("Album");
-        this.FindControl<TextBlock>(prefix + "Playback")!.Text = Read("State");
+        SetUiText(prefix + "Playback", Read("State"));
         this.FindControl<TextBlock>(prefix + "Time")!.Text = Read("Elapsed") + " / " + Read("Duration");
         if (id == "Winamp")
         {
@@ -184,10 +184,10 @@ public partial class MainWindow
             this.FindControl<TextBlock>("WinampMediaAudio")!.Text =
                 FormatValue("BitrateKbps") + " kbps / " + FormatValue("SampleRateHz") + " Hz";
         }
-        this.FindControl<TextBlock>(prefix + "Telemetry")!.Text = "VU: " + Read("Vu") + "  Spectrum: " + Read("Spectrum");
+        SetUiText(prefix + "Telemetry", $"VU: {Read("Vu")}  Spectrum: {Read("Spectrum")}");
     }
 
-    private static string MediaErrorMessage(string provider, Exception exception) =>
+    private static UiMessage MediaErrorMessage(string provider, Exception exception) =>
         provider == "Media" && exception.GetBaseException() is System.ComponentModel.Win32Exception { NativeErrorCode: 2 }
             ? "playerctl is missing. Install playerctl to enable Linux media."
             : exception.GetBaseException().Message;

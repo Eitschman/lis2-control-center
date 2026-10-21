@@ -12,7 +12,7 @@ namespace LIS2.App.Avalonia;
 
 public partial class MainWindow
 {
-    private event Action? HelpLanguageChanged;
+    internal event Action? UiLanguageChanged;
 
     private async System.Threading.Tasks.Task OpenHelpAsync()
     {
@@ -87,9 +87,9 @@ public partial class MainWindow
         ApplyLanguage();
         sectionList.SelectionChanged += (_, _) => Render();
         sectionList.SelectedIndex = HelpReferenceCatalog.ClampSection(_selectedSection);
-        HelpLanguageChanged += ApplyLanguage;
+        UiLanguageChanged += ApplyLanguage;
         try { await dialog.ShowDialog(this); }
-        finally { HelpLanguageChanged -= ApplyLanguage; }
+        finally { UiLanguageChanged -= ApplyLanguage; }
     }
 
     private async System.Threading.Tasks.Task OpenAboutAsync()
@@ -108,7 +108,7 @@ public partial class MainWindow
         };
         var content = new StackPanel { Spacing = 12, Margin = new Thickness(24) };
         content.Children.Add(new TextBlock { Text = "LIS2 Control Center", FontSize = 24, FontWeight = FontWeight.SemiBold });
-        content.Children.Add(new TextBlock { Text = "Version " + version });
+        content.Children.Add(new TextBlock { Text = UiFormat($"Version {version}"), TextWrapping = TextWrapping.Wrap });
         foreach (var (label, value) in new[]
         {
             ("Build", assembly.GetCustomAttribute<AssemblyConfigurationAttribute>()?.Configuration ?? "unknown"),
@@ -119,7 +119,7 @@ public partial class MainWindow
         })
         {
             var row = new Grid { ColumnDefinitions = new ColumnDefinitions("140,*") };
-            row.Children.Add(new TextBlock { Text = BrowserText(label), FontWeight = FontWeight.SemiBold });
+            row.Children.Add(new TextBlock { Text = BrowserText(label), FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap });
             var valueText = new TextBlock { Text = value, TextWrapping = TextWrapping.Wrap };
             Grid.SetColumn(valueText, 1); row.Children.Add(valueText);
             content.Children.Add(row);

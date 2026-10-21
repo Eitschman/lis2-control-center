@@ -148,7 +148,7 @@ public partial class MainWindow
         var index = Array.IndexOf(SettingsKeys, text);
         var code = CurrentUiLanguage();
         return index >= 0 && SettingsTranslations.TryGetValue(code, out var translations)
-            ? translations[index] : text;
+            ? translations[index] : UiText(text);
     }
 
     private void ApplySettingsLocalization()
@@ -196,6 +196,13 @@ public partial class MainWindow
         UpdateSection();
         UpdateVirtualControls();
         this.FindControl<Button>("OpenHelp")!.Content = HelpReferenceLocalization.Translate("Help & reference", CurrentUiLanguage());
-        HelpLanguageChanged?.Invoke();
+        UiLanguageChanged?.Invoke();
+        RefreshUiMessages();
+        if (_workspaceLoaded)
+        {
+            FilterHardwareSensors();
+            RefreshHaEntities();
+            RefreshDiagnostics();
+        }
     }
 }

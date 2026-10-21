@@ -68,9 +68,9 @@ public partial class MainWindow
 
     private void UpdateSerialPlaybackStatus()
     {
-        this.FindControl<TextBlock>("SerialPlaybackStatus")!.Text = _serialSequence?.IsRunning == true
-            ? $"Serial sequence: {_serialSequence.CurrentPageId ?? "waiting for visible page"}"
-            : "Serial sequence stopped";
+        SetUiText("SerialPlaybackStatus", _serialSequence?.IsRunning == true
+            ? (UiMessage)$"Serial sequence: {PagePlaybackName(_serialSequence.CurrentPageId)}"
+            : "Serial sequence stopped");
     }
 
     private async Task TickSerialPlaybackAsync()
@@ -91,7 +91,7 @@ public partial class MainWindow
         catch (Exception ex)
         {
             StopSerialPlayback();
-            SetSerialStatus($"Serial sequence stopped after write error: {ex.Message}");
+            SetSerialStatus($"Serial sequence stopped after write error: {(UiMessage)ex.Message}");
         }
         finally { UpdateSerialControls(); }
     }

@@ -26,7 +26,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            SetVirtualStatus($"Workspace load failed: {ex.Message}");
+            SetVirtualStatus($"Workspace load failed: {(UiMessage)ex.Message}");
             _workspaceLoaded = true;
         }
     }
@@ -54,7 +54,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            SetVirtualStatus($"Home Assistant credential load failed: {ex.Message}");
+            SetVirtualStatus($"Home Assistant credential load failed: {(UiMessage)ex.Message}");
         }
         if (saved.CustomGlyphs.Count == 8)
         {
@@ -74,6 +74,7 @@ public partial class MainWindow
         _preferredTheme = saved.ThemeMode;
         _preferredLanguage = saved.LanguageMode;
         LoadSettingsPreferences();
+        FilterHardwareSensors();
         _fanSettings = PortableFanSettings.Normalize(saved.Fans);
         RefreshFanEditor();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked = saved.ProgramCustomGlyphsOnConnect;
@@ -118,7 +119,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            SetVirtualStatus($"Workspace save failed: {ex.Message}");
+            SetVirtualStatus($"Workspace save failed: {(UiMessage)ex.Message}");
             if (throwOnFailure) throw;
         }
     }

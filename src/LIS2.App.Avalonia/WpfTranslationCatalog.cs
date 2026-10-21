@@ -1091,6 +1091,9 @@ internal static class WpfTranslationCatalog
         return EnglishByTranslation.TryGetValue(value, out var source) ? source : value;
     }
 
+    internal static bool HasTranslation(string source, string language) =>
+        Translations.TryGetValue(language, out var dictionary) && dictionary.ContainsKey(source);
+
     internal static string Translate(string value, string language)
     {
         if (string.IsNullOrEmpty(value)) return value;

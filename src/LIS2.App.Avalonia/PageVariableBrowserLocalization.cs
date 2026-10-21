@@ -37,6 +37,8 @@ public static class PageVariableBrowserLocalization
         ["Select a variable, then insert it into the requested line."] = ["Variable auswählen und in die gewünschte Zeile einfügen.", "Sélectionnez une variable puis insérez-la dans la ligne.", "Bir değişken seçip istediğiniz satıra ekleyin.", "Выберите переменную и вставьте в нужную строку."],
     };
 
+    internal static bool HasTranslation(string source) => Texts.ContainsKey(source);
+
     public static string Translate(string english, string? language)
     {
         var index = language switch { "de" => 0, "fr" => 1, "tr" => 2, "ru" => 3, _ => -1 };

@@ -105,14 +105,14 @@ public partial class MainWindow
                 _serialDisplay = session;
                 session.FanFaulted += ex => global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 {
-                    SetFanStatus("HARDWARE FAN CONTROL FAILED; safety restoration attempted: " + ex.Message);
+                    SetFanStatus($"HARDWARE FAN CONTROL FAILED; safety restoration attempted: {(UiMessage)ex.Message}");
                     UpdateHardwareFanControls();
                 });
                 session = null;
                 SetSerialStatus($"Connected to {port} (display only; fans disabled).");
                 UpdateHardwareFanControls();
             }
-            catch (Exception ex) { SetSerialStatus($"Serial connect failed: {ex.Message}"); }
+            catch (Exception ex) { SetSerialStatus($"Serial connect failed: {(UiMessage)ex.Message}"); }
             finally
             {
                 if (session is not null) await session.DisposeAsync();
@@ -131,9 +131,9 @@ public partial class MainWindow
             var ports = SerialPortDiscovery.GetAvailablePorts();
             picker.ItemsSource = ports;
             picker.SelectedItem = ports.Contains(previous) ? previous : ports.FirstOrDefault();
-            SetSerialStatus(ports.Count == 0 ? "No serial ports found." : $"{ports.Count} serial port(s) available.");
+            SetSerialStatus(ports.Count == 0 ? "No serial ports found." : (UiMessage)$"{ports.Count} serial port(s) available.");
         }
-        catch (Exception ex) { SetSerialStatus($"Serial discovery failed: {ex.Message}"); }
+        catch (Exception ex) { SetSerialStatus($"Serial discovery failed: {(UiMessage)ex.Message}"); }
         UpdateSerialControls();
     }
 
@@ -153,7 +153,7 @@ public partial class MainWindow
                 await _serialSequence.StopAndDrainAsync();
             await action();
         }
-        catch (Exception ex) { SetSerialStatus($"Serial display error: {ex.Message}"); }
+        catch (Exception ex) { SetSerialStatus($"Serial display error: {(UiMessage)ex.Message}"); }
         finally { _serialBusy = false; UpdatePreview(); UpdateSerialControls(); }
     }
 
@@ -177,10 +177,10 @@ public partial class MainWindow
         this.FindControl<Button>("SerialApplyBrightness")!.IsEnabled = !_serialBusy && connected && !(_serialSequence?.IsRunning == true) && !(_serialSequence?.IsBusy == true);
     }
 
-    private void SetSerialStatus(string message)
+    private void SetSerialStatus(UiMessage message)
     {
-        this.FindControl<TextBlock>("SerialStatus")!.Text = message;
-        if (SerialSelected) this.FindControl<TextBlock>("DeviceActionStatus")!.Text = message;
+        SetUiText("SerialStatus", message);
+        if (SerialSelected) SetUiText("DeviceActionStatus", message);
     }
 
     private async Task CloseSerialDisplayAsync()

@@ -85,7 +85,7 @@ public partial class MainWindow
             catch (Exception ex)
             {
                 StopPagePlayback();
-                SetVirtualStatus($"Page sequence reload failed: {ex.Message}");
+                SetVirtualStatus($"Page sequence reload failed: {(UiMessage)ex.Message}");
             }
         }
 
@@ -99,7 +99,7 @@ public partial class MainWindow
             catch (Exception ex)
             {
                 StopSerialPlayback();
-                SetSerialStatus($"Serial page sequence reload failed: {ex.Message}");
+                SetSerialStatus($"Serial page sequence reload failed: {(UiMessage)ex.Message}");
             }
         }
     }
@@ -120,9 +120,9 @@ public partial class MainWindow
         this.FindControl<Button>("PagePlaybackStart")!.IsEnabled = !_busy && !_serialBusy && !_settingsTransportBusy && !_dashboardFansBusy &&
             (!running || (SerialSelected ? _eventStartedSerial : _eventStartedVirtual)) && sequence?.IsBusy != true && SelectedDisplay?.IsConnected == true;
         this.FindControl<Button>("PagePlaybackStop")!.IsEnabled = running;
-        this.FindControl<TextBlock>("PagePlaybackStatus")!.Text = running
-            ? $"Sequence running: {sequence?.CurrentPageId ?? "waiting for visible page"}"
-            : "Sequence stopped";
+        SetUiText("PagePlaybackStatus", running
+            ? (UiMessage)$"Sequence running: {PagePlaybackName(sequence?.CurrentPageId)}"
+            : "Sequence stopped");
     }
 
     private async Task TickPagePlaybackAsync()
@@ -142,7 +142,7 @@ public partial class MainWindow
         catch (Exception ex)
         {
             StopPagePlayback();
-            SetVirtualStatus($"Page sequence stopped: {ex.Message}");
+            SetVirtualStatus($"Page sequence stopped: {(UiMessage)ex.Message}");
         }
         finally { UpdatePagePlaybackControls(); UpdateVirtualControls(); }
     }

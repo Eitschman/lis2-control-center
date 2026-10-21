@@ -48,7 +48,7 @@ public partial class MainWindow
             }
             catch (Exception ex)
             {
-                SetVirtualStatus("Page preset error: " + ex.Message);
+                SetVirtualStatus($"Page preset error: {(UiMessage)ex.Message}");
             }
         };
         this.FindControl<Button>("PageAdd")!.Click += async (_, _) =>
@@ -371,7 +371,7 @@ public partial class MainWindow
                     }
                     catch (Exception ex)
                     {
-                        this.FindControl<TextBlock>("HaStatus")!.Text = $"Home Assistant startup failed: {ex.Message}";
+                        SetUiText("HaStatus", $"Home Assistant startup failed: {(UiMessage)ex.Message}");
                     }
                 }
             }
@@ -381,7 +381,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            SetVirtualStatus($"Clock source startup failed: {ex.Message}");
+            SetVirtualStatus($"Clock source startup failed: {(UiMessage)ex.Message}");
         }
     }
 
@@ -475,7 +475,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            SetVirtualStatus($"Page validation error: {ex.Message}");
+            SetVirtualStatus($"Page validation error: {(UiMessage)ex.Message}");
             return false;
         }
     }

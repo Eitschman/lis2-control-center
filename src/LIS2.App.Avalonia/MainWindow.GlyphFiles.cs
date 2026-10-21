@@ -7,7 +7,7 @@ public partial class MainWindow
 {
     private async Task LoadGlyphSetAsync()
     {
-        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions { Title = "Load glyph set" });
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions { Title = UiText("Load glyph set") });
         if (files.Count == 0) return;
         await using var stream = await files[0].OpenReadAsync();
         using var reader = new StreamReader(stream);
@@ -20,7 +20,7 @@ public partial class MainWindow
     {
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Save glyph set",
+            Title = UiText("Save glyph set"),
             SuggestedFileName = "lis2-glyphs.lis2glyphs.json"
         });
         if (file is null) return;

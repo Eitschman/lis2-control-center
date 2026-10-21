@@ -236,6 +236,7 @@ public sealed class DeviceUiTests
         {
             // Erst nach Erstellen der isolierten Datei darf das Fenster seinen Workspace laden.
             var ui = new Fixture();
+            saved.LanguageMode = "English";
             await ui.Store.SaveAsync(saved);
             if (token) ui.TokenStore.Save("isolated-test-token");
             ui.Window = new MainWindow(ui.Store, ui.TokenStore, false, _ =>

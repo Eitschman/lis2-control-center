@@ -1,6 +1,6 @@
 # PRP: LIS2 Control Center mit Avalonia
 
-Stand: 20.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
+Stand: 21.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
 Implementierungsstand: PORT-03; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
@@ -19,7 +19,7 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 345/345 Avalonia-Tests einschließlich Hilfesprache erfolgreich; der native Windows-Smoke ist im [Status](linux-port-status.md) eingegrenzt. Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
+Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 359/359 Avalonia-Tests einschließlich Menüseiten, Sprachwechsel und Hilfesprache erfolgreich; der native Windows-Smoke ist im [Status](linux-port-status.md) eingegrenzt. Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
 
 ## Implementierungsstand
 

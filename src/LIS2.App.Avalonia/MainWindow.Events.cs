@@ -46,7 +46,7 @@ public partial class MainWindow
         if (!int.TryParse(this.FindControl<TextBox>("EventDuration")!.Text, NumberStyles.Integer,
                 CultureInfo.InvariantCulture, out var seconds) || seconds is < 1 or > 3600)
         {
-            status.Text = "Duration must be between 1 and 3600 seconds.";
+            SetUiText(status, "Duration must be between 1 and 3600 seconds.");
             return;
         }
         var priority = warning ? 100 : this.FindControl<ComboBox>("EventPriority")!.SelectedIndex switch
@@ -69,18 +69,18 @@ public partial class MainWindow
         var list = this.FindControl<ListBox>("EventList")!;
         var selected = list.SelectedIndex;
         list.ItemsSource = snapshot.Select(item => new EventQueueRow(
-            item.Priority switch
+            UiText(item.Priority switch
             {
                 >= 200 => "Critical",
                 >= 100 => "Warning",
                 >= 50 => "Notice",
                 _ => "Info"
-            },
+            }),
             item.Frame.Line1.Trim() + " | " + item.Frame.Line2.Trim(),
             Math.Max(0, (int)Math.Ceiling((item.ExpiresAt - DateTimeOffset.UtcNow).TotalSeconds)) + "s"
         )).ToArray();
         list.SelectedIndex = selected >= 0 && selected < snapshot.Count ? selected : -1;
-        this.FindControl<TextBlock>("EventCount")!.Text = $"{snapshot.Count} events";
+        SetUiText("EventCount", $"{snapshot.Count} events");
     }
 
     private async Task UpdateEventOverlayAsync()
@@ -121,7 +121,7 @@ public partial class MainWindow
                     await TickPagePlaybackAsync();
                 if (_serialSequence?.IsRunning == true)
                     await TickSerialPlaybackAsync();
-                this.FindControl<TextBlock>("EventStatus")!.Text = "No active display events.";
+                SetUiText("EventStatus", "No active display events.");
                 return;
             }
 
@@ -162,14 +162,13 @@ public partial class MainWindow
                     await TickSerialPlaybackAsync();
             }
 
-            this.FindControl<TextBlock>("EventStatus")!.Text =
-                _virtualDevice.IsConnected || _serialDisplay?.IsConnected == true
+            SetUiText("EventStatus", _virtualDevice.IsConnected || _serialDisplay?.IsConnected == true
                     ? "Displaying highest-priority event on connected displays."
-                    : "Event queued; connect a virtual or serial LIS2 to display it.";
+                    : "Event queued; connect a virtual or serial LIS2 to display it.");
         }
         catch (Exception ex)
         {
-            this.FindControl<TextBlock>("EventStatus")!.Text = "Event display error: " + ex.Message;
+            SetUiText("EventStatus", $"Event display error: {(UiMessage)ex.Message}");
         }
         finally
         {

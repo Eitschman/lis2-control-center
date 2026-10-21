@@ -1,6 +1,6 @@
 # Inventar des Avalonia-Branches
 
-Stand: 20.10.2026. Implementierungsstand: PORT-03.
+Stand: 21.10.2026. Implementierungsstand: PORT-03.
 Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Konfiguration. Kein ZIP-Archiv als Implementierungsbaseline.
 
 ## Umfang und Projekte
@@ -88,6 +88,8 @@ Avalonia-Testgruppen:
 - Gemeinsame Quellenaktionen mit gültigen/ungültigen Entwürfen, beiden Sequenzen und persistierter leerer Seitenliste.
 
 `DeviceUiTests` startet zusätzlich das tatsächliche Fenster mit isolierten Stores und simuliertem seriellen Transport über Avalonia.Headless.XUnit und Skia. Geprüft werden Geräte-Buttons, Einstellungen/Import, manuelle Lüfter, Transportwechsel und Trennen per Tastatur. Dashboard, Display und Settings werden in Normal-/Mindestgröße gerendert. Hintergrundquellen sind in dieser Fixture ausdrücklich abgeschaltet. Paketstart, echter Desktop-/Tray-Lebenszyklus, DBus-/HA-/Player-/Sensorintegration und physische LIS2-Ausgabe sind damit nicht abgedeckt. Aktueller CI-Nachweis und Grenzen stehen im [Status](linux-port-status.md).
+
+`MenuLanguageUiTests` prüft die zehn Menüseiten und About in fünf Sprachen sowie Systemstandard, Meldungen beim Sprachwechsel, unveränderte Nutzdaten und das Speichern übersetzter Lüftermodi. `MenuTranslationCatalogTests` prüft statische AXAML-Texte einschließlich Tooltips/Platzhaltern, Formatargumente und verschachtelte Meldungen. `UiTranslations` ergänzt die vorhandenen Kataloge; `UiMessage` hält Textvorlagen und Daten getrennt. Hardwaretypen behalten ihre technischen Filterwerte. Windows-Traytexte folgen dem Sprachwechsel; native Traybedienung ist damit nicht geprüft.
 
 `RuntimeHardeningTests` und der native Desktop-Smoke ergänzen zehn Views, Hilfe/About, fehlende Medienanbieter, Diagnose und Shutdown. CI startet echte Windows- und Linux-X11-Prozesse. Der Tray-Menüpfad, OS-Abmeldung, native Dateiauswahl, Livequellen und extrahierte Pakete sind damit nicht nachgewiesen; beide Smokes verwenden ein virtuelles Gerät.
 

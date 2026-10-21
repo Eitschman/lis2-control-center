@@ -58,7 +58,7 @@ public partial class MainWindow
                     SetWindowsStartup(startup.IsChecked == true);
                     SetStartupStatus(startup.IsChecked == true ? "Windows startup enabled." : "Windows startup disabled.");
                 }
-                catch (Exception ex) { SetStartupStatus("Windows startup error: " + ex.Message); }
+                catch (Exception ex) { SetStartupStatus($"Windows startup error: {(UiMessage)ex.Message}"); }
             };
         }
         LoadSettingsPreferences();
@@ -125,12 +125,11 @@ public partial class MainWindow
             if (!string.IsNullOrWhiteSpace(previous) && !choices.Contains(previous)) choices.Add(previous);
             picker.ItemsSource = choices;
             picker.SelectedItem = previous ?? ports.FirstOrDefault();
-            this.FindControl<TextBlock>("SettingsTransportStatus")!.Text =
-                ports.Count == 0 ? "No serial ports found." : $"{ports.Count} serial port(s) found.";
+            SetUiText("SettingsTransportStatus", ports.Count == 0 ? "No serial ports found." : (UiMessage)$"{ports.Count} serial port(s) found.");
         }
         catch (Exception ex)
         {
-            this.FindControl<TextBlock>("SettingsTransportStatus")!.Text = "Port discovery failed: " + ex.Message;
+            SetUiText("SettingsTransportStatus", $"Port discovery failed: {(UiMessage)ex.Message}");
         }
     }
 
@@ -142,7 +141,7 @@ public partial class MainWindow
         var port = this.FindControl<ComboBox>("SettingsPortComboBox")!.SelectedItem as string;
         if (serial && string.IsNullOrWhiteSpace(port))
         {
-            status.Text = "Bitte zuerst einen seriellen Port auswählen.";
+            SetUiText(status, "Select a serial port first.");
             return;
         }
         _settingsTransportBusy = true;
@@ -167,11 +166,11 @@ public partial class MainWindow
                 await RunVirtualActionAsync(ConnectWithGlyphsAsync);
                 if (_virtualDevice.IsConnected) await StartPagePlaybackAsync();
             }
-            status.Text = SelectedDisplay?.IsConnected == true
-                ? serial ? "LIS2 verbunden: " + port : "Virtueller LIS2 verbunden."
-                : "Verbindungsaufbau fehlgeschlagen. " + this.FindControl<TextBlock>(serial ? "SerialStatus" : "VirtualStatus")!.Text;
+            SetUiText(status, SelectedDisplay?.IsConnected == true
+                ? serial ? (UiMessage)$"LIS2 connected: {port}" : "Virtual LIS2 connected."
+                : (UiMessage)$"Connection failed: {this.FindControl<TextBlock>(serial ? "SerialStatus" : "VirtualStatus")!.Text}");
         }
-        catch (Exception ex) { status.Text = "Verbindungsfehler: " + ex.Message; }
+        catch (Exception ex) { SetUiText(status, $"Connection error: {(UiMessage)ex.Message}"); }
         finally { _settingsTransportBusy = false; UpdateVirtualControls(); UpdateSerialControls(); }
     }
 
@@ -196,9 +195,9 @@ public partial class MainWindow
         try
         {
             await DisconnectTransportsAsync();
-            this.FindControl<TextBlock>("SettingsTransportStatus")!.Text = "LIS2 getrennt.";
+            SetUiText("SettingsTransportStatus", "LIS2 disconnected.");
         }
-        catch (Exception ex) { SetVirtualStatus("Trennen fehlgeschlagen: " + ex.Message); }
+        catch (Exception ex) { SetVirtualStatus($"Disconnect failed: {(UiMessage)ex.Message}"); }
         finally { _settingsTransportBusy = false; UpdateVirtualControls(); UpdateSerialControls(); }
     }
 
@@ -220,6 +219,5 @@ public partial class MainWindow
         key.SetValue(StartupValue, "\"" + executable + "\" --minimized");
     }
 
-    private void SetStartupStatus(string message) =>
-        this.FindControl<TextBlock>("SettingsStartupStatus")!.Text = message;
+    private void SetStartupStatus(UiMessage message) => SetUiText("SettingsStartupStatus", message);
 }

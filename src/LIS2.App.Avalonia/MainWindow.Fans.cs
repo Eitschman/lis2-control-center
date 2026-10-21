@@ -73,7 +73,7 @@ public partial class MainWindow
                 _fanEditorLoading = true;
                 try { this.FindControl<ComboBox>("FanChannelPicker")!.SelectedIndex = _fanEditingChannelIndex; }
                 finally { _fanEditorLoading = false; }
-                SetFanStatus($"Unsaved changes: {ex.Message}");
+                SetFanStatus($"Unsaved changes: {(UiMessage)ex.Message}");
             }
         };
         this.FindControl<Button>("FanSave")!.Click += async (_, _) =>
@@ -84,7 +84,7 @@ public partial class MainWindow
                 await SavePortableWorkspaceAsync(true);
                 SetFanStatus("Fan settings saved. Physical fan output requires separate authorization.");
             }
-            catch (Exception ex) { SetFanStatus($"Invalid fan settings: {ex.Message}"); }
+            catch (Exception ex) { SetFanStatus($"Invalid fan settings: {(UiMessage)ex.Message}"); }
         };
         this.FindControl<Button>("FanPreview")!.Click += async (_, _) =>
         {
@@ -100,22 +100,21 @@ public partial class MainWindow
                 await using var runtime = new FanRuntime(_fanPreviewSensors, _fanPreviewSink, _fanSettings.ToRuntimeChannels());
                 var state = await runtime.TickAsync();
                 UpdateFanOutputPreview(state.Channels.Select(channel => channel.OutputPercent).ToArray());
-                SetFanStatus("DRY RUN: " + string.Join(" / ", state.Channels.Select((c, i) =>
-                    $"Fan {i + 1}: {c.OutputPercent}%{(c.SensorValid ? "" : " (fail-safe)") }")));
+                SetFanStatus($"DRY RUN: {FormatFanOutputs(state.Channels)}");
             }
-            catch (Exception ex) { SetFanStatus($"Simulation failed: {ex.Message}"); }
+            catch (Exception ex) { SetFanStatus($"Simulation failed: {(UiMessage)ex.Message}"); }
         };
         this.FindControl<Button>("FanReadSensors")!.Click += (_, _) =>
         {
             try
             {
                 var values = _liveFanSensors.Snapshot();
-                this.FindControl<TextBlock>("FanSensorStatus")!.Text = values.Count == 0
+                SetUiText("FanSensorStatus", values.Count == 0
                     ? "No readable temperature sensors found. Missing keys trigger fail-safe."
                     : string.Join(Environment.NewLine, values.OrderBy(x => x.Key).Select(x =>
-                        x.Key + " = " + Convert.ToString(x.Value, CultureInfo.InvariantCulture) + " C"));
+                        x.Key + " = " + Convert.ToString(x.Value, CultureInfo.InvariantCulture) + " C")));
             }
-            catch (Exception ex) { this.FindControl<TextBlock>("FanSensorStatus")!.Text = "Sensor read failed: " + ex.Message; }
+            catch (Exception ex) { SetUiText("FanSensorStatus", $"Sensor read failed: {(UiMessage)ex.Message}"); }
         };
         this.FindControl<Button>("FanLivePreview")!.Click += async (_, _) =>
         {
@@ -125,11 +124,9 @@ public partial class MainWindow
                 await using var runtime = new FanRuntime(_liveFanSensors, _fanPreviewSink, _fanSettings.ToRuntimeChannels());
                 var state = await runtime.TickAsync();
                 UpdateFanOutputPreview(state.Channels.Select(channel => channel.OutputPercent).ToArray());
-                SetFanStatus("LIVE SENSOR DRY RUN (no hardware output): " +
-                    string.Join(" / ", state.Channels.Select((c, i) =>
-                        $"Fan {i + 1}: {c.OutputPercent}%{(c.SensorValid ? "" : " (fail-safe)")}")));
+                SetFanStatus($"LIVE SENSOR DRY RUN (no hardware output): {FormatFanOutputs(state.Channels)}");
             }
-            catch (Exception ex) { SetFanStatus("Live sensor preview failed: " + ex.Message); }
+            catch (Exception ex) { SetFanStatus($"Live sensor preview failed: {(UiMessage)ex.Message}"); }
         };
         this.FindControl<Button>("FanMonitorStart")!.Click += async (_, _) =>
         {
@@ -145,7 +142,7 @@ public partial class MainWindow
                 _fanMonitorTask = RunFanMonitorAsync(channels, stop.Token);
                 await Task.Yield();
             }
-            catch (Exception ex) { SetFanStatus("Monitor start failed: " + ex.Message); }
+            catch (Exception ex) { SetFanStatus($"Monitor start failed: {(UiMessage)ex.Message}"); }
         };
         this.FindControl<Button>("FanMonitorStop")!.Click += async (_, _) => await StopFanMonitorAsync();
         this.FindControl<CheckBox>("FanHardwareConsent")!.IsCheckedChanged += (_, _) => UpdateHardwareFanControls();
@@ -164,7 +161,7 @@ public partial class MainWindow
                 await session.StartFansAsync(_liveFanSensors, _fanSettings.ToRuntimeChannels());
                 SetFanStatus("LIVE SERIAL FAN CONTROL ACTIVE: four channels, 2-second loop, fail-safe enabled.");
             }
-            catch (Exception ex) { SetFanStatus("Hardware fan start failed: " + ex.Message); }
+            catch (Exception ex) { SetFanStatus($"Hardware fan start failed: {(UiMessage)ex.Message}"); }
             finally { _serialBusy = false; UpdateSerialControls(); }
         };
         this.FindControl<Button>("FanHardwareStop")!.Click += async (_, _) =>
@@ -178,7 +175,7 @@ public partial class MainWindow
                 await session.StopFansAsync();
                 SetFanStatus("Hardware fan control stopped; safety frame requested; display stays connected.");
             }
-            catch (Exception ex) { SetFanStatus("Hardware fan stop failed: " + ex.Message); }
+            catch (Exception ex) { SetFanStatus($"Hardware fan stop failed: {(UiMessage)ex.Message}"); }
             finally { _serialBusy = false; UpdateSerialControls(); }
         };
         this.FindControl<Button>("FanVirtualStart")!.Click += async (_, _) =>
@@ -198,23 +195,22 @@ public partial class MainWindow
                 pending = new AuthorizedFanRuntimeSession(transport, _fanPreviewSensors,
                     _fanSettings.ToRuntimeChannels());
                 pending.Faulted += ex => Dispatcher.UIThread.Post(() =>
-                    SetFanStatus("VIRTUAL FAN LOOP FAILED: " + ex.Message));
+                    SetFanStatus($"VIRTUAL FAN LOOP FAILED: {(UiMessage)ex.Message}"));
                 await pending.StartAsync(new[] { 100, 100, 100, 100 });
                 _virtualFanTransport = transport;
                 _virtualFanSession = pending;
                 pending = null;
                 this.FindControl<Button>("FanVirtualStart")!.IsEnabled = false;
                 this.FindControl<Button>("FanVirtualStop")!.IsEnabled = true;
-                SetFanStatus("VIRTUAL LIS2 FAN CONTROL: safe frame 100% sent first; " +
-                    "four-channel regulation active; no physical port opened.");
+                SetFanStatus($"VIRTUAL LIS2 FAN CONTROL: safe frame 100% sent first; four-channel regulation active; no physical port opened.");
             }
-            catch (Exception ex) { SetFanStatus("Virtual fan startup failed: " + ex.Message); }
+            catch (Exception ex) { SetFanStatus($"Virtual fan startup failed: {(UiMessage)ex.Message}"); }
             finally { if (pending is not null) await pending.DisposeAsync(); }
         };
         this.FindControl<Button>("FanVirtualStop")!.Click += async (_, _) =>
         {
             try { await StopVirtualFanSessionAsync(); }
-            catch (Exception ex) { SetFanStatus("Virtual fan shutdown failed: " + ex.Message); }
+            catch (Exception ex) { SetFanStatus($"Virtual fan shutdown failed: {(UiMessage)ex.Message}"); }
         };
         RefreshFanEditor();
     }
@@ -232,7 +228,7 @@ public partial class MainWindow
         stop.IsEnabled = connected && running && session?.FansBusy != true && !_serialBusy;
         UpdateDashboardFanControls();
         if (session?.FanFault is { } fault)
-            SetFanStatus("HARDWARE FAN CONTROL FAILED; safety restoration attempted: " + fault.Message);
+            SetFanStatus($"HARDWARE FAN CONTROL FAILED; safety restoration attempted: {(UiMessage)fault.Message}");
     }
 
     private async Task StopVirtualFanSessionAsync()
@@ -264,15 +260,13 @@ public partial class MainWindow
             do
             {
                 var state = await runtime.TickAsync(token);
-                await Dispatcher.UIThread.InvokeAsync(() => SetFanStatus(
-                    "CONTINUOUS DRY RUN (hardware disabled): " + string.Join(" / ",
-                    state.Channels.Select((c, i) => $"Fan {i + 1}: {c.OutputPercent}%{(c.SensorValid ? "" : " (fail-safe)")}"))));
+                await Dispatcher.UIThread.InvokeAsync(() => SetFanStatus($"CONTINUOUS DRY RUN (hardware disabled): {FormatFanOutputs(state.Channels)}"));
             } while (await timer.WaitForNextTickAsync(token));
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { }
         catch (Exception ex)
         {
-            await Dispatcher.UIThread.InvokeAsync(() => SetFanStatus("Fan monitor failed: " + ex.Message));
+            await Dispatcher.UIThread.InvokeAsync(() => SetFanStatus($"Fan monitor failed: {(UiMessage)ex.Message}"));
         }
         finally
         {
@@ -343,7 +337,7 @@ public partial class MainWindow
         var candidate = new PortableFanChannel
         {
             Name = this.FindControl<TextBox>("FanName")!.Text ?? "",
-            Mode = (this.FindControl<ComboBox>("FanModePicker")!.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Fixed",
+            Mode = new[] { "Fixed", "Curve", "Follow", "External", "Off" }[Math.Clamp(this.FindControl<ComboBox>("FanModePicker")!.SelectedIndex, 0, 4)],
             SensorKey = this.FindControl<TextBox>("FanSensorKey")!.Text,
             FixedPercent = ReadInt("FanFixed"), MinimumPercent = ReadInt("FanMinimum"),
             MaximumPercent = ReadInt("FanMaximum"), FailSafePercent = ReadInt("FanFailSafe"),
@@ -361,6 +355,12 @@ public partial class MainWindow
         _fanSettings.AutomaticControlEnabled = this.FindControl<CheckBox>("FanAutomatic")!.IsChecked == true;
     }
 
-    private void SetFanStatus(string message) =>
-        this.FindControl<TextBlock>("FanPreviewStatus")!.Text = message;
+    private static UiMessage FormatFanOutputs(IReadOnlyList<FanChannelState> channels) =>
+        UiMessage.Join(" / ", channels.Select((channel, index) =>
+        {
+            UiMessage safety = channel.SensorValid ? "" : " (fail-safe)";
+            return (UiMessage)$"Fan {index + 1}: {channel.OutputPercent}%{safety}";
+        }));
+
+    private void SetFanStatus(UiMessage message) => SetUiText("FanPreviewStatus", message);
 }

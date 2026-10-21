@@ -36,7 +36,7 @@ public partial class MainWindow
                     probe.Configure(this.FindControl<TextBox>("HaUrl")!.Text,
                         this.FindControl<TextBox>("HaToken")!.Text);
                     await probe.TestConnectionAsync();
-                    this.FindControl<TextBlock>("HaStatus")!.Text = "Home Assistant authentication succeeded.";
+                    SetUiText("HaStatus", "Home Assistant authentication succeeded.");
                 }
                 finally { await probe.DisposeAsync(); }
             });
@@ -100,7 +100,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            this.FindControl<TextBlock>("HaStatus")!.Text = $"Home Assistant error: {ex.Message}";
+            SetUiText("HaStatus", $"Home Assistant error: {(UiMessage)ex.Message}");
         }
         finally { _haActionBusy = false; }
     }
@@ -138,20 +138,20 @@ public partial class MainWindow
         var ha = _pageSources.HomeAssistant;
         var picker = this.FindControl<ComboBox>("HaEntityPicker")!;
         var previous = SelectedHaEntityId();
-        var domains = new[] { "All domains" }.Concat(ha.Entities.Select(e => e.Domain).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(d => d, StringComparer.OrdinalIgnoreCase)).ToArray();
+        var domains = new[] { UiText("All domains") }.Concat(ha.Entities.Select(e => e.Domain).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(d => d, StringComparer.OrdinalIgnoreCase)).ToArray();
         var domainPicker = this.FindControl<ComboBox>("HaDomainFilter")!;
-        var selectedDomain = domainPicker.SelectedItem as string ?? "All domains";
+        var selectedDomain = domainPicker.SelectedIndex > 0 ? domainPicker.SelectedItem as string : null;
         if (!domains.SequenceEqual(domainPicker.ItemsSource as string[] ?? Array.Empty<string>()))
         {
             _updatingHaSelection = true;
             domainPicker.ItemsSource = domains;
-            domainPicker.SelectedItem = domains.Contains(selectedDomain) ? selectedDomain : "All domains";
+            domainPicker.SelectedItem = selectedDomain is not null && domains.Contains(selectedDomain) ? selectedDomain : domains[0];
             _updatingHaSelection = false;
         }
         var filter = this.FindControl<TextBox>("HaEntityFilter")!.Text?.Trim() ?? "";
-        var domain = domainPicker.SelectedItem as string ?? "All domains";
+        var domain = domainPicker.SelectedIndex > 0 ? domainPicker.SelectedItem as string : null;
         var entities = ha.Entities
-            .Where(e => (domain == "All domains" || string.Equals(e.Domain, domain, StringComparison.OrdinalIgnoreCase))
+            .Where(e => (domain is null || string.Equals(e.Domain, domain, StringComparison.OrdinalIgnoreCase))
                 && (e.EntityId.Contains(filter, StringComparison.OrdinalIgnoreCase)
                     || e.FriendlyName.Contains(filter, StringComparison.OrdinalIgnoreCase)
                     || (_haPreferences.FirstOrDefault(p => string.Equals(p.EntityId, e.EntityId, StringComparison.OrdinalIgnoreCase))?.Alias?.Contains(filter, StringComparison.OrdinalIgnoreCase) ?? false)))
@@ -182,10 +182,11 @@ public partial class MainWindow
                 string.Equals(row.EntityId, picker.SelectedItem as string, StringComparison.OrdinalIgnoreCase));
         }
         finally { _updatingHaSelection = false; }
-        this.FindControl<TextBlock>("HaStatus")!.Text = ha.IsConnected
-            ? $"Home Assistant connected ({ha.HomeAssistantVersion ?? "unknown version"}), {ha.Entities.Count} entities, read-only."
-            : ha.LastError is { Length: > 0 } error ? $"Home Assistant disconnected: {error}"
-            : ha.IsConfigured ? "Home Assistant connecting..." : "Home Assistant not configured";
+        UiMessage version = ha.HomeAssistantVersion is null ? "unknown version" : (UiMessage)$"{ha.HomeAssistantVersion}";
+        SetUiText("HaStatus", ha.IsConnected
+            ? (UiMessage)$"Home Assistant connected ({version}), {ha.Entities.Count} entities, read-only."
+            : ha.LastError is { Length: > 0 } error ? (UiMessage)$"Home Assistant disconnected: {error}"
+            : ha.IsConfigured ? "Home Assistant connecting..." : "Home Assistant not configured");
     }
 
     private void RefreshHaSelection()
@@ -206,8 +207,8 @@ public partial class MainWindow
         }
         var entity = _pageSources.HomeAssistant.Entities.FirstOrDefault(e => e.EntityId == id);
         var preference = _haPreferences.FirstOrDefault(p => string.Equals(p.EntityId, id, StringComparison.OrdinalIgnoreCase));
-        this.FindControl<TextBlock>("HaSelectedEntity")!.Text = entity is null
-            ? "Select an entity above." : $"{entity.FriendlyName} ({entity.EntityId}) — {entity.State} {entity.Unit}";
+        SetUiText("HaSelectedEntity", entity is null
+            ? "Select an entity above." : (UiMessage)$"{entity.FriendlyName} ({entity.EntityId}) — {entity.State} {entity.Unit}");
         this.FindControl<TextBox>("HaAlias")!.Text = preference?.Alias ?? "";
         this.FindControl<CheckBox>("HaFavorite")!.IsChecked = preference?.IsFavorite == true;
         var attributes = entity?.Attributes.Keys.OrderBy(n => n, StringComparer.OrdinalIgnoreCase).ToArray() ?? Array.Empty<string>();

@@ -17,9 +17,9 @@ public partial class MainWindow
                 RefreshDiagnostics();
                 var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
                 {
-                    Title = "Export diagnostics report",
+                    Title = UiText("Export diagnostics report"),
                     SuggestedFileName = "lis2-diagnostics.txt",
-                    FileTypeChoices = new[] { new FilePickerFileType("Text report") { Patterns = new[] { "*.txt" } } }
+                    FileTypeChoices = new[] { new FilePickerFileType(UiText("Text report")) { Patterns = new[] { "*.txt" } } }
                 });
                 if (file is null) return;
                 await using var stream = await file.OpenWriteAsync();
@@ -29,7 +29,7 @@ public partial class MainWindow
             }
             catch (Exception ex)
             {
-                SetVirtualStatus("Diagnostics export failed: " + ex.Message);
+                SetVirtualStatus($"Diagnostics export failed: {(UiMessage)ex.Message}");
             }
         };
         RefreshDiagnostics();
@@ -40,10 +40,10 @@ public partial class MainWindow
         RefreshDiagnostics();
         return string.Join(Environment.NewLine + Environment.NewLine, new[]
         {
-            "Diagnostics Snapshot" + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsSnapshot")!.Text ?? ""),
-            "Virtual LIS2 state" + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsVirtualState")!.Text ?? ""),
-            "Decoded command history" + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsCommandHistory")!.Text ?? ""),
-            "Protocol Log" + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsProtocolLog")!.Text ?? "")
+            UiText("Diagnostics Snapshot") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsSnapshot")!.Text ?? ""),
+            UiText("Virtual LIS2 state") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsVirtualState")!.Text ?? ""),
+            UiText("Decoded command history") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsCommandHistory")!.Text ?? ""),
+            UiText("Protocol Log") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsProtocolLog")!.Text ?? "")
         });
     }
 
@@ -58,21 +58,21 @@ public partial class MainWindow
         var summary = RuntimeDiagnosticsSnapshot.Format(
             OperatingSystem.IsWindows() ? "Windows" : OperatingSystem.IsLinux() ? "Linux" : "Other",
             virtualConnected, serial, playback, fanMonitor, _virtualDevice.CommandCount,
-            _serialBusy, sensorRefresh, fanPreviewConfigured);
+            _serialBusy, sensorRefresh, fanPreviewConfigured, UiText);
         this.FindControl<TextBox>("DiagnosticsSnapshot")!.Text = summary;
         var state = _virtualDevice.State;
         var stateLines = new List<string>
         {
-            $"Line 1: [{state.Line1}]",
-            $"Line 2: [{state.Line2}]",
-            $"Brightness: {state.Brightness}",
-            $"Fans: {state.Fan1}% / {state.Fan2}% / {state.Fan3}% / {state.Fan4}%",
-            $"Rejected commands: {state.RejectedCommandCount}",
-            $"Last protocol error: {state.LastProtocolError ?? "-"}",
+            UiFormat($"Line 1: [{state.Line1}]"),
+            UiFormat($"Line 2: [{state.Line2}]"),
+            UiFormat($"Brightness: {state.Brightness}"),
+            UiFormat($"Fans: {state.Fan1}% / {state.Fan2}% / {state.Fan3}% / {state.Fan4}%"),
+            UiFormat($"Rejected commands: {state.RejectedCommandCount}"),
+            UiFormat($"Last protocol error: {state.LastProtocolError ?? "-"}"),
             ""
         };
         for (var slot = 0; slot < state.CustomCharacters.Length; slot++)
-            stateLines.Add($"Glyph {slot + 1}: " + string.Join(" ", state.CustomCharacters[slot].Select(value => value.ToString("X2", CultureInfo.InvariantCulture))));
+            stateLines.Add(UiFormat($"Glyph {slot + 1}: {string.Join(" ", state.CustomCharacters[slot].Select(value => value.ToString("X2", CultureInfo.InvariantCulture)))}"));
         this.FindControl<TextBox>("DiagnosticsVirtualState")!.Text = string.Join(Environment.NewLine, stateLines);
 
         var history = _virtualDevice.CommandHistory;
@@ -84,9 +84,9 @@ public partial class MainWindow
                 string.Join(" ", data.Select(value => value.ToString("X2", CultureInfo.InvariantCulture))) +
                 Environment.NewLine + "      " + Lis2Protocol.DescribeCommand(data)));
         this.FindControl<TextBox>("DiagnosticsProtocolLog")!.Text =
-            "Application" + Environment.NewLine + _applicationJournal.Snapshot() + Environment.NewLine +
-            "Virtual transport" + Environment.NewLine + _virtualDevice.Journal.Snapshot() + Environment.NewLine +
+            UiText("Application") + Environment.NewLine + _applicationJournal.Snapshot() + Environment.NewLine +
+            UiText("Virtual transport") + Environment.NewLine + _virtualDevice.Journal.Snapshot() + Environment.NewLine +
             string.Join(Environment.NewLine, _serialJournals.Select((journal, index) =>
-                "Serial session " + (index + 1) + Environment.NewLine + journal.Snapshot()));
+                UiFormat($"Serial session {index + 1}") + Environment.NewLine + journal.Snapshot()));
     }
 }

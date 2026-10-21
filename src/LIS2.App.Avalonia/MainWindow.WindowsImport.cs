@@ -14,7 +14,7 @@ public partial class MainWindow
             {
                 var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
                 {
-                    Title = "Import original Windows LIS2 settings.json (read-only)",
+                    Title = UiText("Import original Windows LIS2 settings.json (read-only)"),
                     AllowMultiple = false
                 });
                 if (files.Count == 0) return;
@@ -24,7 +24,7 @@ public partial class MainWindow
             }
             catch (Exception ex)
             {
-                this.FindControl<TextBlock>("WindowsImportStatus")!.Text = $"Import failed: {ex.Message}";
+                SetUiText("WindowsImportStatus", $"Import failed: {(UiMessage)ex.Message}");
             }
         };
     }
@@ -33,9 +33,9 @@ public partial class MainWindow
     internal async Task ImportWindowsSettingsAsync(string json)
     {
         if (_settingsTransportBusy || _dashboardFansBusy || _serialBusy || _busy)
-            throw new InvalidOperationException("Eine Geräteaktion läuft noch.");
+            throw new InvalidOperationException("A device action is still running.");
         if (!CommitPendingPageEditor())
-            throw new InvalidOperationException("Der Seitenentwurf enthält ungültige Einstellungen.");
+            throw new InvalidOperationException("Page draft contains invalid settings.");
         var before = CapturePortableWorkspace();
         var imported = WindowsSettingsImporter.Import(json, before);
         // Validate, persist first, then apply. No UI changes if persistence fails.
@@ -65,7 +65,7 @@ public partial class MainWindow
             }
             RefreshPageVariables();
             await _pageSources.ConfigureHomeAssistantAsync(null, null);
-            this.FindControl<TextBlock>("HaStatus")!.Text = "Import übernommen. Home-Assistant-Verbindung bei Bedarf neu verbinden; Token wurde nicht importiert.";
+            SetUiText("HaStatus", "Import applied. Reconnect Home Assistant if needed; token was not imported.");
         }
         finally
         {
@@ -74,7 +74,6 @@ public partial class MainWindow
             UpdateHardwareFanControls();
         }
         await ApplySettingsTransportAsync();
-        this.FindControl<TextBlock>("WindowsImportStatus")!.Text =
-            $"Imported {imported.Pages.Count} pages, {imported.CustomGlyphs.Count} glyphs; token not imported.";
+        SetUiText("WindowsImportStatus", $"Imported {imported.Pages.Count} pages, {imported.CustomGlyphs.Count} glyphs; token not imported.");
     }
 }

@@ -30,7 +30,9 @@
         <StackPanel Grid.Row="2" Margin="4,12,0,10" Spacing="7">
           <Separator />
           <Button Name="OpenHelp" Content="Help &amp; reference" HorizontalContentAlignment="Left" Padding="10,7" />
-          <Button Name="OpenAbout" Content="About LIS2 Control Center" HorizontalContentAlignment="Left" Padding="10,7" />
+          <Button Name="OpenAbout" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" Padding="10,7">
+            <TextBlock Text="About LIS2 Control Center" TextWrapping="Wrap" />
+          </Button>
         </StackPanel>
       </Grid>
     </Border>
@@ -41,7 +43,6 @@
             <TextBlock Name="SectionTitle" Text="Dashboard" FontSize="28" FontWeight="SemiBold" />
 
           </StackPanel>
-          <TextBlock Name="SectionDescription" Text="Overview and quick access to the most important functions." Opacity="0.65" TextWrapping="Wrap" />
         </StackPanel>
         <Border Grid.Column="1" Background="#DDF6E7" CornerRadius="14" Padding="14,9" VerticalAlignment="Top">
           <TextBlock Name="ConnectionText" Text="Disconnected" FontWeight="SemiBold" Foreground="#086D35" />
@@ -104,7 +105,7 @@
                 <TextBlock Name="DashboardFan4Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
               </Grid>
                 <WrapPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right">
-                  <CheckBox Name="DashboardFanConsent" Content="Serielle Lüfterausgabe freigeben" IsVisible="False" Margin="0,0,12,0"/>
+                  <CheckBox Name="DashboardFanConsent" Content="Authorize serial fan output" IsVisible="False" Margin="0,0,12,0"/>
                   <Button Name="DashboardFansApply" Content="Apply" MinWidth="110" IsEnabled="False"/>
                 </WrapPanel>
               </Grid>
@@ -197,9 +198,8 @@
     <ScrollViewer Name="PagesView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
         <TextBlock Text="Display pages" FontSize="18" FontWeight="SemiBold"/>
-        <TextBlock Text="Create, organize and preview pages on the LIS2 display." Opacity="0.7"/>
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
-          <Grid ColumnDefinitions="250,18,*">
+          <Grid Name="PageEditorLayout" ColumnDefinitions="250,18,*">
             <StackPanel Grid.Column="0" Spacing="9">
               <TextBlock Text="Pages" FontWeight="SemiBold" FontSize="16" />
               <TextBlock Text="Preset" Opacity="0.7"/>
@@ -234,16 +234,16 @@
                 <Button Name="PageDuplicate" Content="Duplicate" Margin="0,0,7,7" />
                 <Button Name="PageDelete" Content="Delete" />
               </WrapPanel>
-              <StackPanel Orientation="Horizontal" Spacing="7">
-                <Button Name="PageImport" Content="Load pages..." />
-                <Button Name="PageExport" Content="Save pages..." />
-              </StackPanel>
-              <StackPanel Orientation="Horizontal" Spacing="7">
-                <Button Name="PageUp" Content="↑  Move up" />
-                <Button Name="PageDown" Content="↓  Move down" />
-              </StackPanel>
+              <WrapPanel>
+                <Button Margin="0,0,7,7" Name="PageImport" Content="Load pages..." />
+                <Button Margin="0,0,7,7" Name="PageExport" Content="Save pages..." />
+              </WrapPanel>
+              <WrapPanel>
+                <Button Margin="0,0,7,7" Name="PageUp" Content="↑  Move up" />
+                <Button Margin="0,0,7,7" Name="PageDown" Content="↓  Move down" />
+              </WrapPanel>
             </StackPanel>
-            <StackPanel Grid.Column="2" Spacing="9">
+            <StackPanel Name="PagePropertiesPane" Grid.Column="2" Spacing="9">
               <TextBlock Text="Page properties" FontSize="16" FontWeight="SemiBold"/>
               <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="9" ColumnSpacing="10">
                 <TextBlock Grid.Row="0" Text="Name" />
@@ -253,45 +253,45 @@
                 <TextBlock Grid.Row="2" Text="Line 2" />
                 <TextBox Name="PageLine2" Grid.Row="2" Grid.Column="1" />
                 <TextBlock Grid.Row="3" Text="Duration (s)" />
-                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                  <TextBox Name="PageDuration" Width="90" />
-                  <TextBlock Text="Refresh (ms)" VerticalAlignment="Center" />
-                  <TextBox Name="PageRefresh" Width="90" />
-                </StackPanel>
+                <WrapPanel Grid.Row="3" Grid.Column="1">
+                  <TextBox Margin="0,0,8,8" Name="PageDuration" Width="90" />
+                  <TextBlock Margin="0,0,8,8" Text="Refresh (ms)" VerticalAlignment="Center" />
+                  <TextBox Margin="0,0,8,8" Name="PageRefresh" Width="90" />
+                </WrapPanel>
                 <TextBlock Grid.Row="4" Text="Visible when" />
                 <StackPanel Grid.Row="4" Grid.Column="1" Spacing="5">
-                  <StackPanel Orientation="Horizontal" Spacing="7">
-                    <TextBox Name="PageConditionKey" Width="185" Watermark="Template key" />
-                    <ComboBox Name="PageConditionOperator" Width="85">
+                  <WrapPanel>
+                    <TextBox Margin="0,0,7,7" Name="PageConditionKey" Width="185" Watermark="Template key" />
+                    <ComboBox Margin="0,0,7,7" Name="PageConditionOperator" Width="85">
                       <ComboBoxItem Content="=" /><ComboBoxItem Content="!=" />
                       <ComboBoxItem Content="&gt;" /><ComboBoxItem Content="&gt;=" />
                       <ComboBoxItem Content="&lt;" /><ComboBoxItem Content="&lt;=" />
                     </ComboBox>
-                    <TextBox Name="PageConditionValue" Width="110" Watermark="Value" />
-                    <Button Name="PageApplyCondition" Content="Apply condition" />
-                  </StackPanel>
+                    <TextBox Margin="0,0,7,7" Name="PageConditionValue" Width="110" Watermark="Value" />
+                    <Button Margin="0,0,7,7" Name="PageApplyCondition" Content="Apply condition" />
+                  </WrapPanel>
                   <TextBox Name="PageVisibility" Watermark="Raw visibility expression" />
                   <TextBlock Name="PageConditionStatus" Opacity="0.65" />
                 </StackPanel>
                 <TextBlock Grid.Row="5" Text="Overflow" />
-                <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                  <ComboBox Name="PageOverflow1" Width="135"><ComboBoxItem Content="PingPong" /><ComboBoxItem Content="Truncate" /><ComboBoxItem Content="Marquee" /></ComboBox>
-                  <ComboBox Name="PageOverflow2" Width="135"><ComboBoxItem Content="PingPong" /><ComboBoxItem Content="Truncate" /><ComboBoxItem Content="Marquee" /></ComboBox>
-                </StackPanel>
+                <WrapPanel Grid.Row="5" Grid.Column="1">
+                  <ComboBox Margin="0,0,8,8" Name="PageOverflow1" Width="135"><ComboBoxItem Content="PingPong" /><ComboBoxItem Content="Truncate" /><ComboBoxItem Content="Marquee" /></ComboBox>
+                  <ComboBox Margin="0,0,8,8" Name="PageOverflow2" Width="135"><ComboBoxItem Content="PingPong" /><ComboBoxItem Content="Truncate" /><ComboBoxItem Content="Marquee" /></ComboBox>
+                </WrapPanel>
                 <TextBlock Grid.Row="6" Text="Scroll timing" />
-                <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                  <TextBlock Text="Step (ms)" VerticalAlignment="Center" />
-                  <TextBox Name="PageScrollStep" Width="75" />
-                  <TextBlock Text="Edge pause (ms)" VerticalAlignment="Center" />
-                  <TextBox Name="PageScrollPause" Width="75" />
-                </StackPanel>
+                <WrapPanel Grid.Row="6" Grid.Column="1">
+                  <TextBlock Margin="0,0,8,8" Text="Step (ms)" VerticalAlignment="Center" />
+                  <TextBox Margin="0,0,8,8" Name="PageScrollStep" Width="75" />
+                  <TextBlock Margin="0,0,8,8" Text="Edge pause (ms)" VerticalAlignment="Center" />
+                  <TextBox Margin="0,0,8,8" Name="PageScrollPause" Width="75" />
+                </WrapPanel>
                 <TextBlock Grid.Row="7" Text="Enabled" />
                 <CheckBox Name="PageEnabled" Grid.Row="7" Grid.Column="1" />
               </Grid>
               <TextBlock Text="Insert template variable" FontWeight="SemiBold" Margin="0,6,0,0"/>
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Name="PageVariableBrowser" Content="Browse variables…" MinWidth="180" />
-              </StackPanel>
+              <WrapPanel>
+                <Button Margin="0,0,8,8" Name="PageVariableBrowser" Content="Browse variables…" MinWidth="180" />
+              </WrapPanel>
               <TextBlock Name="PageVariableStatus" Opacity="0.65" />
               <Separator Margin="0,5"/>
               <Grid ColumnDefinitions="*,Auto" Margin="0,5,0,0">
@@ -304,12 +304,12 @@
                   <TextBlock Name="PagePreview2" Width="384" FontFamily="Consolas" FontSize="30" Foreground="#F7FBFF" TextWrapping="NoWrap"/>
                 </StackPanel>
               </Border>
-              <StackPanel Orientation="Horizontal" Spacing="7">
-                <Button Name="PageSave" Content="Save page" />
-                <Button Name="PageTest" Content="Test event (5 s)" />
-                <Button Name="PagePlaybackStart" Content="Start sequence" />
-                <Button Name="PagePlaybackStop" Content="Stop sequence" IsEnabled="False" />
-              </StackPanel>
+              <WrapPanel>
+                <Button Margin="0,0,7,7" Name="PageSave" Content="Save page" />
+                <Button Margin="0,0,7,7" Name="PageTest" Content="Test event (5 s)" />
+                <Button Margin="0,0,7,7" Name="PagePlaybackStart" Content="Start sequence" />
+                <Button Margin="0,0,7,7" Name="PagePlaybackStop" Content="Stop sequence" IsEnabled="False" />
+              </WrapPanel>
             </StackPanel>
           </Grid>
         </Border>
@@ -402,32 +402,34 @@
     </ScrollViewer>
     <ScrollViewer Name="HomeAssistantView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
-        <TextBlock Text="Home Assistant" FontSize="18" FontWeight="SemiBold"/>
-        <TextBlock Text="Connect to Home Assistant and manage entity aliases, favorites and display templates." Opacity="0.7" TextWrapping="Wrap"/>
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Connection" FontWeight="SemiBold" FontSize="18" />
             <CheckBox Name="HaEnabled" Content="Enable Home Assistant" />
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock Text="URL" VerticalAlignment="Center" />
-              <TextBox Name="HaUrl" Width="310" Watermark="http://homeassistant.local:8123" />
-              <TextBlock Text="Token" VerticalAlignment="Center" />
-              <TextBox Name="HaToken" Width="240" PasswordChar="*" Watermark="Long-lived access token" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <Button Name="HaTest" Content="Test connection" />
-              <Button Name="HaConnect" Content="Save / reconnect" />
-            </StackPanel>
+            <WrapPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,8,8">
+                <TextBlock Text="URL" VerticalAlignment="Center" />
+                <TextBox Name="HaUrl" Width="310" Watermark="http://homeassistant.local:8123" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,8,8">
+                <TextBlock Text="Token" VerticalAlignment="Center" />
+                <TextBox Name="HaToken" Width="240" PasswordChar="*" Watermark="Long-lived access token" />
+              </StackPanel>
+            </WrapPanel>
+            <WrapPanel>
+              <Button Margin="0,0,8,8" Name="HaTest" Content="Test connection" />
+              <Button Margin="0,0,8,8" Name="HaConnect" Content="Save / reconnect" />
+            </WrapPanel>
           </StackPanel>
         </Border>
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Home Assistant entities" FontWeight="SemiBold" FontSize="18" />
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBox Name="HaEntityFilter" Width="240" Watermark="Search entity ID, friendly name or alias" />
-              <ComboBox Name="HaEntityPicker" Width="370" />
-              <ComboBox Name="HaDomainFilter" Width="140" />
-            </StackPanel>
+            <WrapPanel>
+              <TextBox Margin="0,0,8,8" Name="HaEntityFilter" Width="240" Watermark="Search entity ID, friendly name or alias" />
+              <ComboBox Margin="0,0,8,8" Name="HaEntityPicker" Width="370" />
+              <ComboBox Margin="0,0,8,8" Name="HaDomainFilter" Width="220" />
+            </WrapPanel>
             <TextBlock Name="HaStatus" Text="Not configured" TextWrapping="Wrap" />
             <Grid ColumnDefinitions="34,2.4*,1.4*,1*,1.7*" Margin="8,4,8,0">
               <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
@@ -455,11 +457,11 @@
           <StackPanel Spacing="10">
             <TextBlock Text="Selected entity" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="HaSelectedEntity" Text="Select an entity above." />
-            <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="Alias" VerticalAlignment="Center" /><TextBox Name="HaAlias" Width="220" /><CheckBox Name="HaFavorite" Content="Favorite" /><Button Name="HaSaveEntity" Content="Save entity" /></StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8"><Button Name="HaCopyKey" Content="Copy key" /><Button Name="HaCreatePage" Content="Create display page" /></StackPanel>
+            <WrapPanel><TextBlock Margin="0,0,8,8" Text="Alias" VerticalAlignment="Center" /><TextBox Margin="0,0,8,8" Name="HaAlias" Width="220" /><CheckBox Margin="0,0,8,8" Name="HaFavorite" Content="Favorite" /><Button Margin="0,0,8,8" Name="HaSaveEntity" Content="Save entity" /></WrapPanel>
+            <WrapPanel><Button Margin="0,0,8,8" Name="HaCopyKey" Content="Copy key" /><Button Margin="0,0,8,8" Name="HaCreatePage" Content="Create display page" /></WrapPanel>
             <TextBlock Text="Attributes" FontWeight="SemiBold" />
             <ListBox Name="HaAttributes" Height="150" />
-            <StackPanel Orientation="Horizontal" Spacing="8"><Button Name="HaCopyAttributeKey" Content="Copy key" /><Button Name="HaCreateAttributePage" Content="Create attribute page" /></StackPanel>
+            <WrapPanel><Button Margin="0,0,8,8" Name="HaCopyAttributeKey" Content="Copy key" /><Button Margin="0,0,8,8" Name="HaCreateAttributePage" Content="Create attribute page" /></WrapPanel>
 
           </StackPanel>
         </Border>
@@ -483,27 +485,27 @@
           <StackPanel Spacing="10">
             <TextBlock Text="Fan channel configuration" FontSize="17" FontWeight="SemiBold" />
             <TextBlock Text="Physical fan outputs require explicit authorization. Configuration and previews do not send hardware commands." TextWrapping="Wrap" />
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock Text="Channel" VerticalAlignment="Center" />
-              <ComboBox Name="FanChannelPicker" Width="140" SelectedIndex="0">
+            <WrapPanel>
+              <TextBlock Margin="0,0,8,8" Text="Channel" VerticalAlignment="Center" />
+              <ComboBox Margin="0,0,8,8" Name="FanChannelPicker" Width="140" SelectedIndex="0">
                 <ComboBoxItem Content="Fan 1" /><ComboBoxItem Content="Fan 2" />
                 <ComboBoxItem Content="Fan 3" /><ComboBoxItem Content="Fan 4" />
               </ComboBox>
-              <TextBlock Text="Mode" VerticalAlignment="Center" />
-              <ComboBox Name="FanModePicker" Width="140" SelectedIndex="0">
+              <TextBlock Margin="0,0,8,8" Text="Mode" VerticalAlignment="Center" />
+              <ComboBox Margin="0,0,8,8" Name="FanModePicker" Width="140" SelectedIndex="0">
                 <ComboBoxItem Content="Fixed" /><ComboBoxItem Content="Curve" />
                 <ComboBoxItem Content="Follow" /><ComboBoxItem Content="External" />
                 <ComboBoxItem Content="Off" />
               </ComboBox>
-            </StackPanel>
+            </WrapPanel>
             <Grid ColumnDefinitions="180,240" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
               <TextBlock Grid.Row="0" Text="Name" /><TextBox Grid.Row="0" Grid.Column="1" Name="FanName" />
               <TextBlock Grid.Row="1" Text="Sensor key" /><TextBox Grid.Row="1" Grid.Column="1" Name="FanSensorKey" />
               <TextBlock Grid.Row="2" Text="Fixed percent" /><TextBox Grid.Row="2" Grid.Column="1" Name="FanFixed" />
               <TextBlock Grid.Row="3" Text="Minimum / maximum" />
-              <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                <TextBox Name="FanMinimum" Width="110" /><TextBox Name="FanMaximum" Width="110" />
-              </StackPanel>
+              <WrapPanel Grid.Row="3" Grid.Column="1">
+                <TextBox Margin="0,0,8,8" Name="FanMinimum" Width="110" /><TextBox Margin="0,0,8,8" Name="FanMaximum" Width="110" />
+              </WrapPanel>
               <TextBlock Grid.Row="4" Text="Fail-safe percent" /><TextBox Grid.Row="4" Grid.Column="1" Name="FanFailSafe" />
               <TextBlock Grid.Row="5" Text="Hysteresis (C)" /><TextBox Grid.Row="5" Grid.Column="1" Name="FanHysteresis" />
               <TextBlock Grid.Row="6" Text="Allow stop" /><CheckBox Grid.Row="6" Grid.Column="1" Name="FanAllowStop" />
@@ -513,7 +515,7 @@
               <TextBox Grid.Column="0" Name="FanCurve" Height="154" HorizontalAlignment="Stretch" AcceptsReturn="True" />
               <Border Grid.Column="2" Background="{DynamicResource Lis2MutedCardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="5" Padding="8">
                 <StackPanel Spacing="5">
-                  <TextBlock Text="Fan curve preview · 0–100 %" FontSize="12" Opacity="0.7"/>
+                  <TextBlock Text="Fan curve preview · 0-100 %" FontSize="12" Opacity="0.7"/>
                   <Canvas Width="300" Height="116" ClipToBounds="True">
                     <Path Stroke="#CBD5E1" StrokeThickness="1" Data="M 0,0 L 0,110 L 298,110"/>
                     <Path Stroke="#CBD5E1" StrokeThickness="1" Data="M 0,55 L 298,55"/>
@@ -522,33 +524,35 @@
                 </StackPanel>
               </Border>
             </Grid>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock Text="Simulated sensor temperature" VerticalAlignment="Center" />
-              <TextBox Name="FanSimulatedTemperature" Width="90" Text="50" />
-              <Button Name="FanSave" Content="Save fan channel" />
-              <Button Name="FanPreview" Content="Simulate all four channels" />
-            </StackPanel>
+            <WrapPanel>
+              <TextBlock Margin="0,0,8,8" Text="Simulated sensor temperature" VerticalAlignment="Center" />
+              <TextBox Margin="0,0,8,8" Name="FanSimulatedTemperature" Width="90" Text="50" />
+              <Button Margin="0,0,8,8" Name="FanSave" Content="Save fan channel" />
+              <Button Margin="0,0,8,8" Name="FanPreview" Content="Simulate all four channels" />
+            </WrapPanel>
             <TextBlock Text="System temperature sensors (Linux hwmon, read-only)" FontWeight="SemiBold" />
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <Button Name="FanReadSensors" Content="List detected sensors" />
-              <Button Name="FanLivePreview" Content="Preview with real sensor values (dry run)" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <Button Name="FanMonitorStart" Content="Start continuous sensor preview (dry run)" />
-              <Button Name="FanMonitorStop" Content="Stop preview" IsEnabled="False" />
-            </StackPanel>
+            <WrapPanel>
+              <Button Margin="0,0,8,8" Name="FanReadSensors" Content="List detected sensors" />
+              <Button Margin="0,0,8,8" Name="FanLivePreview" Content="Preview with real sensor values (dry run)" />
+            </WrapPanel>
+            <WrapPanel>
+              <Button Margin="0,0,8,8" Name="FanMonitorStart" Content="Start continuous sensor preview (dry run)" />
+              <Button Margin="0,0,8,8" Name="FanMonitorStop" Content="Stop preview" IsEnabled="False" />
+            </WrapPanel>
             <TextBlock Text="Virtual LIS2 protocol integration (no physical hardware)" FontWeight="SemiBold" />
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <Button Name="FanVirtualStart" Content="Start virtual four-fan controller" />
-              <Button Name="FanVirtualStop" Content="Stop and restore safety frame" IsEnabled="False" />
-            </StackPanel>
+            <WrapPanel>
+              <Button Margin="0,0,8,8" Name="FanVirtualStart" Content="Start virtual four-fan controller" />
+              <Button Margin="0,0,8,8" Name="FanVirtualStop" Content="Stop and restore safety frame" IsEnabled="False" />
+            </WrapPanel>
             <TextBlock Text="Physical LIS2 fans: explicit per-connection authorization (experimental)" FontWeight="SemiBold" />
             <TextBlock Text="Only use with a connected LIS2 and verified fan wiring. The first fan command sets all four fans to 100%. Stopping restores 100%. This feature is never auto-enabled by saved settings." TextWrapping="Wrap" />
-            <CheckBox Name="FanHardwareConsent" Content="I explicitly authorize physical fan output for this connection" />
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <Button Name="FanHardwareStart" Content="Enable physical four-fan control" IsEnabled="False" />
-              <Button Name="FanHardwareStop" Content="Stop and restore 100% safety frame" IsEnabled="False" />
-            </StackPanel>
+            <CheckBox Name="FanHardwareConsent">
+              <TextBlock Text="I explicitly authorize physical fan output for this connection" TextWrapping="Wrap" />
+            </CheckBox>
+            <WrapPanel>
+              <Button Margin="0,0,8,8" Name="FanHardwareStart" Content="Enable physical four-fan control" IsEnabled="False" />
+              <Button Margin="0,0,8,8" Name="FanHardwareStop" Content="Stop and restore 100% safety frame" IsEnabled="False" />
+            </WrapPanel>
             <TextBlock Name="FanSensorStatus" Text="Sensor discovery has not run." TextWrapping="Wrap" />
             <TextBlock Name="FanPreviewStatus" Text="Physical fan output disabled." TextWrapping="Wrap" />
           </StackPanel>
@@ -559,12 +563,11 @@
         <StackPanel Spacing="12">
           <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16"><StackPanel Spacing="12">
           <TextBlock Text="Hardware monitoring" FontSize="18" FontWeight="SemiBold" />
-          <TextBlock Text="Read-only sensors from the current operating system. Refresh to capture a new snapshot; no LIS2 hardware commands are sent." TextWrapping="Wrap" />
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Name="HardwareRefresh" Content="Refresh sensors" />
-            <Button Name="HardwareAutoRefresh" Content="Start live updates" />
-            <TextBox Name="HardwareSearch" Width="220" Watermark="Search alias or sensor key" />
-            <ComboBox Name="HardwareTypeFilter" Width="160" SelectedIndex="0">
+          <WrapPanel>
+            <Button Margin="0,0,8,8" Name="HardwareRefresh" Content="Refresh sensors" />
+            <Button Margin="0,0,8,8" Name="HardwareAutoRefresh" Content="Start live updates" />
+            <TextBox Margin="0,0,8,8" Name="HardwareSearch" Width="220" Watermark="Search alias or sensor key" />
+            <ComboBox Margin="0,0,8,8" Name="HardwareTypeFilter" Width="160" SelectedIndex="0">
               <ComboBoxItem Content="All types" />
               <ComboBoxItem Content="Favorites" />
               <ComboBoxItem Content="Unavailable" />
@@ -578,7 +581,7 @@
               <ComboBoxItem Content="Throughput" />
               <ComboBoxItem Content="Other" />
             </ComboBox>
-          </StackPanel>
+          </WrapPanel>
           <CheckBox Name="HardwareFavoritesOnly" Content="Favorites only" />
                     <Grid ColumnDefinitions="34,2.1*,1.1*,1*,2.8*" Margin="8,0,8,4"><TextBlock Grid.Column="0" Text="★" /><TextBlock Grid.Column="1" Text="Sensor" FontWeight="SemiBold" /><TextBlock Grid.Column="2" Text="Type" FontWeight="SemiBold" /><TextBlock Grid.Column="3" Text="Value" FontWeight="SemiBold" /><TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold" /></Grid>
           <ListBox Name="HardwareSensorList" MinHeight="260" MaxHeight="450">
@@ -595,7 +598,7 @@
                     <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
                     <TextBlock Text="{Binding SensorName}" FontSize="11" Opacity="0.65" TextTrimming="CharacterEllipsis" />
                   </StackPanel>
-                  <TextBlock Grid.Column="2" Text="{Binding SensorType}" />
+                  <TextBlock Grid.Column="2" Text="{Binding DisplaySensorType}" />
                   <TextBlock Grid.Column="3" Text="{Binding DisplayValue}" FontFamily="Consolas" />
                   <TextBlock Grid.Column="4" Text="{Binding Key}" FontFamily="Consolas" Opacity="0.65" TextTrimming="CharacterEllipsis" />
                 </Grid>
@@ -607,31 +610,30 @@
           <StackPanel Spacing="10">
             <TextBlock Text="Selected sensor / fan assignment" FontSize="18" FontWeight="SemiBold"/>
           <TextBlock Name="HardwareSelectedSensor" Text="Select a sensor above." TextWrapping="Wrap" />
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBox Name="HardwareAlias" Width="260" Watermark="Alias for selected sensor" />
-            <CheckBox Name="HardwareFavorite" Content="Favorite" VerticalAlignment="Center" />
-            <Button Name="HardwareSavePreference" Content="Save sensor preference" />
-          </StackPanel>
+          <WrapPanel>
+            <TextBox Margin="0,0,8,8" Name="HardwareAlias" Width="260" Watermark="Alias for selected sensor" />
+            <CheckBox Margin="0,0,8,8" Name="HardwareFavorite" Content="Favorite" VerticalAlignment="Center" />
+            <Button Margin="0,0,8,8" Name="HardwareSavePreference" Content="Save sensor preference" />
+          </WrapPanel>
           <TextBlock Name="HardwareSensorStatus" Text="Refresh to discover available sensors." TextWrapping="Wrap" />
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Name="HardwareUseForFan" Content="Use for Fan 1" IsEnabled="False" />
-            <Button Name="HardwareUseForFan2" Content="Fan 2" IsEnabled="False" />
-            <Button Name="HardwareUseForFan3" Content="Fan 3" IsEnabled="False" />
-            <Button Name="HardwareUseForFan4" Content="Fan 4" IsEnabled="False" />
-          </StackPanel>
+          <WrapPanel>
+            <Button Margin="0,0,8,8" Name="HardwareUseForFan" Content="Use for Fan 1" IsEnabled="False" />
+            <Button Margin="0,0,8,8" Name="HardwareUseForFan2" Content="Fan 2" IsEnabled="False" />
+            <Button Margin="0,0,8,8" Name="HardwareUseForFan3" Content="Fan 3" IsEnabled="False" />
+            <Button Margin="0,0,8,8" Name="HardwareUseForFan4" Content="Fan 4" IsEnabled="False" />
+          </WrapPanel>
           <TextBlock Text="Sensor assignment updates the fan editor but is not saved until you explicitly save fan configuration. Physical fan output remains disabled unless separately authorized." TextWrapping="Wrap" />
         </StackPanel></Border>
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
           <TextBlock Text="Display presets" FontSize="16" FontWeight="SemiBold" />
-          <TextBlock Text="Create editable display pages from available hardware sensor keys. Pages are saved to the portable workspace; no LIS2 device commands are sent." TextWrapping="Wrap" />
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Name="HardwarePresetCPU" Content="CPU" />
-            <Button Name="HardwarePresetGPU" Content="GPU" />
-            <Button Name="HardwarePresetMemory" Content="Memory" />
-            <Button Name="HardwarePresetTemperatures" Content="Temperatures" />
-            <Button Name="HardwarePresetFans" Content="Fans" />
-          </StackPanel>
+          <WrapPanel>
+            <Button Margin="0,0,8,8" Name="HardwarePresetCPU" Content="CPU" />
+            <Button Margin="0,0,8,8" Name="HardwarePresetGPU" Content="GPU" />
+            <Button Margin="0,0,8,8" Name="HardwarePresetMemory" Content="Memory" />
+            <Button Margin="0,0,8,8" Name="HardwarePresetTemperatures" Content="Temperatures" />
+            <Button Margin="0,0,8,8" Name="HardwarePresetFans" Content="Fans" />
+          </WrapPanel>
         </StackPanel></Border>
         </StackPanel>
       </ScrollViewer>
@@ -732,7 +734,7 @@
               <WrapPanel>
                 <Button Name="SettingsRefreshPorts" Content="Refresh" Margin="0,0,8,0"/>
                 <Button Name="SettingsApplyTransport" Content="Apply / reconnect" Margin="0,0,8,0"/>
-                <Button Name="SettingsDisconnectTransport" Content="Trennen"/>
+                <Button Name="SettingsDisconnectTransport" Content="Disconnect"/>
               </WrapPanel>
               <TextBlock Name="SettingsTransportStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
@@ -769,7 +771,7 @@
           </Border>
           <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="12">
-            <TextBlock Text="Windows-Einstellungen" FontSize="18" FontWeight="SemiBold"/>
+            <TextBlock Text="Windows settings" FontSize="18" FontWeight="SemiBold"/>
             <Button Name="ImportWindowsSettings" Content="Import Windows settings.json..." />
             <TextBlock Name="WindowsImportStatus" Opacity="0.7" TextWrapping="Wrap" />
           </StackPanel>
@@ -793,16 +795,16 @@
           <TextBlock Name="SerialPlaybackStatus" Text="Serial sequence stopped" TextWrapping="Wrap" />
           <Button Name="SerialSendPage" Content="Send selected page" HorizontalAlignment="Left" IsEnabled="False" />
           <Button Name="SerialSendGlyphs" Content="Program 8 glyphs" HorizontalAlignment="Left" IsEnabled="False" />
-          <StackPanel Orientation="Horizontal" Spacing="5">
-            <TextBlock Text="Brightness" VerticalAlignment="Center" />
-            <ComboBox Name="SerialBrightness" SelectedIndex="0" Width="75">
+          <WrapPanel>
+            <TextBlock Margin="0,0,5,5" Text="Brightness" VerticalAlignment="Center" />
+            <ComboBox Margin="0,0,5,5" Name="SerialBrightness" SelectedIndex="0" Width="75">
               <ComboBoxItem Content="100%" />
               <ComboBoxItem Content="75%" />
               <ComboBoxItem Content="50%" />
               <ComboBoxItem Content="25%" />
             </ComboBox>
-            <Button Name="SerialApplyBrightness" Content="Apply" IsEnabled="False" />
-          </StackPanel>
+            <Button Margin="0,0,5,5" Name="SerialApplyBrightness" Content="Apply" IsEnabled="False" />
+          </WrapPanel>
           <Button Name="SerialClear" Content="Clear serial display" HorizontalAlignment="Left" IsEnabled="False" />
           <TextBlock Name="SerialStatus" Text="Serial display disconnected; fan control unavailable." TextWrapping="Wrap" />
           <Button Name="VirtualConnect" Content="Connect virtual LIS2" HorizontalAlignment="Left" />

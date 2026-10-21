@@ -62,10 +62,10 @@ public partial class MainWindow
                     this.FindControl<Slider>($"DashboardFan{channel + 1}Slider")!.Value = outputs[channel];
                 }
                 await SavePortableWorkspaceAsync(true);
-                SetVirtualStatus("Lüfterausgabe: " + string.Join(" / ", outputs.Select(value => value + " %")));
+                SetVirtualStatus($"Fan output: {string.Join(" / ", outputs.Select(value => value + " %"))}");
             });
         }
-        catch (Exception ex) { SetVirtualStatus("Lüfterausgabe fehlgeschlagen: " + ex.Message); }
+        catch (Exception ex) { SetVirtualStatus($"Fan output failed: {(UiMessage)ex.Message}"); }
         finally { _dashboardFansBusy = false; UpdateHardwareFanControls(); UpdateVirtualControls(); }
     }
 }

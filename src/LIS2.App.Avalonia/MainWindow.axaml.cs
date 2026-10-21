@@ -34,6 +34,7 @@ public partial class MainWindow : Window
             OperatingSystem.IsWindows() ? new WindowsHardwareFanSensors() :
             new SnapshotFanSensors(() => new Dictionary<string, object?>());
         InitializeComponent();
+        SizeChanged += (_, _) => UpdatePageEditorLayout();
 
         for (var i = 0; i < SectionNames.Length; i++)
         {
@@ -195,12 +196,12 @@ public partial class MainWindow : Window
             await action();
             UpdatePreview();
             SetVirtualStatus(_virtualDevice.IsConnected
-                ? $"Virtual LIS2: connected ({_virtualDevice.CommandCount} commands)"
+                ? (UiMessage)$"Virtual LIS2: connected ({_virtualDevice.CommandCount} commands)"
                 : "Virtual LIS2: disconnected");
         }
         catch (Exception ex)
         {
-            SetVirtualStatus($"Virtual LIS2 error: {ex.Message}");
+            SetVirtualStatus($"Virtual LIS2 error: {(UiMessage)ex.Message}");
         }
         finally
         {
@@ -235,7 +236,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            SetVirtualStatus($"Virtual LIS2 error: {ex.Message}");
+            SetVirtualStatus($"Virtual LIS2 error: {(UiMessage)ex.Message}");
         }
     }
 
@@ -253,13 +254,13 @@ public partial class MainWindow : Window
         RefreshDiagnostics();
     }
 
-    private void SetVirtualStatus(string message)
+    private void SetVirtualStatus(UiMessage message)
     {
-        _applicationJournal.Record("Application", message);
+        _applicationJournal.Record("Application", message.Render("en"));
         var status = this.FindControl<TextBlock>("VirtualStatus");
         if (status is not null)
-            status.Text = message;
-        this.FindControl<TextBlock>("DeviceActionStatus")!.Text = message;
+            SetUiText(status, message);
+        SetUiText("DeviceActionStatus", message);
     }
 
     private void UpdateVirtualControls()
@@ -275,8 +276,8 @@ public partial class MainWindow : Window
             this.FindControl<Button>(name)!.IsEnabled = !_busy && !_serialBusy && !_settingsTransportBusy && !playbackBusy && connected;
         var badge = this.FindControl<TextBlock>("ConnectionText");
         if (badge is not null)
-            badge.Text = connected ? SerialSelected ? "Connected (Serial)" : "Connected (Virtual)" : "Disconnected";
-        this.FindControl<TextBlock>("TransportSummaryText")!.Text = SerialSelected ? "Serial: " + _preferredPortName : "Virtual LIS2";
+            SetUiText(badge, connected ? SerialSelected ? "Connected (Serial)" : "Connected (Virtual)" : "Disconnected");
+        SetUiText("TransportSummaryText", SerialSelected ? (UiMessage)$"Serial: {_preferredPortName}" : "Virtual LIS2");
         this.FindControl<Button>("SettingsApplyTransport")!.IsEnabled = !_settingsTransportBusy && !_serialBusy && !_busy && !_dashboardFansBusy;
         this.FindControl<Button>("ImportWindowsSettings")!.IsEnabled = !_settingsTransportBusy && !_serialBusy && !_busy && !_dashboardFansBusy;
         this.FindControl<Button>("SettingsDisconnectTransport")!.IsEnabled = connected && !_settingsTransportBusy && !_serialBusy && !_busy && !_dashboardFansBusy;
@@ -287,18 +288,27 @@ public partial class MainWindow : Window
         UpdateDashboardFanControls();
         var virtualState = this.FindControl<TextBlock>("VirtualStateText");
         if (virtualState is not null)
-            virtualState.Text = SerialSelected
-                ? connected ? "LIS2 verbunden: " + _preferredPortName : "LIS2 getrennt: " + _preferredPortName
-                : CurrentUiLanguage() == "de"
-                ? _virtualDevice.IsConnected
-                    ? $"Virtueller LIS2 verbunden. Befehle: {_virtualDevice.CommandCount}."
-                    : "Status verfügbar, wenn der virtuelle Transport aktiv ist."
+            SetUiText(virtualState, SerialSelected
+                ? connected ? (UiMessage)$"LIS2 connected: {_preferredPortName}" : (UiMessage)$"LIS2 disconnected: {_preferredPortName}"
                 : _virtualDevice.IsConnected
-                    ? $"Virtual LIS2 connected. Commands: {_virtualDevice.CommandCount}."
-                    : "State available when Virtual transport is active.";
+                    ? (UiMessage)$"Virtual LIS2 connected. Commands: {_virtualDevice.CommandCount}."
+                    : "State available when Virtual transport is active.");
     }
 
     private static readonly string[] SectionNames = { "Dashboard", "Display", "Pages", "Media", "Events", "Hardware", "Fan Control", "Settings", "Diagnostics", "Home Assistant" };
+
+    /// <summary>Bei schmalen Fenstern bleiben Seitenliste und Editor untereinander zugänglich.</summary>
+    private void UpdatePageEditorLayout()
+    {
+        var stacked = Bounds.Width < 1200;
+        var layout = this.FindControl<Grid>("PageEditorLayout")!;
+        var editor = this.FindControl<StackPanel>("PagePropertiesPane")!;
+        layout.ColumnDefinitions = new ColumnDefinitions(stacked ? "*" : "250,18,*");
+        layout.RowDefinitions = new RowDefinitions(stacked ? "Auto,Auto" : "Auto");
+        Grid.SetColumn(editor, stacked ? 0 : 2);
+        Grid.SetRow(editor, stacked ? 1 : 0);
+        editor.Margin = new global::Avalonia.Thickness(0, stacked ? 18 : 0, 0, 0);
+    }
     private int _selectedSection;
 
     private void NavigateTo(int index)
@@ -326,7 +336,6 @@ public partial class MainWindow : Window
             button.FontWeight = i == _selectedSection ? global::Avalonia.Media.FontWeight.SemiBold : global::Avalonia.Media.FontWeight.Normal;
         }
         var title = this.FindControl<TextBlock>("SectionTitle");
-        var description = this.FindControl<TextBlock>("SectionDescription");
 
         if (title is not null)
             title.Text = SettingsTranslate(section);
@@ -350,26 +359,10 @@ public partial class MainWindow : Window
             {
                 System.Diagnostics.Trace.TraceError("Media navigation failed: {0}", ex);
                 var status = this.FindControl<TextBlock>("WindowsMediaStatus");
-                if (status is not null) status.Text = "Media error: " + ex.GetBaseException().Message;
+                if (status is not null) SetUiText(status, $"Provider error: {ex.GetBaseException().Message}");
             }
         }
 
-        if (description is not null)
-            description.IsVisible = section is not ("Dashboard" or "Display" or "Settings" or "Diagnostics" or "Media");
-        if (description is not null)
-            description.Text = TranslateSectionDescription(section, section switch
-            {
-                "Dashboard" => "Overview and quick access to the most important functions.",
-                "Display" => "Quick display tests, custom characters and brightness.",
-                "Pages" => "Manage display pages, templates, conditions and live preview.",
-                "Media" => "View active media players, track metadata and audio telemetry.",
-                "Events" => "Compose and manage prioritized, timed display events.",
-                "Hardware" => "Browse platform sensors, aliases and fan assignments.",
-                "Fan Control" => "Configure four fan channels and inspect regulation curves.",
-                "Settings" => "LIS2 transport, COM port and Windows startup behavior.",
-                "Diagnostics" => "Inspect the virtual device, commands and protocol log.",
-                "Home Assistant" => "Connect entities, favorites and templates to the display.",
-                _ => ""
-            });
+
     }
 }

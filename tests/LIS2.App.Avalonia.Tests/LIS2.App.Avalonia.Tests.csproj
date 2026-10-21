@@ -15,5 +15,6 @@
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
+    <EmbeddedResource Include="../../src/LIS2.App.Avalonia/MainWindow.axaml" LogicalName="MainWindow.axaml" />
   </ItemGroup>
 </Project>

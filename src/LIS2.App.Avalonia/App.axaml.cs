@@ -71,6 +71,13 @@ public partial class App : Application
         var exit = new NativeMenuItem("Exit");
         exit.Click += async (_, _) => await ExitAsync(desktop, window);
         menu.Add(exit);
+        void LocalizeTray()
+        {
+            show.Header = window.UiText("Open LIS2 Control Center");
+            exit.Header = window.UiText("Exit");
+        }
+        window.UiLanguageChanged += LocalizeTray;
+        LocalizeTray();
         _trayIcon = new TrayIcon { Icon = icon, ToolTipText = "LIS2 Control Center", Menu = menu, IsVisible = true };
         _trayIcon.Clicked += (_, _) => RestoreWindow(window);
         TrayIcon.SetIcons(this, new TrayIcons { _trayIcon });

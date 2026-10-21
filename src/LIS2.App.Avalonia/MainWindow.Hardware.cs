@@ -24,8 +24,7 @@ public partial class MainWindow
             // sampling required by page templates throughout the application.
             _hardwareListLiveUpdates = !_hardwareListLiveUpdates;
             if (_hardwareListLiveUpdates) RefreshHardwareSensors();
-            this.FindControl<Button>("HardwareAutoRefresh")!.Content =
-                _hardwareListLiveUpdates ? "Stop live updates" : "Start live updates";
+            SetUiButton("HardwareAutoRefresh", _hardwareListLiveUpdates ? "Stop live updates" : "Start live updates");
         };
         this.FindControl<TextBox>("HardwareSearch")!.TextChanged += (_, _) => FilterHardwareSensors();
         this.FindControl<ComboBox>("HardwareTypeFilter")!.SelectionChanged += (_, _) => FilterHardwareSensors();
@@ -55,7 +54,7 @@ public partial class MainWindow
                 preference.IsFavorite = oldFavorite;
                 if (created)
                     _hardwarePreferences.Remove(preference);
-                this.FindControl<TextBlock>("HardwareSensorStatus")!.Text = "Preference save failed: " + ex.Message;
+                SetUiText("HardwareSensorStatus", $"Preference save failed: {(UiMessage)ex.Message}");
             }
         };
         this.FindControl<ListBox>("HardwareSensorList")!.SelectionChanged += (_, _) =>
@@ -73,8 +72,7 @@ public partial class MainWindow
             var preference = _hardwarePreferences.FirstOrDefault(p => string.Equals(p.Key, selected?.Key, StringComparison.OrdinalIgnoreCase));
             this.FindControl<TextBox>("HardwareAlias")!.Text = preference?.Alias ?? "";
             this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked = preference?.IsFavorite == true;
-            this.FindControl<TextBlock>("HardwareSelectedSensor")!.Text =
-                selected?.SelectionDetails ?? "Select a sensor above.";
+            SetUiText("HardwareSelectedSensor", selected is null ? "Select a sensor above." : (UiMessage)$"{selected.SelectionDetails}");
         };
         for (var channelIndex = 0; channelIndex < 4; channelIndex++)
         {
@@ -90,8 +88,7 @@ public partial class MainWindow
                 var page = HardwareDisplayPresetBuilder.Build(selectedPreset, _hardwareSensors, _hardwarePreferences);
                 if (page is null)
                 {
-                    this.FindControl<TextBlock>("HardwareSensorStatus")!.Text =
-                        "No matching available sensors for " + selectedPreset + " preset.";
+                    SetUiText("HardwareSensorStatus", $"No matching available sensors for {selectedPreset} preset.");
                     return;
                 }
                 if (await AddSourcePageAsync(added =>
@@ -103,7 +100,7 @@ public partial class MainWindow
                     added.Line1OverflowMode = "PingPong";
                     added.Line2OverflowMode = "PingPong";
                 }))
-                    SetVirtualStatus("Created " + selectedPreset + " display preset.");
+                    SetVirtualStatus($"Created {selectedPreset} display preset.");
             };
         }
         if (_startBackgroundSources)
@@ -175,7 +172,8 @@ public partial class MainWindow
             _pages.Pages.SelectMany(page => new[] { page.Line1Template, page.Line2Template }),
             _fanSettings.Channels.Select(channel => channel.SensorKey));
         var options = HardwareSensorCatalog.Build(_hardwareSensors, _hardwarePreferences, search,
-            this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsChecked == true, typeFilter, tracked);
+            this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsChecked == true, typeFilter, tracked)
+            .Select(entry => entry with { Language = CurrentUiLanguage() }).ToArray();
         var list = this.FindControl<ListBox>("HardwareSensorList")!;
         var previousKey = _selectedHardwareSensorKey;
         _hardwareListRebinding = true;
@@ -191,17 +189,22 @@ public partial class MainWindow
             _selectedHardwareSensorKey = null;
             this.FindControl<TextBox>("HardwareAlias")!.Text = "";
             this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked = false;
-            this.FindControl<TextBlock>("HardwareSelectedSensor")!.Text = "Select a sensor above.";
+            SetUiText("HardwareSelectedSensor", "Select a sensor above.");
         }
         else
         {
-            this.FindControl<TextBlock>("HardwareSelectedSensor")!.Text =
-                (list.SelectedItem as HardwareSensorEntry)?.SelectionDetails ?? "Select a sensor above.";
+            SetUiText("HardwareSelectedSensor", list.SelectedItem is HardwareSensorEntry selected
+                ? (UiMessage)$"{selected.SelectionDetails}" : "Select a sensor above.");
         }
         this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = list.SelectedItem is not null;
         SetHardwareFanAssignmentEnabled(list.SelectedItem is HardwareSensorEntry { IsAvailable: true });
-        this.FindControl<TextBlock>("HardwareSensorStatus")!.Text =
-            HardwareSensorCatalog.BuildSummary(_hardwareSensors, options, _hardwareSourceError);
+        var total = _hardwareSensors.Count(pair => HardwareSensorCatalog.IsSensorKey(pair.Key));
+        var unavailable = options.Count(entry => !entry.IsAvailable);
+        SetUiText("HardwareSensorStatus", !string.IsNullOrWhiteSpace(_hardwareSourceError)
+            ? (UiMessage)$"Hardware source error: {_hardwareSourceError}"
+            : unavailable > 0
+                ? (UiMessage)$"{options.Length} visible sensor(s) / {total} total values · {unavailable} unavailable configured sensor(s)"
+                : (UiMessage)$"{options.Length} visible sensor(s) / {total} total values");
     }
 
 }

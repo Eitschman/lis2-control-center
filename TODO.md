@@ -1,7 +1,7 @@
 # TODO: Avalonia-Portierung
 
-Stand: 20.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-03 mit lokalisierter Hilfe. Lokal 345/345 Avalonia-Tests erfolgreich; nativer Windows-Smoke und aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
+Stand: 21.10.2026. Branch: `feature/linux-avalonia`.
+Implementierungsstand: PORT-03 mit lokalisierter Oberfläche und Hilfe. Lokal 359/359 Avalonia-Tests erfolgreich; nativer Windows-Smoke und aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -33,10 +33,11 @@ Seitenerzeugung aus HA, Medien und Hardware-Presets verwendet `PageWorkspaceActi
 
 Betroffen: `PageWorkspaceActions`, Quellenhandler, Workspace-Laden und Avalonia-Tests. Die Nachweise prüfen den gemeinsamen Ablauf headless, keine echten GUI-Klicks, HA-Verbindungen oder serielle Hardware.
 
-Erster Schritt bei der nächsten Fortsetzung, vor PORT-04: **Übersetzungen auf allen zehn Menüseiten prüfen und fehlende Übersetzungen korrigieren**. Benutzerbefund aus der GUI: Auf allen Seiten stehen noch viele Texte auf Englisch. Die lokalisierte Hilfe belegt keine Übersetzungsabdeckung der übrigen Oberfläche.
+Das Übersetzungspaket vor PORT-04 ist umgesetzt und mit isolierten Avalonia-Fenstern geprüft:
 
-- [ ] Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics und Home Assistant einzeln mit deutscher Sprache durchgehen. Navigation, Beschriftungen, Buttons, Tooltips, Dialoge sowie Leer-, Status- und Fehlermeldungen berücksichtigen.
-- [ ] Fehlende Übersetzungen in den unterstützten Sprachkatalogen ergänzen; gespeicherte Sprache, Systemstandard und Sprachwechsel einschließlich dynamischer Texte prüfen. Technische Schlüssel und Nutzerdaten unverändert lassen. Betroffene Ansichten rendern und ansehen.
+- [x] Alle zehn Menüseiten mit Navigation, Beschriftungen, Buttons, Tooltips, Dateidialogtiteln, About sowie Leer-, Status- und Fehlermeldungen abgeglichen. Technische Protokollmeldungen und fremde Ausnahmeinformationen bleiben unverändert.
+- [x] Deutsch, Englisch, Französisch, Türkisch, Russisch, Systemstandard und Sprachwechsel geprüft. Statusmeldungen behalten Vorlage und Daten getrennt; Musiktitel, Displayinhalte, Sensorwerte und Schlüssel werden nicht übersetzt. Lüftermodi werden über stabile Indizes gespeichert.
+- [x] Katalogabdeckung und Formatplatzhalter geprüft; zehn Ansichten in Deutsch bei 1305 × 893 und 950 × 600 gerendert, zusätzliche französische und russische Ansichten geprüft. Schmale Aktionszeilen umbrechen, der Seiteneditor ordnet Liste und Eigenschaften bei schmalen Fenstern untereinander an. Nachweise und Grenzen stehen im [Status](docs/prp/linux-port-status.md).
 
 Danach folgt **PORT-04: Medien und Produktgrenzen**.
 
@@ -59,7 +60,7 @@ Danach folgt **PORT-04: Medien und Produktgrenzen**.
 - [x] Start-/Stop-/Drain-Pfade abgeglichen: Medienstart vor Dispose drainieren, MPRIS abbrechen/Kindprozess beenden, Timer vor Quellenabbau stoppen, weitere Ressourcen trotz Cleanup-Fehlern abbauen. Verzögerter Start erfolgreich/fehlgeschlagen getestet; reale Quellensysteme separat offen.
 - [x] Differenzielle Schreibspannen in serieller und virtueller Session nachgewiesen, einschließlich identischer Frames, manueller Cacheinvalidierung, Reconnect und Teilfehlern.
 - [x] Sieben `IPlatform*`-Verträge gegen tatsächliche Aufrufpfade und Zielarchitektur abgeglichen; Abweichungstabelle im Inventar, kein vorgetäuschter Adapterumbau.
-- [x] [CI 39455194970](https://github.com/Eitschman/lis2-control-center/actions/runs/39455194970) für `d2d2def`: alle sieben Jobs erfolgreich, je OS 345/345 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes und drei Pakete erfolgreich.
+- [x] [CI 39455194970](https://github.com/Eitschman/lis2-control-center/actions/runs/39455194970) für `d2d2def`: alle sieben Jobs erfolgreich, je OS 359/359 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes und drei Pakete erfolgreich.
 
 ### PORT-04: Medien und Produktgrenzen
 
@@ -81,7 +82,7 @@ Danach folgt **PORT-04: Medien und Produktgrenzen**.
 - [ ] Die zehn Ansichten anhand der [aktuellen Matrix](docs/prp/wpf-avalonia-parity-audit.md) semantisch prüfen, einschließlich Fehler-, Leer-, Auswahl- und Speicherpfaden.
 - [x] Zehn Hilfethemen einschließlich Titel, Navigation und Absätzen in fünf Sprachen; gespeicherte Sprache, Systemstandard und Wechsel im offenen Dialog mit Controls geprüft.
 - [x] Hilfetexte gegen den Avalonia-Code prüfen: Lüftermodi/-Sicherheitsgrenzen, Medien je Plattform, numerische Glyphenreferenzen, Variablenliste, Formatierung und Sichtbarkeit.
-- [ ] Weitere WPF-Inhaltstiefe und About-Übersetzungen abgleichen. Benannte Glyphenschlüssel werden von der Avalonia-Runtime nicht bereitgestellt; die Hilfe zeigt dafür nutzbare numerische Slots.
+- [ ] Weitere WPF-Inhaltstiefe abgleichen. Benannte Glyphenschlüssel werden von der Avalonia-Runtime nicht bereitgestellt; die Hilfe zeigt dafür nutzbare numerische Slots.
 - [ ] Hilfeplatzierung, Tray-Menütexte und weitere hart codierte Laufzeittexte abgleichen.
 - [ ] Themes, Tastatur/Fokus, DPI, Fenstergrenzen und lange Texte in allen fünf Sprachen prüfen.
 - [ ] Bestehenden Display-Formatierungstest kulturfest formulieren: deutscher Windows-Lauf ergibt korrektes Komma, Test erwartet fest einen Dezimalpunkt; invarianter Lauf besteht mit 48/48. Produktformatierung nach `CurrentCulture` erhalten.

@@ -65,7 +65,7 @@ public partial class MainWindow
     private async Task RunPageFileActionAsync(Func<Task> action)
     {
         try { await action(); }
-        catch (Exception ex) { SetVirtualStatus($"Page file error: {ex.Message}"); }
+        catch (Exception ex) { SetVirtualStatus($"Page file error: {(UiMessage)ex.Message}"); }
     }
 
     private async Task SavePagesAsync()
@@ -75,7 +75,7 @@ public partial class MainWindow
         if (!CommitPendingPageEditor()) return;
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Save page definitions",
+            Title = UiText("Save page definitions"),
             SuggestedFileName = "lis2-pages.json"
         });
         if (file is null) return;
@@ -91,7 +91,7 @@ public partial class MainWindow
     {
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Load page definitions",
+            Title = UiText("Load page definitions"),
             AllowMultiple = false
         });
         if (files.Count == 0) return;

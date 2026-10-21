@@ -19,6 +19,8 @@ internal static class DesktopSmoke
     public static async Task RunAsync(MainWindow window, string directory)
     {
         Directory.CreateDirectory(directory);
+        // Der Smoke prüft englische Meldungen; Sprachvarianten werden getrennt geprüft.
+        window.FindControl<ComboBox>("LanguageModeComboBox")!.SelectedIndex = 1;
         await WaitAsync(() => window.FindControl<TextBlock>("ConnectionText")!.Text?.StartsWith("Connected") == true &&
             window.FindControl<Button>("SettingsApplyTransport")!.IsEnabled);
         foreach (var (view, index) in Views.Select((view, index) => (view, index)))
