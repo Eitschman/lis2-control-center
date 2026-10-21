@@ -1,6 +1,6 @@
 # Inventar des Avalonia-Branches
 
-Stand: 21.10.2026. Implementierungsstand: PORT-03.
+Stand: 21.10.2026. Implementierungsstand: PORT-04.
 Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Konfiguration. Kein ZIP-Archiv als Implementierungsbaseline.
 
 ## Umfang und Projekte
@@ -33,7 +33,7 @@ Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin`
 | Workspace | PortableWorkspaceStore, PortableFanSettings, WindowsSettingsImporter, MainWindow.Workspace/WindowsImport; PageWorkspaceActions verbindet Quellenaktionen, Editor, Sequenz-Reload und Persistenz |
 | Geheimnisse | PortableHaTokenStore, LegacyHaTokenStore; DPAPI, secret-tool und lokaler AES-Dateipfad |
 | Hardware | LinuxSystemSensors/LinuxHwmonFanSensors, WindowsHardwareFanSensors, HardwareSensorCatalog und HardwareDisplayPresetBuilder |
-| Medien | MainWindow.Media, WindowsMediaBridge und LinuxMprisSource; Originalquellen in Winamp, WindowsMedia und WmpLegacy |
+| Medien | MainWindow.Media, WindowsMediaBridge, WindowsMediaSmoke und LinuxMprisSource; aktive Windows-Quellen Winamp/WindowsMedia; gespeicherte Linux-Playerauswahl und Spielposition; Legacy unbenutzt |
 | Hilfe/Sprachen | HelpReferenceCatalog mit eigenem HelpReferenceLocalization-Katalog für fünf Sprachen, MainWindow.HelpAbout, UiTranslations/UiMessage, WpfTranslationCatalog, Settings-/UI-/Browser-Lokalisierung und sprachabhängige Statusmeldungen |
 
 Die `IPlatform*`-Verträge haben derzeit keine entsprechenden Adapterimplementierungen. UI-unabhängige Schleifen bestehen neben weiterer Orchestrierung in den MainWindow-Dateien.
@@ -44,7 +44,7 @@ Die `IPlatform*`-Verträge haben derzeit keine entsprechenden Adapterimplementie
 | --- | --- | --- |
 | `IPlatformSerialPortDiscovery` | Statische `SerialPortDiscovery` aus Settings/Serial; kein Hardwarezugriff bei Suche | Kein injizierter Vertragsadapter |
 | `IPlatformSensorProvider` | `IFanSensorSource`, `LinuxSystemSensors`, `WindowsHardwareFanSensors` | Produktivvertrag liefert `object?`, Entwurf nur `double?`; vor Adapterumbau Schlüssel und Metadaten erhalten |
-| `IPlatformMediaProvider` | `WindowsMediaBridge.Values`, Winamp-/Legacy-Values, asynchrones `LinuxMprisSource.ReadAsync` | Synchrones Entwurfs-Snapshot bildet Start, Abbruch und Dispose nicht ab; `AsyncProviderLifetime` ordnet aktuell den Medienabbau |
+| `IPlatformMediaProvider` | `WindowsMediaBridge.Values`, Winamp-Values, asynchrones `LinuxMprisSource.ReadSnapshotAsync` | Synchrones Entwurfs-Snapshot bildet Start, Abbruch und Dispose nicht ab; `AsyncProviderLifetime` ordnet aktuell den Medienabbau |
 | `IPlatformTrayService` | Windows-Tray direkt in `App`; Exit wartet auf `BeginShutdownAsync` | Linux-Tray und Dienstinjektion offen, PORT-06 |
 | `IPlatformAutostartService` | Windows-Registry in `MainWindow.Settings` | Linux-Desktopdatei und Vertragsadapter offen, PORT-06 |
 | `IPlatformSecretStore` | `PortableHaTokenStore`, DPAPI/secret-tool | Synchroner spezialisierter Tokenstore statt allgemeinem Schlüsselvertrag; lokaler AES-Pfad in PORT-05 klären |

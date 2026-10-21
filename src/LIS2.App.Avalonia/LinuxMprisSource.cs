@@ -1,9 +1,17 @@
 using System.Diagnostics;
+using System.Globalization;
+using System.Xml.Linq;
 
 namespace LIS2.App.Avalonia;
 
-public sealed class LinuxMprisSource(string executable = "playerctl")
+public sealed class LinuxMprisSource(string executable = "playerctl",
+    Func<IReadOnlyList<string>, CancellationToken, Task<PlayerctlResult>>? command = null)
 {
+    // XML-Escaping erhält Trennzeichen und Zeilenumbrüche in echten Titeln und Interpreten.
+    internal const string MetadataFormat = "<media><state>{{status}}</state><title>{{markup_escape(xesam:title)}}</title>" +
+        "<artist>{{markup_escape(xesam:artist)}}</artist><album>{{markup_escape(xesam:album)}}</album>" +
+        "<elapsed>{{position}}</elapsed><duration>{{mpris:length}}</duration></media>";
+
     public static IReadOnlyDictionary<string, object?> Map(string state, string title, string artist)
         => new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
         {
@@ -15,43 +23,76 @@ public sealed class LinuxMprisSource(string executable = "playerctl")
 
     public static IReadOnlyDictionary<string, object?> Parse(string output)
     {
-        var parts = output.TrimEnd('\r', '\n').Split('|');
-        if (parts.Length < 5) return Map("", "", "");
-        var values = new Dictionary<string, object?>(Map(parts[0], parts[1], parts[2]), StringComparer.OrdinalIgnoreCase)
+        var media = XElement.Parse(output);
+        if (media.Name != "media" || media.Element("state")?.Value is not ("Playing" or "Paused" or "Stopped"))
+            throw new FormatException("Invalid playerctl metadata.");
+        string Read(string name) => media.Element(name)?.Value ?? throw new FormatException("Invalid playerctl metadata.");
+        return new Dictionary<string, object?>(Map(Read("state"), Read("title"), Read("artist")), StringComparer.OrdinalIgnoreCase)
         {
-            ["Album"] = parts[3], ["Duration"] = null
+            ["Album"] = Read("album"), ["Elapsed"] = FormatTime(Read("elapsed")), ["Duration"] = FormatTime(Read("duration"))
         };
-        if (long.TryParse(parts[4], out var micros) && micros >= 0)
-            values["Duration"] = TimeSpan.FromMicroseconds(micros).ToString(@"hh\:mm\:ss");
-        return values;
+    }
+
+    private static string? FormatTime(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return null;
+        if (!long.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out var micros) ||
+            micros > TimeSpan.MaxValue.Ticks / 10)
+            throw new FormatException("Invalid playerctl time.");
+        var time = TimeSpan.FromTicks(micros * 10);
+        return $"{(long)time.TotalHours:00}:{time.Minutes:00}:{time.Seconds:00}";
+    }
+
+    public async Task<MprisSnapshot> ReadSnapshotAsync(string? selectedPlayer, CancellationToken cancellationToken = default)
+    {
+        var listing = await RunAsync(["--list-all"], cancellationToken);
+        var players = listing.Output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Distinct(StringComparer.Ordinal).ToArray();
+        // Eine gespeicherte Auswahl bleibt bei Abwesenheit getrennt und wechselt nicht zu einem anderen Player.
+        var player = string.IsNullOrEmpty(selectedPlayer) ? players.FirstOrDefault() : selectedPlayer;
+        if (player is null || !players.Contains(player, StringComparer.Ordinal))
+            return new(players, Map("", "", ""));
+        var result = await RunAsync(["--player=" + player, "metadata", "--format", MetadataFormat], cancellationToken);
+        var values = string.IsNullOrWhiteSpace(result.Output) ? Map("", "", "") : Parse(result.Output);
+        return new(players, new Dictionary<string, object?>(values) { ["Player"] = player });
     }
 
     public async Task<IReadOnlyDictionary<string, object?>> ReadAsync(CancellationToken cancellationToken = default)
+        => (await ReadSnapshotAsync(null, cancellationToken)).Values;
+
+    private async Task<PlayerctlResult> RunAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken)
     {
-        if (!OperatingSystem.IsLinux()) return Map("", "", "");
+        var result = await (command is null ? ExecuteAsync(executable, arguments, cancellationToken, TimeSpan.FromSeconds(3)) : command(arguments, cancellationToken));
+        if (result.ExitCode == 0) return result;
+        if (result.Error.Trim() is "No players found" or "No player could handle this command") return new(0, "", "");
+        throw new InvalidOperationException($"playerctl failed ({result.ExitCode}): {result.Error.Trim()}");
+    }
+
+    internal static async Task<PlayerctlResult> ExecuteAsync(string executable, IReadOnlyList<string> arguments,
+        CancellationToken cancellationToken, TimeSpan requestTimeout)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
         using var process = new Process();
         try
         {
             process.StartInfo.FileName = executable;
-            process.StartInfo.ArgumentList.Add("metadata");
-            process.StartInfo.ArgumentList.Add("--format");
-            process.StartInfo.ArgumentList.Add("{{status}}|{{xesam:title}}|{{xesam:artist}}|{{xesam:album}}|{{mpris:length}}");
+            foreach (var argument in arguments) process.StartInfo.ArgumentList.Add(argument);
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.UseShellExecute = false;
+            // Fehlertexte für die Unterscheidung zwischen fehlenden Playern und Providerfehlern stabil halten.
+            process.StartInfo.Environment["LC_ALL"] = "C";
             if (!process.Start()) throw new InvalidOperationException("Could not start playerctl.");
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            timeout.CancelAfter(TimeSpan.FromSeconds(3));
+            timeout.CancelAfter(requestTimeout);
             var errorTask = process.StandardError.ReadToEndAsync(timeout.Token);
             var output = await process.StandardOutput.ReadToEndAsync(timeout.Token);
             await process.WaitForExitAsync(timeout.Token);
             var error = await errorTask;
-            if (process.ExitCode == 0)
-            {
-                return Parse(output);
-            }
-            if (error.Contains("No players found", StringComparison.OrdinalIgnoreCase)) return Map("", "", "");
-            throw new InvalidOperationException("playerctl failed with exit code " + process.ExitCode + ".");
+            return new(process.ExitCode, output, error);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException("Media request timed out.");
         }
         finally
         {
@@ -68,3 +109,6 @@ public sealed class LinuxMprisSource(string executable = "playerctl")
         }
     }
 }
+
+public sealed record PlayerctlResult(int ExitCode, string Output, string Error);
+public sealed record MprisSnapshot(IReadOnlyList<string> Players, IReadOnlyDictionary<string, object?> Values);

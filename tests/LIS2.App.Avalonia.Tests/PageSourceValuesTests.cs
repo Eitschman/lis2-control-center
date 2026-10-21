@@ -50,11 +50,12 @@ public sealed class PageSourceValuesTests
     [Fact]
     public void LinuxMprisParsesAlbumDurationAndMissingData()
     {
-        var values = LinuxMprisSource.Parse("Playing|Song|Artist|Album|123000000");
+        var values = LinuxMprisSource.Parse("<media><state>Playing</state><title>Song</title><artist>Artist</artist><album>Album</album><elapsed>1000000</elapsed><duration>123000000</duration></media>");
         Assert.Equal("Album", values["Album"]);
         Assert.Equal("00:02:03", values["Duration"]);
         Assert.Equal("Song", values["Title"]);
-        Assert.Equal(false, LinuxMprisSource.Parse("bad response")["Connected"]);
+        Assert.Equal("00:00:01", values["Elapsed"]);
+        Assert.Throws<System.Xml.XmlException>(() => LinuxMprisSource.Parse("bad response"));
     }
 
     [Fact]

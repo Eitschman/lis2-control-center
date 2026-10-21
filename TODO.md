@@ -1,7 +1,7 @@
 # TODO: Avalonia-Portierung
 
 Stand: 21.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-03 mit lokalisierter Oberfläche und Hilfe. Lokal 359/359 Avalonia-Tests erfolgreich; nativer Windows-Smoke und aktueller CI-Nachweis im [Status](docs/prp/linux-port-status.md).
+Implementierungsstand: PORT-04 mit gespeicherter Linux-Playerauswahl, Spielposition und korrigierter Legacy-Produktgrenze. Lokal 375/375 Avalonia-Tests erfolgreich; Paketstart und CI-Nachweis im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -66,11 +66,13 @@ Danach folgt **PORT-04: Medien und Produktgrenzen**.
 
 ### PORT-04: Medien und Produktgrenzen
 
-- [ ] Linux-MPRIS-Position, Playerauswahl, Lifecycle und Fehleranzeige ergänzen. Aktuell periodische `playerctl`-Metadatenabfrage, keine eigene D-Bus-Subscription.
+- [x] Linux-MPRIS-Position, gespeicherte Playerauswahl, Lifecycle und Fehleranzeige ergänzen. Sekündliche playerctl-Abfrage mit Playerliste, expliziter Instanz, XML-Escaping, Abbruch und Timeout; keine eigene D-Bus-Subscription. Abwesende ausgewählte Player bleiben getrennt und alte Metadaten werden entfernt.
 - [ ] VLC und Plexamp einzeln auf realen Zielsystemen prüfen.
-- [ ] GSMTC-Paket auf Windows mit/ohne Player und fehlender Provider-DLL starten.
-- [ ] WMP-Legacy-Aktivierung gegen den zurückgestellten Produktumfang korrigieren oder ausdrücklich entscheiden lassen. Der Avalonia-Code startet die Quelle und zeigt ihre Karte unter Windows.
-- [ ] Keine Linux-VU-/Spektrumanalyse aus MPRIS-Metadaten ableiten. Wine/Winamp bleibt optional.
+- [x] Windows-GSMTC-Paket ohne laufenden Player und mit fehlender Provider-DLL lokal starten. Publish enthält WinRT-Laufzeitdateien; CI prüft Initialisierung, Verbindung, Shutdown und fehlende DLL.
+- [ ] GSMTC mit laufendem Windows Media Player auf einem Zielsystem prüfen.
+- [x] WMP Legacy bleibt zurückgestellt: Avalonia startet die Quelle nicht, zeigt keine Karte und referenziert das Legacy-Projekt nicht.
+- [x] Linux liefert keine VU-/Spektrumanalyse aus MPRIS-Metadaten; Regressionstest prüft diese Grenze. Wine/Winamp bleibt optional.
+- [x] Avalonia-Branch-CI baut zusätzlich den selbständigen Windows-Protokolltester und das native Win32/x86-Winamp-Plug-in; eigene Artefakte wie auf main.
 
 ### PORT-05: Home Assistant und Tokenstore
 

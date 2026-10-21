@@ -61,9 +61,8 @@ internal static class HelpReferenceCatalog
                 AddExample("Winamp", "{Winamp.State}  {Winamp.Artist}  {Winamp.Title}  {Winamp.Album}  {Winamp.Elapsed}  {Winamp.Duration}");
                 Add("Spectrum", "{Winamp.Vu}  {Winamp.Spectrum}  {Winamp.SpectrumGlyphs} require a supported source of live audio telemetry.");
                 AddExample("Windows media", "{WindowsMedia.State}  {WindowsMedia.Artist}  {WindowsMedia.Title}  {WindowsMedia.Connected}");
-                Add("Linux and Windows", "Linux uses MPRIS through playerctl, which must be installed. Its Media.* values include state, title, artist, album, duration and connection status, but no elapsed position, VU or spectrum. Windows uses WindowsMedia.* for GSMTC, Winamp.* for the Winamp plug-in and WmpLegacy.* for the separate Legacy plug-in. Create a page from the relevant media card. No plug-in is needed for GSMTC.");
-                AddExample("Media", "{Media.State}  {Media.Title}  {Media.Artist}  {Media.Album}  {Media.Duration}  {Media.Connected}");
-                AddExample("Windows media", "{WmpLegacy.State}  {WmpLegacy.Title}  {WmpLegacy.Artist}  {WmpLegacy.Elapsed}  {WmpLegacy.Duration}");
+                Add("Linux and Windows", "Linux uses MPRIS through playerctl, which must be installed. Select an automatic or specific player; the selection is saved. An unavailable selected player stays disconnected. Media.* provides Player, State, Title, Artist, Album, Elapsed, Duration and Connected, but no VU or spectrum. Values are refreshed every second. Windows uses WindowsMedia.* for GSMTC and Winamp.* for the Winamp plug-in. WMP Legacy is deferred and is not started. Create a page from the relevant media card. No plug-in is needed for GSMTC.");
+                AddExample("Media", "{Media.Player}  {Media.State}  {Media.Title}  {Media.Artist}  {Media.Album}  {Media.Elapsed}  {Media.Duration}  {Media.Connected}");
                 AddExample("Example", "{Winamp.Artist|fallback:Nothing playing} / {Winamp.Title|fallback:--}");
                 break;
             case 4:

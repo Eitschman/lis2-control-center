@@ -5,6 +5,12 @@ internal static class UiTranslations
 {
     private static readonly IReadOnlyDictionary<string, string[]> Texts = new Dictionary<string, string[]>(StringComparer.Ordinal)
     {
+        ["Player"] = ["Player", "Lecteur", "Oynatıcı", "Проигрыватель"],
+        ["Automatic player"] = ["Automatische Playerauswahl", "Sélection automatique du lecteur", "Otomatik oynatıcı seçimi", "Автоматический выбор проигрывателя"],
+        ["Media request timed out."] = ["Zeitüberschreitung bei der Medienabfrage.", "La requête média a expiré.", "Medya isteği zaman aşımına uğradı.", "Время запроса медиа истекло."],
+        ["Invalid playerctl metadata."] = ["Ungültige playerctl-Metadaten.", "Métadonnées playerctl invalides.", "Geçersiz playerctl meta verileri.", "Некорректные метаданные playerctl."],
+        ["Invalid playerctl time."] = ["Ungültige playerctl-Zeitangabe.", "Durée playerctl invalide.", "Geçersiz playerctl zamanı.", "Некорректное время playerctl."],
+        ["Could not start playerctl."] = ["playerctl konnte nicht gestartet werden.", "Impossible de démarrer playerctl.", "playerctl başlatılamadı.", "Не удалось запустить playerctl."],
         ["Fan channel configuration"] = ["Lüfterkanal konfigurieren", "Configuration du canal de ventilateur", "Fan kanalı yapılandırması", "Настройка канала вентилятора"],
         ["5x8 bitmap (8 rows)"] = ["5x8-Bitmap (8 Zeilen)", "Bitmap 5x8 (8 lignes)", "5x8 bit eşlem (8 satır)", "Растр 5x8 (8 строк)"],
         ["Alias for selected sensor"] = ["Alias für ausgewählten Sensor", "Alias du capteur sélectionné", "Seçili sensör için takma ad", "Псевдоним выбранного датчика"],

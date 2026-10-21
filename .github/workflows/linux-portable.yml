@@ -19,6 +19,47 @@ permissions:
   contents: read
 
 jobs:
+  windows-tools:
+    name: Windows Protocol Tester
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Publish self-contained Protocol Tester
+        run: dotnet publish tools/LIS2.ProtocolTester/LIS2.ProtocolTester.csproj --configuration Release --runtime win-x64 --self-contained true -p:DebugType=None -p:DebugSymbols=false --output artifacts/LIS2.ProtocolTester
+      - name: Verify Protocol Tester runtime assets
+        shell: pwsh
+        run: |
+          foreach ($file in @('LIS2.ProtocolTester.exe', 'LIS2.ProtocolTester.dll', 'LIS2.ProtocolTester.runtimeconfig.json', 'coreclr.dll')) {
+            if (-not (Test-Path "artifacts/LIS2.ProtocolTester/$file")) { throw "Missing Protocol Tester asset: $file" }
+          }
+      - name: Upload Protocol Tester
+        uses: actions/upload-artifact@v4
+        with:
+          name: LIS2-ProtocolTester-win-x64
+          path: artifacts/LIS2.ProtocolTester/
+          if-no-files-found: error
+          retention-days: 14
+
+  winamp-plugin:
+    name: Winamp plugin x86
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Win32 plugin
+        run: cmake -S native/LIS2.WinampPlugin -B native/LIS2.WinampPlugin/build -A Win32
+      - name: Build Win32 plugin
+        run: cmake --build native/LIS2.WinampPlugin/build --config Release
+      - name: Upload gen_lis2.dll
+        uses: actions/upload-artifact@v4
+        with:
+          name: gen_lis2-win32
+          path: native/LIS2.WinampPlugin/build/Release/gen_lis2.dll
+          if-no-files-found: error
+          retention-days: 14
+
   portable:
     name: .NET 8 shared libraries (${{ matrix.os }})
     strategy:
@@ -111,12 +152,12 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          dotnet build src/LIS2.WindowsMedia/LIS2.WindowsMedia.csproj --configuration Release
+          dotnet publish src/LIS2.WindowsMedia/LIS2.WindowsMedia.csproj --configuration Release --runtime win-x64 --self-contained false --output publish/windows-media-provider
           if ($LASTEXITCODE -ne 0) { throw "Windows GSMTC provider build failed" }
-          $dll = "src/LIS2.WindowsMedia/bin/Release/net8.0-windows10.0.19041.0/LIS2.WindowsMedia.dll"
+          $dll = "publish/windows-media-provider/LIS2.WindowsMedia.dll"
           if (-not (Test-Path $dll)) { throw "Missing Windows GSMTC provider: $dll" }
           Copy-Item $dll "publish/${{ matrix.rid }}/LIS2.WindowsMedia.dll"
-          Get-ChildItem "src/LIS2.WindowsMedia/bin/Release/net8.0-windows10.0.19041.0" -Filter "*.dll" |
+          Get-ChildItem "publish/windows-media-provider" -Filter "*.dll" |
             Where-Object { $_.Name -ne "LIS2.WindowsMedia.dll" } |
             ForEach-Object { if (-not (Test-Path "publish/${{ matrix.rid }}/$($_.Name)")) { Copy-Item $_.FullName "publish/${{ matrix.rid }}/$($_.Name)" } }
       - name: Verify published executable and runtime assets
@@ -130,7 +171,28 @@ jobs:
           if (-not (Test-Path "$folder/LIS2.App.Avalonia.dll")) { throw "Missing managed application assembly" }
           if (-not (Test-Path "$folder/LIS2.App.Avalonia.runtimeconfig.json")) { throw "Missing runtime configuration" }
           if ("${{ runner.os }}" -eq "Windows" -and -not (Test-Path "$folder/LIS2.WindowsMedia.dll")) { throw "Missing Windows GSMTC provider in publish output" }
+          if ("${{ runner.os }}" -eq "Windows") {
+            foreach ($dependency in @('WinRT.Runtime.dll', 'Microsoft.Windows.SDK.NET.dll')) {
+              if (-not (Test-Path "$folder/$dependency")) { throw "Missing GSMTC runtime dependency: $dependency" }
+            }
+          }
           Write-Host "Verified ${{ matrix.rid }} executable: $size bytes"
+      - name: Smoke packaged Windows GSMTC provider
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $process = Start-Process "publish/${{ matrix.rid }}/LIS2.App.Avalonia.exe" -ArgumentList '--media-provider-smoke', 'media-provider-smoke' -PassThru
+          if (-not $process.WaitForExit(45000)) { $process.Kill(); throw "GSMTC smoke timed out" }
+          if ($process.ExitCode -ne 0) { throw "GSMTC smoke failed: $($process.ExitCode)" }
+          Get-Content 'media-provider-smoke/provider.txt'
+          Get-Content 'media-provider-smoke/result.txt'
+      - name: Upload Windows GSMTC smoke
+        if: always() && runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Avalonia-GSMTC-smoke-Windows
+          path: media-provider-smoke/
+          if-no-files-found: error
       - name: Package Linux executable
         if: runner.os == 'Linux'
         shell: bash

@@ -1,7 +1,7 @@
 # PRP: LIS2 Control Center mit Avalonia
 
 Stand: 21.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-03; genaue Prüfnachweise im [Status](linux-port-status.md).
+Implementierungsstand: PORT-04; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
 
@@ -19,7 +19,7 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 359/359 Avalonia-Tests einschließlich Menüseiten, Sprachwechsel und Hilfesprache erfolgreich; der native Windows-Smoke ist im [Status](linux-port-status.md) eingegrenzt. Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
+Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 375/375 Avalonia-Tests einschließlich Menüseiten, Sprachwechsel und Hilfesprache erfolgreich; der native Windows-Smoke ist im [Status](linux-port-status.md) eingegrenzt. Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
 
 ## Implementierungsstand
 
@@ -33,7 +33,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Glyphen | Acht 5x8-Slots, Dateien, Namen, Spektrumset und Ersetzungsdialog vorhanden | Physische Zeichenprüfung und UI-/Transportabgleich offen |
 | Sensoren | LibreHardwareMonitor auf Windows; procfs/sysfs/hwmon auf Linux; Aliase, Favoriten und fehlende Sensoren berücksichtigt | Stabile Identitäten und Rechte auf Zielsystemen prüfen |
 | Lüfter | Vier Modi plus Off, Kurven, Hysterese, Fail-safe, Simulation, freizugebende serielle Regelung und Dashboard-Handausgabe mit Kanalgrenzen | Weitere WPF-Interaktionen abgleichen; Hardware bleibt ungeprüft |
-| Medien | Winamp, reflektiert geladener GSMTC-Anbieter und Linux-`playerctl` angebunden | MPRIS-Zeitposition, Playerwahl und echte Zielplayer offen; WMP Legacy weicht vom zurückgestellten Produktumfang ab |
+| Medien | Winamp/GSMTC auf Windows; Linux-playerctl mit gespeicherter Auswahl, Spielposition, Lifecycle und Fehleranzeige; Legacy deaktiviert | Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen offen |
 | Home Assistant | WebSocket-Quelle, Entitäten, Attribute, Aliase, Favoriten und Seitenaktionen mit Sequenz-Reload vorhanden | Linux-Liveprüfung und Deaktivierung/Persistenz prüfen |
 | Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache und Windows-Tray/Autostart | Nativer Dateidialog und Linux-Desktopintegration offen |
 | Hilfe und About | Kontextbezogene Hilfe mit zehn Themen in fünf Sprachen, Live-Schlüsseln und numerischer Glyphenreferenz; About folgt der ausgewählten Sprache | Weitere WPF-Inhaltstiefe, Platzierung und native Desktop-Bedienung offen |
@@ -61,8 +61,8 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 
 - [x] Windows-/Linux-Sensoranbieter und getestete Sensorkataloge vorhanden.
 - [x] Bestehende `Clock.*`, `Hardware.*`, `Winamp.*`, `WindowsMedia.*` und `HA.*`-Schlüssel werden weiterverwendet.
-- [x] Linux-Medien liefern `Media.Connected`, `Media.State`, `Media.Title`, `Media.Artist`, `Media.Album` und `Media.Duration` über `playerctl`.
-- [ ] Linux-Playerauswahl, Position, Ereignisbenachrichtigungen und Reconnect-Verhalten implementieren bzw. nachweisen; derzeit wird periodisch abgefragt.
+- [x] Linux-Medien liefern `Media.Connected`, `Media.State`, `Media.Title`, `Media.Artist`, `Media.Album`, `Media.Elapsed`, `Media.Duration` und `Media.Player` über `playerctl`.
+- [x] Gespeicherte Linux-Playerauswahl, Position, Trennen/Wiederfinden und Abbruch/Timeout implementiert und getestet. Der Anbieter fragt sekündlich ab; eine eigene D-Bus-Subscription bleibt offen.
 - [ ] VLC und Plexamp einzeln auf dem Zielsystem prüfen. Wine/Winamp bleibt optional.
 - [x] Workspace und validierende Windows-Importlogik einschließlich Seiten, Glyphen und Lüfterkonfiguration vorhanden.
 - [x] Windows-DPAPI und Linux-`secret-tool` sind im Tokenstore angebunden.
@@ -74,7 +74,7 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 
 ### Oberfläche und Verifikation
 
-Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. Statische Texte, Formatargumente und unveränderte Nutzdaten werden automatisiert geprüft; die Sichtprüfung und Plattformgrenzen stehen im Status. Die nächste Priorität ist PORT-04 gemäß [TODO](../../TODO.md).
+Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. Statische Texte, Formatargumente und unveränderte Nutzdaten werden automatisiert geprüft; die Sichtprüfung und Plattformgrenzen stehen im Status. Die Medienimplementierung aus PORT-04 ist geprüft; reale Playernachweise bleiben offen. Nächstes Implementierungspaket ist PORT-05 gemäß [TODO](../../TODO.md).
 
 - [x] Zehn Hauptansichten, Hilfe und About sind angelegt und angebunden.
 - [x] System/Light/Dark sowie System/English/German/French/Turkish/Russian sind auswählbar.
@@ -96,7 +96,7 @@ Kein physisches LIS2 steht für die bisherigen automatisierten Prüfungen zur Ve
 
 Der Benutzer sieht manuelle Desktop-Abnahme nach Umsetzung des Ports vor. Fehlende Desktop-Abnahme darf nicht als erfolgreicher visueller Nachweis erscheinen. Erforderliche technische und gestalterische Prüfungen der jeweils bearbeiteten Oberfläche bleiben ausdrücklich vom späteren Benutzerentscheid zu unterscheiden.
 
-Unbekannte Protokollkommandos werden nicht automatisch gesendet. 19200 Baud/8N1, serialisierte Ausgabe, Sensor-Fail-safe und nicht persistente Lüfterfreigabe bleiben verbindlich. WMP Legacy ist als Produktentscheidung zurückgestellt; seine aktuelle Aktivierung in Avalonia ist ein offener Widerspruch.
+Unbekannte Protokollkommandos werden nicht automatisch gesendet. 19200 Baud/8N1, serialisierte Ausgabe, Sensor-Fail-safe und nicht persistente Lüfterfreigabe bleiben verbindlich. WMP Legacy ist als Produktentscheidung zurückgestellt und wird von Avalonia nicht gestartet.
 
 ## Vorgehen je Arbeitspaket
 

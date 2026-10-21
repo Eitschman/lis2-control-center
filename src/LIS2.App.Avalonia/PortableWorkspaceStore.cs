@@ -75,6 +75,7 @@ public sealed class PortableWorkspace
     public bool ProgramCustomGlyphsOnConnect { get; set; }
     public string ThemeMode { get; set; } = "System";
     public string LanguageMode { get; set; } = "System";
+    public string? LinuxMediaPlayer { get; set; }
 }
 
 public sealed class PortableHardwareSensorPreference

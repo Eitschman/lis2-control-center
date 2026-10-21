@@ -73,6 +73,8 @@ public partial class MainWindow
         _preferredPortName = saved.PortName;
         _preferredTheme = saved.ThemeMode;
         _preferredLanguage = saved.LanguageMode;
+        _selectedMediaPlayer = saved.LinuxMediaPlayer;
+        UpdateMediaPlayerPicker([]);
         LoadSettingsPreferences();
         FilterHardwareSensors();
         _fanSettings = PortableFanSettings.Normalize(saved.Fans);
@@ -106,6 +108,7 @@ public partial class MainWindow
         BrightnessPercent = _preferredBrightness,
         ThemeMode = _preferredTheme,
         LanguageMode = _preferredLanguage,
+        LinuxMediaPlayer = _selectedMediaPlayer,
         Fans = PortableFanSettings.Normalize(_fanSettings),
         ProgramCustomGlyphsOnConnect = this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true
     };

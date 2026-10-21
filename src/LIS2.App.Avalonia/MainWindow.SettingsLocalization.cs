@@ -198,6 +198,7 @@ public partial class MainWindow
         this.FindControl<Button>("OpenHelp")!.Content = HelpReferenceLocalization.Translate("Help & reference", CurrentUiLanguage());
         UiLanguageChanged?.Invoke();
         RefreshUiMessages();
+        UpdateMediaPlayerPicker(this.FindControl<ComboBox>("LinuxMediaPlayer")!.Items.OfType<string>().Skip(1).ToArray());
         if (_workspaceLoaded)
         {
             FilterHardwareSensors();

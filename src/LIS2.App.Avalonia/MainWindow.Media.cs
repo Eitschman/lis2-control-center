@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
 using LIS2.Winamp;
-using LIS2.WmpLegacy;
 using LIS2.Runtime;
 
 namespace LIS2.App.Avalonia;
@@ -9,7 +8,6 @@ namespace LIS2.App.Avalonia;
 public partial class MainWindow
 {
     private readonly WinampDataSource _mediaWinamp = new();
-    private readonly WmpLegacyDataSource _mediaLegacy = new();
     private DispatcherTimer? _mediaTimer;
     private readonly LinuxMprisSource _mpris = new();
     private readonly WindowsMediaBridge _windowsMedia = new();
@@ -19,12 +17,13 @@ public partial class MainWindow
     private Task _mediaRefresh = Task.CompletedTask;
     private readonly CancellationTokenSource _mediaCancellation = new();
     private readonly Dictionary<string, string> _mediaErrors = new();
+    private string? _selectedMediaPlayer;
+    private bool _updatingMediaPlayers;
 
     private void InitializeMedia()
     {
         this.FindControl<Border>("LinuxMediaCard")!.IsVisible = OperatingSystem.IsLinux();
         this.FindControl<Border>("WinampMediaCard")!.IsVisible = OperatingSystem.IsWindows();
-        this.FindControl<Border>("WmpLegacyMediaCard")!.IsVisible = OperatingSystem.IsWindows();
         this.FindControl<Border>("WindowsMediaCard")!.IsVisible = OperatingSystem.IsWindows();
         _mediaTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _mediaTimer.Tick += (_, _) => RefreshMedia();
@@ -33,14 +32,22 @@ public partial class MainWindow
         this.FindControl<Button>("WinampMediaPage")!.Click += async (_, _) =>
             await CreateMediaPageAsync("Winamp", "Winamp");
         this.FindControl<Button>("LinuxMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("Media", "Linux media");
-        this.FindControl<Button>("WmpLegacyMediaPage")!.Click += async (_, _) =>
-            await CreateMediaPageAsync("WmpLegacy", "Windows Media Player Legacy");
+        this.FindControl<ComboBox>("LinuxMediaPlayer")!.SelectionChanged += async (_, _) =>
+        {
+            if (_updatingMediaPlayers) return;
+            var picker = this.FindControl<ComboBox>("LinuxMediaPlayer")!;
+            _selectedMediaPlayer = picker.SelectedIndex <= 0 ? null : picker.SelectedItem as string;
+            // Laufende Antworten der vorherigen Auswahl dürfen keine neuen Werte überschreiben.
+            _pageSources.UpdateMedia("Media", new Dictionary<string, object?>());
+            ApplyMprisValues(LinuxMprisSource.Map("", "", ""));
+            await SavePortableWorkspaceAsync();
+        };
         if (_startBackgroundSources) _ = _mediaLifetime.StartAsync(StartMediaAsync);
     }
 
     private async Task StartMediaAsync()
     {
-        // WPF plug-ins use Windows named-pipe servers; do not activate on Linux.
+        // Winamp verwendet Windows-Pipes; die zurückgestellte Legacy-Quelle wird nicht gestartet.
         if (!OperatingSystem.IsWindows())
         {
             RefreshMedia();
@@ -50,7 +57,6 @@ public partial class MainWindow
         if (_mediaStopping) return;
         this.FindControl<Border>("WindowsMediaCard")!.IsVisible = true;
         await StartMediaProviderSafeAsync("Winamp", () => _mediaWinamp.StartAsync());
-        await StartMediaProviderSafeAsync("WmpLegacy", () => _mediaLegacy.StartAsync());
         if (!_mediaStopping) RefreshMedia();
     }
 
@@ -62,7 +68,7 @@ public partial class MainWindow
         {
             _mediaErrors[provider] = ex.GetBaseException().Message;
             _applicationJournal.Record("Media", provider + " startup failed (" + ex.GetBaseException().GetType().Name + ")");
-            System.Diagnostics.Trace.TraceError("Media startup {0} failed: {1}", provider, ex);
+            System.Diagnostics.Trace.TraceError("Media startup {0} failed: {1}: {2}", provider, ex.GetBaseException().GetType().Name, ex.GetBaseException().Message);
             if (_mediaStopping) return;
             _pageSources.UpdateMedia(provider, new Dictionary<string, object?>());
             var controlName = provider switch
@@ -70,7 +76,7 @@ public partial class MainWindow
                 "WindowsMedia" => "WindowsMediaStatus",
                 "Winamp" => "WinampMediaStatus",
                 "Media" => "LinuxMediaStatus",
-                _ => "WmpLegacyMediaStatus"
+                _ => throw new ArgumentException("Unknown media provider.", nameof(provider))
             };
             var status = this.FindControl<TextBlock>(controlName);
             if (status is not null)
@@ -95,7 +101,6 @@ public partial class MainWindow
         }
         RefreshMediaProvider("WindowsMedia", RefreshWindowsMedia);
         RefreshMediaProvider("Winamp", () => RefreshMediaSource("Winamp", _mediaWinamp.Values));
-        RefreshMediaProvider("WmpLegacy", () => RefreshMediaSource("WmpLegacy", _mediaLegacy.Values));
     }
 
     private void RefreshMediaProvider(string provider, Action refresh)
@@ -109,12 +114,12 @@ public partial class MainWindow
         {
             _applicationJournal.Record("Media", provider + " refresh failed (" + ex.GetBaseException().GetType().Name + ")");
             var message = ex.GetBaseException().Message;
-            System.Diagnostics.Trace.TraceError("Media provider {0} failed: {1}", provider, ex);
+            System.Diagnostics.Trace.TraceError("Media provider {0} failed: {1}: {2}", provider, ex.GetBaseException().GetType().Name, message);
             var status = provider switch
             {
                 "WindowsMedia" => "WindowsMediaStatus",
                 "Winamp" => "WinampMediaStatus",
-                _ => "WmpLegacyMediaStatus"
+                _ => throw new ArgumentException("Unknown media provider.", nameof(provider))
             };
             _pageSources.UpdateMedia(provider, new Dictionary<string, object?>());
             var statusControl = this.FindControl<TextBlock>(status);
@@ -140,35 +145,78 @@ public partial class MainWindow
     {
         if (_mprisRefreshing) return;
         _mprisRefreshing = true;
+        var selectedPlayer = _selectedMediaPlayer;
         try
         {
-            var values = await _mpris.ReadAsync(_mediaCancellation.Token);
-            if (_mediaStopping) return;
-            _pageSources.UpdateMedia("Media", values);
-            string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
-            SetUiText("LinuxMediaStatus", Read("Connected") == "True" ? "Connected" : "Disconnected");
-            this.FindControl<TextBlock>("LinuxMediaTitle")!.Text = Read("Title");
-            this.FindControl<TextBlock>("LinuxMediaArtist")!.Text = Read("Artist");
-            this.FindControl<TextBlock>("LinuxMediaAlbum")!.Text = Read("Album");
-            SetUiText("LinuxMediaPlayback", Read("State"));
-            this.FindControl<TextBlock>("LinuxMediaDuration")!.Text = Read("Duration");
+            var snapshot = await _mpris.ReadSnapshotAsync(selectedPlayer, _mediaCancellation.Token);
+            if (_mediaStopping || selectedPlayer != _selectedMediaPlayer) return;
+            ApplyMprisSnapshot(snapshot);
         }
         catch (Exception ex)
         {
-            if (_mediaStopping) return;
+            if (_mediaStopping || selectedPlayer != _selectedMediaPlayer) return;
             _applicationJournal.Record("Media", "MPRIS refresh failed (" + ex.GetBaseException().GetType().Name + ")");
             System.Diagnostics.Trace.TraceError("Linux MPRIS refresh failed: {0}", ex);
             _pageSources.UpdateMedia("Media", new Dictionary<string, object?>());
+            ApplyMprisValues(LinuxMprisSource.Map("", "", ""));
             var status = this.FindControl<TextBlock>("LinuxMediaStatus");
-            if (status is not null) SetUiText(status, $"Provider error: {MediaErrorMessage("Media", ex)}");
+            if (status is not null)
+            {
+                SetUiText(status, $"Provider error: {MediaErrorMessage("Media", ex)}");
+                status.Foreground = global::Avalonia.Media.Brushes.DarkRed;
+            }
         }
         finally { _mprisRefreshing = false; }
+    }
+
+    internal void UpdateMediaPlayerPicker(IReadOnlyList<string> players)
+    {
+        _updatingMediaPlayers = true;
+        try
+        {
+            var picker = this.FindControl<ComboBox>("LinuxMediaPlayer")!;
+            var choices = new List<string> { UiText("Automatic player") };
+            choices.AddRange(players);
+            if (_selectedMediaPlayer is not null && !choices.Skip(1).Contains(_selectedMediaPlayer)) choices.Add(_selectedMediaPlayer);
+            picker.ItemsSource = choices;
+            picker.SelectedIndex = _selectedMediaPlayer is null ? 0 : choices.FindIndex(1, item => item == _selectedMediaPlayer);
+        }
+        finally { _updatingMediaPlayers = false; }
+    }
+
+    internal void ApplyMprisSnapshot(MprisSnapshot snapshot)
+    {
+        UpdateMediaPlayerPicker(snapshot.Players);
+        _pageSources.UpdateMedia("Media", snapshot.Values);
+        ApplyMprisValues(snapshot.Values);
+    }
+
+    internal void ApplyMprisValues(IReadOnlyDictionary<string, object?> values)
+    {
+        this.FindControl<TextBlock>("LinuxMediaStatus")!.ClearValue(TextBlock.ForegroundProperty);
+        string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
+        SetUiText("LinuxMediaStatus", Read("Connected") == "True" ? "Connected" : "Disconnected");
+        SetUiText("LinuxMediaTitle", string.IsNullOrWhiteSpace(Read("Title")) ? "Nothing playing" : (UiMessage)$"{Read("Title")}");
+        foreach (var field in new[] { "Artist", "Album", "Playback", "Duration" })
+        {
+            var text = field switch
+            {
+                "Playback" => Read("State"),
+                "Duration" => string.IsNullOrEmpty(Read("Elapsed")) && string.IsNullOrEmpty(Read("Duration"))
+                    ? "" : Read("Elapsed") + " / " + Read("Duration"),
+                _ => Read(field)
+            };
+            var control = this.FindControl<TextBlock>("LinuxMedia" + field)!;
+            control.IsVisible = !string.IsNullOrWhiteSpace(text);
+            if (field == "Playback") SetUiText(control, text);
+            else control.Text = text;
+        }
     }
 
     private void RefreshMediaSource(string id, IReadOnlyDictionary<string, object?> values)
     {
         _pageSources.UpdateMedia(id, values);
-        var prefix = id == "Winamp" ? "WinampMedia" : "WmpLegacyMedia";
+        var prefix = "WinampMedia";
         string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
         SetUiText(prefix + "Status", Read("Connected") == "True" ? "Connected" : "Disconnected");
         SetUiText(prefix + "Title", string.IsNullOrWhiteSpace(Read("Title")) ? "Nothing playing" : (UiMessage)$"{Read("Title")}");
@@ -211,7 +259,7 @@ public partial class MainWindow
         await _mediaLifetime.StopAsync(() => RuntimeShutdown.RunAsync(
             () => _mediaRefresh,
             () => _windowsMedia.DisposeAsync().AsTask(),
-            () => _mediaWinamp.StopAsync(), () => _mediaLegacy.StopAsync(),
-            () => _mediaWinamp.DisposeAsync().AsTask(), () => _mediaLegacy.DisposeAsync().AsTask()));
+            () => _mediaWinamp.StopAsync(),
+            () => _mediaWinamp.DisposeAsync().AsTask()));
     }
 }

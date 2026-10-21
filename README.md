@@ -13,11 +13,11 @@ LIS2 Control Center is an independent replacement for the obsolete VL System Mul
 
 ## Avalonia-Arbeitsstand
 
-Stand: 21.10.2026, Implementierungsstand PORT-03 mit lokalisierter Oberfläche und Hilfe. Die gemeinsame App unter `src/LIS2.App.Avalonia` enthält zehn Hauptansichten, Display-/Seiten-/Ereignisruntime, Glyphen, Windows-/Linux-Sensoren, Lüfterregelung mit ausdrücklicher serieller Freigabe, HA, Medien, Workspace, Hilfe und About. Der modale Variablenbrowser ist eine genehmigte Abweichung von WPF.
+Stand: 21.10.2026, Implementierungsstand PORT-04 mit gespeicherter Linux-Playerauswahl und Spielposition. Die gemeinsame App unter `src/LIS2.App.Avalonia` enthält zehn Hauptansichten, Display-/Seiten-/Ereignisruntime, Glyphen, Windows-/Linux-Sensoren, Lüfterregelung mit ausdrücklicher serieller Freigabe, HA, Medien, Workspace, Hilfe und About. Der modale Variablenbrowser ist eine genehmigte Abweichung von WPF.
 
-Lokal sind 359/359 Avalonia-Tests auf Windows erfolgreich. Gerätebedienung, Einstellungen und alle zehn Menüseiten werden mit tatsächlichen Avalonia-Controls und Skia-Rendering geprüft. Statische Texte und dynamische Meldungen folgen der gewählten Sprache; Metadaten und technische Schlüssel bleiben unverändert. Die Hilfe folgt Deutsch, Englisch, Französisch, Türkisch, Russisch oder der Systemsprache, auch bei geöffnetem Dialog. Ein nativer Windows-Smoke startet zehn Ansichten, Hilfe/About, fehlende Medienanbieter und Diagnose und wartet auf den Shutdown. Der aktuelle CI-Nachweis und die Sichtprüfungen stehen im [Status](docs/prp/linux-port-status.md). Extrahierter Paketstart, echte ARM64-Ausführung und physische LIS2-Prüfung bleiben offen.
+Lokal sind 375/375 Avalonia-Tests auf Windows erfolgreich. Gerätebedienung, Einstellungen und alle zehn Menüseiten werden mit tatsächlichen Avalonia-Controls und Skia-Rendering geprüft. Statische Texte und dynamische Meldungen folgen der gewählten Sprache; Metadaten und technische Schlüssel bleiben unverändert. Die Hilfe folgt Deutsch, Englisch, Französisch, Türkisch, Russisch oder der Systemsprache, auch bei geöffnetem Dialog. Ein nativer Windows-Smoke startet zehn Ansichten, Hilfe/About, fehlende Medienanbieter und Diagnose und wartet auf den Shutdown. Der aktuelle CI-Nachweis und die Sichtprüfungen stehen im [Status](docs/prp/linux-port-status.md). Extrahierter Paketstart, echte ARM64-Ausführung und physische LIS2-Prüfung bleiben offen.
 
-Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. Transport, Port, HA-Aktivierung und Helligkeit werden gespeichert. Gemeinsame Displayaktionen verwenden den angewendeten Transport. Der Windows-Import ist sichtbar; manuelle Lüfterausgaben beachten Kanalgrenzen und benötigen bei serieller Ausgabe je Aktion eine Freigabe. Nächstes Paket: Quellen und Medien (PORT-04).
+Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. Transport, Port, HA-Aktivierung und Helligkeit werden gespeichert. Gemeinsame Displayaktionen verwenden den angewendeten Transport. Der Windows-Import ist sichtbar; manuelle Lüfterausgaben beachten Kanalgrenzen und benötigen bei serieller Ausgabe je Aktion eine Freigabe. Die Medienimplementierung aus PORT-04 ist geprüft; Liveplayer-Nachweise bleiben offen. Nächstes Implementierungspaket: Home Assistant und Tokenstore (PORT-05).
 
 ## WPF-Funktionsreferenz
 
@@ -83,7 +83,7 @@ The modern Windows 11 Media Player is integrated directly through **Global Syste
 - ready-made Now Playing page preset
 - dedicated Media-page card alongside Winamp
 
-Windows Media Player Legacy bleibt im Produktumfang zurückgestellt; die WPF-Integration und nativen Legacy-CI-Artefakte sind deaktiviert. Der Avalonia-Code startet unter Windows derzeit dennoch die Legacy-Quelle und zeigt ihre Karte. Dieser Widerspruch ist als offene Arbeit erfasst und bedeutet keine Freigabe des Legacy-Umfangs.
+Windows Media Player Legacy bleibt im Produktumfang zurückgestellt. WPF und Avalonia starten die Legacy-Quelle nicht; Avalonia zeigt keine Legacy-Karte. Native Legacy-CI-Artefakte sind deaktiviert.
 
 ### Home Assistant
 
@@ -262,7 +262,7 @@ Development artifacts:
 
 Tagged releases additionally contain portable ZIP packages and `SHA256SUMS.txt`. See [Release process](docs/release.md).
 
-Der separate Workflow `linux-portable.yml` prüft `feature/linux-avalonia` einschließlich nativem Windows-/Linux-X11-Smoke und erzeugt `LIS2-Avalonia-win-x64`, `LIS2-Avalonia-linux-x64` und `LIS2-Avalonia-linux-arm64`. Smoke-Screenshots und Ergebnisdateien werden separat hochgeladen. Jedes Paketartefakt enthält ein Archiv und eine SHA-256-Datei; die Aufbewahrung beträgt 14 Tage. Tag-Releases veröffentlichen derzeit weiterhin WPF. Der Avalonia-Workflow führt keine WPF-Tests aus.
+Der separate Workflow `linux-portable.yml` prüft `feature/linux-avalonia` einschließlich nativem Windows-/Linux-X11-Smoke und erzeugt `LIS2-Avalonia-win-x64`, `LIS2-Avalonia-linux-x64` und `LIS2-Avalonia-linux-arm64`. Smoke-Screenshots und Ergebnisdateien werden separat hochgeladen. Der Workflow erzeugt zusätzlich `LIS2-ProtocolTester-win-x64` und `gen_lis2-win32` wie main. Das Windows-App-Paket enthält den GSMTC-Anbieter samt WinRT-Abhängigkeiten und wird mit einem Anbieter-Starttest geprüft. Jedes Avalonia-Paketartefakt enthält ein Archiv und eine SHA-256-Datei; die Aufbewahrung beträgt 14 Tage. Tag-Releases veröffentlichen derzeit weiterhin WPF. Der Avalonia-Workflow führt keine WPF-Tests aus.
 
 ## Documentation
 
