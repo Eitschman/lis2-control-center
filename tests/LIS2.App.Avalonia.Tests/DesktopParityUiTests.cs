@@ -73,6 +73,16 @@ public sealed class DesktopParityUiTests
             await WaitUntil(() => window.OwnedWindows.Any(dialog => dialog.Name == "HelpDialog"));
             var help = window.OwnedWindows.Single(dialog => dialog.Name == "HelpDialog");
             Assert.Equal(1, help.GetVisualDescendants().OfType<ListBox>().Single(list => list.Name == "HelpSections").SelectedIndex);
+            if (language == "French")
+            {
+                help.Width = 840;
+                help.Height = 600;
+                help.GetVisualDescendants().OfType<ListBox>().Single(list => list.Name == "HelpSections").SelectedIndex = 3;
+                await Capture(help, "port06-French-media-help");
+                var reference = help.GetVisualDescendants().OfType<ScrollViewer>().Single(scroll => scroll.Content is StackPanel);
+                reference.Offset = new Vector(0, reference.Extent.Height);
+                await Capture(help, "port06-French-media-help-reference");
+            }
             help.Close();
             Assert.True(window.IsEnabled);
             Click(window, "NavButton4");

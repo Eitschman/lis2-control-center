@@ -121,7 +121,10 @@ internal static class DesktopSmoke
     private static void Capture(Window window, string path)
     {
         window.UpdateLayout();
-        using var bitmap = new RenderTargetBitmap(new PixelSize((int)window.Bounds.Width, (int)window.Bounds.Height));
+        var scaling = window.RenderScaling;
+        using var bitmap = new RenderTargetBitmap(new PixelSize(
+            (int)Math.Ceiling(window.Bounds.Width * scaling), (int)Math.Ceiling(window.Bounds.Height * scaling)),
+            new Vector(96 * scaling, 96 * scaling));
         bitmap.Render(window);
         bitmap.Save(path);
     }

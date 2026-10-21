@@ -19,7 +19,7 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal bestehen 399 Avalonia-Tests; der zusätzliche Linux-Schlüsselbundtest ist unter Windows übersprungen. HA-Verbindungsabläufe verwenden einen lokalen WebSocket-Protokollpartner. Linux-CI führt die Suite mit isoliertem echtem Secret Service aus; der aktuelle Nachweis steht im [Status](linux-port-status.md). Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu.
+Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal bestehen 416 Avalonia-Tests; der zusätzliche Linux-Schlüsselbundtest ist unter Windows übersprungen. HA-Verbindungsabläufe verwenden einen lokalen WebSocket-Protokollpartner. Linux-CI führt die Suite mit isoliertem echtem Secret Service aus; der aktuelle Nachweis steht im [Status](linux-port-status.md). Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu.
 
 ## Implementierungsstand
 
