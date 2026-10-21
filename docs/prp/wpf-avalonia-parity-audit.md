@@ -1,6 +1,6 @@
 # WPF-/Avalonia-Paritätsaudit
 
-Stand: 21.10.2026. Implementierungsstand: PORT-04.
+Stand: 21.10.2026. Implementierungsstand: PORT-05.
 
 Referenz: [WPF-XAML](../../src/LIS2.App/MainWindow.xaml), [WPF-Code](../../src/LIS2.App/MainWindow.xaml.cs), [Avalonia-AXAML](../../src/LIS2.App.Avalonia/MainWindow.axaml) und zugehörige partielle Dateien. Vorhandene Ansichten oder identische Controlnamen sind keine Verhaltens- oder Darstellungsabnahme.
 
@@ -17,7 +17,7 @@ Referenz: [WPF-XAML](../../src/LIS2.App/MainWindow.xaml), [WPF-Code](../../src/L
 | Fan Control | Vier Kanäle, Modi, Grenzen, Hysterese, Kurventext/-vorschau, Dry-run, virtuelle und serielle Regelung; MainWindow.Fans | Separate Test-/Freigabeaktionen gegenüber WPF abgleichen. Sicherheit erhalten; Tastatur, fehlerhafte Kurven, Status und Werte bei aktivem Runtimepfad prüfen |
 | Settings | Transport/Port/HA-Aktivierung gespeichert, explizites Anwenden/Trennen, Helligkeit beim Connect, sichtbarer Windows-Import einschließlich Hardwarepräferenzen | Nativer Import-Dateidialog und Linux-Tray/Autostart offen; erweiterte Serial-Testcontrols bleiben ausgeblendet |
 | Diagnostics | Snapshot, virtueller Zustand, dekodierte Historie, UTC-Anwendungs-/Transportjournal und Export; MainWindow.Diagnostics | Begrenztes Sitzungsjournal statt dauerhaftem Logarchiv. Native Dateiauswahl und Exportformat gegen WPF prüfen |
-| Home Assistant | Eigene View mit Enable/URL/Token/Test/Save, Entitäten, Attributen, Copy/Create; Entwurfsschutz/Reload und eigenes persistiertes Aktivierungsfeld | Nicht in Pages eingebettet. Tokenstore-Ausweichpfad, echte Deaktivierung/Wiederverbindung und Linux-Liveprüfung offen |
+| Home Assistant | Eigene View mit Enable/URL/Token/Test/Save, Entitäten, Attributnamen/-werten, Copy/Create; wirksame Aliase, Favoriten und persistierte Aktivierung; lokale Linux-AES-Wahl ausdrücklich genehmigt | Nicht in Pages eingebettet. Reale HA-Instanz und Desktop-Keyring auf Zielsystemen offen; Reconnect/Stop und Persistenz mit isolierten Daten geprüft |
 
 Alle zehn Views sind im AXAML vorhanden und über die Navigation angebunden. „Media, Events und Home Assistant fehlen“ beschreibt diesen Code nicht.
 
@@ -33,7 +33,7 @@ System/Light/Dark, fünf Sprachkataloge, Windows-Tray und Autostart existieren. 
 
 Der Benutzer hat den modalen Variablenbrowser als Ersatz der großen WPF-Variablen-ComboBox genehmigt. Er enthält Suche/Kategorien/HA-Filter, aktuelle Werte, persistente Favoriten und Einfügen in beide Zeilen. Stored Templates bleiben unverändert.
 
-Physische Lüfterausgabe erfordert eine ausdrückliche, nicht persistierte Freigabe. Eine WPF-ähnliche Schaltfläche rechtfertigt kein Umgehen dieses Pfades. Zusätzliche/verschobene Bedienelemente, WMP-Legacy-Aktivierung und lokaler Tokenstore werden durch ihre Erwähnung nicht genehmigt.
+Physische Lüfterausgabe erfordert eine ausdrückliche, nicht persistierte Freigabe. Eine WPF-ähnliche Schaltfläche rechtfertigt kein Umgehen dieses Pfades. Zusätzliche/verschobene Bedienelemente benötigen eine fachliche Grundlage. Die lokale Linux-Tokenspeicherung ist nur mit ausdrücklicher Auswahl in der App genehmigt; der automatische Ausweichpfad entfällt. WMP Legacy bleibt deaktiviert.
 
 ## Prüfnachweise und verbleibende Abnahme
 

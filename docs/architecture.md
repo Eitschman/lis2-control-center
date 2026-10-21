@@ -86,7 +86,7 @@ Der Workspace enthält Seiten, Glyphen, Lüftereinstellungen, Transportmodus, Po
 
 `WindowsSettingsImporter` validiert bekannte Felder einschließlich Geräteauswahl, HA-Aktivierung und Hardwarepräferenzen, ohne Windows-Tokens zu importieren. Sein Button ist unter Einstellungen sichtbar. Der UI-Ablauf speichert vor dem Anwenden, drainiert und trennt bisherige Geräte und beendet die HA-Verbindung. Anschließend verbindet er den importierten Gerätetransport; HA wird bei Bedarf ausdrücklich neu verbunden.
 
-`PortableHaTokenStore` verwendet Windows DPAPI bzw. Linux `secret-tool`. Bei fehlendem Secret Service schreibt der Linux-Pfad automatisch AES-GCM-Chiffretext und einen lokalen Schlüssel. Migration in den nativen Store wird versucht. Dieser vorhandene Ausweichpfad ist ein offener Freigabe-/Sicherheitsbefund, keine zugesicherte Gleichwertigkeit zum nativen Store.
+`PortableHaTokenStore` verwendet Windows DPAPI bzw. Linux `secret-tool`. Unter Linux wählt der Benutzer lokale AES-GCM-Dateien ausdrücklich über `HomeAssistantLocalTokenStorage`; fehlender oder gesperrter Secret Service wechselt die Speicherart nicht. Schlüssel und Chiffretext liegen getrennt vom Workspace nebeneinander mit Unix-Dateirechten 0600. Dies schützt nicht gegen Zugriff mit demselben Benutzerkonto. Im nativen Modus werden lokale Dateien erst nach erfolgreichem Speichern und Rücklesen entfernt. Löschfehler bleiben sichtbar; HA wird trotzdem gestoppt und seine Deaktivierung gespeichert. Der Schlüsselbundprozess liest stdout/stderr parallel und hat eine Frist von zehn Sekunden. `PageSourceValues` ergänzt originale HA-Schlüssel um normalisierte Aliase einschließlich Einheiten und Attributen; Stop und Verbindungsabbruch entfernen alte Quellwerte.
 
 ## Desktop und Lebenszyklus
 

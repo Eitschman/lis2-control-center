@@ -391,6 +391,7 @@
           <StackPanel Spacing="10">
             <TextBlock Text="Connection" FontWeight="SemiBold" FontSize="18" />
             <CheckBox Name="HaEnabled" Content="Enable Home Assistant" />
+            <CheckBox Name="HaLocalTokenStorage" Content="Store token in a local AES file" />
             <WrapPanel>
               <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,8,8">
                 <TextBlock Text="URL" VerticalAlignment="Center" />
@@ -405,6 +406,7 @@
               <Button Margin="0,0,8,8" Name="HaTest" Content="Test connection" />
               <Button Margin="0,0,8,8" Name="HaConnect" Content="Save / reconnect" />
             </WrapPanel>
+            <TextBlock Name="HaActionStatus" IsVisible="False" TextWrapping="Wrap" />
           </StackPanel>
         </Border>
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
@@ -419,9 +421,9 @@
             <Grid ColumnDefinitions="34,2.4*,1.4*,1*,1.7*" Margin="8,4,8,0">
               <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
               <TextBlock Grid.Column="1" Text="Entity" FontWeight="SemiBold"/>
-              <TextBlock Grid.Column="2" Text="Friendly name" FontWeight="SemiBold"/>
-              <TextBlock Grid.Column="3" Text="State" FontWeight="SemiBold"/>
-              <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold"/>
+              <TextBlock Grid.Column="2" Text="Friendly name" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,6,0"/>
+              <TextBlock Grid.Column="3" Text="State" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,6,0"/>
+              <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold" TextWrapping="Wrap"/>
             </Grid>
             <ListBox Name="HaEntityList" MinHeight="160" MaxHeight="330">
               <ListBox.ItemTemplate>
@@ -445,7 +447,16 @@
             <WrapPanel><TextBlock Margin="0,0,8,8" Text="Alias" VerticalAlignment="Center" /><TextBox Margin="0,0,8,8" Name="HaAlias" Width="220" /><CheckBox Margin="0,0,8,8" Name="HaFavorite" Content="Favorite" /><Button Margin="0,0,8,8" Name="HaSaveEntity" Content="Save entity" /></WrapPanel>
             <WrapPanel><Button Margin="0,0,8,8" Name="HaCopyKey" Content="Copy key" /><Button Margin="0,0,8,8" Name="HaCreatePage" Content="Create display page" /></WrapPanel>
             <TextBlock Text="Attributes" FontWeight="SemiBold" />
-            <ListBox Name="HaAttributes" Height="150" />
+            <ListBox Name="HaAttributes" Height="150">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="2*,3*" Margin="2,4">
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" Margin="0,0,8,0"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Value}" TextWrapping="Wrap"/>
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
             <WrapPanel><Button Margin="0,0,8,8" Name="HaCopyAttributeKey" Content="Copy key" /><Button Margin="0,0,8,8" Name="HaCreateAttributePage" Content="Create attribute page" /></WrapPanel>
 
           </StackPanel>

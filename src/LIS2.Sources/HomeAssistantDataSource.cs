@@ -28,7 +28,8 @@ public sealed class HomeAssistantDataSource : IDataSource
         Volatile.Read(ref _entities);
 
     public bool IsConfigured =>
-        Uri.TryCreate(_baseUrl, UriKind.Absolute, out _) &&
+        Uri.TryCreate(_baseUrl, UriKind.Absolute, out var uri) &&
+        uri.Scheme is "http" or "https" &&
         !string.IsNullOrWhiteSpace(_accessToken);
 
     public bool IsConnected { get; private set; }
@@ -84,23 +85,16 @@ public sealed class HomeAssistantDataSource : IDataSource
         try
         {
             if (_cts is null)
+            {
+                LastError = null;
+                PublishEmpty();
                 return;
+            }
 
             await _cts.CancelAsync().ConfigureAwait(false);
 
-            if (_socket is { State: WebSocketState.Open or WebSocketState.CloseReceived })
-            {
-                try
-                {
-                    await _socket.CloseAsync(
-                        WebSocketCloseStatus.NormalClosure,
-                        "LIS2 Control Center stopping",
-                        CancellationToken.None).ConfigureAwait(false);
-                }
-                catch
-                {
-                }
-            }
+            // Der lokale Shutdown wartet nicht auf eine Antwort des HA-Servers.
+            _socket?.Abort();
 
             if (_loopTask is not null)
             {
@@ -119,6 +113,8 @@ public sealed class HomeAssistantDataSource : IDataSource
             _cts.Dispose();
             _cts = null;
             IsConnected = false;
+            LastError = null;
+            PublishEmpty();
         }
         finally
         {
@@ -136,7 +132,7 @@ public sealed class HomeAssistantDataSource : IDataSource
         timeout.CancelAfter(TimeSpan.FromSeconds(10));
 
         await socket.ConnectAsync(CreateWebSocketUri(), timeout.Token).ConfigureAwait(false);
-        var hello = await ReceiveJsonAsync(socket, timeout.Token).ConfigureAwait(false);
+        using var hello = await ReceiveJsonAsync(socket, timeout.Token).ConfigureAwait(false);
 
         if (GetType(hello) != "auth_required")
             throw new InvalidOperationException("Unexpected Home Assistant WebSocket greeting.");
@@ -146,7 +142,7 @@ public sealed class HomeAssistantDataSource : IDataSource
             new { type = "auth", access_token = _accessToken },
             timeout.Token).ConfigureAwait(false);
 
-        var auth = await ReceiveJsonAsync(socket, timeout.Token).ConfigureAwait(false);
+        using var auth = await ReceiveJsonAsync(socket, timeout.Token).ConfigureAwait(false);
         var type = GetType(auth);
 
         if (type == "auth_invalid")
@@ -175,15 +171,13 @@ public sealed class HomeAssistantDataSource : IDataSource
             }
             catch (Exception ex)
             {
-                IsConnected = false;
                 LastError = ex.Message;
-                Changed?.Invoke(this, EventArgs.Empty);
             }
             finally
             {
                 _socket?.Dispose();
                 _socket = null;
-                IsConnected = false;
+                PublishEmpty();
             }
 
             await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
@@ -195,7 +189,7 @@ public sealed class HomeAssistantDataSource : IDataSource
         _socket = new ClientWebSocket();
         await _socket.ConnectAsync(CreateWebSocketUri(), cancellationToken).ConfigureAwait(false);
 
-        var greeting = await ReceiveJsonAsync(_socket, cancellationToken).ConfigureAwait(false);
+        using var greeting = await ReceiveJsonAsync(_socket, cancellationToken).ConfigureAwait(false);
         if (GetType(greeting) != "auth_required")
             throw new InvalidOperationException("Unexpected Home Assistant WebSocket greeting.");
 
@@ -204,7 +198,7 @@ public sealed class HomeAssistantDataSource : IDataSource
             new { type = "auth", access_token = _accessToken },
             cancellationToken).ConfigureAwait(false);
 
-        var auth = await ReceiveJsonAsync(_socket, cancellationToken).ConfigureAwait(false);
+        using var auth = await ReceiveJsonAsync(_socket, cancellationToken).ConfigureAwait(false);
         var authType = GetType(auth);
 
         if (authType == "auth_invalid")
@@ -248,6 +242,11 @@ public sealed class HomeAssistantDataSource : IDataSource
         var type = message.TryGetProperty("type", out var rawType)
             ? rawType.GetString()
             : null;
+
+        if (type == "result" && message.TryGetProperty("id", out var requestId) &&
+            requestId.GetInt32() is 1 or 2 &&
+            message.TryGetProperty("success", out var requestSuccess) && !requestSuccess.GetBoolean())
+            throw new InvalidOperationException("Home Assistant state or subscription request failed.");
 
         if (type == "result" &&
             message.TryGetProperty("id", out var rawId) &&
@@ -355,6 +354,9 @@ public sealed class HomeAssistantDataSource : IDataSource
         Volatile.Write(
             ref _entities,
             Array.Empty<HomeAssistantEntityInfo>());
+        HomeAssistantVersion = null;
+        LastUpdateAt = null;
+        IsConnected = false;
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
@@ -403,7 +405,7 @@ public sealed class HomeAssistantDataSource : IDataSource
 
     private Uri CreateWebSocketUri()
     {
-        if (!Uri.TryCreate(_baseUrl, UriKind.Absolute, out var baseUri))
+        if (!Uri.TryCreate(_baseUrl, UriKind.Absolute, out var baseUri) || baseUri.Scheme is not ("http" or "https"))
             throw new InvalidOperationException("Home Assistant URL is invalid.");
 
         var builder = new UriBuilder(baseUri)

@@ -15,6 +15,11 @@ public sealed class PortableHaTokenStore
     private readonly string _directory;
     private readonly LegacyHaTokenStore _legacy;
     private readonly string _secretTool;
+    private readonly Func<string, string?, string?>? _nativeOperation;
+    private readonly TimeSpan _requestTimeout = TimeSpan.FromSeconds(10);
+
+    /// <summary>Lokale AES-Dateien nur nach ausdrücklicher Auswahl verwenden.</summary>
+    public bool UseLocalStorage { get; set; }
 
     public PortableHaTokenStore(string? directory = null, string secretTool = "secret-tool")
     {
@@ -23,10 +28,23 @@ public sealed class PortableHaTokenStore
         _secretTool = secretTool;
     }
 
+    internal PortableHaTokenStore(string directory, Func<string, string?, string?> nativeOperation)
+        : this(directory) => _nativeOperation = nativeOperation;
+
+    internal PortableHaTokenStore(string directory, string secretTool, TimeSpan requestTimeout)
+        : this(directory, secretTool) => _requestTimeout = requestTimeout;
+
     public void Save(string token)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(token);
-        if (OperatingSystem.IsWindows())
+        if (UseLocalStorage)
+        {
+            _legacy.Save(token);
+            if (_legacy.Load() != token) throw new CryptographicException("Local credential store verification failed.");
+            return;
+        }
+        if (_nativeOperation is not null) _nativeOperation("store", token);
+        else if (OperatingSystem.IsWindows())
         {
             Directory.CreateDirectory(_directory);
             var bytes = Encoding.UTF8.GetBytes(token);
@@ -42,12 +60,7 @@ public sealed class PortableHaTokenStore
         }
         else if (OperatingSystem.IsLinux())
         {
-            try { RunSecretTool("store", token); }
-            catch (Exception ex) when (IsSecretServiceUnavailable(ex))
-            {
-                _legacy.Save(token);
-                return;
-            }
+            RunSecretTool("store", token);
         }
         else throw new PlatformNotSupportedException("No supported native credential store on this platform.");
 
@@ -63,44 +76,43 @@ public sealed class PortableHaTokenStore
 
     public string? Load()
     {
-        string? native;
-        try { native = LoadNative(); }
-        catch (Exception ex) when (OperatingSystem.IsLinux() && IsSecretServiceUnavailable(ex))
-        {
-            return _legacy.Load();
-        }
+        if (UseLocalStorage) return _legacy.Load();
+        var native = LoadNative();
         if (!string.IsNullOrEmpty(native)) return native;
         var legacy = _legacy.Load();
         if (string.IsNullOrEmpty(legacy)) return null;
-        // Do not break startup when the desktop keyring is unavailable/locked:
-        // keep the old encrypted token until a future successful migration.
-        try { Save(legacy); }
-        catch (Exception) when (OperatingSystem.IsLinux()) { }
+        // Bei gesperrtem Keyring bleiben die alten Dateien erhalten; der Fehler
+        // wird angezeigt, statt automatisch die lokale Speicherung zu verwenden.
+        Save(legacy);
         return legacy;
     }
 
     public void Delete()
     {
-        if (OperatingSystem.IsWindows())
+        if (UseLocalStorage) { DeleteLocal(); return; }
+        if (_nativeOperation is not null) _nativeOperation("clear", null);
+        else if (OperatingSystem.IsWindows())
         {
             var path = Path.Combine(_directory, "ha-token.dpapi");
             if (File.Exists(path)) File.Delete(path);
         }
         else if (OperatingSystem.IsLinux())
         {
-            try { RunSecretTool("clear", null); }
-            catch (Exception ex) when (IsSecretServiceUnavailable(ex)) { }
+            RunSecretTool("clear", null);
         }
+        DeleteLocal();
+    }
+
+    private void DeleteLocal()
+    {
         _legacy.Delete();
         var key = Path.Combine(_directory, "ha-token.key");
         if (File.Exists(key)) File.Delete(key);
     }
 
-    private static bool IsSecretServiceUnavailable(Exception ex) =>
-        ex is System.ComponentModel.Win32Exception or TimeoutException or IOException;
-
     private string? LoadNative()
     {
+        if (_nativeOperation is not null) return _nativeOperation("lookup", null);
         if (OperatingSystem.IsWindows())
         {
             var path = Path.Combine(_directory, "ha-token.dpapi");
@@ -113,7 +125,10 @@ public sealed class PortableHaTokenStore
         throw new PlatformNotSupportedException();
     }
 
-    private string? RunSecretTool(string operation, string? token)
+    private string? RunSecretTool(string operation, string? token) =>
+        RunSecretToolAsync(operation, token).GetAwaiter().GetResult();
+
+    private async Task<string?> RunSecretToolAsync(string operation, string? token)
     {
         var psi = new ProcessStartInfo(_secretTool)
         {
@@ -132,25 +147,36 @@ public sealed class PortableHaTokenStore
         psi.ArgumentList.Add("lis2-control-center");
         psi.ArgumentList.Add("credential");
         psi.ArgumentList.Add("home-assistant-token");
-        using var process = Process.Start(psi) ?? throw new IOException("Unable to start secret-tool.");
-        if (token is not null)
+        using var process = new Process { StartInfo = psi };
+        try { if (!process.Start()) throw new IOException("Unable to start secret-tool."); }
+        catch (System.ComponentModel.Win32Exception ex)
         {
-            process.StandardInput.Write(token);
-            process.StandardInput.Close();
+            throw new IOException("Secret Service is unavailable. Install secret-tool and unlock the desktop keyring, or explicitly select local AES storage.", ex);
         }
-        else process.StandardInput.Close();
-        var output = process.StandardOutput.ReadToEnd();
-        var error = process.StandardError.ReadToEnd();
-        if (!process.WaitForExit(10000))
+        using var timeout = new CancellationTokenSource(_requestTimeout);
+        var outputTask = process.StandardOutput.ReadToEndAsync(timeout.Token);
+        var errorTask = process.StandardError.ReadToEndAsync(timeout.Token);
+        try
         {
-            process.Kill(true);
+            if (token is not null) await process.StandardInput.WriteAsync(token.AsMemory(), timeout.Token).ConfigureAwait(false);
+            process.StandardInput.Close();
+            await process.WaitForExitAsync(timeout.Token).ConfigureAwait(false);
+            var output = await outputTask.ConfigureAwait(false);
+            var error = await errorTask.ConfigureAwait(false);
+            if (process.ExitCode != 0)
+            {
+                if (operation is "lookup" or "clear" && process.ExitCode == 1 && string.IsNullOrWhiteSpace(error)) return null;
+                throw new IOException("Secret Service request failed. Check the session D-Bus and unlock the desktop keyring.");
+            }
+            return operation == "lookup" ? output.TrimEnd('\r', '\n') : null;
+        }
+        catch (OperationCanceledException) when (timeout.IsCancellationRequested)
+        {
+            if (!process.HasExited) process.Kill(true);
+            await process.WaitForExitAsync().ConfigureAwait(false);
+            try { await Task.WhenAll(outputTask, errorTask).ConfigureAwait(false); }
+            catch (OperationCanceledException) { }
             throw new TimeoutException("Secret Service request timed out.");
         }
-        if (process.ExitCode != 0)
-        {
-            if (operation == "lookup" && string.IsNullOrWhiteSpace(error)) return null;
-            throw new IOException("Secret Service request failed (secret-tool exit " + process.ExitCode + ").");
-        }
-        return operation == "lookup" ? output.TrimEnd('\r', '\n') : null;
     }
 }

@@ -1,11 +1,11 @@
 # Inventar des Avalonia-Branches
 
-Stand: 21.10.2026. Implementierungsstand: PORT-04.
+Stand: 21.10.2026. Implementierungsstand: PORT-05.
 Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Konfiguration. Kein ZIP-Archiv als Implementierungsbaseline.
 
 ## Umfang und Projekte
 
-Der Quellbestand umfasst 291 Dateien, darunter 224 C#-Dateien und 22 C#-Projektdateien. Es gibt neun Testprojekte. Das Avalonia-Testprojekt enthält 37 `*Tests.cs`-Dateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
+Der Quellbestand unter `src`, `tests`, `tools` und `native` umfasst 291 Dateien, darunter 244 C#-Dateien und 22 C#-Projektdateien. Es gibt neun Testprojekte. Das Avalonia-Testprojekt enthält 47 `*Tests.cs`-Dateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
 
 | Gruppe | Projekte | Target |
 | --- | --- | --- |
@@ -68,7 +68,7 @@ Der Abgleich ist eine Bestandsaufnahme. Die unbenutzten Entwurfsverträge sind k
 
 ## Persistierte Daten und Grenzen
 
-`PortableWorkspace` enthält TransportMode, PortName, HomeAssistantEnabled, Pages, Fans, HomeAssistantUrl, CustomGlyphs, HomeAssistantEntityPreferences, HardwareSensorPreferences, PageVariableFavorites, BrightnessPercent, ProgramCustomGlyphsOnConnect, ThemeMode und LanguageMode.
+`PortableWorkspace` enthält TransportMode, PortName, HomeAssistantEnabled, HomeAssistantLocalTokenStorage, Pages, Fans, HomeAssistantUrl, CustomGlyphs, HomeAssistantEntityPreferences, HardwareSensorPreferences, PageVariableFavorites, BrightnessPercent, ProgramCustomGlyphsOnConnect, ThemeMode, LanguageMode und LinuxMediaPlayer. Die lokale Tokenwahl greift nur unter Linux. Der Tokenwert selbst bleibt außerhalb des Workspace.
 
 Der Windows-Importer übernimmt Transportmodus/Port, Seiten, Glyphen, HA-Aktivierung/-URL/-Präferenzen, Hardwarepräferenzen, Fans, Helligkeit, Glyph-on-connect, Theme und Sprache; Windows-Tokens und andere unbekannte Felder werden nicht übertragen. Der Importbutton ist in den Einstellungen sichtbar. Ein fehlender gespeicherter Port bleibt in der Auswahl erhalten. Helligkeit und konfigurierte Glyphen werden beim Verbinden angewendet.
 

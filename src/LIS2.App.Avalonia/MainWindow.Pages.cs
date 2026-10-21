@@ -8,7 +8,7 @@ namespace LIS2.App.Avalonia;
 public partial class MainWindow
 {
     private readonly PageWorkspace _pages = new();
-    private readonly DisplayRuntimeHost _runtime = new();
+    private readonly DisplayRuntimeHost _runtime;
     private PageSourceValues _pageSources => _runtime.Sources;
     private bool _loadingPage;
     private int? _loadedPageIndex;

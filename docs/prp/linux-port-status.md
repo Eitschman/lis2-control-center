@@ -1,8 +1,8 @@
 # Avalonia-Portierung: aktueller Arbeitsstand
 
 Stand: 21.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-04 mit lokalisierter Oberfläche und Hilfe, gespeicherter Linux-Playerauswahl und Spielposition. Reale Playernachweise bleiben offen.
-Geprüfter Code-Commit: `cd4b7799f85f96339f19f2f7bcdd509cbfc231bb`. Nachfolgende reine Dokumentationscommits ändern diesen Code nicht.
+Implementierungsstand: PORT-05 mit HA-Verbindungsprüfungen, Alias-/Attributwerten und ausdrücklich wählbarer lokaler Linux-Tokenspeicherung. Reale HA-/Playernachweise bleiben offen.
+Lokaler PORT-05-Arbeitsstand geprüft; der zugehörige GitHub-CI-Nachweis steht noch aus.
 
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
@@ -10,7 +10,8 @@ Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](..
 
 Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 
-- Avalonia: 375/375 Tests erfolgreich, Exit 0, keine übersprungenen Tests (`TestResults/port04-release.trx`). Die 14 neuen Katalog-/Sprachfälle betreffen statische AXAML-Texte, fünf Sprachen und Systemstandard, zehn Ansichten, About, Sprachwechsel, Statusmeldungen, unveränderte Daten, Lüftermodi und Formatargumente.
+- Avalonia: 399 Tests erfolgreich, ein Linux-Schlüsselbundtest unter Windows übersprungen, 400 Fälle insgesamt, Exit 0 (`TestResults/port05-local.trx`). Die Suite enthält Katalog-/Sprachfälle für statische AXAML-Texte, fünf Sprachen und Systemstandard, zehn Ansichten, About, Sprachwechsel, Statusmeldungen, unveränderte Daten, Lüftermodi und Formatargumente.
+- Gemeinsam genutzte Datenquellen: 13/13 bestehende Tests erfolgreich, Exit 0 (`tests/LIS2.Sources.Tests/TestResults/port05-sources.trx`).
 - Gegenproben: Die deutsche Lüfterüberschrift blieb vor der Ergänzung englisch (`menu-language-negative.trx`). Musiktitel wie Connected wurden vor der Eingrenzung der statischen Übersetzung verändert; 6/6 Fälle erkennen das (`menu-data-negative.trx`, Exit 1). Ein falscher französischer Formatindex wird vom Katalogtest erkannt (`menu-placeholder-negative.trx`, 1/1 fehlgeschlagen). Regulären Stand wiederhergestellt und gesamte Suite mit Exit 0 geprüft.
 - Hilfe: fünf Sprachen, Systemstandard und Sprachwechsel im offenen Dialog mit echten Controls geprüft. Katalogtests decken alle zehn Themen, leere und gefüllte Variablenlisten, unveränderte technische Schlüssel sowie die Ausführung von HA-Formatierungs-/Sichtbarkeitsbeispielen und numerischen Glyphenreferenzen ab. Die Gegenprobe vor der Korrektur scheiterte bei deutscher Sprache am englischen Dialogtitel (`help-language-negative.trx`, Exit 1).
 - Sieben Fälle in `RuntimeHardeningTests` prüfen verzögerten erfolgreichen/fehlgeschlagenen Start gegen Shutdown, Fortsetzung nach Cleanup-Fehlern, differenzielle serielle/virtuelle Frames, Teilfehler, manuelle Cacheinvalidierung, Reconnect mit/ohne Lüfterfreigabe, begrenztes Journal sowie tatsächliche Ansichten und Dialoge.
@@ -21,11 +22,19 @@ Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 
 Diagnose, Hilfe/About und Medienfehler wurden unter Windows und Linux gerendert und angesehen. Die Linux-Ansichten stammen aus dem nativen X11-Smoke; die korrigierte Fehlermeldung benennt das fehlende playerctl mit Installationshinweis. Die Fehleranzeige verwendet Textumbruch und rote Schrift. Screenshots liegen unter `TestResults/screenshots/port03-*.png` und in den nativen Smoke-Artefakten. Die Geräte-UI-Tests aus PORT-02 prüfen zusätzlich Dashboard/Display/Settings bei 1305 × 893 und 950 × 600 Pixeln sowie Trennen per Tastatur. Ein automatisierter Bildvergleich besteht nicht.
 
-[CI 39569558081](https://github.com/Eitschman/lis2-control-center/actions/runs/39569558081) prüft den angegebenen Code-Commit. Alle neun Jobs sind erfolgreich: je Betriebssystem 375/375 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests, beide nativen Desktop-Smokes, drei App-Pakete sowie der Windows-Protokolltester und das native Win32/x86-Winamp-Plug-in. Der Windows-Paketjob startet den echten GSMTC-Anbieter aus der Publish-Ausgabe: Connected=False; Shutdown und fehlende Anbieter-DLL bestehen.
+Der Workflow prüft neun Jobs: Avalonia und gemeinsame Bibliotheken auf Windows/Linux, native Desktop-Smokes, drei App-Pakete, den Windows-Protokolltester und das native Win32/x86-Winamp-Plug-in. Die Linux-Avalonia-Suite läuft unter einem privaten D-Bus mit temporärem GNOME-Keyring. Der Windows-Paketjob startet den GSMTC-Anbieter aus der Publish-Ausgabe. Der aktuelle PORT-05-Lauf muss noch ausgewertet werden.
 
 Artefakte: `Avalonia-device-views-Windows`/`Linux`, `Avalonia-desktop-smoke-Windows`/`Linux` sowie drei `LIS2-Avalonia-*`-Pakete, `LIS2-ProtocolTester-win-x64`, `gen_lis2-win32` und `Avalonia-GSMTC-smoke-Windows`. Die Desktop-Smokes enthalten je 13 gerenderte Ansichten, Diagnose vor/nach Shutdown und `result.txt`. WPF wird durch diesen Workflow nicht geprüft. Nachfolgende reine Dokumentationscommits ändern den hier geprüften Code nicht; der verlinkte Lauf gehört ausdrücklich zum angegebenen Commit.
 
 Menü-Sichtprüfung unter Windows mit Skia: zehn Ansichten auf Deutsch bei 1305 × 893 und 950 × 600 einschließlich gescrollter Inhalte; zusätzliche französische und russische Menüseiten und About bei langen Übersetzungen. Aus dem Linux-CI-Artefakt wurden zusätzlich der deutsche Seiteneditor und Home Assistant, die russische Lüfterseite und französisches About angesehen. Screenshots: `TestResults/screenshots/menu-*.png` beziehungsweise `Avalonia-device-views-Linux`. Die Pixelmaße der schmalen Ansichten werden auf 950 × 600 geprüft. Aktionszeilen umbrechen; der Seiteneditor stapelt Liste und Eigenschaften bei schmalen Fenstern. Die Metadatenfelder und Listeneinträge sind von der statischen Übersetzung ausgenommen. Diagnosebeschriftungen sind lokalisiert; rohe Protokollbefehle, Journale und fremde Ausnahmeinformationen bleiben technische Originaldaten. Native Dateidialoge und Trayaktionen sind nicht über die Spracheinstellungen hinweg bedient worden.
+
+## Home-Assistant-Nachweise aus PORT-05
+
+- Lokaler WebSocket-Protokollpartner: Authentifizierung, Anfangszustände, Attribute, Ereignisse, Reconnect und Stop ohne kooperierenden Server. Vor der Korrektur scheiterten fünf von sieben Verbindungsfällen an alten Werten, ignorierten Fehlerantworten und ungeeigneten URL-Schemata (`/tmp/lis2-port05-before.log`, Exit 1). Nach der Korrektur bestehen sieben Fälle.
+- `PageHomeAssistantTests` prüfen Aliaszustand, Einheit, Attribute, unveränderte Originalschlüssel, Tokenfreiheit und Entfernen der Werte nach Deaktivierung. `HomeAssistantUiTests` verwenden echte Controls, einen isolierten Workspace und künstliche Token: Verbindung, Alias/Favorit, Attributseite, gespeicherte Speicherwahl und Deaktivierung. Speicherfehler verhindern eine neue Verbindung und bleiben neben dem Quellenstatus sichtbar; Deaktivierung bleibt auch bei Löschfehler gespeichert.
+- Tokenprüfungen: native Speicherfehler wechseln nicht zu AES; AES erst nach Auswahl; Migration entfernt Dateien erst nach erfolgreicher Rückleseprüfung. Beschädigte Schlüssel/Dateien, fehlende Schlüssel und unter Linux fremde Zugriffsrechte führen zu Fehlern. Die Linux-CI ergänzt einen echten privaten Schlüsselbund sowie fehlendes `secret-tool`, Exitfehler, volle stderr-Pipe und Prozess-Timeout. Deren Auswertung steht noch aus.
+- Windows-Skia-Sichtprüfung: HA auf Deutsch bei 1305 × 893, Russisch bei 950 × 600, französische Attribute bei 950 × 600 und deutscher Speicherfehler. Lange Tabellenüberschriften umbrechen. Screenshots: `TestResults/screenshots/port05-ha-*.png`. Die Linux-Speicherwahl wird auf Windows ausschließlich für die Sichtprüfung eingeblendet; im Produkt erscheint sie nur auf Linux.
+- Eine reale HA-Instanz und der Benutzer-Schlüsselbund auf den Zielsystemen sind nicht geprüft.
 
 ## Mediennachweise aus PORT-04
 
@@ -47,16 +56,16 @@ Lokalisierte Hilfedialoge wurden unter Windows mit Skia bei 840 × 600 Pixeln ge
 | Events/Glyphen | Ereignisqueue, Ablauf/Abbruch, acht Glyphenslots, Dateien, Namen und Spektrumset | Dialogparität und physische Zeichen offen |
 | Hardware/Fans | Windows LibreHardwareMonitor, Linux procfs/sysfs/hwmon; vier Kanäle, Grenzen, Hysterese, Fail-safe, virtuelle/serielle Regelung und Handausgabe | Reale Treiber, Sensorwechsel und Sicherheitszustände nicht geprüft |
 | Medien | Windows Winamp/GSMTC; Legacy deaktiviert. Linux-playerctl mit gespeicherter Auswahl, Spielposition, sicherem XML-Format und Abbruch/Timeout. Fehler entfernen alte Metadaten | Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen offen; keine eigene D-Bus-Subscription |
-| Home Assistant | WebSocket, Entitäten/Attribute, Aliase/Favoriten, Clipboard und Seitenerzeugung | Keine eigene aktuelle Liveprüfung oder Linux-Abnahme |
+| Home Assistant | WebSocket-Anmeldung, Anfangszustände, Events, Reconnect und Stop mit lokalem Protokollpartner; wirksame Aliase, Attributwerte, Favoriten und Seitenerzeugung | Reale HA-Instanz und Zielsystemabnahme offen |
 | Einstellungen | Persistierter Transport/Port/HA-Aktivierung, Helligkeit, Windows-Import, Theme/Sprache, Windows-Tray/Autostart | Native Dateiauswahl und Linux-Desktopintegration offen |
-| Tokenstore | DPAPI, secret-tool, lokaler AES-Dateipfad und Migration | Automatischer AES-Ausweichpfad in PORT-05 zu klären |
+| Tokenstore | DPAPI, secret-tool; Linux-AES nur nach ausdrücklicher Auswahl; verifizierte Migration, beschädigte Dateien und Löschfehler geprüft | Echter Linux-Keyring und Rechte werden im aktuellen CI-Lauf geprüft; Benutzer-Schlüsselbund auf Zielsystem offen |
 | Hilfe/About | Kontextauswahl und zehn Themen in fünf Sprachen; gespeicherte Sprache, Systemstandard und offener Dialog geprüft; Inhalte gegen Code korrigiert; About mit Versions-/Laufzeitdaten und tatsächlichem Workspace-Ordner | Weitere WPF-Inhaltstiefe, Hilfeplatzierung offen; Runtime unterstützt nur numerische Glyphenschlüssel |
 | Diagnose | UTC-Journal für Anwendung und tatsächliche virtuelle/serielle Transportergebnisse, OK/ERROR, dekodierte Befehle, aktueller Export | Maximal 1000 Einträge pro Journal und zehn serielle Sitzungen; kein persistentes Logarchiv |
 
 ## Verbindliche Grenzen und Weiterarbeit
 
-Eine gemeinsame Avalonia-Oberfläche bleibt das Ziel; WPF bleibt Referenz bis zur Paritätsabnahme. Der modale Variablenbrowser ist genehmigt. Zusätzliche oder versteckte Bedienelemente gegenüber WPF, automatischer Tokenstore-Ausweichpfad bleiben ausdrücklich offene Befunde.
+Eine gemeinsame Avalonia-Oberfläche bleibt das Ziel; WPF bleibt Referenz bis zur Paritätsabnahme. Der modale Variablenbrowser und eine ausdrücklich gewählte lokale Linux-AES-Speicherung sind genehmigt. Der automatische Tokenstore-Ausweichpfad entfällt. Weitere zusätzliche oder versteckte Bedienelemente gegenüber WPF bleiben im Paritätsaudit zu prüfen.
 
 Native Dateiauswahl, Tray-Menübedienung, OS-Abmeldung, DPI-/Theme-/Sprachmatrix, Live-HA-/Player-/Sensorintegration, extrahierter Paketstart, ARM64-Ausführung auf ARM64 und physische LIS2-Ausgabe sind durch den Smoke nicht nachgewiesen.
 
-Die Medienimplementierung aus PORT-04 ist lokal geprüft. Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen bleiben offen; VLC und Plexamp sind auf dem verfügbaren Linux-System nicht installiert. Nächstes Implementierungspaket: **PORT-05: Home Assistant und Tokenstore**. Neue Linux-Desktopdienste gehören zu PORT-06.
+Die Medien- und HA-Implementierung ist mit den genannten isolierten Daten geprüft. Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen und HA auf Zielsystemen bleiben offen. Nächstes Implementierungspaket: **PORT-06: WPF-Abgleich und Desktopintegration**.

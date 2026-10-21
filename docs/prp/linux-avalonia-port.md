@@ -1,7 +1,7 @@
 # PRP: LIS2 Control Center mit Avalonia
 
 Stand: 21.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-04; genaue Prüfnachweise im [Status](linux-port-status.md).
+Implementierungsstand: PORT-05; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
 
@@ -19,7 +19,7 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal sind 375/375 Avalonia-Tests einschließlich Menüseiten, Sprachwechsel und Hilfesprache erfolgreich; der native Windows-Smoke ist im [Status](linux-port-status.md) eingegrenzt. Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu. Ein späterer Dokumentations- oder Implementierungscommit erhält dadurch keinen eigenen CI-Nachweis.
+Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal bestehen 399 Avalonia-Tests; der zusätzliche Linux-Schlüsselbundtest ist unter Windows übersprungen. HA-Verbindungsabläufe verwenden einen lokalen WebSocket-Protokollpartner. Linux-CI führt die Suite mit isoliertem echtem Secret Service aus; der aktuelle Nachweis steht im [Status](linux-port-status.md). Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu.
 
 ## Implementierungsstand
 
@@ -34,7 +34,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Sensoren | LibreHardwareMonitor auf Windows; procfs/sysfs/hwmon auf Linux; Aliase, Favoriten und fehlende Sensoren berücksichtigt | Stabile Identitäten und Rechte auf Zielsystemen prüfen |
 | Lüfter | Vier Modi plus Off, Kurven, Hysterese, Fail-safe, Simulation, freizugebende serielle Regelung und Dashboard-Handausgabe mit Kanalgrenzen | Weitere WPF-Interaktionen abgleichen; Hardware bleibt ungeprüft |
 | Medien | Winamp/GSMTC auf Windows; Linux-playerctl mit gespeicherter Auswahl, Spielposition, Lifecycle und Fehleranzeige; Legacy deaktiviert | Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen offen |
-| Home Assistant | WebSocket-Quelle, Entitäten, Attribute, Aliase, Favoriten und Seitenaktionen mit Sequenz-Reload vorhanden | Linux-Liveprüfung und Deaktivierung/Persistenz prüfen |
+| Home Assistant | WebSocket-Quelle, Reconnect und Stop, Entitäten, Attributwerte, wirksame Aliase, Favoriten und Seitenaktionen; ausdrückliche lokale Linux-Tokenauswahl | Reale HA-Instanz und Desktop-Schlüsselbund auf Zielsystemen prüfen |
 | Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache und Windows-Tray/Autostart | Nativer Dateidialog und Linux-Desktopintegration offen |
 | Hilfe und About | Kontextbezogene Hilfe mit zehn Themen in fünf Sprachen, Live-Schlüsseln und numerischer Glyphenreferenz; About folgt der ausgewählten Sprache | Weitere WPF-Inhaltstiefe, Platzierung und native Desktop-Bedienung offen |
 | Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Export mit zeitgestempeltem Anwendungs-/Transportjournal | Sitzungsprotokoll begrenzt; kein dauerhaftes Logarchiv; nativen Dateidialog prüfen |
@@ -66,7 +66,7 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 - [ ] VLC und Plexamp einzeln auf dem Zielsystem prüfen. Wine/Winamp bleibt optional.
 - [x] Workspace und validierende Windows-Importlogik einschließlich Seiten, Glyphen und Lüfterkonfiguration vorhanden.
 - [x] Windows-DPAPI und Linux-`secret-tool` sind im Tokenstore angebunden.
-- [ ] Automatischen lokalen AES-Dateipfad bei fehlendem Secret Service gegen die verbindliche Freigabepolitik prüfen. Vorhandener Code ist keine Freigabe.
+- [x] Lokale Linux-AES-Speicherung nur nach ausdrücklicher Auswahl gemäß Benutzerentscheidung; keine automatische Umschaltung bei Keyringfehlern. Migration und Dateifehler sind durch Gegenproben abgesichert.
 - [x] Quellenaktionen übernehmen gültige Entwürfe und laden laufende Sequenzen neu; ungültige Entwürfe verhindern den Wechsel.
 - [x] Gespeicherte leere Seitenlisten ersetzen die Startseite; ohne Workspace-Datei bleibt sie erhalten.
 - [x] Transport, Port, HA-Aktivierung und Helligkeit speichern/wiederherstellen; Windows-Import sichtbar und um Hardwarepräferenzen ergänzt.
@@ -74,7 +74,7 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 
 ### Oberfläche und Verifikation
 
-Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. Statische Texte, Formatargumente und unveränderte Nutzdaten werden automatisiert geprüft; die Sichtprüfung und Plattformgrenzen stehen im Status. Die Medienimplementierung aus PORT-04 ist geprüft; reale Playernachweise bleiben offen. Nächstes Implementierungspaket ist PORT-05 gemäß [TODO](../../TODO.md).
+Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. Statische Texte, Formatargumente und unveränderte Nutzdaten werden automatisiert geprüft; die Sichtprüfung und Plattformgrenzen stehen im Status. HA-Verbindung, Attribute, Aliase und Tokenspeicherung sind in PORT-05 mit isolierten Daten geprüft; reale HA-/Playernachweise bleiben offen. Nächstes Implementierungspaket ist PORT-06 gemäß [TODO](../../TODO.md).
 
 - [x] Zehn Hauptansichten, Hilfe und About sind angelegt und angebunden.
 - [x] System/Light/Dark sowie System/English/German/French/Turkish/Russian sind auswählbar.

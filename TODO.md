@@ -77,10 +77,13 @@ Danach folgt **PORT-04: Medien und Produktgrenzen**.
 
 ### PORT-05: Home Assistant und Tokenstore
 
-- [ ] HA-Verbindung, Reconnect, Attribute/Aliase, Deaktivierung und Persistenz unter Linux sowie Windows gezielt prüfen.
-- [ ] Automatischen AES-Dateipfad bei fehlendem Secret Service gegen die Freigabepolitik klären; aktuelle Implementierung nicht als genehmigte Produktentscheidung behandeln.
-- [ ] `secret-tool`-/DBus-/Keyring-Voraussetzungen und erkennbare Fehlerzustände auf den Zielsystemen prüfen.
-- [ ] Migration/Entfernung alter Tokendateien und Zugriffsrechte mit gültigen und fehlerhaften Fällen absichern.
+- [x] Lokaler WebSocket-Protokollpartner prüft Anmeldung, Anfangszustände, Ereignisse, Verbindungsabbruch, Reconnect und Deaktivierung; fehlgeschlagene Zustands-/Aboanfragen werden sichtbar, alte Werte entfernt.
+- [x] Aliaswerte einschließlich Einheit und Attributen erreichen Seiten und Variablenbrowser. Attributseiten verwenden `.attribute.`; der Browser zeigt Namen und Werte. GUI-Tests prüfen Favoriten, Seitenanlage und Persistenz.
+- [x] Benutzerentscheidung: Lokale AES-Speicherung unter Linux nur nach ausdrücklicher Auswahl in der App. Auswahl wird gespeichert; Keyringfehler aktivieren keinen Dateipfad.
+- [x] Migration löscht AES-Dateien erst nach erfolgreicher nativer Speicherung und Rückleseprüfung. Gegenproben erhalten Dateien bei Fehlern; beschädigte Dateien, fehlende Schlüssel und offene Unix-Dateirechte werden erkannt.
+- [x] Speichern erfolgt vor neuer Verbindung. Deaktivierung stoppt die Quelle und bleibt auch bei fehlgeschlagener Tokenlöschung gespeichert; Fehler erscheinen getrennt vom laufenden Quellenstatus.
+- [ ] Linux-CI-Nachweis für echten isolierten Secret Service, Prozess-Timeout/Fehler, Unix-Rechte und AES-Auswahl auswerten.
+- [ ] Mit realer HA-Instanz und dem Desktop-Schlüsselbund auf den Zielsystemen prüfen; lokale WebSocket-Fixtures ersetzen diese Prüfung nicht.
 
 ### PORT-06: WPF-Abgleich und Desktopintegration
 

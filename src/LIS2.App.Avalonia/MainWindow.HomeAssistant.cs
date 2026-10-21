@@ -8,24 +8,36 @@ public partial class MainWindow
 {
     private PeriodicRuntimeLoop _haUiTimer = null!;
     private bool _haActionBusy;
+    private UiMessage? _haActionMessage;
     private sealed record HaEntityRow(string EntityId, string FriendlyName, string State, string TemplateKey, string Favorite);
+    private sealed record HaAttributeRow(string Name, string Value);
 
 
     private void InitializeHomeAssistant()
     {
+        this.FindControl<CheckBox>("HaLocalTokenStorage")!.IsVisible = OperatingSystem.IsLinux();
         this.FindControl<Button>("HaConnect")!.Click += async (_, _) =>
             await RunHaActionAsync(async () =>
             {
                 var enabled = this.FindControl<CheckBox>("HaEnabled")!.IsChecked == true;
                 var token = this.FindControl<TextBox>("HaToken")!.Text;
-                await _pageSources.ConfigureHomeAssistantAsync(
-                    enabled ? this.FindControl<TextBox>("HaUrl")!.Text : null,
-                    enabled ? token : null);
+                var url = this.FindControl<TextBox>("HaUrl")!.Text;
+                if (enabled && (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https") || string.IsNullOrWhiteSpace(token)))
+                    throw new InvalidOperationException("Home Assistant URL and access token are required.");
+                _haTokenStore.UseLocalStorage = OperatingSystem.IsLinux() && this.FindControl<CheckBox>("HaLocalTokenStorage")!.IsChecked == true;
+                // Vor einer neuen Verbindung muss die gewählte Speicherung erfolgreich sein.
                 if (enabled && !string.IsNullOrWhiteSpace(token))
-                    _haTokenStore.Save(token);
+                    await Task.Run(() => _haTokenStore.Save(token.Trim()));
                 else if (!enabled)
-                    _haTokenStore.Delete();
+                {
+                    await _pageSources.ConfigureHomeAssistantAsync(null, null);
+                    await SavePortableWorkspaceAsync(true);
+                    await Task.Run(_haTokenStore.Delete);
+                    this.FindControl<TextBox>("HaToken")!.Text = "";
+                    return;
+                }
                 await SavePortableWorkspaceAsync(true);
+                if (enabled) await _pageSources.ConfigureHomeAssistantAsync(url, token);
             });
         this.FindControl<Button>("HaTest")!.Click += async (_, _) =>
             await RunHaActionAsync(async () =>
@@ -36,7 +48,7 @@ public partial class MainWindow
                     probe.Configure(this.FindControl<TextBox>("HaUrl")!.Text,
                         this.FindControl<TextBox>("HaToken")!.Text);
                     await probe.TestConnectionAsync();
-                    SetUiText("HaStatus", "Home Assistant authentication succeeded.");
+                    _haActionMessage = "Home Assistant authentication succeeded.";
                 }
                 finally { await probe.DisposeAsync(); }
             });
@@ -62,6 +74,7 @@ public partial class MainWindow
             }
             preference.Alias = this.FindControl<TextBox>("HaAlias")!.Text?.Trim() ?? string.Empty;
             preference.IsFavorite = this.FindControl<CheckBox>("HaFavorite")!.IsChecked == true;
+            ApplyHaAliases();
             await SavePortableWorkspaceAsync();
             RefreshHaEntities();
         };
@@ -92,40 +105,58 @@ public partial class MainWindow
     {
         if (_haActionBusy) return;
         _haActionBusy = true;
+        _haActionMessage = null;
+        this.FindControl<Button>("HaConnect")!.IsEnabled = false;
+        this.FindControl<Button>("HaTest")!.IsEnabled = false;
+        foreach (var name in new[] { "HaEnabled", "HaLocalTokenStorage", "HaUrl", "HaToken" })
+            this.FindControl<Control>(name)!.IsEnabled = false;
+        RefreshHaActionMessage();
         try
         {
             await action();
-            RefreshHaEntities();
             RefreshPageVariables();
         }
         catch (Exception ex)
         {
-            SetUiText("HaStatus", $"Home Assistant error: {(UiMessage)ex.Message}");
+            _haActionMessage = $"Home Assistant error: {(UiMessage)ex.Message}";
         }
-        finally { _haActionBusy = false; }
+        finally
+        {
+            _haActionBusy = false;
+            this.FindControl<Button>("HaConnect")!.IsEnabled = true;
+            this.FindControl<Button>("HaTest")!.IsEnabled = true;
+            foreach (var name in new[] { "HaEnabled", "HaLocalTokenStorage", "HaUrl", "HaToken" })
+                this.FindControl<Control>(name)!.IsEnabled = true;
+            RefreshHaEntities();
+        }
     }
 
     private bool _updatingHaSelection;
+
+    private void RefreshHaActionMessage()
+    {
+        this.FindControl<TextBlock>("HaActionStatus")!.IsVisible = _haActionMessage is not null;
+        if (_haActionMessage is not null) SetUiText("HaActionStatus", _haActionMessage);
+    }
+
+    private void ApplyHaAliases() => _pageSources.SetHomeAssistantAliases(
+        _haPreferences.Select(preference => new KeyValuePair<string, string>(preference.EntityId, preference.Alias)));
 
     private string? SelectedHaEntityId() =>
         this.FindControl<ComboBox>("HaEntityPicker")!.SelectedItem as string;
 
     private string? SelectedHaAttribute() =>
-        this.FindControl<ListBox>("HaAttributes")!.SelectedItem as string;
+        (this.FindControl<ListBox>("HaAttributes")!.SelectedItem as HaAttributeRow)?.Name;
 
     private string HaEntityKey(string id)
     {
         var alias = _haPreferences.FirstOrDefault(p => string.Equals(p.EntityId, id, StringComparison.OrdinalIgnoreCase))?.Alias;
-        var normalized = NormalizeHaAlias(alias);
+        var normalized = PageSourceValues.NormalizeHaAlias(alias);
         return "{HA." + (normalized.Length > 0 ? normalized : id) + "}";
     }
 
-    private static string NormalizeHaAlias(string? alias) =>
-        new string((alias ?? "").Trim().Select(c => char.IsLetterOrDigit(c) || c is '_' or '-' ? c : '_').ToArray())
-            .Trim('_').Replace("__", "_", StringComparison.Ordinal);
-
     private string HaAttributeKey(string id, string name) =>
-        HaEntityKey(id).TrimEnd('}') + "." + name + "}";
+        HaEntityKey(id).TrimEnd('}') + ".attribute." + name + "}";
 
     private async Task CopyHaKeyAsync(string key)
     {
@@ -135,6 +166,7 @@ public partial class MainWindow
 
     private void RefreshHaEntities()
     {
+        if (_updatingHaSelection) return;
         var ha = _pageSources.HomeAssistant;
         var picker = this.FindControl<ComboBox>("HaEntityPicker")!;
         var previous = SelectedHaEntityId();
@@ -182,7 +214,9 @@ public partial class MainWindow
                 string.Equals(row.EntityId, picker.SelectedItem as string, StringComparison.OrdinalIgnoreCase));
         }
         finally { _updatingHaSelection = false; }
+        RefreshHaDetails(false);
         UiMessage version = ha.HomeAssistantVersion is null ? "unknown version" : (UiMessage)$"{ha.HomeAssistantVersion}";
+        RefreshHaActionMessage();
         SetUiText("HaStatus", ha.IsConnected
             ? (UiMessage)$"Home Assistant connected ({version}), {ha.Entities.Count} entities, read-only."
             : ha.LastError is { Length: > 0 } error ? (UiMessage)$"Home Assistant disconnected: {error}"
@@ -205,19 +239,29 @@ public partial class MainWindow
             }
             finally { _updatingHaSelection = false; }
         }
+        RefreshHaDetails(true);
+    }
+
+    private void RefreshHaDetails(bool loadPreferences)
+    {
+        var id = SelectedHaEntityId();
         var entity = _pageSources.HomeAssistant.Entities.FirstOrDefault(e => e.EntityId == id);
         var preference = _haPreferences.FirstOrDefault(p => string.Equals(p.EntityId, id, StringComparison.OrdinalIgnoreCase));
         SetUiText("HaSelectedEntity", entity is null
             ? "Select an entity above." : (UiMessage)$"{entity.FriendlyName} ({entity.EntityId}) — {entity.State} {entity.Unit}");
-        this.FindControl<TextBox>("HaAlias")!.Text = preference?.Alias ?? "";
-        this.FindControl<CheckBox>("HaFavorite")!.IsChecked = preference?.IsFavorite == true;
-        var attributes = entity?.Attributes.Keys.OrderBy(n => n, StringComparer.OrdinalIgnoreCase).ToArray() ?? Array.Empty<string>();
+        if (loadPreferences)
+        {
+            this.FindControl<TextBox>("HaAlias")!.Text = preference?.Alias ?? "";
+            this.FindControl<CheckBox>("HaFavorite")!.IsChecked = preference?.IsFavorite == true;
+        }
+        var attributes = entity?.Attributes.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(pair => new HaAttributeRow(pair.Key, Convert.ToString(pair.Value, System.Globalization.CultureInfo.InvariantCulture) ?? "")).ToArray() ?? [];
         var list = this.FindControl<ListBox>("HaAttributes")!;
-        var previous = list.SelectedItem as string;
-        if (!attributes.SequenceEqual(list.ItemsSource as string[] ?? Array.Empty<string>()))
+        var previous = SelectedHaAttribute();
+        if (!attributes.SequenceEqual(list.ItemsSource as HaAttributeRow[] ?? []))
         {
             list.ItemsSource = attributes;
-            list.SelectedItem = previous is not null && attributes.Contains(previous) ? previous : attributes.FirstOrDefault();
+            list.SelectedItem = attributes.FirstOrDefault(attribute => attribute.Name == previous) ?? attributes.FirstOrDefault();
         }
     }
 

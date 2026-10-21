@@ -26,7 +26,7 @@ public sealed class LegacyHaTokenStore
         else
         {
             key = RandomNumberGenerator.GetBytes(32);
-            using (var stream = new FileStream(keyPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            using (var stream = new FileStream(keyPath, PrivateFileOptions(FileMode.CreateNew)))
                 stream.Write(key);
             Restrict(keyPath);
         }
@@ -44,8 +44,11 @@ public sealed class LegacyHaTokenStore
             tag.CopyTo(data, 13);
             ciphertext.CopyTo(data, 29);
             var temp = Path.Combine(_directory, "ha-token.bin.tmp");
-            File.WriteAllBytes(temp, data);
-            Restrict(temp);
+            using (var stream = new FileStream(temp, PrivateFileOptions(FileMode.Create)))
+            {
+                Restrict(temp);
+                stream.Write(data);
+            }
             File.Move(temp, Path.Combine(_directory, "ha-token.bin"), true);
         }
         finally
@@ -59,7 +62,10 @@ public sealed class LegacyHaTokenStore
     {
         var keyPath = Path.Combine(_directory, "ha-token.key");
         var tokenPath = Path.Combine(_directory, "ha-token.bin");
-        if (!File.Exists(keyPath) || !File.Exists(tokenPath)) return null;
+        if (!File.Exists(tokenPath)) return null;
+        if (!File.Exists(keyPath)) throw new CryptographicException("Invalid Home Assistant token storage.");
+        ValidatePermissions(keyPath);
+        ValidatePermissions(tokenPath);
         var key = File.ReadAllBytes(keyPath);
         var data = File.ReadAllBytes(tokenPath);
         if (key.Length != 32 || data.Length < 29 || data[0] != 1)
@@ -87,5 +93,20 @@ public sealed class LegacyHaTokenStore
     {
         if (!OperatingSystem.IsWindows())
             File.SetUnixFileMode(path, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+    }
+
+    private static FileStreamOptions PrivateFileOptions(FileMode mode)
+    {
+        var options = new FileStreamOptions { Mode = mode, Access = FileAccess.Write, Share = FileShare.None };
+        if (!OperatingSystem.IsWindows()) options.UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite;
+        return options;
+    }
+
+    private static void ValidatePermissions(string path)
+    {
+        if (!OperatingSystem.IsWindows() && (File.GetUnixFileMode(path) &
+            (UnixFileMode.GroupRead | UnixFileMode.GroupWrite | UnixFileMode.GroupExecute |
+             UnixFileMode.OtherRead | UnixFileMode.OtherWrite | UnixFileMode.OtherExecute)) != 0)
+            throw new CryptographicException("Home Assistant token files must be private to the current user.");
     }
 }

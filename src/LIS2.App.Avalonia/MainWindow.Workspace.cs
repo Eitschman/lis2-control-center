@@ -41,6 +41,8 @@ public partial class MainWindow
         if (restorePages) PageWorkspaceActions.RestorePages(validation, saved);
         this.FindControl<TextBox>("HaUrl")!.Text = saved.HomeAssistantUrl;
         this.FindControl<CheckBox>("HaEnabled")!.IsChecked = saved.HomeAssistantEnabled == true;
+        _haTokenStore.UseLocalStorage = OperatingSystem.IsLinux() && saved.HomeAssistantLocalTokenStorage;
+        this.FindControl<CheckBox>("HaLocalTokenStorage")!.IsChecked = _haTokenStore.UseLocalStorage;
         try
         {
             var token = _haTokenStore.Load();
@@ -54,7 +56,8 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            SetVirtualStatus($"Home Assistant credential load failed: {(UiMessage)ex.Message}");
+            _haActionMessage = $"Home Assistant credential load failed: {(UiMessage)ex.Message}";
+            RefreshHaActionMessage();
         }
         if (saved.CustomGlyphs.Count == 8)
         {
@@ -62,6 +65,7 @@ public partial class MainWindow
             LoadGlyphEditor();
         }
         _haPreferences = saved.HomeAssistantEntityPreferences.ToList();
+        ApplyHaAliases();
         _favoritePageVariables.Clear();
         foreach (var key in saved.PageVariableFavorites.Where(key => !string.IsNullOrWhiteSpace(key)))
             _favoritePageVariables.Add(key);
@@ -90,6 +94,7 @@ public partial class MainWindow
         TransportMode = _preferredTransportMode,
         PortName = _preferredPortName,
         HomeAssistantEnabled = this.FindControl<CheckBox>("HaEnabled")!.IsChecked == true,
+        HomeAssistantLocalTokenStorage = OperatingSystem.IsLinux() && this.FindControl<CheckBox>("HaLocalTokenStorage")!.IsChecked == true,
         Pages = System.Text.Json.JsonSerializer.Deserialize<List<PageDefinition>>(_pages.ExportJson()) ?? new(),
         HomeAssistantUrl = this.FindControl<TextBox>("HaUrl")!.Text ?? string.Empty,
         CustomGlyphs = _glyphs.Glyphs.Select(g => new CustomGlyphSettings

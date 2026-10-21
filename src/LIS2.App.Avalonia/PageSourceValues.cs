@@ -9,6 +9,14 @@ public sealed class PageSourceValues : IAsyncDisposable
     private readonly SourceRuntime _runtime = new();
     private readonly Dictionary<string, object?> _hardware = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, object?> _media = new(StringComparer.OrdinalIgnoreCase);
+    private KeyValuePair<string, string>[] _haAliases = [];
+
+    public void SetHomeAssistantAliases(IEnumerable<KeyValuePair<string, string>> aliases) =>
+        _haAliases = aliases.ToArray();
+
+    public static string NormalizeHaAlias(string? alias) =>
+        new string((alias ?? "").Trim().Select(character => char.IsLetterOrDigit(character) || character is '_' or '-' ? character : '_').ToArray())
+            .Trim('_').Replace("__", "_", StringComparison.Ordinal);
 
     public void UpdateMedia(string sourceId, IReadOnlyDictionary<string, object?> values)
     {
@@ -47,6 +55,16 @@ public sealed class PageSourceValues : IAsyncDisposable
     public IReadOnlyDictionary<string, object?> Snapshot(DateTimeOffset now)
     {
         var values = new Dictionary<string, object?>(_runtime.Snapshot(), StringComparer.OrdinalIgnoreCase);
+        // Originalschlüssel bleiben erhalten; Aliase erhalten auch Einheit und Attribute.
+        foreach (var preference in _haAliases)
+        {
+            var alias = NormalizeHaAlias(preference.Value);
+            var original = "HA." + preference.Key;
+            if (alias.Length == 0 || !values.ContainsKey(original)) continue;
+            foreach (var pair in values.Where(pair => pair.Key.Equals(original, StringComparison.OrdinalIgnoreCase) ||
+                pair.Key.StartsWith(original + ".", StringComparison.OrdinalIgnoreCase)).ToArray())
+                values.TryAdd("HA." + alias + pair.Key[original.Length..], pair.Value);
+        }
         foreach (var pair in _hardware) values[pair.Key] = pair.Value;
         foreach (var pair in _media) values[pair.Key] = pair.Value;
         foreach (var pair in PageClockValues.Create(now))

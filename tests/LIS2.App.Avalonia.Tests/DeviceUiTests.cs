@@ -229,7 +229,13 @@ public sealed class DeviceUiTests
         private Fixture()
         {
             Store = new PortableWorkspaceStore(StorePath);
-            TokenStore = new PortableHaTokenStore(_directory, "lis2-no-keyring-for-tests");
+            string? token = null;
+            TokenStore = new PortableHaTokenStore(_directory, (operation, value) =>
+            {
+                if (operation == "store") token = value;
+                if (operation == "clear") token = null;
+                return operation == "lookup" ? token : null;
+            });
         }
 
         public static async Task<Fixture> OpenAsync(PortableWorkspace saved, bool token = false)

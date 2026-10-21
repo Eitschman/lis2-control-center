@@ -23,8 +23,10 @@ public partial class MainWindow : Window
 
     /// <summary>Erlaubt isolierte UI-Prüfungen mit eigenem Workspace und simuliertem Transport.</summary>
     internal MainWindow(PortableWorkspaceStore workspaceStore, PortableHaTokenStore tokenStore,
-        bool startBackgroundSources, Func<string, SerialDisplaySession> serialSessionFactory)
+        bool startBackgroundSources, Func<string, SerialDisplaySession> serialSessionFactory,
+        PageSourceValues? pageSources = null)
     {
+        _runtime = new DisplayRuntimeHost(pageSources);
         _workspaceStore = workspaceStore;
         _haTokenStore = tokenStore;
         _startBackgroundSources = startBackgroundSources;

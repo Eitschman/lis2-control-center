@@ -95,6 +95,7 @@ internal static class HelpReferenceCatalog
             case 9:
                 Add("Home Assistant", "The read-only WebSocket integration loads states and receives live state_changed updates.");
                 Add("Connection", "Enter the Home Assistant URL and a long-lived access token, then test and save the connection.");
+                Add("Token storage", "Windows uses DPAPI. Linux uses the desktop keyring through secret-tool. Local AES storage requires explicit selection; the key is stored beside the encrypted token. Keyring errors are displayed without switching storage automatically. Disabling Home Assistant stops the source and removes the token from the selected store. Switching back to the keyring migrates local files only after verifying the saved token.");
                 AddExample("Entity state", "{HA.sensor.living_room_temperature}");
                 AddExample("Unit and friendly name", "{HA.sensor.living_room_temperature.Unit}  {HA.sensor.living_room_temperature.FriendlyName}");
                 AddExample("Attributes", "{HA.media_player.living_room.attribute.media_title}");
