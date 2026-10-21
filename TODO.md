@@ -1,7 +1,7 @@
 # TODO: Avalonia-Portierung
 
 Stand: 21.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-04 mit gespeicherter Linux-Playerauswahl, Spielposition und korrigierter Legacy-Produktgrenze. Lokal 375/375 Avalonia-Tests erfolgreich; Paketstart und CI-Nachweis im [Status](docs/prp/linux-port-status.md).
+Implementierungsstand: PORT-05 mit geprüften HA-Verbindungsabläufen, Alias-/Attributwerten und ausdrücklich wählbarer lokaler Linux-Tokenspeicherung. Lokal 399 Avalonia-Tests erfolgreich, ein Linux-Schlüsselbundtest unter Windows übersprungen; CI-Nachweise im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -41,7 +41,7 @@ Das Übersetzungspaket vor PORT-04 ist umgesetzt und mit isolierten Avalonia-Fen
 
 - [x] [CI 39565668081](https://github.com/Eitschman/lis2-control-center/actions/runs/39565668081) für `c22048d`: alle sieben Jobs erfolgreich, je OS 359/359 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes und drei Pakete erfolgreich. Linux-Sichtprüfung zusätzlich anhand der Workflow-Screenshots.
 
-Danach folgt **PORT-04: Medien und Produktgrenzen**.
+Nächstes Implementierungspaket ist **PORT-06: WPF-Abgleich und Desktopintegration**. Die offenen Zielsystemprüfungen aus PORT-04/05 bleiben in den jeweiligen Paketen aufgeführt.
 
 ## Weitere Implementierungs- und Prüfaufgaben
 
@@ -82,7 +82,7 @@ Danach folgt **PORT-04: Medien und Produktgrenzen**.
 - [x] Benutzerentscheidung: Lokale AES-Speicherung unter Linux nur nach ausdrücklicher Auswahl in der App. Auswahl wird gespeichert; Keyringfehler aktivieren keinen Dateipfad.
 - [x] Migration löscht AES-Dateien erst nach erfolgreicher nativer Speicherung und Rückleseprüfung. Gegenproben erhalten Dateien bei Fehlern; beschädigte Dateien, fehlende Schlüssel und offene Unix-Dateirechte werden erkannt.
 - [x] Speichern erfolgt vor neuer Verbindung. Deaktivierung stoppt die Quelle und bleibt auch bei fehlgeschlagener Tokenlöschung gespeichert; Fehler erscheinen getrennt vom laufenden Quellenstatus.
-- [ ] Linux-CI-Nachweis für echten isolierten Secret Service, Prozess-Timeout/Fehler, Unix-Rechte und AES-Auswahl auswerten.
+- [x] Linux-CI: 400/400 Avalonia-Tests einschließlich echtem isoliertem Secret Service, Prozess-Timeout/Fehler, Unix-Rechten und AES-Auswahl erfolgreich; Windows: 399 erfolgreich, ein Linux-Schlüsselbundtest übersprungen. Code und Lauf im [Status](docs/prp/linux-port-status.md).
 - [ ] Mit realer HA-Instanz und dem Desktop-Schlüsselbund auf den Zielsystemen prüfen; lokale WebSocket-Fixtures ersetzen diese Prüfung nicht.
 
 ### PORT-06: WPF-Abgleich und Desktopintegration

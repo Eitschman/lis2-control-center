@@ -31,7 +31,7 @@ Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin`
 | Avalonia-Shell | `App.axaml(.cs)`, `Program.cs`, `MainWindow.axaml(.cs)`; zehn Views und partielle Handlerdateien |
 | Sessions | IDisplaySession, VirtualDeviceSession, SerialDisplaySession, UnifiedLis2Session, AuthorizedFanRuntimeSession und SafeSerialFanSession; MainWindow.DeviceActions/DashboardFans für die gemeinsame Bedienung |
 | Workspace | PortableWorkspaceStore, PortableFanSettings, WindowsSettingsImporter, MainWindow.Workspace/WindowsImport; PageWorkspaceActions verbindet Quellenaktionen, Editor, Sequenz-Reload und Persistenz |
-| Geheimnisse | PortableHaTokenStore, LegacyHaTokenStore; DPAPI, secret-tool und lokaler AES-Dateipfad |
+| Geheimnisse | PortableHaTokenStore, LegacyHaTokenStore; DPAPI, secret-tool und ausdrücklich gewählter lokaler Linux-AES-Dateipfad |
 | Hardware | LinuxSystemSensors/LinuxHwmonFanSensors, WindowsHardwareFanSensors, HardwareSensorCatalog und HardwareDisplayPresetBuilder |
 | Medien | MainWindow.Media, WindowsMediaBridge, WindowsMediaSmoke und LinuxMprisSource; aktive Windows-Quellen Winamp/WindowsMedia; gespeicherte Linux-Playerauswahl und Spielposition; Legacy unbenutzt |
 | Hilfe/Sprachen | HelpReferenceCatalog mit eigenem HelpReferenceLocalization-Katalog für fünf Sprachen, MainWindow.HelpAbout, UiTranslations/UiMessage, WpfTranslationCatalog, Settings-/UI-/Browser-Lokalisierung und sprachabhängige Statusmeldungen |
@@ -47,7 +47,7 @@ Die `IPlatform*`-Verträge haben derzeit keine entsprechenden Adapterimplementie
 | `IPlatformMediaProvider` | `WindowsMediaBridge.Values`, Winamp-Values, asynchrones `LinuxMprisSource.ReadSnapshotAsync` | Synchrones Entwurfs-Snapshot bildet Start, Abbruch und Dispose nicht ab; `AsyncProviderLifetime` ordnet aktuell den Medienabbau |
 | `IPlatformTrayService` | Windows-Tray direkt in `App`; Exit wartet auf `BeginShutdownAsync` | Linux-Tray und Dienstinjektion offen, PORT-06 |
 | `IPlatformAutostartService` | Windows-Registry in `MainWindow.Settings` | Linux-Desktopdatei und Vertragsadapter offen, PORT-06 |
-| `IPlatformSecretStore` | `PortableHaTokenStore`, DPAPI/secret-tool | Synchroner spezialisierter Tokenstore statt allgemeinem Schlüsselvertrag; lokaler AES-Pfad in PORT-05 klären |
+| `IPlatformSecretStore` | `PortableHaTokenStore`, DPAPI/secret-tool und ausdrücklich gewählte Linux-AES-Dateien | Spezialisierter synchroner Tokenstore statt allgemeinem Schlüsselvertrag; UI-Speichern/-Löschen läuft außerhalb des UI-Threads, initiales Laden synchron |
 | `IPlatformAppearance` | Avalonia `RequestedThemeVariant`/`ActualThemeVariant`, Windows-Titelbalken | Kein Adapter mit Änderungsereignis; Theme-/Desktopnachweis bleibt PORT-06 |
 
 Der Abgleich ist eine Bestandsaufnahme. Die unbenutzten Entwurfsverträge sind kein Nachweis einer durchgängigen Plattformtrennung. Ein Umbau muss die tatsächlich benötigten asynchronen Lebenszyklen berücksichtigen; zusätzliche Linux-Desktopfunktionen gehören nicht zu PORT-03.
