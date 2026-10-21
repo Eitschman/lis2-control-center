@@ -28,8 +28,8 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Bereich | Stand | Offener Umfang |
 | --- | --- | --- |
 | Projektstruktur | Avalonia 11.3.6, .NET 8, portable Bibliotheken und `LIS2.Runtime` vorhanden | Plattformverträge sind noch nicht durchgängig angebunden; UI-Code enthält weitere Orchestrierung |
-| Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen; gemeinsame Geräteaktionen und differenzielle Spannen am angewendeten Transport | Physische Ausgabe offen |
-| Seiteneditor | Seitenpflege, Vorlagen, Bedingungen, Presets, animierte Vorschau, Variablenbrowser, validierter JSON-Import/-Export und gemeinsamer Entwurfsschutz für Quellenaktionen vorhanden | GUI-Interaktionen und WPF-Bedienparität prüfen |
+| Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen; gemeinsame Geräteaktionen und differenzielle Spannen am angewendeten Transport | PORT-06A: Winamp-Spektrumvariable und Glyphenvorschau korrigieren; physische Ausgabe offen |
+| Seiteneditor | Seitenpflege, Vorlagen, Bedingungen, Presets, animierte Vorschau, Variablenbrowser, validierter JSON-Import/-Export und gemeinsamer Entwurfsschutz für Quellenaktionen vorhanden | PORT-06A: gespeicherte Bedingungen in Builderfelder übernehmen, Variablenauswahl anbinden, Presets vereinheitlichen |
 | Glyphen | Acht 5x8-Slots, Dateien, Namen, Spektrumset und Ersetzungsdialog vorhanden | Physische Zeichenprüfung und UI-/Transportabgleich offen |
 | Sensoren | LibreHardwareMonitor auf Windows; procfs/sysfs/hwmon auf Linux; Aliase, Favoriten und fehlende Sensoren berücksichtigt | Stabile Identitäten und Rechte auf Zielsystemen prüfen |
 | Lüfter | Vier Modi plus Off, Kurven, Hysterese, Fail-safe, Simulation, freizugebende serielle Regelung und Dashboard-Handausgabe mit Kanalgrenzen | Weitere WPF-Interaktionen abgleichen; Hardware bleibt ungeprüft |
@@ -37,7 +37,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Home Assistant | WebSocket-Quelle, Reconnect und Stop, Entitäten, Attributwerte, wirksame Aliase, Favoriten und Seitenaktionen; ausdrückliche lokale Linux-Tokenauswahl | Reale HA-Instanz und Desktop-Schlüsselbund auf Zielsystemen prüfen |
 | Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache, Windows-/Linux-Tray und plattformeigener Autostart | Nativer Dateidialog, Tray-Bedienung und Anmeldung auf Zielsystemen offen |
 | Hilfe und About | Kontextbezogene Hilfe mit zehn Themen in fünf Sprachen, Live-Schlüsseln, statischen Variablenbeschreibungen und numerischen/benannten Glyphen; F1 und Hilfe am Titel; About folgt der Sprache | Native Desktop-Bedienung und Benutzerabnahme offen |
-| Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Export mit zeitgestempeltem Anwendungs-/Transportjournal | Sitzungsprotokoll begrenzt; kein dauerhaftes Logarchiv; nativen Dateidialog prüfen |
+| Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Export mit zeitgestempeltem Anwendungs-/Transportjournal | PORT-06A: WPF-Diagnosefelder und Start-/Absturzfehlerdatei ergänzen; nativen Dateidialog prüfen |
 | CI und Pakete | Windows-/Ubuntu-Builds, vier Testprojekte je OS, nativer Desktop-Smoke und drei selbstständige Pakete mit Prüfsummen | Archivstart und echte ARM64-Ausführung fehlen |
 
 ## Prüffähige Checkliste
@@ -74,7 +74,9 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 
 ### Oberfläche und Verifikation
 
-Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. Statische Texte, Formatargumente und unveränderte Nutzdaten werden automatisiert geprüft; die Sichtprüfung und Plattformgrenzen stehen im Status. HA-Verbindung, Attribute, Aliase und Tokenspeicherung sind in PORT-05 mit isolierten Daten geprüft; reale HA-/Playernachweise bleiben offen. Nächstes Paket ist PORT-07 gemäß [TODO](../../TODO.md).
+Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. Statische Texte, Formatargumente und unveränderte Nutzdaten werden automatisiert geprüft; die Sichtprüfung und Plattformgrenzen stehen im Status. HA-Verbindung, Attribute, Aliase und Tokenspeicherung sind in PORT-05 mit isolierten Daten geprüft; reale HA-/Playernachweise bleiben offen. Nächstes Paket ist **PORT-06A: Paritätskorrekturen und Bedienung** gemäß [TODO](../../TODO.md). Der direkte Abgleich mit `origin/main` (`922ca1b`) zeigt trotz vorhandener Ansichten konkrete Funktions- und Bedienlücken; Quellstellen stehen im [Paritätsaudit](wpf-avalonia-parity-audit.md#direkter-main-abgleich-und-nächstes-paket-port-06a).
+
+Abnahmekriterien für PORT-06A: Das Spektrumpreset rendert aus echten Winamp-Snapshotwerten eine nicht leere, zum aktiven Glyphensatz passende Zeile; Bildschirmvorschauen bilden die VFD-Glyphen sichtbar ab. Gespeicherte Sichtbarkeitsregeln sind im Builder bearbeitbar, numerische Sensoren direkt im Lüftereditor auswählbar. Medien-/Diagnoseangaben und Glyphensatzwechsel entsprechen den dokumentierten WPF-Abläufen. Hardware-Presets wählen in beiden Ansichten konsistent; Plattformvorlagen und Quellenbeschriftungen passen zum Betriebssystem. Speichern meldet den tatsächlichen Schreibabschluss, Fehler erhalten den Entwurf. HA-Kopieraktionen, zusammenhängende Lüfterbedienung und die Bewertung von Pixel-/Kurveneditoren sind im selben Paket erfasst. Neue UI-Pfade benötigen funktionale Gegenproben und Sichtprüfungen; physische Freigaben und genehmigte Abweichungen bleiben bestehen. Danach folgt PORT-07.
 
 - [x] Zehn Hauptansichten, Hilfe und About sind angelegt und angebunden.
 - [x] System/Light/Dark sowie System/English/German/French/Turkish/Russian sind auswählbar.
