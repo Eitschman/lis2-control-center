@@ -36,7 +36,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Medien | Winamp, reflektiert geladener GSMTC-Anbieter und Linux-`playerctl` angebunden | MPRIS-Zeitposition, Playerwahl und echte Zielplayer offen; WMP Legacy weicht vom zurückgestellten Produktumfang ab |
 | Home Assistant | WebSocket-Quelle, Entitäten, Attribute, Aliase, Favoriten und Seitenaktionen mit Sequenz-Reload vorhanden | Linux-Liveprüfung und Deaktivierung/Persistenz prüfen |
 | Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache und Windows-Tray/Autostart | Nativer Dateidialog und Linux-Desktopintegration offen |
-| Hilfe und About | Kontextbezogene Hilfe mit zehn Themen in fünf Sprachen, Live-Schlüsseln und numerischer Glyphenreferenz; About-Dialog vorhanden | Weitere WPF-Inhaltstiefe, About-Übersetzungen, Platzierung und Desktop-Bedienung offen |
+| Hilfe und About | Kontextbezogene Hilfe mit zehn Themen in fünf Sprachen, Live-Schlüsseln und numerischer Glyphenreferenz; About folgt der ausgewählten Sprache | Weitere WPF-Inhaltstiefe, Platzierung und native Desktop-Bedienung offen |
 | Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Export mit zeitgestempeltem Anwendungs-/Transportjournal | Sitzungsprotokoll begrenzt; kein dauerhaftes Logarchiv; nativen Dateidialog prüfen |
 | CI und Pakete | Windows-/Ubuntu-Builds, vier Testprojekte je OS, nativer Desktop-Smoke und drei selbstständige Pakete mit Prüfsummen | Archivstart und echte ARM64-Ausführung fehlen |
 
@@ -74,13 +74,13 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 
 ### Oberfläche und Verifikation
 
-Priorität für die nächste Fortsetzung: Vor PORT-04 die Übersetzungen aller zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und Dialoge prüfen und fehlende Übersetzungen korrigieren. Laut Benutzerprüfung stehen auf allen Seiten noch viele Texte auf Englisch. Die bereits geprüfte Hilfelokalisierung ist kein Nachweis für die übrige Oberfläche; die konkrete Aufgabenliste steht in [TODO](../../TODO.md).
+Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. Statische Texte, Formatargumente und unveränderte Nutzdaten werden automatisiert geprüft; die Sichtprüfung und Plattformgrenzen stehen im Status. Die nächste Priorität ist PORT-04 gemäß [TODO](../../TODO.md).
 
 - [x] Zehn Hauptansichten, Hilfe und About sind angelegt und angebunden.
 - [x] System/Light/Dark sowie System/English/German/French/Turkish/Russian sind auswählbar.
 - [x] Variablenbrowser enthält Suche, Kategorien, HA-Filter, Livewerte, persistente Favoriten und Einfügen in beide Zeilen.
 - [ ] Semantischen Funktionsabgleich aller zehn Ansichten einschließlich Fehler-, Leer-, Auswahl- und Persistenzpfaden schließen.
-- [ ] Hilfe und About mit WPF-Inhalt, Übersetzungen und Navigation abgleichen.
+- [ ] Hilfe und About mit WPF-Inhaltstiefe und Bedienabläufen abgleichen.
 - [x] Hilfesprache einschließlich Systemstandard und offenem Dialog prüfen; Inhalte gegen aktuelle Avalonia-Abläufe korrigieren und Beispiele mit der tatsächlichen Vorlagen-Engine ausführen.
 - [x] Avalonia-GUI-Smoke für zehn Ansichten, Hilfe/About, fehlende Medienanbieter, Diagnose und geordnetes Beenden ergänzt; aktuelle Nachweise im Status.
 - [ ] Desktop-Darstellung, Tastatur, DPI, Theme und Sprachen auf den Zielsystemen prüfen.

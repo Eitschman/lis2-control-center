@@ -240,7 +240,7 @@ dotnet build src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Rele
 dotnet test tests/LIS2.App.Avalonia.Tests/LIS2.App.Avalonia.Tests.csproj --configuration Release
 ```
 
-Diese Befehle sind im genannten GitHub-Lauf auf Windows und Ubuntu erfolgreich ausgeführt worden; in diesem Dokumentationsauftrag wurde kein lokaler Build gestartet. Für GSMTC enthält das Windows-Publish zusätzliche Schritte.
+Die konkreten lokalen und GitHub-Prüfläufe stehen im Portierungsstatus. Für GSMTC enthält das Windows-Publish zusätzliche Schritte.
 
 ## CI and development artifacts
 

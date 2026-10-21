@@ -39,6 +39,8 @@ Das Übersetzungspaket vor PORT-04 ist umgesetzt und mit isolierten Avalonia-Fen
 - [x] Deutsch, Englisch, Französisch, Türkisch, Russisch, Systemstandard und Sprachwechsel geprüft. Statusmeldungen behalten Vorlage und Daten getrennt; Musiktitel, Displayinhalte, Sensorwerte und Schlüssel werden nicht übersetzt. Lüftermodi werden über stabile Indizes gespeichert.
 - [x] Katalogabdeckung und Formatplatzhalter geprüft; zehn Ansichten in Deutsch bei 1305 × 893 und 950 × 600 gerendert, zusätzliche französische und russische Ansichten geprüft. Schmale Aktionszeilen umbrechen, der Seiteneditor ordnet Liste und Eigenschaften bei schmalen Fenstern untereinander an. Nachweise und Grenzen stehen im [Status](docs/prp/linux-port-status.md).
 
+- [x] [CI 39565668081](https://github.com/Eitschman/lis2-control-center/actions/runs/39565668081) für `c22048d`: alle sieben Jobs erfolgreich, je OS 359/359 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes und drei Pakete erfolgreich. Linux-Sichtprüfung zusätzlich anhand der Workflow-Screenshots.
+
 Danach folgt **PORT-04: Medien und Produktgrenzen**.
 
 ## Weitere Implementierungs- und Prüfaufgaben
@@ -60,7 +62,7 @@ Danach folgt **PORT-04: Medien und Produktgrenzen**.
 - [x] Start-/Stop-/Drain-Pfade abgeglichen: Medienstart vor Dispose drainieren, MPRIS abbrechen/Kindprozess beenden, Timer vor Quellenabbau stoppen, weitere Ressourcen trotz Cleanup-Fehlern abbauen. Verzögerter Start erfolgreich/fehlgeschlagen getestet; reale Quellensysteme separat offen.
 - [x] Differenzielle Schreibspannen in serieller und virtueller Session nachgewiesen, einschließlich identischer Frames, manueller Cacheinvalidierung, Reconnect und Teilfehlern.
 - [x] Sieben `IPlatform*`-Verträge gegen tatsächliche Aufrufpfade und Zielarchitektur abgeglichen; Abweichungstabelle im Inventar, kein vorgetäuschter Adapterumbau.
-- [x] [CI 39455194970](https://github.com/Eitschman/lis2-control-center/actions/runs/39455194970) für `d2d2def`: alle sieben Jobs erfolgreich, je OS 359/359 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes und drei Pakete erfolgreich.
+- [x] [CI 39455194970](https://github.com/Eitschman/lis2-control-center/actions/runs/39455194970) für `d2d2def`: alle sieben Jobs erfolgreich, je OS 345/345 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes und drei Pakete erfolgreich.
 
 ### PORT-04: Medien und Produktgrenzen
 
