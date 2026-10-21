@@ -168,9 +168,10 @@ public partial class MainWindow
     {
         if (_updatingHaSelection) return;
         var ha = _pageSources.HomeAssistant;
+        var snapshot = ha.Entities;
         var picker = this.FindControl<ComboBox>("HaEntityPicker")!;
         var previous = SelectedHaEntityId();
-        var domains = new[] { UiText("All domains") }.Concat(ha.Entities.Select(e => e.Domain).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(d => d, StringComparer.OrdinalIgnoreCase)).ToArray();
+        var domains = new[] { UiText("All domains") }.Concat(snapshot.Select(e => e.Domain).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(d => d, StringComparer.OrdinalIgnoreCase)).ToArray();
         var domainPicker = this.FindControl<ComboBox>("HaDomainFilter")!;
         var selectedDomain = domainPicker.SelectedIndex > 0 ? domainPicker.SelectedItem as string : null;
         if (!domains.SequenceEqual(domainPicker.ItemsSource as string[] ?? Array.Empty<string>()))
@@ -182,7 +183,7 @@ public partial class MainWindow
         }
         var filter = this.FindControl<TextBox>("HaEntityFilter")!.Text?.Trim() ?? "";
         var domain = domainPicker.SelectedIndex > 0 ? domainPicker.SelectedItem as string : null;
-        var entities = ha.Entities
+        var entities = snapshot
             .Where(e => (domain is null || string.Equals(e.Domain, domain, StringComparison.OrdinalIgnoreCase))
                 && (e.EntityId.Contains(filter, StringComparison.OrdinalIgnoreCase)
                     || e.FriendlyName.Contains(filter, StringComparison.OrdinalIgnoreCase)
@@ -200,7 +201,7 @@ public partial class MainWindow
         }
         var rows = entities.Select(id =>
         {
-            var entity = ha.Entities.First(e => string.Equals(e.EntityId, id, StringComparison.OrdinalIgnoreCase));
+            var entity = snapshot.First(e => string.Equals(e.EntityId, id, StringComparison.OrdinalIgnoreCase));
             var favorite = _haPreferences.Any(p => string.Equals(p.EntityId, id, StringComparison.OrdinalIgnoreCase) && p.IsFavorite);
             return new HaEntityRow(id, entity.FriendlyName, entity.State + " " + entity.Unit,
                 HaEntityKey(id), favorite ? "★" : "");
@@ -219,7 +220,7 @@ public partial class MainWindow
         RefreshHaActionMessage();
         SetUiText("HaStatus", ha.IsConnected
             ? (UiMessage)$"Home Assistant connected ({version}), {ha.Entities.Count} entities, read-only."
-            : ha.LastError is { Length: > 0 } error ? (UiMessage)$"Home Assistant disconnected: {error}"
+            : ha.LastError is { Length: > 0 } error ? (UiMessage)$"Home Assistant disconnected: {(UiMessage)error}"
             : ha.IsConfigured ? "Home Assistant connecting..." : "Home Assistant not configured");
     }
 

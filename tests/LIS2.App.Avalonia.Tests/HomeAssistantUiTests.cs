@@ -73,6 +73,11 @@ public sealed class HomeAssistantUiTests
             }
             Assert.True(workspace.Load().HomeAssistantEntityPreferences.Single().IsFavorite);
             Assert.DoesNotContain("fixture-token", await File.ReadAllTextAsync(workspace.FilePath));
+            await server.SendAsync(socket, new { id = 2, type = "result", success = false });
+            await HomeAssistantServer.WaitAsync(() => !sources.HomeAssistant.IsConnected);
+            window.FindControl<TextBox>("HaEntityFilter")!.Text = "disconnected";
+            await HomeAssistantServer.WaitAsync(() => window.FindControl<ListBox>("HaEntityList")!.ItemCount == 0);
+            Assert.Contains(UiTranslations.Translate("Home Assistant state or subscription request failed.", code), window.FindControl<TextBlock>("HaStatus")!.Text);
             window.FindControl<CheckBox>("HaEnabled")!.IsChecked = false;
             Click(window, "HaConnect");
             await HomeAssistantServer.WaitAsync(() => window.FindControl<Button>("HaConnect")!.IsEnabled);
