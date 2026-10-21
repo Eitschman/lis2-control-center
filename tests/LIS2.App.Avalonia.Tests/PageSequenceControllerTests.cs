@@ -174,18 +174,28 @@ public sealed class PageSequenceControllerTests
     public async Task PeriodicRuntimeLoopStopsWithoutFurtherCallbacks()
     {
         var count = 0;
+        var firstTick = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var restartedTick = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var restarted = false;
         await using var loop = new PeriodicRuntimeLoop(TimeSpan.FromMilliseconds(10),
-            _ => { Interlocked.Increment(ref count); return Task.CompletedTask; });
+            _ =>
+            {
+                Interlocked.Increment(ref count);
+                (Volatile.Read(ref restarted) ? restartedTick : firstTick).TrySetResult(true);
+                return Task.CompletedTask;
+            });
         Assert.True(loop.Start());
         Assert.False(loop.Start());
-        await Task.Delay(75);
+        // Unter CI-Last ist die erste Ausführung nicht an eine kurze Zeitspanne gebunden.
+        await firstTick.Task.WaitAsync(TimeSpan.FromSeconds(5));
         await loop.StopAndDrainAsync();
         var stoppedAt = Volatile.Read(ref count);
         Assert.True(stoppedAt > 0);
         await Task.Delay(40);
         Assert.Equal(stoppedAt, Volatile.Read(ref count));
+        Volatile.Write(ref restarted, true);
         Assert.True(loop.Start());
-        await Task.Delay(30);
+        await restartedTick.Task.WaitAsync(TimeSpan.FromSeconds(5));
         await loop.StopAndDrainAsync();
         Assert.True(Volatile.Read(ref count) > stoppedAt);
     }
@@ -210,19 +220,25 @@ public sealed class PageSequenceControllerTests
     public async Task PeriodicRuntimeLoopCanRestartAfterCallbackFailureWasObserved()
     {
         var attempts = 0;
+        var failedTick = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var restartedTick = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         await using var loop = new PeriodicRuntimeLoop(TimeSpan.FromMilliseconds(10),
             _ =>
             {
                 if (Interlocked.Increment(ref attempts) == 1)
+                {
+                    failedTick.TrySetResult(true);
                     throw new IOException("Simulated source failure");
+                }
+                restartedTick.TrySetResult(true);
                 return Task.CompletedTask;
             });
         Assert.True(loop.Start());
-        await Task.Delay(70);
+        await failedTick.Task.WaitAsync(TimeSpan.FromSeconds(5));
         await Assert.ThrowsAsync<IOException>(() => loop.StopAndDrainAsync());
         Assert.False(loop.IsRunning);
         Assert.True(loop.Start());
-        await Task.Delay(50);
+        await restartedTick.Task.WaitAsync(TimeSpan.FromSeconds(5));
         await loop.StopAndDrainAsync();
         Assert.True(Volatile.Read(ref attempts) > 1);
     }
