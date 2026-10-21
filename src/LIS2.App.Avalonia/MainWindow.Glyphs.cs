@@ -40,6 +40,7 @@ public partial class MainWindow
             var slot = this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1;
             _glyphs.SaveSlot(slot, this.FindControl<TextBox>("GlyphName")!.Text,
                 this.FindControl<TextBox>("GlyphBitmapEditor")!.Text);
+            _runtime.Sources.SetGlyphNames(_glyphs.Glyphs.Select(glyph => glyph.Name));
             RefreshGlyphPreview();
             SetVirtualStatus($"Saved glyph slot {slot} in workspace.");
             _ = SavePortableWorkspaceAsync();
@@ -58,6 +59,7 @@ public partial class MainWindow
 
     private void LoadGlyphEditor()
     {
+        _runtime.Sources.SetGlyphNames(_glyphs.Glyphs.Select(glyph => glyph.Name));
         var slot = this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1;
         if (slot is < 1 or > 8) return;
         var glyph = _glyphs.GetSlot(slot);
@@ -70,7 +72,9 @@ public partial class MainWindow
     {
         var slot = this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1;
         if (slot is < 1 or > 8) return;
-        this.FindControl<TextBlock>("GlyphTemplateKey")!.Text = $"{{Glyph.{slot}}}";
+        var name = PageSourceValues.NormalizeGlyphName(this.FindControl<TextBox>("GlyphName")!.Text);
+        this.FindControl<TextBlock>("GlyphTemplateKey")!.Text = name.Length == 0 || int.TryParse(name, out _)
+            ? $"{{Glyph.{slot}}}" : $"{{Glyph.{slot}}}  {{Glyph.{name}}}";
         try
         {
             var rows = GlyphBitmap.Parse(this.FindControl<TextBox>("GlyphBitmapEditor")!.Text);

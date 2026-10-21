@@ -10,6 +10,8 @@ public sealed class PageClockValuesTests
         var instant = new DateTimeOffset(2026, 10, 13, 14, 15, 16, TimeSpan.Zero);
         var values = PageClockValues.Create(instant);
         var local = instant.ToLocalTime();
+        Assert.Equal(local.ToString("dd.MM.yyyy"), values["Clock.Date"]);
+        Assert.Equal(local.ToString("dddd"), values["Clock.Day"]);
         Assert.Equal(local.Hour, values["Clock.Hour"]);
         Assert.Equal(local.Minute, values["Clock.Minute"]);
         Assert.Equal(local.Second, values["Clock.Second"]);

@@ -180,7 +180,8 @@ public partial class MainWindow
         this.FindControl<Button>("SettingsRefreshPorts")!.Content = SettingsTranslate("Refresh");
         this.FindControl<Button>("SettingsApplyTransport")!.Content = SettingsTranslate("Apply / reconnect");
         this.FindControl<CheckBox>("StartWithWindowsCheckBox")!.Content =
-            SettingsTranslate("Start LIS2 Control Center with Windows (minimized to tray)");
+            OperatingSystem.IsWindows() ? SettingsTranslate("Start LIS2 Control Center with Windows (minimized to tray)")
+                : UiText("Start LIS2 Control Center at login (minimized)");
         for (var i = 0; i < SectionNames.Length; i++)
         {
             var button = this.FindControl<Button>($"NavButton{i}");

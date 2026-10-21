@@ -11,11 +11,12 @@ public static class PageClockValues
         var result = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
         {
             ["Clock.Time"] = local.ToString("HH:mm:ss", CultureInfo.InvariantCulture),
-            ["Clock.Date"] = local.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            ["Clock.Date"] = local.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture),
             ["Clock.Hour"] = local.Hour,
             ["Clock.Minute"] = local.Minute,
             ["Clock.Second"] = local.Second,
-            ["Clock.Day"] = local.Day,
+            // Entspricht ClockDataSource, damit sich der Wert beim Quellenstart nicht ändert.
+            ["Clock.Day"] = local.ToString("dddd", CultureInfo.CurrentCulture),
             ["Clock.Month"] = local.Month,
             ["Clock.Year"] = local.Year,
             ["Clock.DayOfWeek"] = local.DayOfWeek.ToString()

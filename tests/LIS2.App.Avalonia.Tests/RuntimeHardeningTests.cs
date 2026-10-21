@@ -131,7 +131,7 @@ public sealed class RuntimeHardeningTests
         try
         {
             window.Show();
-            await DesktopSmoke.RunAsync(window, directory);
+            await DesktopSmoke.RunAsync(window, directory, crossProcessActivation: false);
             Assert.True(window.ShutdownCompletion.IsCompletedSuccessfully);
             var report = File.ReadAllText(Path.Combine(directory, "diagnostics.txt"));
             Assert.Contains("OK Write", report);

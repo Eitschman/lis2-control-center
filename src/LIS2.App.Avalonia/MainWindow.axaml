@@ -29,7 +29,6 @@
         </StackPanel></ScrollViewer>
         <StackPanel Grid.Row="2" Margin="4,12,0,10" Spacing="7">
           <Separator />
-          <Button Name="OpenHelp" Content="Help &amp; reference" HorizontalContentAlignment="Left" Padding="10,7" />
           <Button Name="OpenAbout" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" Padding="10,7">
             <TextBlock Text="About LIS2 Control Center" TextWrapping="Wrap" />
           </Button>
@@ -37,15 +36,11 @@
       </Grid>
     </Border>
     <Grid Grid.Column="1" Margin="20" RowDefinitions="Auto,*,Auto">
-      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,18">
-        <StackPanel Grid.Column="0" Spacing="5">
-          <StackPanel Orientation="Horizontal" Spacing="12">
-            <TextBlock Name="SectionTitle" Text="Dashboard" FontSize="28" FontWeight="SemiBold" />
-
-          </StackPanel>
-        </StackPanel>
-        <Border Grid.Column="1" Background="#DDF6E7" CornerRadius="14" Padding="14,9" VerticalAlignment="Top">
-          <TextBlock Name="ConnectionText" Text="Disconnected" FontWeight="SemiBold" Foreground="#086D35" />
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,18">
+        <TextBlock Grid.Column="0" Name="SectionTitle" Text="Dashboard" FontSize="28" FontWeight="SemiBold" TextWrapping="Wrap" />
+        <Button Grid.Column="1" Name="OpenHelp" Content="Help &amp; reference" Margin="12,0" VerticalAlignment="Top" />
+        <Border Grid.Column="2" Background="{DynamicResource Lis2StatusBrush}" CornerRadius="14" Padding="14,9" VerticalAlignment="Top">
+          <TextBlock Name="ConnectionText" Text="Disconnected" FontWeight="SemiBold" Foreground="{DynamicResource Lis2StatusTextBrush}" />
         </Border>
       </Grid>
       <ScrollViewer Name="DashboardView" Grid.Row="1">
@@ -160,7 +155,7 @@
                 <TextBlock Text="Name" />
                 <TextBox Name="GlyphName" Text="Glyph 1" />
                 <TextBlock Text="Template key" />
-                <TextBlock Name="GlyphTemplateKey" Text="{}{Glyph.1}" FontFamily="Consolas" />
+                <TextBlock Name="GlyphTemplateKey" Text="{}{Glyph.1}" FontFamily="Consolas" TextWrapping="Wrap" />
               </StackPanel>
               <StackPanel Grid.Column="1" Spacing="5">
                 <TextBlock Text="5x8 bitmap (8 rows)" />
@@ -197,7 +192,6 @@
     </ScrollViewer>
     <ScrollViewer Name="PagesView" Grid.Row="1" IsVisible="False">
       <StackPanel Spacing="12">
-        <TextBlock Text="Display pages" FontSize="18" FontWeight="SemiBold"/>
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <Grid Name="PageEditorLayout" ColumnDefinitions="250,18,*">
             <StackPanel Grid.Column="0" Spacing="9">
@@ -468,13 +462,13 @@
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="12">
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12"><TextBlock Text="Fan Outputs" FontSize="18" FontWeight="SemiBold"/><CheckBox Name="FanAutomatic" Grid.Column="1" Content="Automatic control" VerticalAlignment="Center"/></Grid>
-            <Grid ColumnDefinitions="90,*,65" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="12">
+            <Grid ColumnDefinitions="140,*,65" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="12">
               <TextBlock Grid.Row="0" Text="Fan 1"/><ProgressBar Name="FanOutputBar1" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="0" Height="14" Foreground="#17A45A"/><TextBlock Name="FanOutputText1" Grid.Row="0" Grid.Column="2" Text="—" TextAlignment="Right"/>
               <TextBlock Grid.Row="1" Text="Fan 2"/><ProgressBar Name="FanOutputBar2" Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Value="0" Height="14" Foreground="#17A45A"/><TextBlock Name="FanOutputText2" Grid.Row="1" Grid.Column="2" Text="—" TextAlignment="Right"/>
               <TextBlock Grid.Row="2" Text="Fan 3"/><ProgressBar Name="FanOutputBar3" Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="100" Value="0" Height="14" Foreground="#17A45A"/><TextBlock Name="FanOutputText3" Grid.Row="2" Grid.Column="2" Text="—" TextAlignment="Right"/>
               <TextBlock Grid.Row="3" Text="Fan 4"/><ProgressBar Name="FanOutputBar4" Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="100" Value="0" Height="14" Foreground="#17A45A"/><TextBlock Name="FanOutputText4" Grid.Row="3" Grid.Column="2" Text="—" TextAlignment="Right"/>
             </Grid>
-            <TextBlock Text="Preview values appear after simulation; they do not represent actual hardware output." FontSize="12" Opacity="0.7"/>
+            <TextBlock Text="Preview values appear after simulation; they do not represent actual hardware output." FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
           </StackPanel>
         </Border>
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
@@ -488,7 +482,7 @@
                 <ComboBoxItem Content="Fan 3" /><ComboBoxItem Content="Fan 4" />
               </ComboBox>
               <TextBlock Margin="0,0,8,8" Text="Mode" VerticalAlignment="Center" />
-              <ComboBox Margin="0,0,8,8" Name="FanModePicker" Width="140" SelectedIndex="0">
+              <ComboBox Margin="0,0,8,8" Name="FanModePicker" Width="220" SelectedIndex="0">
                 <ComboBoxItem Content="Fixed" /><ComboBoxItem Content="Curve" />
                 <ComboBoxItem Content="Follow" /><ComboBoxItem Content="External" />
                 <ComboBoxItem Content="Off" />
@@ -719,12 +713,12 @@
             <StackPanel Spacing="12">
               <TextBlock Name="SettingsDeviceHeading" Text="Device / Transport" FontWeight="SemiBold" FontSize="18"/>
               <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="10">
-                <TextBlock Grid.Row="0" Name="SettingsTransportLabel" Text="Transport" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="0" Name="SettingsTransportLabel" Text="Transport" VerticalAlignment="Center" TextWrapping="Wrap"/>
                 <ComboBox Grid.Row="0" Grid.Column="1" Name="TransportModeComboBox" SelectedIndex="0" Width="220" HorizontalAlignment="Left">
                   <ComboBoxItem Content="Virtual"/>
                   <ComboBoxItem Content="Serial"/>
                 </ComboBox>
-                <TextBlock Grid.Row="1" Name="SettingsPortLabel" Text="COM port" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="1" Name="SettingsPortLabel" Text="COM port" VerticalAlignment="Center" TextWrapping="Wrap"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" Name="SettingsPortComboBox" Width="220" HorizontalAlignment="Left"/>
               </Grid>
               <WrapPanel>
@@ -760,8 +754,10 @@
           </Border>
           <Border Background="{DynamicResource Lis2CardBrush}" Name="SettingsWindowsCard" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
-              <TextBlock Text="Windows" FontWeight="SemiBold" FontSize="18"/>
-              <CheckBox Name="StartWithWindowsCheckBox" Content="Start LIS2 Control Center with Windows (minimized to tray)"/>
+              <TextBlock Text="Desktop startup" FontWeight="SemiBold" FontSize="18"/>
+              <CheckBox Name="StartWithWindowsCheckBox" Content="Start LIS2 Control Center with Windows (minimized to tray)">
+                <CheckBox.ContentTemplate><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap" /></DataTemplate></CheckBox.ContentTemplate>
+              </CheckBox>
               <TextBlock Name="SettingsStartupStatus" TextWrapping="Wrap" Opacity="0.75"/>
             </StackPanel>
           </Border>

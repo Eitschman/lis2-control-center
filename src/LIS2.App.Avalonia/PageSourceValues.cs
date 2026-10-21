@@ -10,6 +10,19 @@ public sealed class PageSourceValues : IAsyncDisposable
     private readonly Dictionary<string, object?> _hardware = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, object?> _media = new(StringComparer.OrdinalIgnoreCase);
     private KeyValuePair<string, string>[] _haAliases = [];
+    private string[] _glyphNames = [];
+
+    public void SetGlyphNames(IEnumerable<string> names) => _glyphNames = names.Take(8).ToArray();
+
+    /// <summary>Verwendet dieselben ASCII-Schlüssel wie die WPF-Funktionsreferenz.</summary>
+    public static string NormalizeGlyphName(string? name)
+    {
+        var normalized = new string(LIS2.Core.Lis2Protocol.ToSafeAscii((name ?? "").Trim())
+            .Select(character => char.IsAsciiLetterOrDigit(character) || character is '_' or '-' ? character : '_').ToArray());
+        while (normalized.Contains("__", StringComparison.Ordinal))
+            normalized = normalized.Replace("__", "_", StringComparison.Ordinal);
+        return normalized.Trim('_');
+    }
 
     public void SetHomeAssistantAliases(IEnumerable<KeyValuePair<string, string>> aliases) =>
         _haAliases = aliases.ToArray();
@@ -71,6 +84,13 @@ public sealed class PageSourceValues : IAsyncDisposable
             values.TryAdd(pair.Key, pair.Value);
         for (var slot = 1; slot <= 8; slot++)
             values[$"Glyph.{slot}"] = LIS2.Core.Lis2Protocol.CustomGlyph(slot).ToString();
+        for (var index = 0; index < _glyphNames.Length; index++)
+        {
+            var name = NormalizeGlyphName(_glyphNames[index]);
+            // Numerische Slots bleiben auch bei einem gleichlautenden Namen eindeutig.
+            if (name.Length > 0 && !int.TryParse(name, out _))
+                values["Glyph." + name] = LIS2.Core.Lis2Protocol.CustomGlyph(index + 1).ToString();
+        }
         return values;
     }
 

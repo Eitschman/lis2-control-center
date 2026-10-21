@@ -70,21 +70,23 @@ public class HelpReferenceCatalogTests
     }
 
     [Fact]
-    public void DisplayHelpMapsEditorNamesToSupportedNumericGlyphKeys()
+    public void DisplayHelpProvidesRunnableNumericAndNamedGlyphKeys()
     {
         var text = string.Join("\n", HelpReferenceCatalog.GetSection(1, [], ["CPU temp!", "Fan-1"])
             .Select(x => x.Body));
         Assert.Contains("CPU temp!: {Glyph.1}", text);
         Assert.Contains("Fan-1: {Glyph.2}", text);
-        Assert.DoesNotContain("{Glyph.CPU_temp}", text);
+        Assert.Contains("{Glyph.CPU_temp}", text);
         Assert.Contains("{Glyph.8}", text);
         var source = new PageSourceValues();
+        source.SetGlyphNames(["CPU temp!", "Fan-1"]);
         var values = source.Snapshot(DateTimeOffset.UnixEpoch);
         var examples = HelpReferenceCatalog.GetSection(1, [], ["CPU temp!", "Fan-1"])
             .Where(entry => entry.Heading == "Named glyph");
         foreach (var example in examples)
         {
-            var template = example.Body[(example.Body.IndexOf(": ", StringComparison.Ordinal) + 2)..];
+            var template = example.Body.Contains(": ", StringComparison.Ordinal)
+                ? example.Body[(example.Body.IndexOf(": ", StringComparison.Ordinal) + 2)..] : example.Body;
             Assert.Single(new LIS2.Display.TemplateRenderer().Render(template, values));
         }
     }

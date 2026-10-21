@@ -27,6 +27,11 @@ public sealed class DeviceUiTests
         Assert.Equal(Lis2Brightness.Percent50, transport.State.Brightness);
         Assert.Equal((byte)8, transport.State.CustomCharacters[7][0]);
         Assert.DoesNotContain(transport.Writes, IsFanCommand);
+        ui.Window.Hide();
+        ui.Window.Show();
+        await Task.Delay(60);
+        Assert.Single(ui.SerialTransports);
+        Assert.True(transport.IsOpen);
         ui.Click("NavButton1");
         ui.Control<TextBox>("Line1TextBox").Text = "ÄÖÜ LIS2";
         ui.Control<TextBox>("Line2TextBox").Text = "Selected serial";

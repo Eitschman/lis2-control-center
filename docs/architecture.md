@@ -90,9 +90,13 @@ Der Workspace enthält Seiten, Glyphen, Lüftereinstellungen, Transportmodus, Po
 
 ## Desktop und Lebenszyklus
 
-Windows-Tray, Minimieren/Schließen ins Tray und Run-Autostart mit `--minimized` sind in `App.axaml.cs` und `MainWindow.Settings.cs` implementiert. Linux erhält diese Tray-/Autostartanbindung derzeit nicht. Single Instance und Splash sind im Avalonia-Pfad nicht umgesetzt.
+`App.axaml.cs` bindet das Avalonia-Tray auf Windows und Linux an. Öffnen und Beenden folgen dem Sprachwechsel; Beenden wartet auf `BeginShutdownAsync`. Windows minimiert/schließt in den Infobereich. Linux hält minimierte Fenster in der Taskleiste und beendet beim Schließen, damit der Prozess auch ohne Tray-Host erreichbar bleibt. Die Anmeldung verwendet unter Windows den Benutzer-Run-Schlüssel und unter Linux `DesktopAutostart` mit dem eigenen XDG-Eintrag `autostart/lis2-control-center.desktop`. Pfade werden ohne Shell maskiert; beim Start über `dotnet` wird auch der Assemblypfad eingetragen.
 
-`MainWindow` initialisiert Quellen/Timer und räumt sie im asynchronen `Closed`-Handler auf. UI-Medienrefresh, Hardwareanzeige, Ereignisanzeige und Editorpreview enthalten weiterhin Dispatcher-Timer. Die Existenz von Stop/Drain-Methoden ersetzt keinen GUI-Prozessende-Test.
+`DesktopInstance` hält einen exklusiven Dateihandle unter dem Benutzerprofil und nimmt Aktivierungsanforderungen über eine auf denselben Benutzer beschränkte Named Pipe entgegen. Folgestarts öffnen kein zweites Gerät. Entscheidend ist der offene Handle, nicht die nach Ende verbleibende Sperrdatei. `StartupSplash` wird vor der Hauptfensterinitialisierung gerendert. Wiederanzeigen initialisiert Quellen und Transport nicht erneut. Native Desktop-Smokes prüfen die Aktivierung durch einen separaten Prozess.
+
+`PageSourceValues` bietet numerische und gespeicherte benannte Glyphenvariablen an. Die Namensnormalisierung entspricht WPF; doppelte Namen bezeichnen den letzten Slot, numerische Namen überschreiben keine Slotnummer. `HelpVariableCatalog` beschreibt statische Schlüssel auch ohne verbundene Quelle und verwendet WPF-Hilfeübersetzungen ohne WPF-Abhängigkeit. Datums-/Wochentagswerte behalten beim Start der gemeinsamen Clock-Quelle ihren Vertrag.
+
+`MainWindow` initialisiert Quellen/Timer einmalig und drainiert sie beim Schließen über `BeginShutdownAsync`. UI-Medienrefresh, Hardwareanzeige, Ereignisanzeige und Editorpreview enthalten weiterhin Dispatcher-Timer. Native Desktop-Smokes prüfen das Prozessende zusätzlich zu den Stop-/Drain-Verträgen.
 
 Theme-Ressourcen und fünf Sprachkataloge existieren. Die Hilfe wird aus `HelpReferenceCatalog` mit zehn Kontextthemen aufgebaut; About zeigt Version, Runtime, Architektur, OS und Datenverzeichnis. Vollständige Übersetzungs-/Darstellungsparität ist nicht nachgewiesen.
 

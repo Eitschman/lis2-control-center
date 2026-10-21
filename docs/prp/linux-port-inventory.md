@@ -1,6 +1,6 @@
 # Inventar des Avalonia-Branches
 
-Stand: 21.10.2026. Implementierungsstand: PORT-05.
+Stand: 21.10.2026. Implementierungsstand: PORT-06.
 Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Konfiguration. Kein ZIP-Archiv als Implementierungsbaseline.
 
 ## Umfang und Projekte
@@ -45,10 +45,10 @@ Die `IPlatform*`-Verträge haben derzeit keine entsprechenden Adapterimplementie
 | `IPlatformSerialPortDiscovery` | Statische `SerialPortDiscovery` aus Settings/Serial; kein Hardwarezugriff bei Suche | Kein injizierter Vertragsadapter |
 | `IPlatformSensorProvider` | `IFanSensorSource`, `LinuxSystemSensors`, `WindowsHardwareFanSensors` | Produktivvertrag liefert `object?`, Entwurf nur `double?`; vor Adapterumbau Schlüssel und Metadaten erhalten |
 | `IPlatformMediaProvider` | `WindowsMediaBridge.Values`, Winamp-Values, asynchrones `LinuxMprisSource.ReadSnapshotAsync` | Synchrones Entwurfs-Snapshot bildet Start, Abbruch und Dispose nicht ab; `AsyncProviderLifetime` ordnet aktuell den Medienabbau |
-| `IPlatformTrayService` | Windows-Tray direkt in `App`; Exit wartet auf `BeginShutdownAsync` | Linux-Tray und Dienstinjektion offen, PORT-06 |
-| `IPlatformAutostartService` | Windows-Registry in `MainWindow.Settings` | Linux-Desktopdatei und Vertragsadapter offen, PORT-06 |
+| `IPlatformTrayService` | Windows-/Linux-Avalonia-Tray direkt in `App`; Exit wartet auf `BeginShutdownAsync`; Texte folgen der Sprache | Native Tray-Host-Bedienung offen; Linux schließt die App und behält minimierte Fenster in der Taskleiste |
+| `IPlatformAutostartService` | Windows-Registry in `MainWindow.Settings`, Linux-XDG-Datei über `DesktopAutostart`, beide mit `--minimized` | Dateivertrag isoliert geprüft; Anmeldung auf Zielsystemen offen |
 | `IPlatformSecretStore` | `PortableHaTokenStore`, DPAPI/secret-tool und ausdrücklich gewählte Linux-AES-Dateien | Spezialisierter synchroner Tokenstore statt allgemeinem Schlüsselvertrag; UI-Speichern/-Löschen läuft außerhalb des UI-Threads, initiales Laden synchron |
-| `IPlatformAppearance` | Avalonia `RequestedThemeVariant`/`ActualThemeVariant`, Windows-Titelbalken | Kein Adapter mit Änderungsereignis; Theme-/Desktopnachweis bleibt PORT-06 |
+| `IPlatformAppearance` | Avalonia `RequestedThemeVariant`/`ActualThemeVariant`, Windows-Titelbalken; System-Themeänderungen aktualisieren die Farbressourcen | Fünf Sprachen mit drei Themes geprüft; tatsächlicher OS-Themewechsel und Monitorwechsel bleiben Zielsystemprüfung |
 
 Der Abgleich ist eine Bestandsaufnahme. Die unbenutzten Entwurfsverträge sind kein Nachweis einer durchgängigen Plattformtrennung. Ein Umbau muss die tatsächlich benötigten asynchronen Lebenszyklen berücksichtigen; zusätzliche Linux-Desktopfunktionen gehören nicht zu PORT-03.
 

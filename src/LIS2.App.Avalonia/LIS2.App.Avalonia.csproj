@@ -8,6 +8,10 @@
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="LIS2.App.Avalonia.Tests" />
+    <Compile Include="../LIS2.App/HelpLocalization.de.cs" Link="Help/HelpLocalization.de.cs" />
+    <Compile Include="../LIS2.App/HelpLocalization.fr.cs" Link="Help/HelpLocalization.fr.cs" />
+    <Compile Include="../LIS2.App/HelpLocalization.tr.cs" Link="Help/HelpLocalization.tr.cs" />
+    <Compile Include="../LIS2.App/HelpLocalization.ru.cs" Link="Help/HelpLocalization.ru.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />

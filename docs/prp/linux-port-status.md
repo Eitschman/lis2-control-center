@@ -1,12 +1,20 @@
 # Avalonia-Portierung: aktueller Arbeitsstand
 
 Stand: 21.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-05 mit HA-Verbindungsprüfungen, Alias-/Attributwerten und ausdrücklich wählbarer lokaler Linux-Tokenspeicherung. Reale HA-/Playernachweise bleiben offen.
-Geprüfter Code-Commit: `33e8467082b5ed533ede5b09af4fc331e9e4bb20`. Nachfolgende reine Dokumentationscommits ändern diesen Code nicht.
+Implementierungsstand: PORT-06 mit Desktopintegration, benannten Glyphenvariablen, vertiefter Hilfe und geprüften Sprach-/Themewechseln. Reale HA-/Playernachweise sowie Desktop-Abnahme bleiben offen.
+PORT-06 ist lokal geprüft. Der letzte grüne GitHub-Code-Nachweis betrifft `33e8467082b5ed533ede5b09af4fc331e9e4bb20`; der neue Workflow-Nachweis wird nach dem Push ergänzt.
 
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
 ## Aktuelle Verifikation
+
+- PORT-06 lokal: Avalonia 416 erfolgreich, ein Linux-Schlüsselbundtest übersprungen, 417 Fälle insgesamt, Exit 0 (`port06-all.trx`); Display 50/50, Exit 0. Die Formatierungstests setzen en-US, de-DE und fr-FR ausdrücklich und stellen die vorherige Kultur wieder her.
+- `DesktopParityUiTests`: zehn Ansichten in fünf Sprachen bei Hell/Dunkel/System und 950 × 600, Grenzen zwischen Titel und Hilfe, Fokus, F1-Kontexthilfe, Glyphenspeicherung, ungültige/gültige Ereignisdauer, Ereignisauswahl/-abbruch sowie ungültige/gültige Lüfterausgabe. Skia-Sichtprüfung: türkische Einstellungen bei 950 × 600, russischer Glypheneditor bei 1305 × 893 und Splash. Portbeschriftung und Glyphenschlüssel umbrechen.
+- `DesktopIntegrationTests`: Autostarteintrag anlegen, maskieren und gezielt entfernen, fremden Eintrag erhalten, verborgenen Eintrag erkennen, ungültige Pfade ablehnen; exklusiver Instanzhandle, zweimalige Aktivierung, Wiederstart und fehlende Gegenstelle; benannte Glyphen, Umbenennen, Namenskollisionen und numerische Slots; statische Variablenhilfe mit tatsächlichen Clock-/Winamp-Schlüsseln in fünf Sprachen.
+- Gegenprobe Wiederanzeigen: ohne Initialisierungsschutz scheitert `SerialStartupAndCommonActionsUseSavedDeviceAndBrightness` nach Hide/Show an gesperrter Displayausgabe (`/tmp/lis2-port06-restore-negative.log`, Exit 1). Mit Schutz besteht derselbe Ablauf und verwendet weiterhin die erste Verbindung.
+- Nativer Windows-Smoke: Splash, Tray-Menü, Aktivierung aus einem separaten Prozess, zehn Ansichten, Hilfe/About, fehlender Medienanbieter, Diagnose und drainierter Shutdown; Exit 0. Isoliertes Ergebnis: `%TEMP%/lis2-port06-native2/result.txt`. Tatsächliche Tray-Menüklicks und Anmeldung mit Autostart sind dadurch nicht belegt. Linux-X11-Ausführung einschließlich gemessener Skalierung bei 150 Prozent wird im Branch-Workflow geprüft.
+
+Die nachfolgenden Quellen-/HA-Nachweise bleiben für die unveränderten Abläufe relevant:
 
 Lokal auf Windows mit .NET SDK 10.0.112 und Zielruntime .NET 8 geprüft:
 
@@ -57,9 +65,9 @@ Lokalisierte Hilfedialoge wurden unter Windows mit Skia bei 840 × 600 Pixeln ge
 | Hardware/Fans | Windows LibreHardwareMonitor, Linux procfs/sysfs/hwmon; vier Kanäle, Grenzen, Hysterese, Fail-safe, virtuelle/serielle Regelung und Handausgabe | Reale Treiber, Sensorwechsel und Sicherheitszustände nicht geprüft |
 | Medien | Windows Winamp/GSMTC; Legacy deaktiviert. Linux-playerctl mit gespeicherter Auswahl, Spielposition, sicherem XML-Format und Abbruch/Timeout. Fehler entfernen alte Metadaten | Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen offen; keine eigene D-Bus-Subscription |
 | Home Assistant | WebSocket-Anmeldung, Anfangszustände, Events, Reconnect und Stop mit lokalem Protokollpartner; wirksame Aliase, Attributwerte, Favoriten und Seitenerzeugung | Reale HA-Instanz und Zielsystemabnahme offen |
-| Einstellungen | Persistierter Transport/Port/HA-Aktivierung, Helligkeit, Windows-Import, Theme/Sprache, Windows-Tray/Autostart | Native Dateiauswahl und Linux-Desktopintegration offen |
+| Einstellungen | Persistierter Transport/Port/HA-Aktivierung, Helligkeit, Windows-Import, Theme/Sprache, Windows-/Linux-Tray und Autostart | Native Dateiauswahl, Tray-Bedienung und Autostart bei Anmeldung offen |
 | Tokenstore | DPAPI, secret-tool; Linux-AES nur nach ausdrücklicher Auswahl; verifizierte Migration, beschädigte Dateien und Löschfehler; echter privater Linux-Keyring und Unix-Dateirechte in CI geprüft | Benutzer-Schlüsselbund auf Zielsystem offen |
-| Hilfe/About | Kontextauswahl und zehn Themen in fünf Sprachen; gespeicherte Sprache, Systemstandard und offener Dialog geprüft; Inhalte gegen Code korrigiert; About mit Versions-/Laufzeitdaten und tatsächlichem Workspace-Ordner | Weitere WPF-Inhaltstiefe, Hilfeplatzierung offen; Runtime unterstützt nur numerische Glyphenschlüssel |
+| Hilfe/About | Kontextauswahl und zehn Themen in fünf Sprachen; gespeicherte Sprache, Systemstandard und offener Dialog geprüft; Inhalte gegen Code korrigiert; About mit Versions-/Laufzeitdaten und tatsächlichem Workspace-Ordner | Statische Variablenbeschreibungen und benannte Glyphen vorhanden; Hilfe am Titel und F1; native Bedienungsabnahme offen |
 | Diagnose | UTC-Journal für Anwendung und tatsächliche virtuelle/serielle Transportergebnisse, OK/ERROR, dekodierte Befehle, aktueller Export | Maximal 1000 Einträge pro Journal und zehn serielle Sitzungen; kein persistentes Logarchiv |
 
 ## Verbindliche Grenzen und Weiterarbeit
@@ -68,4 +76,4 @@ Eine gemeinsame Avalonia-Oberfläche bleibt das Ziel; WPF bleibt Referenz bis zu
 
 Native Dateiauswahl, Tray-Menübedienung, OS-Abmeldung, DPI-/Theme-/Sprachmatrix, Live-HA-/Player-/Sensorintegration, extrahierter Paketstart, ARM64-Ausführung auf ARM64 und physische LIS2-Ausgabe sind durch den Smoke nicht nachgewiesen.
 
-Die Medien- und HA-Implementierung ist mit den genannten isolierten Daten geprüft. Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen und HA auf Zielsystemen bleiben offen. Nächstes Implementierungspaket: **PORT-06: WPF-Abgleich und Desktopintegration**.
+Die Medien- und HA-Implementierung ist mit den genannten isolierten Daten geprüft. Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen und HA auf Zielsystemen bleiben offen. Nächstes Paket: **PORT-07: Pakete und Zielsysteme**.

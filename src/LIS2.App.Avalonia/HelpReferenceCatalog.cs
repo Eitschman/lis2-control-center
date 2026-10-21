@@ -37,9 +37,14 @@ internal static class HelpReferenceCatalog
                 Add("Custom glyphs", "Eight programmable 5x8 slots are available. Use {Glyph.1} through {Glyph.8} in templates.");
                 foreach (var glyph in glyphNames.Take(8).Select((name, index) => (name, slot: index + 1))
                              .Where(glyph => !string.IsNullOrWhiteSpace(glyph.name)))
+                {
                     AddExample("Named glyph", glyph.name + ": {Glyph." + glyph.slot + "}");
+                    var key = PageSourceValues.NormalizeGlyphName(glyph.name);
+                    if (key.Length > 0 && !int.TryParse(key, out _))
+                        AddExample("Named glyph", "{Glyph." + key + "}");
+                }
                 Add("Character ROM", "The raw ROM and special-character tests are intended for protocol validation on real hardware.");
-                Add("Custom glyphs", "Save glyphs in the workspace and send them to the connected device. Enable programming on connect to restore them after reconnecting. Names label the editor slots; templates currently require numeric references such as {Glyph.1}.");
+                Add("Custom glyphs", "Save glyphs in the workspace and send them to the connected device. Programming on connect restores them after reconnecting. Templates accept numeric slots and saved names, for example {Glyph.1} and {Glyph.Play}. Spaces and punctuation become underscores; duplicate names use the last slot. Numeric names do not replace numeric slots.");
                 break;
             case 2:
                 Add("Pages", "Each enabled page contains a name, two templates, duration, refresh interval, overflow modes and optional visibility condition.");
@@ -49,6 +54,7 @@ internal static class HelpReferenceCatalog
                 Add("Visibility", "Use =, !=, >, >=, < or <=. Example: HA.sensor.temperature>=25");
                 Add("Formatting details", "number and percent accept 0 to 6 decimal places. percent appends % without multiplying by 100; bytes uses powers of 1024. Numbers follow the operating system culture. Missing values return fallback directly, without further formatting. Visibility uses one condition without braces; numeric comparisons use a decimal point. Missing keys hide the page.");
                 AddExample("Clock", "{Clock.Time}  {Clock.Date}  {Clock.Day}");
+                content.AddRange(HelpVariableCatalog.Get("Clock.", language));
                 var keys = variableKeys.Where(k => !k.StartsWith("HA.", StringComparison.OrdinalIgnoreCase))
                     .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(k => k, StringComparer.OrdinalIgnoreCase).Take(200).ToArray();
                 if (keys.Length == 0) Add("Available runtime variables", "No runtime variables currently available.");
@@ -64,6 +70,9 @@ internal static class HelpReferenceCatalog
                 Add("Linux and Windows", "Linux uses MPRIS through playerctl, which must be installed. Select an automatic or specific player; the selection is saved. An unavailable selected player stays disconnected. Media.* provides Player, State, Title, Artist, Album, Elapsed, Duration and Connected, but no VU or spectrum. Values are refreshed every second. Windows uses WindowsMedia.* for GSMTC and Winamp.* for the Winamp plug-in. WMP Legacy is deferred and is not started. Create a page from the relevant media card. No plug-in is needed for GSMTC.");
                 AddExample("Media", "{Media.Player}  {Media.State}  {Media.Title}  {Media.Artist}  {Media.Album}  {Media.Elapsed}  {Media.Duration}  {Media.Connected}");
                 AddExample("Example", "{Winamp.Artist|fallback:Nothing playing} / {Winamp.Title|fallback:--}");
+                content.AddRange(HelpVariableCatalog.Get("Media.", language));
+                content.AddRange(HelpVariableCatalog.Get("Winamp.", language));
+                content.AddRange(HelpVariableCatalog.Get("WindowsMedia.", language));
                 break;
             case 4:
                 Add("Events", "Timed events temporarily override ordinary page output on connected displays.");
@@ -85,7 +94,7 @@ internal static class HelpReferenceCatalog
                 Add("Transport", "Applying saves the transport and port, disconnects the current device and connects the selected transport. A missing saved port remains selected and is never replaced automatically. Serial display control does not enable fans.");
                 Add("Windows import", "Import in Settings reads settings.json without changing the source file. It imports transport, port, brightness, glyphs, pages, fans and sensor preferences, including Home Assistant activation and URL. The token stays separate. Reconnect Home Assistant afterward if required.");
                 Add("Appearance", "The system, light and dark themes are supported. Language changes apply to the application interface.");
-                Add("Windows startup", "Automatic startup is only available on Windows.");
+                Add("Settings", "Autostart uses the Windows user registry or a Linux XDG autostart entry. Windows closes to tray; Linux closes the application and keeps minimized windows in the taskbar. Tray menus offer Open and Exit. A second launch activates the existing instance. F1 opens help for the current section.");
                 break;
             case 8:
                 Add("Diagnostics", "Inspect the current device snapshot, decoded command history and protocol log.");

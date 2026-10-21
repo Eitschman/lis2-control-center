@@ -16,6 +16,7 @@ public partial class MainWindow : Window
     private readonly List<DiagnosticJournal> _serialJournals = new();
     private Task _sourceStartup = Task.CompletedTask;
     private Task _transportStartup = Task.CompletedTask;
+    private bool _initialOpenHandled;
     internal bool CloseToTray { get; set; }
 
     public MainWindow() : this(new PortableWorkspaceStore(), new PortableHaTokenStore(), true,
@@ -45,6 +46,12 @@ public partial class MainWindow : Window
         }
         this.FindControl<Button>("OpenTransportSettings")!.Click += (_, _) => NavigateTo(7);
         this.FindControl<Button>("OpenHelp")!.Click += async (_, _) => await OpenHelpAsync();
+        KeyDown += async (_, args) =>
+        {
+            if (args.Key != global::Avalonia.Input.Key.F1) return;
+            args.Handled = true;
+            await OpenHelpAsync();
+        };
         this.FindControl<Button>("OpenAbout")!.Click += async (_, _) => await OpenAboutAsync();
 
         this.FindControl<Button>("VirtualConnect")!.Click += async (_, _) =>
@@ -105,6 +112,9 @@ public partial class MainWindow : Window
         // immediately testable without requiring an experimental serial connection.
         Opened += async (_, _) =>
         {
+            // Wiederherstellen aus dem Tray darf keine Verbindung oder Runtime neu starten.
+            if (_initialOpenHandled) return;
+            _initialOpenHandled = true;
             // The visual tree is not fully attached in the constructor; translate
             // page controls after Opened so system-language defaults reach them.
             ApplyPageLocalization();

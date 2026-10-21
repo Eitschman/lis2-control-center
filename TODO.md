@@ -1,7 +1,7 @@
 # TODO: Avalonia-Portierung
 
 Stand: 21.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-05 mit geprüften HA-Verbindungsabläufen, Alias-/Attributwerten und ausdrücklich wählbarer lokaler Linux-Tokenspeicherung. Lokal 399 Avalonia-Tests erfolgreich, ein Linux-Schlüsselbundtest unter Windows übersprungen; CI-Nachweise im [Status](docs/prp/linux-port-status.md).
+Implementierungsstand: PORT-06 mit Desktopintegration, benannten Glyphenvariablen und vertiefter Hilfe. Lokal 416 Avalonia-Tests erfolgreich, ein Linux-Schlüsselbundtest unter Windows übersprungen; 50 Displaytests erfolgreich. CI-Nachweise und Zielsystemprüfungen im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -41,7 +41,7 @@ Das Übersetzungspaket vor PORT-04 ist umgesetzt und mit isolierten Avalonia-Fen
 
 - [x] [CI 39565668081](https://github.com/Eitschman/lis2-control-center/actions/runs/39565668081) für `c22048d`: alle sieben Jobs erfolgreich, je OS 359/359 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes und drei Pakete erfolgreich. Linux-Sichtprüfung zusätzlich anhand der Workflow-Screenshots.
 
-Nächstes Implementierungspaket ist **PORT-06: WPF-Abgleich und Desktopintegration**. Die offenen Zielsystemprüfungen aus PORT-04/05 bleiben in den jeweiligen Paketen aufgeführt.
+Nächstes Paket ist **PORT-07: Pakete und Zielsysteme**. Offene Zielsystem- und Abnahmeprüfungen aus PORT-04 bis PORT-06 bleiben ausdrücklich aufgeführt.
 
 ## Weitere Implementierungs- und Prüfaufgaben
 
@@ -90,12 +90,15 @@ Nächstes Implementierungspaket ist **PORT-06: WPF-Abgleich und Desktopintegrati
 - [ ] Die zehn Ansichten anhand der [aktuellen Matrix](docs/prp/wpf-avalonia-parity-audit.md) semantisch prüfen, einschließlich Fehler-, Leer-, Auswahl- und Speicherpfaden.
 - [x] Zehn Hilfethemen einschließlich Titel, Navigation und Absätzen in fünf Sprachen; gespeicherte Sprache, Systemstandard und Wechsel im offenen Dialog mit Controls geprüft.
 - [x] Hilfetexte gegen den Avalonia-Code prüfen: Lüftermodi/-Sicherheitsgrenzen, Medien je Plattform, numerische Glyphenreferenzen, Variablenliste, Formatierung und Sichtbarkeit.
-- [ ] Weitere WPF-Inhaltstiefe abgleichen. Benannte Glyphenschlüssel werden von der Avalonia-Runtime nicht bereitgestellt; die Hilfe zeigt dafür nutzbare numerische Slots.
-- [ ] Hilfeplatzierung, Tray-Menütexte und weitere hart codierte Laufzeittexte abgleichen.
-- [ ] Themes, Tastatur/Fokus, DPI, Fenstergrenzen und lange Texte in allen fünf Sprachen prüfen.
-- [ ] Bestehenden Display-Formatierungstest kulturfest formulieren: deutscher Windows-Lauf ergibt korrektes Komma, Test erwartet fest einen Dezimalpunkt; invarianter Lauf besteht mit 48/48. Produktformatierung nach `CurrentCulture` erhalten.
+- [x] Benannte Glyphenschlüssel einschließlich Normalisierung, Umbenennen, doppelten Namen und geschützten numerischen Slots anbinden; Hilfe und Editor zeigen ausführbare Schlüssel.
+- [x] Statische Clock-/Winamp-/WindowsMedia-/MPRIS-Variablen auch ohne Quelle beschreiben und WPF-Fachübersetzungen gemeinsam verwenden.
+- [x] Hilfe neben dem Bereichstitel und per F1 öffnen; Tray-Menütexte folgen fünf Sprachen.
+- [x] Zehn Ansichten in fünf Sprachen mit Hell/Dunkel/System bei 950 × 600, Titelgrenzen, Fokus und F1 prüfen; abgeschnittene Port-/Glyphen-/Lüftertexte korrigieren.
+- [ ] Tatsächlichen OS-Themewechsel, Monitor-/DPI-Wechsel und native Tastaturbedienung auf den Ziel-Desktops prüfen.
+- [x] Display-Formatierung in en-US, de-DE und fr-FR prüfen; Produktformatierung nach `CurrentCulture` erhalten. Lokaler Lauf: 50/50.
 - [ ] Zusätzliche Bedienflächen und nicht ausdrücklich geforderte Titelzusätze im bearbeiteten UI-Bereich bereinigen; genehmigten Variablenbrowser erhalten.
-- [ ] Linux-Tray, Autostart, Single Instance und Splash gegenüber dem PRP-Ziel bearbeiten.
+- [x] Windows-/Linux-Tray, XDG-Autostart, Single Instance mit Fensteraktivierung und Splash anbinden. Wiederanzeigen startet die Geräteverbindung nicht erneut; Gegenprobe und Regression vorhanden.
+- [ ] Tray-Menübedienung und Anmeldung mit Autostart auf realen Windows-/Linux-Desktops prüfen. Linux minimiert in die Taskleiste und beendet beim Schließen; Windows minimiert/schließt in den Infobereich. Plattformabweichung bei der Benutzerabnahme prüfen.
 - [ ] WPF erst nach Funktions-/Darstellungsabgleich und Benutzerabnahme entfernen.
 
 ### PORT-07: Pakete und Zielsysteme

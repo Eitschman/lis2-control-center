@@ -9,6 +9,21 @@ internal static class Program
     {
         if (args is ["--media-provider-smoke", var directory])
             return WindowsMediaSmoke.RunAsync(Path.GetFullPath(directory)).GetAwaiter().GetResult();
+        if (args is ["--instance-activation-smoke", var profileDirectory])
+        {
+            using var unexpectedLease = DesktopInstance.TryAcquire(profileDirectory);
+            if (unexpectedLease is not null) return 2;
+            return DesktopInstance.ActivateAsync(profileDirectory).GetAwaiter().GetResult() ? 0 : 1;
+        }
+        if (!args.Contains("--desktop-smoke", StringComparer.Ordinal))
+        {
+            var profile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LIS2ControlCenter", "Avalonia");
+            using var instance = DesktopInstance.TryAcquire(profile);
+            if (instance is null) return DesktopInstance.ActivateAsync(profile).GetAwaiter().GetResult() ? 0 : 1;
+            App.Instance = instance;
+            try { return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args); }
+            finally { App.Instance = null; }
+        }
         return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 

@@ -1,7 +1,7 @@
 # PRP: LIS2 Control Center mit Avalonia
 
 Stand: 21.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-05; genaue Prüfnachweise im [Status](linux-port-status.md).
+Implementierungsstand: PORT-06; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
 
@@ -35,8 +35,8 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Lüfter | Vier Modi plus Off, Kurven, Hysterese, Fail-safe, Simulation, freizugebende serielle Regelung und Dashboard-Handausgabe mit Kanalgrenzen | Weitere WPF-Interaktionen abgleichen; Hardware bleibt ungeprüft |
 | Medien | Winamp/GSMTC auf Windows; Linux-playerctl mit gespeicherter Auswahl, Spielposition, Lifecycle und Fehleranzeige; Legacy deaktiviert | Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen offen |
 | Home Assistant | WebSocket-Quelle, Reconnect und Stop, Entitäten, Attributwerte, wirksame Aliase, Favoriten und Seitenaktionen; ausdrückliche lokale Linux-Tokenauswahl | Reale HA-Instanz und Desktop-Schlüsselbund auf Zielsystemen prüfen |
-| Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache und Windows-Tray/Autostart | Nativer Dateidialog und Linux-Desktopintegration offen |
-| Hilfe und About | Kontextbezogene Hilfe mit zehn Themen in fünf Sprachen, Live-Schlüsseln und numerischer Glyphenreferenz; About folgt der ausgewählten Sprache | Weitere WPF-Inhaltstiefe, Platzierung und native Desktop-Bedienung offen |
+| Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache, Windows-/Linux-Tray und plattformeigener Autostart | Nativer Dateidialog, Tray-Bedienung und Anmeldung auf Zielsystemen offen |
+| Hilfe und About | Kontextbezogene Hilfe mit zehn Themen in fünf Sprachen, Live-Schlüsseln, statischen Variablenbeschreibungen und numerischen/benannten Glyphen; F1 und Hilfe am Titel; About folgt der Sprache | Native Desktop-Bedienung und Benutzerabnahme offen |
 | Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Export mit zeitgestempeltem Anwendungs-/Transportjournal | Sitzungsprotokoll begrenzt; kein dauerhaftes Logarchiv; nativen Dateidialog prüfen |
 | CI und Pakete | Windows-/Ubuntu-Builds, vier Testprojekte je OS, nativer Desktop-Smoke und drei selbstständige Pakete mit Prüfsummen | Archivstart und echte ARM64-Ausführung fehlen |
 
@@ -74,7 +74,7 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 
 ### Oberfläche und Verifikation
 
-Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. Statische Texte, Formatargumente und unveränderte Nutzdaten werden automatisiert geprüft; die Sichtprüfung und Plattformgrenzen stehen im Status. HA-Verbindung, Attribute, Aliase und Tokenspeicherung sind in PORT-05 mit isolierten Daten geprüft; reale HA-/Playernachweise bleiben offen. Nächstes Implementierungspaket ist PORT-06 gemäß [TODO](../../TODO.md).
+Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. Statische Texte, Formatargumente und unveränderte Nutzdaten werden automatisiert geprüft; die Sichtprüfung und Plattformgrenzen stehen im Status. HA-Verbindung, Attribute, Aliase und Tokenspeicherung sind in PORT-05 mit isolierten Daten geprüft; reale HA-/Playernachweise bleiben offen. Nächstes Paket ist PORT-07 gemäß [TODO](../../TODO.md).
 
 - [x] Zehn Hauptansichten, Hilfe und About sind angelegt und angebunden.
 - [x] System/Light/Dark sowie System/English/German/French/Turkish/Russian sind auswählbar.
@@ -84,7 +84,8 @@ Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehl
 - [x] Hilfesprache einschließlich Systemstandard und offenem Dialog prüfen; Inhalte gegen aktuelle Avalonia-Abläufe korrigieren und Beispiele mit der tatsächlichen Vorlagen-Engine ausführen.
 - [x] Avalonia-GUI-Smoke für zehn Ansichten, Hilfe/About, fehlende Medienanbieter, Diagnose und geordnetes Beenden ergänzt; aktuelle Nachweise im Status.
 - [ ] Desktop-Darstellung, Tastatur, DPI, Theme und Sprachen auf den Zielsystemen prüfen.
-- [ ] Linux-Tray/Autostart, Single Instance und Splash entsprechend dem Portierungsziel bearbeiten.
+- [x] Linux-Tray/XDG-Autostart, Single Instance mit Fensteraktivierung und Splash anbinden; Windows-Tray erhalten und Wiederherstellen ohne erneuten Geräteverbindungsaufbau prüfen.
+- [ ] Native Tray-Bedienung, Autostart bei Anmeldung und Plattformabweichung beim Schließen auf den Ziel-Desktops abnehmen.
 - [x] Pakete `win-x64`, `linux-x64` und `linux-arm64` werden selbstständig veröffentlicht und mit SHA-256-Dateien hochgeladen.
 - [ ] Extrahierte Pakete starten; ARM64 auf ARM64 ausführen und Laufzeitabhängigkeiten dokumentieren.
 - [ ] Support-/Lizenzstatus der verwendeten .NET-/Avalonia-Versionen vor dem Release anhand offizieller Quellen verifizieren.

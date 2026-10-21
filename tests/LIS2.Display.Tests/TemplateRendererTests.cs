@@ -32,26 +32,35 @@ public sealed class TemplateRendererTests
         Assert.Equal("--", renderer.Render("{HA.sensor.two|fallback:--}", values));
     }
 
-    [Fact]
-    public void Render_FormatsNumberPercentBytesAndAffixes()
+    [Theory]
+    [InlineData("en-US", "21.5°C", "1.0 GB")]
+    [InlineData("de-DE", "21,5°C", "1,0 GB")]
+    [InlineData("fr-FR", "21,5°C", "1,0 GB")]
+    public void Render_FormatsNumberPercentBytesAndAffixes(string culture, string temperature, string bytes)
     {
-        var renderer = new TemplateRenderer();
-        var values = new Dictionary<string, object?>
+        var previous = System.Globalization.CultureInfo.CurrentCulture;
+        try
         {
-            ["Temp"] = 21.456,
-            ["Load"] = 73.2,
-            ["Disk"] = 1073741824L
-        };
+            System.Globalization.CultureInfo.CurrentCulture = new(culture);
+            var renderer = new TemplateRenderer();
+            var values = new Dictionary<string, object?>
+            {
+                ["Temp"] = 21.456,
+                ["Load"] = 73.2,
+                ["Disk"] = 1073741824L
+            };
 
-        Assert.Equal(
-            "21.5°C",
-            renderer.Render("{Temp|number:1|suffix:°C}", values));
-        Assert.Equal(
-            "73%",
-            renderer.Render("{Load|percent:0}", values));
-        Assert.Equal(
-            "1.0 GB",
-            renderer.Render("{Disk|bytes:1}", values));
+            Assert.Equal(
+                temperature,
+                renderer.Render("{Temp|number:1|suffix:°C}", values));
+            Assert.Equal(
+                "73%",
+                renderer.Render("{Load|percent:0}", values));
+            Assert.Equal(
+                bytes,
+                renderer.Render("{Disk|bytes:1}", values));
+        }
+        finally { System.Globalization.CultureInfo.CurrentCulture = previous; }
     }
 
     [Fact]

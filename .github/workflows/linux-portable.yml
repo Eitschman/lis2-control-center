@@ -125,13 +125,21 @@ jobs:
         shell: pwsh
         run: |
           $app = "src/LIS2.App.Avalonia/bin/Release/net8.0/LIS2.App.Avalonia.exe"
-          $process = Start-Process $app -ArgumentList '--desktop-smoke', 'desktop-smoke' -PassThru
+          $process = Start-Process $app -ArgumentList '--desktop-smoke', 'desktop-smoke', '--minimized' -PassThru
           if (-not $process.WaitForExit(90000)) { $process.Kill(); throw "Desktop smoke timed out" }
           if ($process.ExitCode -ne 0) { throw "Desktop smoke failed: $($process.ExitCode)" }
           if (-not (Test-Path 'desktop-smoke/result.txt')) { throw "Desktop smoke result missing" }
       - name: Native desktop smoke (Linux X11)
         if: runner.os == 'Linux'
-        run: timeout 90s xvfb-run -a dotnet src/LIS2.App.Avalonia/bin/Release/net8.0/LIS2.App.Avalonia.dll --desktop-smoke desktop-smoke
+        run: timeout 90s xvfb-run -a dotnet src/LIS2.App.Avalonia/bin/Release/net8.0/LIS2.App.Avalonia.dll --desktop-smoke desktop-smoke --minimized
+      # Die zusätzliche X11-Ausführung prüft echte Rasterung bei 150 Prozent.
+      - name: Native desktop smoke at 150 percent (Linux X11)
+        if: runner.os == 'Linux'
+        shell: bash
+        env:
+          AVALONIA_SCREEN_SCALE_FACTORS: 'screen=1.5'
+          LIS2_SMOKE_EXPECT_SCALE: '1.5'
+        run: timeout 90s xvfb-run -a -s '-screen 0 2400x1600x24' dotnet src/LIS2.App.Avalonia/bin/Release/net8.0/LIS2.App.Avalonia.dll --desktop-smoke desktop-smoke/dpi150
       - name: Upload native desktop smoke
         if: always()
         uses: actions/upload-artifact@v4

@@ -10,6 +10,7 @@ public partial class MainWindow
 {
     private bool _loadingSettings;
     private bool _settingsTransportBusy;
+    private bool _applyingTheme;
     private const string StartupKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string StartupValue = "LIS2 Control Center";
 
@@ -38,30 +39,51 @@ public partial class MainWindow
             if (_loadingSettings) return;
             _preferredLanguage = language.SelectedIndex switch
             {
-                1 => "English", 2 => "German", 3 => "French", 4 => "Turkish", 5 => "Russian", _ => "System"
+                1 => "English",
+                2 => "German",
+                3 => "French",
+                4 => "Turkish",
+                5 => "Russian",
+                _ => "System"
             };
             ApplySettingsLocalization();
             this.FindControl<TextBlock>("SettingsAppearanceStatus")!.Text = string.Empty;
             _ = SavePortableWorkspaceAsync();
         };
-        this.FindControl<Border>("SettingsWindowsCard")!.IsVisible = OperatingSystem.IsWindows();
+        this.FindControl<Border>("SettingsWindowsCard")!.IsVisible = OperatingSystem.IsWindows() || OperatingSystem.IsLinux();
         var startup = this.FindControl<CheckBox>("StartWithWindowsCheckBox")!;
-        if (OperatingSystem.IsWindows())
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
         {
-            try { startup.IsChecked = IsWindowsStartupEnabled(); }
+            var linuxStartup = DesktopAutostart.ForCurrentUser();
+            try { startup.IsChecked = OperatingSystem.IsWindows() ? IsWindowsStartupEnabled() : linuxStartup.IsEnabled; }
             catch (Exception ex) { SetStartupStatus(ex.Message); }
             startup.IsCheckedChanged += (_, _) =>
             {
                 if (_loadingSettings) return;
                 try
                 {
-                    SetWindowsStartup(startup.IsChecked == true);
-                    SetStartupStatus(startup.IsChecked == true ? "Windows startup enabled." : "Windows startup disabled.");
+                    if (OperatingSystem.IsWindows()) SetWindowsStartup(startup.IsChecked == true);
+                    else
+                    {
+                        var executable = Environment.ProcessPath ?? throw new InvalidOperationException("Executable path unavailable.");
+                        linuxStartup.SetEnabled(startup.IsChecked == true, executable,
+                            string.Equals(Path.GetFileNameWithoutExtension(executable), "dotnet", StringComparison.OrdinalIgnoreCase)
+                                ? typeof(MainWindow).Assembly.Location : null);
+                    }
+                    SetStartupStatus(startup.IsChecked == true ? "Desktop startup enabled." : "Desktop startup disabled.");
                 }
-                catch (Exception ex) { SetStartupStatus($"Windows startup error: {(UiMessage)ex.Message}"); }
+                catch (Exception ex)
+                {
+                    _loadingSettings = true;
+                    startup.IsChecked = !startup.IsChecked;
+                    _loadingSettings = false;
+                    SetStartupStatus($"Desktop startup error: {(UiMessage)ex.Message}");
+                }
             };
         }
         LoadSettingsPreferences();
+        if (Application.Current is { } app) app.ActualThemeVariantChanged += OnSystemThemeChanged;
+        Closed += (_, _) => { if (Application.Current is { } app) app.ActualThemeVariantChanged -= OnSystemThemeChanged; };
         _loadingSettings = false;
     }
 
@@ -76,8 +98,12 @@ public partial class MainWindow
         this.FindControl<ComboBox>("LanguageModeComboBox")!.SelectedIndex =
             _preferredLanguage.ToLowerInvariant() switch
             {
-                "english" => 1, "german" => 2, "french" => 3,
-                "turkish" => 4, "russian" => 5, _ => 0
+                "english" => 1,
+                "german" => 2,
+                "french" => 3,
+                "turkish" => 4,
+                "russian" => 5,
+                _ => 0
             };
         ApplyPreferredTheme();
         _loadingSettings = false;
@@ -86,31 +112,41 @@ public partial class MainWindow
 
     private void ApplyPreferredTheme()
     {
+        if (_applyingTheme) return;
         if (Application.Current is not { } app) return;
-        app.RequestedThemeVariant = _preferredTheme switch
+        _applyingTheme = true;
+        try
         {
-            "Light" => ThemeVariant.Light,
-            "Dark" => ThemeVariant.Dark,
-            _ => ThemeVariant.Default
-        };
-        var dark = _preferredTheme.Equals("Dark", StringComparison.OrdinalIgnoreCase) ||
-            (_preferredTheme.Equals("System", StringComparison.OrdinalIgnoreCase) &&
-             app.ActualThemeVariant == ThemeVariant.Dark);
-        static global::Avalonia.Media.SolidColorBrush Brush(string hex) =>
-            new(global::Avalonia.Media.Color.Parse(hex));
-        app.Resources["Lis2CardBrush"] = Brush(dark ? "#202A35" : "#FFFFFF");
-        app.Resources["Lis2SurfaceBrush"] = Brush(dark ? "#141C26" : "#F5F7FA");
-        app.Resources["Lis2BorderBrush"] = Brush(dark ? "#455466" : "#D4DCE5");
-        app.Resources["Lis2SidebarBrush"] = Brush(dark ? "#192430" : "#FFFFFF");
-        app.Resources["Lis2SidebarTextBrush"] = Brush(dark ? "#EDF3FA" : "#10243A");
-        app.Resources["Lis2SelectedBrush"] = Brush(dark ? "#26583E" : "#DDF6E7");
-        app.Resources["Lis2IconBrush"] = Brush(dark ? "#C7D7E6" : "#233D55");
-        app.Resources["Lis2MutedCardBrush"] = Brush(dark ? "#263444" : "#F8FAFC");
-        app.Resources["Lis2HeaderBrush"] = Brush(dark ? "#304154" : "#E8EEF3");
-        app.Resources["Lis2StatusBrush"] = Brush(dark ? "#194A32" : "#E8F5EC");
-        app.Resources["Lis2StatusTextBrush"] = Brush(dark ? "#B4F2CD" : "#166534");
-        UpdateSection();
+            app.RequestedThemeVariant = _preferredTheme switch
+            {
+                "Light" => ThemeVariant.Light,
+                "Dark" => ThemeVariant.Dark,
+                _ => ThemeVariant.Default
+            };
+            var dark = _preferredTheme.Equals("Dark", StringComparison.OrdinalIgnoreCase) ||
+                (_preferredTheme.Equals("System", StringComparison.OrdinalIgnoreCase) &&
+                 app.ActualThemeVariant == ThemeVariant.Dark);
+            static global::Avalonia.Media.SolidColorBrush Brush(string hex) =>
+                new(global::Avalonia.Media.Color.Parse(hex));
+            app.Resources["Lis2CardBrush"] = Brush(dark ? "#202A35" : "#FFFFFF");
+            app.Resources["Lis2SurfaceBrush"] = Brush(dark ? "#141C26" : "#F5F7FA");
+            app.Resources["Lis2BorderBrush"] = Brush(dark ? "#455466" : "#D4DCE5");
+            app.Resources["Lis2SidebarBrush"] = Brush(dark ? "#192430" : "#FFFFFF");
+            app.Resources["Lis2SidebarTextBrush"] = Brush(dark ? "#EDF3FA" : "#10243A");
+            app.Resources["Lis2SelectedBrush"] = Brush(dark ? "#26583E" : "#DDF6E7");
+            app.Resources["Lis2IconBrush"] = Brush(dark ? "#C7D7E6" : "#233D55");
+            app.Resources["Lis2MutedCardBrush"] = Brush(dark ? "#263444" : "#F8FAFC");
+            app.Resources["Lis2HeaderBrush"] = Brush(dark ? "#304154" : "#E8EEF3");
+            app.Resources["Lis2StatusBrush"] = Brush(dark ? "#194A32" : "#E8F5EC");
+            app.Resources["Lis2StatusTextBrush"] = Brush(dark ? "#B4F2CD" : "#166534");
+            UpdateSection();
+        }
+        finally { _applyingTheme = false; }
+    }
 
+    private void OnSystemThemeChanged(object? sender, EventArgs args)
+    {
+        if (_preferredTheme.Equals("System", StringComparison.OrdinalIgnoreCase)) ApplyPreferredTheme();
     }
 
     private void RefreshSettingsPorts(bool restorePreference = false)
@@ -216,7 +252,9 @@ public partial class MainWindow
         if (!enabled) { key.DeleteValue(StartupValue, false); return; }
         var executable = Environment.ProcessPath
             ?? throw new InvalidOperationException("Executable path unavailable.");
-        key.SetValue(StartupValue, "\"" + executable + "\" --minimized");
+        var assemblyArgument = string.Equals(Path.GetFileNameWithoutExtension(executable), "dotnet", StringComparison.OrdinalIgnoreCase)
+            ? " \"" + typeof(MainWindow).Assembly.Location + "\"" : "";
+        key.SetValue(StartupValue, "\"" + executable + "\"" + assemblyArgument + " --minimized");
     }
 
     private void SetStartupStatus(UiMessage message) => SetUiText("SettingsStartupStatus", message);
