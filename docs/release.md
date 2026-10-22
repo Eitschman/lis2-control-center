@@ -2,7 +2,7 @@
 
 Stand: 22.10.2026. App und Protokolltester verwenden Avalonia. Hauptbranch, Entwicklungsbranch und Tag-Releases verwenden denselben Paketbau.
 
-[Release v0.1.1](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.1) zu `9b790f8` enthält drei portable App-Archive, zwei Debian-Pakete, den Windows-Protokolltester, `gen_lis2.dll` und `SHA256SUMS.txt`. [Release-CI 39766372507](https://github.com/Eitschman/lis2-control-center/actions/runs/39766372507) besteht alle zwölf Jobs. Nach Download stimmen alle sieben Prüfsummen; die sechs Anwendungspakete enthalten Produktversion 0.1.1, Avalonia 11.3.22, Runtime 10.0.13 und Lizenzbeilagen. Installation und Paketauswahl stehen in der [README](../README.md#download-and-installation). Die Folgeveröffentlichung v0.1.2 ergänzt About und die englische README; ihr Nachweis wird nach dem Paketlauf ergänzt.
+[Release v0.1.2](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.2) zu `b2331ed` enthält drei portable App-Archive, zwei Debian-Pakete, den Windows-Protokolltester, `gen_lis2.dll` und `SHA256SUMS.txt`. [Release-CI 39770589294](https://github.com/Eitschman/lis2-control-center/actions/runs/39770589294) besteht alle zwölf Jobs. Nach Download stimmen alle sieben Prüfsummen; die sechs Anwendungspakete enthalten Produktversion 0.1.2, Avalonia 11.3.22, Runtime 10.0.13 und Lizenzbeilagen. Alle fünf App-Pakete enthalten die englische README mit Lizenz- und Bibliotheksübersicht. About zeigt Avalonia-Version und MIT-Lizenz und öffnet über eine lokalisierte Schaltfläche den mitgelieferten Lizenzordner. Fehlende Dateien werden ausdrücklich gemeldet. Installation und Paketauswahl stehen in der [README](../README.md#download-and-installation).
 
 ## Avalonia-Branch
 
