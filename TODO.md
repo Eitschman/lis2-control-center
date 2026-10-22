@@ -147,7 +147,7 @@ Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standa
 - [ ] Avalonia-Patchstand gesondert aktualisieren und API-/Darstellungsregressionen prüfen; DBus-Sicherheitskorrektur 0.21.3 ist ausdrücklich eingebunden.
 - [x] Alle Projekte, SDK-Auswahl und CI auf .NET 10 umstellen; selbstständige Pakete verwenden einheitlich 10.0.13. Lokaler Windows-Build ohne Warnungen/Fehler, 606 Tests erfolgreich und ein Linux-Schlüsselbundtest übersprungen.
 - [x] Lizenztexte, Fremdkomponentenhinweise und feste Quellverweise aus den tatsächlich aufgelösten NuGet-Paketen beilegen; Paketbau mit fehlenden Nachweisen ausdrücklich ablehnen und mit positiven/negativen Fällen prüfen.
-- [x] Hauptbranch- und Tag-Workflows auf denselben Avalonia-Paketbau umstellen. Tag-Version an App, Protokolltester und Debian-Pakete übergeben; kein Release-Tag angelegt.
+- [x] Hauptbranch- und Tag-Workflows auf denselben Avalonia-Paketbau umstellen. Tag-Version an App, Protokolltester und Debian-Pakete übergeben; [Release v0.1.0](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.0) veröffentlicht. Alle sieben Downloadprüfsummen sowie Runtime 10.0.13, Produktversion 0.1.0 und Lizenzbeilagen der sechs Anwendungspakete nach dem Download geprüft.
 - [x] Geprüfte Avalonia-Quellbasis nach `main` übernehmen und den gemeinsamen Buildworkflow verwenden. Commitbezogene Prüfläufe sind im [Main-Buildworkflow](https://github.com/Eitschman/lis2-control-center/actions/workflows/build.yml?query=branch%3Amain) einzusehen.
 
 ## Physische Validierung, getrennt von Softwarepaketen

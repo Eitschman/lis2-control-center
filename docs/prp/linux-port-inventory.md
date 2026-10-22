@@ -5,7 +5,7 @@ Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Ko
 
 ## Umfang und Projekte
 
-Der mit `rg --files` ermittelte Quellbestand unter `src`, `tests`, `tools` und `native` umfasst 269 Dateien, darunter 228 C#-Dateien und 20 C#-Projektdateien. Es gibt acht Testprojekte. Dateizahlen ändern sich mit den gepflegten Quell- und Testdateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
+Der mit `rg --files` ermittelte Quellbestand unter `src`, `tests`, `tools` und `native` umfasst 281 Dateien, darunter 228 C#-Dateien und 20 C#-Projektdateien. Es gibt acht Testprojekte. Dateizahlen ändern sich mit den gepflegten Quell- und Testdateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
 
 | Gruppe | Projekte | Target |
 | --- | --- | --- |
