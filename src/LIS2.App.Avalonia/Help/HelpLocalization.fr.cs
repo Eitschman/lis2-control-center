@@ -1,4 +1,4 @@
-namespace LIS2.App;
+namespace LIS2.App.Avalonia;
 
 internal static partial class HelpLocalization
 {

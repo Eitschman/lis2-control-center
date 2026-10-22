@@ -5,7 +5,7 @@ Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md
 
 ## Projekte und Abhängigkeiten
 
-`LIS2.App.Avalonia` ist die gemeinsame Desktopanwendung für Windows und Linux. `LIS2.App` enthält die WPF-Referenz und bleibt bis zur Paritätsabnahme erhalten. WPF wird nicht an die neue Runtime angebunden.
+`LIS2.App.Avalonia` ist die gemeinsame Desktopanwendung für Windows und Linux. Auch `tools/LIS2.ProtocolTester` verwendet Avalonia. Der Quellbaum und die Solution enthalten keine WPF-Projekte. Die WPF-Funktionsreferenz ist über Git-Commit `922ca1b` zugänglich.
 
 | Projekt | Tatsächliche Zuständigkeit |
 | --- | --- |
@@ -18,7 +18,7 @@ Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md
 | `LIS2.WindowsMedia` | Windows-GSMTC-Anbieter, separat gebaut und für Windows-Pakete mitgeliefert |
 | `LIS2.App.Avalonia` | AXAML, partielle MainWindow-Dateien, Plattformadapter, Workspace, Tokenstore, Hilfe/About und UI-Integration |
 
-Die portablen Projekte verwenden `net8.0`. `Directory.Build.props` gibt weiterhin `net8.0-windows10.0.19041.0` vor; portable Projekte überschreiben diesen Wert. WPF, GSMTC und mehrere Windows-Test-/Toolprojekte erben das Windows-Ziel.
+Die portablen Projekte verwenden `net8.0`. `Directory.Build.props` gibt weiterhin `net8.0-windows10.0.19041.0` vor; portable Projekte überschreiben diesen Wert. GSMTC und mehrere Windows-Test-/Simulatorprojekte erben das Windows-Ziel. Der Protokolltester verwendet ausdrücklich `net8.0`.
 
 Mehrere UI-unabhängige Dateien liegen physisch unter `src/LIS2.App.Avalonia` und werden in `LIS2.Runtime.csproj` per `Compile Include/Link` eingebunden. Die App schließt deren eigene Kompilierung mit `Compile Remove` aus. Diese Klassen behalten teilweise den Namespace `LIS2.App.Avalonia`, die Runtime referenziert jedoch kein Avalonia-Paket. Eine andere physische Ablage oder ein durchgängiges ViewModel-/DI-Modell ist kein bereits umgesetzter Zustand.
 
@@ -96,7 +96,7 @@ Der Workspace enthält Seiten, Glyphen, Lüftereinstellungen, Transportmodus, Po
 
 `DesktopInstance` hält einen exklusiven Dateihandle unter dem Benutzerprofil und nimmt Aktivierungsanforderungen über eine auf denselben Benutzer beschränkte Named Pipe entgegen. Folgestarts öffnen kein zweites Gerät. Entscheidend ist der offene Handle, nicht die nach Ende verbleibende Sperrdatei. `StartupSplash` wird vor der Hauptfensterinitialisierung gerendert. Wiederanzeigen initialisiert Quellen und Transport nicht erneut. Native Desktop-Smokes prüfen die Aktivierung durch einen separaten Prozess.
 
-`PageSourceValues` bietet numerische und gespeicherte benannte Glyphenvariablen an. Die Namensnormalisierung entspricht WPF; doppelte Namen bezeichnen den letzten Slot, numerische Namen überschreiben keine Slotnummer. `HelpVariableCatalog` beschreibt statische Schlüssel auch ohne verbundene Quelle und verwendet WPF-Hilfeübersetzungen ohne WPF-Abhängigkeit. Datums-/Wochentagswerte behalten beim Start der gemeinsamen Clock-Quelle ihren Vertrag.
+`PageSourceValues` bietet numerische und gespeicherte benannte Glyphenvariablen an. Die Namensnormalisierung entspricht WPF; doppelte Namen bezeichnen den letzten Slot, numerische Namen überschreiben keine Slotnummer. `HelpVariableCatalog` beschreibt statische Schlüssel auch ohne verbundene Quelle und verwendet die eigenen Hilfeübersetzungen unter `LIS2.App.Avalonia/Help`. Datums-/Wochentagswerte behalten beim Start der gemeinsamen Clock-Quelle ihren Vertrag.
 
 `MainWindow` initialisiert Quellen/Timer einmalig und drainiert sie beim Schließen über `BeginShutdownAsync`. UI-Medienrefresh, Hardwareanzeige, Ereignisanzeige und Editorpreview enthalten weiterhin Dispatcher-Timer. Native Desktop-Smokes prüfen das Prozessende zusätzlich zu den Stop-/Drain-Verträgen.
 

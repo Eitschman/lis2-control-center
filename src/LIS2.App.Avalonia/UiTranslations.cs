@@ -308,7 +308,7 @@ internal static class UiTranslations
     };
 
     internal static bool HasTranslation(string source, string language) => Texts.ContainsKey(source) ||
-        PageVariableBrowserLocalization.HasTranslation(source) || WpfTranslationCatalog.HasTranslation(source, language);
+        PageVariableBrowserLocalization.HasTranslation(source) || UiTranslationCatalog.HasTranslation(source, language);
 
     internal static IEnumerable<string> Sources => Texts.Keys;
 
@@ -318,7 +318,7 @@ internal static class UiTranslations
         if (index < 0) return source;
         if (Texts.TryGetValue(source, out var translations)) return translations[index];
         var browser = PageVariableBrowserLocalization.Translate(source, language);
-        return browser != source ? browser : WpfTranslationCatalog.Translate(source, language);
+        return browser != source ? browser : UiTranslationCatalog.Translate(source, language);
     }
 
     internal static string FindEnglishSource(string text)
@@ -326,6 +326,6 @@ internal static class UiTranslations
         if (Texts.ContainsKey(text)) return text;
         foreach (var (key, translations) in Texts)
             if (translations.Contains(text, StringComparer.Ordinal)) return key;
-        return WpfTranslationCatalog.FindEnglishSource(text);
+        return UiTranslationCatalog.FindEnglishSource(text);
     }
 }

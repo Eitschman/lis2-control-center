@@ -1,4 +1,4 @@
-namespace LIS2.App
+namespace LIS2.App.Avalonia
 {
     /// <summary>Gemeinsame Fachübersetzungen ohne Abhängigkeit von WPF oder dessen Sprachdienst.</summary>
     internal static partial class HelpLocalization
@@ -79,7 +79,7 @@ namespace LIS2.App.Avalonia
         {
             var index = language switch { "de" => 1, "fr" => 2, "tr" => 3, "ru" => 4, _ => 0 };
             return Variables.Where(variable => variable.Key.StartsWith(prefix, StringComparison.Ordinal))
-                .Select(variable => ("{" + variable.Key + "}", global::LIS2.App.HelpLocalization.Translate(variable.Description, language)))
+                .Select(variable => ("{" + variable.Key + "}", HelpLocalization.Translate(variable.Description, language)))
                 .Concat(PortableVariables.Where(variable => variable.Key.StartsWith(prefix, StringComparison.Ordinal))
                     .Select(variable => ("{" + variable.Key + "}", variable.Descriptions[index])));
         }

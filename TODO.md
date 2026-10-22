@@ -102,11 +102,11 @@ Technischer Nachweis: [CI 39581947442](https://github.com/Eitschman/lis2-control
 - [ ] Zusätzliche Start-/Stop-, Datei- und Testaktionen gegenüber WPF im manuellen Bedienungsabgleich bewerten.
 - [x] Windows-/Linux-Tray, XDG-Autostart, Single Instance mit Fensteraktivierung und Splash anbinden. Wiederanzeigen startet die Geräteverbindung nicht erneut; Gegenprobe und Regression vorhanden.
 - [ ] Tray-Menübedienung und Anmeldung mit Autostart auf realen Windows-/Linux-Desktops prüfen. Linux minimiert in die Taskleiste und beendet beim Schließen; Windows minimiert/schließt in den Infobereich. Plattformabweichung bei der Benutzerabnahme prüfen.
-- [ ] WPF erst nach Funktions-/Darstellungsabgleich und Benutzerabnahme entfernen.
+- [x] WPF-App und Testprojekt auf ausdrücklichen Benutzerauftrag entfernen; Protokolltester auf Avalonia portieren. Offene Zielsystemprüfungen bleiben separat erhalten.
 
 ### PORT-06A: Paritätskorrekturen und Bedienung
 
-A01 bis A14 sind softwareseitig umgesetzt und Teil der 451 erfolgreichen Avalonia-Tests des aktuellen PORT-06B-Stands; ein Linux-Schlüsselbundtest ist unter Windows übersprungen. Aktueller CI-Lauf sowie Zielsystemprüfungen stehen im [Status](docs/prp/linux-port-status.md). WPF bleibt bis zur Paritätsabnahme erhalten.
+A01 bis A14 sind softwareseitig umgesetzt und Teil der 451 erfolgreichen Avalonia-Tests des aktuellen PORT-06B-Stands; ein Linux-Schlüsselbundtest ist unter Windows übersprungen. Aktueller CI-Lauf sowie Zielsystemprüfungen stehen im [Status](docs/prp/linux-port-status.md). Die WPF-Referenz liegt in Git-Commit `922ca1b`; im aktuellen Quellbaum verwenden App und Protokolltester Avalonia.
 
 - [x] **A01: Winamp-Spektrum.** `Winamp.SpectrumGlyphs` verwendet den aktiven Spektrumzeichensatz, sonst das Textspektrum. Quelle, Preset, Vorschau und virtuelles Gerät werden mit 0..15-/0..255-Pegeln und Quellenverlust geprüft.
 - [x] **A02: Glyphenvorschau.** Gemeinsame Abbildung in Dashboard und Seiteneditor: Slotmarkierungen für eigene Zeichen, Balken für Spektrumstufen. Der Gerätepfad behält die privaten VFD-Zeichen.
@@ -147,7 +147,8 @@ Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standa
 - [ ] Vor Avalonia-Release ein eigenes Paket für unterstütztes .NET und Avalonia-Patchstand einplanen und prüfen.
 - [ ] Windows-Runtimepatch angleichen: geprüfte Pakete enthalten Windows .NET 8.0.31 gegenüber Linux 8.0.32.
 - [ ] Lizenztexte/Fremdkomponentenhinweise und nötige Quellverweise zu den tatsächlich verteilten NuGet-Paketen in Archive und Debian-Pakete aufnehmen; MPL-2.0-Pakete, HidSharp und Mono.Posix gesondert abgleichen.
-- [ ] Avalonia-Releaseumschaltung und Versionsmetadaten erst nach den PRP-Abnahmekriterien vornehmen; Tag-Releases veröffentlichen derzeit WPF.
+- [x] Hauptbranch- und Tag-Workflows auf denselben Avalonia-Paketbau umstellen. Tag-Version an App, Protokolltester und Debian-Pakete übergeben; kein Release-Tag angelegt.
+- [ ] Main-Übernahme und ersten gemeinsamen CI-Lauf nachweisen.
 
 ## Physische Validierung, getrennt von Softwarepaketen
 

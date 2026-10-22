@@ -2,151 +2,20 @@ name: Build
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: build-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  build:
-    name: Windows .NET 8
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: 8.0.x
-
-      - name: Restore
-        run: dotnet restore .\LIS2ControlCenter.sln
-
-      - name: Build
-        run: dotnet build .\LIS2ControlCenter.sln --configuration Release --no-restore
-
-      - name: Test
-        run: dotnet test .\LIS2ControlCenter.sln --configuration Release --no-build --verbosity normal
-
-      - name: WPF startup smoke test
-        run: >
-          dotnet run
-          --project .\src\LIS2.App\LIS2.App.csproj
-          --configuration Release
-          --no-build
-          --
-          --smoke-test
-
-      - name: WPF UI regression test
-        run: >
-          dotnet run
-          --project .\src\LIS2.App\LIS2.App.csproj
-          --configuration Release
-          --no-build
-          --
-          --ui-test
-          --ui-test-output
-          .\artifacts\ui-tests
-
-      - name: Upload UI regression evidence
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: LIS2-UI-Regression
-          path: artifacts/ui-tests/
-          if-no-files-found: warn
-
-      - name: Publish LIS2 Control Center
-        if: github.event_name != 'pull_request'
-        run: >
-          dotnet publish .\src\LIS2.App\LIS2.App.csproj
-          --configuration Release
-          --runtime win-x64
-          --self-contained true
-          -p:DebugType=None
-          -p:DebugSymbols=false
-          --output .\artifacts\LIS2ControlCenter
-
-      - name: Publish Protocol Tester
-        if: github.event_name != 'pull_request'
-        run: >
-          dotnet publish .\tools\LIS2.ProtocolTester\LIS2.ProtocolTester.csproj
-          --configuration Release
-          --runtime win-x64
-          --self-contained true
-          -p:DebugType=None
-          -p:DebugSymbols=false
-          --output .\artifacts\LIS2.ProtocolTester
-
-      - name: Scan published application with Microsoft Defender
-        if: github.event_name != 'pull_request'
-        shell: pwsh
-        run: |
-          $defender = Join-Path $env:ProgramFiles 'Windows Defender/MpCmdRun.exe'
-          if (-not (Test-Path $defender)) { throw 'Microsoft Defender command-line scanner is unavailable.' }
-          & $defender -Scan -ScanType 3 -File (Resolve-Path '.\\artifacts\\LIS2ControlCenter').Path -DisableRemediation
-          if ($LASTEXITCODE -ne 0) { throw "Microsoft Defender scan failed (exit code $LASTEXITCODE)." }
-
-      - name: Record published application hashes
-        if: github.event_name != 'pull_request'
-        shell: pwsh
-        run: |
-          Get-ChildItem '.\\artifacts\\LIS2ControlCenter' -File -Recurse |
-            Get-FileHash -Algorithm SHA256 |
-            ForEach-Object { "$($_.Hash)  $([IO.Path]::GetRelativePath((Resolve-Path '.\\artifacts\\LIS2ControlCenter').Path, $_.Path))" } |
-            Set-Content -Encoding ascii '.\\artifacts\\LIS2ControlCenter\\SHA256SUMS.txt'
-
-      - name: Upload LIS2 Control Center
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v7
-        with:
-          name: LIS2-Control-Center-win-x64
-          path: artifacts/LIS2ControlCenter/
-          if-no-files-found: error
-
-      - name: Upload Protocol Tester
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v7
-        with:
-          name: LIS2-ProtocolTester-win-x64
-          path: artifacts/LIS2.ProtocolTester/
-          if-no-files-found: error
-
-  winamp-plugin:
-    name: Winamp plugin x86
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Configure Win32 plugin
-        run: cmake -S .\native\LIS2.WinampPlugin -B .\native\LIS2.WinampPlugin\build -A Win32
-
-      - name: Build Win32 plugin
-        run: cmake --build .\native\LIS2.WinampPlugin\build --config Release
-
-      - name: Upload gen_lis2.dll
-        uses: actions/upload-artifact@v7
-        with:
-          name: gen_lis2-win32
-          path: native/LIS2.WinampPlugin/build/Release/gen_lis2.dll
-          if-no-files-found: error
-
+  avalonia:
+    uses: ./.github/workflows/linux-portable.yml
 
   wmp-legacy-plugin:
-    if: ${{ false }} # Deferred: retain WMP plugin build recipe without producing binaries/artifacts.
+    if: github.repository == 'disabled/WMP-Legacy' # Legacy-Plug-ins bleiben außerhalb des Produktumfangs.
     name: WMP Legacy plugin ${{ matrix.arch }}
     runs-on: windows-latest
 
@@ -198,7 +67,7 @@ jobs:
 
 
   wmp-legacy-visualization:
-    if: ${{ false }} # Deferred: retain WMP plugin build recipe without producing binaries/artifacts.
+    if: github.repository == 'disabled/WMP-Legacy' # Legacy-Plug-ins bleiben außerhalb des Produktumfangs.
     name: WMP Legacy visualization ${{ matrix.arch }}
     runs-on: windows-latest
 

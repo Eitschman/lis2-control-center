@@ -2,134 +2,77 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    tags: ['v*']
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  release:
-    name: Build release
-    runs-on: windows-latest
-
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v6
+      - id: version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?$ ]]; then
+            echo 'Unsupported release version' >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+  packages:
+    needs: version
+    uses: ./.github/workflows/linux-portable.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+  release:
+    needs: [version, packages]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
         with:
-          dotnet-version: 8.0.x
-
-      - name: Resolve version
-        shell: pwsh
+          pattern: LIS2-*
+          path: artifacts
+      - uses: actions/download-artifact@v4
+        with:
+          name: gen_lis2-win32
+          path: artifacts/gen_lis2-win32
+      - name: Prepare versioned release packages and checksums
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ needs.version.outputs.version }}
         run: |
-          $version = "${{ github.ref_name }}".TrimStart("v")
-          if ($version -notmatch '^\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?$') {
-            throw "Tag '${{ github.ref_name }}' is not a supported semantic version."
-          }
-          "LIS2_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-      - name: Restore
-        run: dotnet restore .\LIS2ControlCenter.sln
-
-      - name: Build
-        run: dotnet build .\LIS2ControlCenter.sln --configuration Release --no-restore -p:Version=$env:LIS2_VERSION
-
-      - name: Test
-        run: dotnet test .\LIS2ControlCenter.sln --configuration Release --no-build --verbosity normal
-
-      - name: WPF startup smoke test
-        run: >
-          dotnet run
-          --project .\src\LIS2.App\LIS2.App.csproj
-          --configuration Release
-          --no-build
-          --
-          --smoke-test
-
-      - name: Publish portable application
-        run: >
-          dotnet publish .\src\LIS2.App\LIS2.App.csproj
-          --configuration Release
-          --runtime win-x64
-          --self-contained true
-          -p:Version=$env:LIS2_VERSION
-          -p:DebugType=None
-          -p:DebugSymbols=false
-          --output .\release\LIS2-Control-Center
-
-      - name: Publish protocol tester
-        run: >
-          dotnet publish .\tools\LIS2.ProtocolTester\LIS2.ProtocolTester.csproj
-          --configuration Release
-          --runtime win-x64
-          --self-contained true
-          -p:Version=$env:LIS2_VERSION
-          -p:DebugType=None
-          -p:DebugSymbols=false
-          --output .\release\LIS2-ProtocolTester
-
-      - name: Build Winamp x86 plugin
-        run: |
-          cmake -S .\native\LIS2.WinampPlugin -B .\native\LIS2.WinampPlugin\build -A Win32
-          cmake --build .\native\LIS2.WinampPlugin\build --config Release
-
-      - name: Build WMP Legacy native plugins
-        run: |
-          cmake -S .\native\LIS2.WmpLegacyPlugin -B .\native\LIS2.WmpLegacyPlugin\build-x86 -A Win32
-          cmake --build .\native\LIS2.WmpLegacyPlugin\build-x86 --config Release
-          cmake -S .\native\LIS2.WmpLegacyPlugin -B .\native\LIS2.WmpLegacyPlugin\build-x64 -A x64
-          cmake --build .\native\LIS2.WmpLegacyPlugin\build-x64 --config Release
-          cmake -S .\native\LIS2.WmpLegacyVisualization -B .\native\LIS2.WmpLegacyVisualization\build-x86 -A Win32
-          cmake --build .\native\LIS2.WmpLegacyVisualization\build-x86 --config Release
-          cmake -S .\native\LIS2.WmpLegacyVisualization -B .\native\LIS2.WmpLegacyVisualization\build-x64 -A x64
-          cmake --build .\native\LIS2.WmpLegacyVisualization\build-x64 --config Release
-
-      - name: Package portable release
-        shell: pwsh
-        run: |
-          Copy-Item README.md .\release\LIS2-Control-Center\README.md
-          Copy-Item LICENSE .\release\LIS2-Control-Center\LICENSE
-          Copy-Item .\native\LIS2.WinampPlugin\build\Release\gen_lis2.dll .\release\gen_lis2.dll
-          Copy-Item .\native\LIS2.WmpLegacyPlugin\build-x86\Release\lis2_wmp_legacy.dll .\release\lis2_wmp_legacy-x86.dll
-          Copy-Item .\native\LIS2.WmpLegacyPlugin\build-x64\Release\lis2_wmp_legacy.dll .\release\lis2_wmp_legacy-x64.dll
-          Copy-Item .\native\LIS2.WmpLegacyVisualization\build-x86\Release\lis2_wmp_legacy_visualization.dll .\release\lis2_wmp_legacy_visualization-x86.dll
-          Copy-Item .\native\LIS2.WmpLegacyVisualization\build-x64\Release\lis2_wmp_legacy_visualization.dll .\release\lis2_wmp_legacy_visualization-x64.dll
-
-          Compress-Archive -Path .\release\LIS2-Control-Center\* -DestinationPath ".\release\LIS2-Control-Center-$env:LIS2_VERSION-win-x64.zip"
-          Compress-Archive -Path .\release\LIS2-ProtocolTester\* -DestinationPath ".\release\LIS2-ProtocolTester-$env:LIS2_VERSION-win-x64.zip"
-
-          $files = @(
-            ".\release\LIS2-Control-Center-$env:LIS2_VERSION-win-x64.zip",
-            ".\release\LIS2-ProtocolTester-$env:LIS2_VERSION-win-x64.zip",
-            ".\release\gen_lis2.dll",
-            ".\release\lis2_wmp_legacy-x86.dll",
-            ".\release\lis2_wmp_legacy-x64.dll",
-            ".\release\lis2_wmp_legacy_visualization-x86.dll",
-            ".\release\lis2_wmp_legacy_visualization-x64.dll"
-          )
-
-          $lines = foreach ($file in $files) {
-            $hash = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLowerInvariant()
-            "$hash  $(Split-Path $file -Leaf)"
-          }
-          $lines | Set-Content .\release\SHA256SUMS.txt
-
-      - name: Create GitHub release
-        shell: pwsh
+          python3 - <<'PYTHON'
+          import hashlib, os, pathlib, shutil, zipfile
+          source = pathlib.Path('artifacts')
+          output = pathlib.Path('release')
+          output.mkdir()
+          version = os.environ['RELEASE_VERSION']
+          for folder in source.glob('LIS2-Avalonia-*'):
+              archive = next(path for path in folder.iterdir() if path.name.endswith(('.zip', '.tar.gz')))
+              name = archive.name.replace('LIS2-Avalonia-', f'LIS2-Control-Center-{version}-')
+              shutil.copy2(archive, output / name)
+          for package in source.glob('LIS2-Debian-*/*.deb'):
+              shutil.copy2(package, output / package.name)
+          with zipfile.ZipFile(output / f'LIS2-ProtocolTester-{version}-win-x64.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+              for path in (source / 'LIS2-ProtocolTester-win-x64').rglob('*'):
+                  if path.is_file(): archive.write(path, path.relative_to(source / 'LIS2-ProtocolTester-win-x64'))
+          shutil.copy2(source / 'gen_lis2-win32/gen_lis2.dll', output / 'gen_lis2.dll')
+          packages = sorted(output.iterdir())
+          if len(packages) != 7: raise RuntimeError(f'Expected seven release files, got {len(packages)}')
+          (output / 'SHA256SUMS.txt').write_text(''.join(f'{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n' for path in packages))
+          PYTHON
+          cd release
+          sha256sum -c SHA256SUMS.txt
+      - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "${{ github.ref_name }}" `
-            --title "LIS2 Control Center ${{ github.ref_name }}" `
-            --generate-notes `
-            ".\release\LIS2-Control-Center-$env:LIS2_VERSION-win-x64.zip" `
-            ".\release\LIS2-ProtocolTester-$env:LIS2_VERSION-win-x64.zip" `
-            ".\release\gen_lis2.dll" `
-            ".\release\lis2_wmp_legacy-x86.dll" `
-            ".\release\lis2_wmp_legacy-x64.dll" `
-            ".\release\lis2_wmp_legacy_visualization-x86.dll" `
-            ".\release\lis2_wmp_legacy_visualization-x64.dll" `
-            ".\release\SHA256SUMS.txt"
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: gh release create "$RELEASE_TAG" --verify-tag --title "$RELEASE_TAG" --generate-notes release/*

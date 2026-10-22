@@ -2,7 +2,7 @@ using LIS2.App.Avalonia;
 
 namespace LIS2.App.Avalonia.Tests;
 
-public class WpfTranslationCatalogTests
+public class UiTranslationCatalogTests
 {
     [Theory]
     [InlineData("de", "Dashboard", "Übersicht")]
@@ -10,7 +10,7 @@ public class WpfTranslationCatalogTests
     [InlineData("de", "VFD Preview", "VFD-Vorschau")]
     [InlineData("de", "Fan Control", "Lüftersteuerung")]
     public void GermanWpfLabelsArePreserved(string language, string source, string expected)
-        => Assert.Equal(expected, WpfTranslationCatalog.Translate(source, language));
+        => Assert.Equal(expected, UiTranslationCatalog.Translate(source, language));
 
     [Theory]
     [InlineData("en")]
@@ -19,7 +19,7 @@ public class WpfTranslationCatalogTests
     [InlineData("tr")]
     [InlineData("ru")]
     public void DynamicSensorValuesAreNeverTranslated(string language)
-        => Assert.Equal("Hardware.CPU.Load.Core 0", WpfTranslationCatalog.Translate("Hardware.CPU.Load.Core 0", language));
+        => Assert.Equal("Hardware.CPU.Load.Core 0", UiTranslationCatalog.Translate("Hardware.CPU.Load.Core 0", language));
 
     [Theory]
     [InlineData("de")]
@@ -29,8 +29,8 @@ public class WpfTranslationCatalogTests
     public void LanguageSwitchingRestoresEnglishSource(string language)
     {
         const string original = "Dashboard";
-        Assert.NotEqual(original, WpfTranslationCatalog.Translate(original, language));
-        Assert.Equal(original, WpfTranslationCatalog.Translate(original, "en"));
+        Assert.NotEqual(original, UiTranslationCatalog.Translate(original, language));
+        Assert.Equal(original, UiTranslationCatalog.Translate(original, "en"));
     }
 
     [Theory]
@@ -38,11 +38,11 @@ public class WpfTranslationCatalogTests
     [InlineData("fr", "Tableau de bord", "Tableau de bord")]
     [InlineData("tr", "Genel Bakış", "Gösterge Paneli")]
     [InlineData("ru", "Обзор", "Панель")]
-    public void TranslatedLabelsCanReturnToEnglish(string language, string translated, string wpfTranslation)
+    public void TranslatedLabelsCanReturnToEnglish(string language, string translated, string catalogTranslation)
     {
-        Assert.Equal("Dashboard", WpfTranslationCatalog.FindEnglishSource(translated));
-        Assert.Equal("Dashboard", WpfTranslationCatalog.Translate(translated, "en"));
-        Assert.Equal(wpfTranslation, WpfTranslationCatalog.Translate("Dashboard", language));
+        Assert.Equal("Dashboard", UiTranslationCatalog.FindEnglishSource(translated));
+        Assert.Equal("Dashboard", UiTranslationCatalog.Translate(translated, "en"));
+        Assert.Equal(catalogTranslation, UiTranslationCatalog.Translate("Dashboard", language));
     }
 
     [Theory]
@@ -67,7 +67,7 @@ public class WpfTranslationCatalogTests
     [InlineData("System Status")]
     [InlineData("VFD Preview")]
     public void OriginalEnglishCatalogKeysAreStable(string key)
-        => Assert.Equal(key, WpfTranslationCatalog.FindEnglishSource(key));
+        => Assert.Equal(key, UiTranslationCatalog.FindEnglishSource(key));
 
     [Theory]
     [InlineData("de")]
@@ -77,12 +77,12 @@ public class WpfTranslationCatalogTests
     public void WpfTranslationsRoundTripAcrossLanguages(string language)
     {
         const string key = "Dashboard";
-        var localized = WpfTranslationCatalog.Translate(key, language);
-        Assert.Equal(key, WpfTranslationCatalog.FindEnglishSource(localized));
-        Assert.Equal(key, WpfTranslationCatalog.Translate(localized, "en"));
+        var localized = UiTranslationCatalog.Translate(key, language);
+        Assert.Equal(key, UiTranslationCatalog.FindEnglishSource(localized));
+        Assert.Equal(key, UiTranslationCatalog.Translate(localized, "en"));
     }
 
     [Fact]
     public void WpfPrefixPreservesDecorativeMarkers()
-        => Assert.Equal("• Übersicht", WpfTranslationCatalog.Translate("• Dashboard", "de"));
+        => Assert.Equal("• Übersicht", UiTranslationCatalog.Translate("• Dashboard", "de"));
 }

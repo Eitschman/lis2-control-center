@@ -2,7 +2,7 @@
 
 Steuerungssoftware für das **VL System L.I.S. 2** mit 20x2-VFD und vier Lüfterkanälen.
 
-> **Status:** Avalonia-Portierung auf `feature/linux-avalonia`; WPF bleibt die Funktionsreferenz<br>
+> **Status:** Gemeinsame Avalonia-Anwendung für Windows und Linux<br>
 > **Zielplattformen:** Windows x64, Linux x64 und Linux ARM64<br>
 > **Implementierung:** C# / .NET 8, Avalonia 11.3.6; Winamp-Plug-in als natives Win32/x86-Modul<br>
 > **License:** MIT
@@ -19,9 +19,9 @@ Lokal sind 451 Avalonia-Tests auf Windows erfolgreich; ein Test für einen isoli
 
 Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. Transport, Port, HA-Aktivierung, lokale Linux-Tokenauswahl und Helligkeit werden gespeichert. Gemeinsame Displayaktionen verwenden den angewendeten Transport. Der Windows-Import ist sichtbar; manuelle Lüfterausgaben beachten Kanalgrenzen und benötigen bei serieller Ausgabe je Aktion eine Freigabe. Live-HA und Liveplayer auf den Zielsystemen bleiben offen. PORT-06A ergänzt die Spektrumvariable, sichtbare Glyphenvorschauen, den angebundenen Bedingungsbrowser, direkte Sensorauswahl, konsistente Presets, Speicherrückmeldungen und Diagnosefelder. Pixelraster und präzise Kurvenpunkte sind bedienbar. Nach den PORT-07-Paketprüfungen stehen Support-/Versionspflege, Distributionslizenzen und manuelle Desktop-Abnahme an.
 
-## WPF-Funktionsreferenz
+## Funktionsumfang
 
-Die folgenden Funktionsbeschreibungen beziehen sich auf die vorhandene Windows-WPF-Anwendung. Die Avalonia-App übernimmt diesen Umfang schrittweise; vorhandener Code ist keine pauschale Paritätsabnahme. Windows-Tray-/GSMTC-Funktionen gelten nicht automatisch auf Linux.
+Die folgenden Funktionen gehören zur Avalonia-Anwendung. Plattformabhängige Medien-, Sensor- und Desktopdienste sowie die noch offenen Zielsystemprüfungen stehen im Portierungsstatus. Die WPF-Referenz ist im Git-Commit `922ca1b` zugänglich; der aktuelle Quellbaum enthält keine WPF-Anwendung.
 
 ### LIS2 / display
 
@@ -83,7 +83,7 @@ The modern Windows 11 Media Player is integrated directly through **Global Syste
 - ready-made Now Playing page preset
 - dedicated Media-page card alongside Winamp
 
-Windows Media Player Legacy bleibt im Produktumfang zurückgestellt. WPF und Avalonia starten die Legacy-Quelle nicht; Avalonia zeigt keine Legacy-Karte. Native Legacy-CI-Artefakte sind deaktiviert.
+Windows Media Player Legacy bleibt im Produktumfang zurückgestellt. Die Anwendung startet die Legacy-Quelle nicht und zeigt keine Legacy-Karte. Native Legacy-CI-Artefakte sind deaktiviert.
 
 ### Home Assistant
 
@@ -156,7 +156,6 @@ The projects are deliberately separated:
 - `src/LIS2.Fans` — fan-control modes, curves, hysteresis and fail-safe logic
 - `src/LIS2.Winamp` — named-pipe host, Winamp snapshots and display-value formatting
 - `src/LIS2.WindowsMedia` — Windows 11 GSMTC session source and Windows Media display values
-- `src/LIS2.App` — WPF UI, settings, pages, presets, tray, themes and localization
 - `src/LIS2.App.Avalonia`: gemeinsame Desktop-App und Plattformadapter für Windows/Linux.
 - `src/LIS2.Runtime`: UI-unabhängige Runtime, Schleifen, Linux-Sensoren und Plattformverträge; Details in [architecture.md](docs/architecture.md).
 - `tools/LIS2.ProtocolTester` — low-level protocol testing
@@ -220,11 +219,10 @@ See [docs/protocol.md](docs/protocol.md) and [docs/reverse-engineering.md](docs/
 
 ## Building
 
-Die folgenden Befehle bauen die Windows-Solution einschließlich WPF-Referenz. Voraussetzungen:
+Die folgenden Befehle bauen die Solution mit Avalonia-App, Avalonia-Protokolltester, Bibliotheken und Windows-GSMTC-Anbieter. Voraussetzungen:
 
 - Windows
 - .NET 8 SDK
-- Visual Studio 2022 or another environment capable of building WPF
 - CMake/MSVC when building the native Winamp plug-in
 
 ```powershell
@@ -233,7 +231,7 @@ dotnet build .\LIS2ControlCenter.sln -c Release
 dotnet test .\LIS2ControlCenter.sln -c Release --no-build
 ```
 
-Die Avalonia-Branch-CI baut und prüft stattdessen gezielt die portable App und deren Testprojekt:
+Unter Linux werden die portablen Projekte gezielt gebaut und geprüft:
 
 ```text
 dotnet build src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release
@@ -244,25 +242,16 @@ Die konkreten lokalen und GitHub-Prüfläufe stehen im Portierungsstatus. Für G
 
 ## CI and development artifacts
 
-Der Windows-Workflow für `main` und der Tag-Releaseworkflow verwenden die WPF-Solution:
+`build.yml` prüft `main` und Pull Requests über den wiederverwendbaren Workflow `linux-portable.yml`. Derselbe Workflow prüft den Avalonia-Branch und führt Windows-/Linux-Tests, native Desktop-Smokes, Archivstarts und Debian-Installationsprüfungen aus. Windows baut zusätzlich die gesamte Solution und prüft die Quellen- und Medienbibliotheken. Die Windows-App wird mit Microsoft Defender geprüft.
 
-1. restores and builds the complete .NET solution on Windows;
-2. runs the Core, Display, Sources, Fans, Winamp, Windows Media and application reliability tests;
-3. runs a WPF startup/tab smoke test;
-4. publishes a self-contained Windows x64 LIS2 Control Center;
-5. publishes the self-contained x64 protocol tester;
-6. builds and uploads the native Winamp x86 plug-in;
-7. creates tagged portable GitHub releases for `v*` tags, including SHA-256 checksums.
+Entwicklungsartefakte:
 
-Development artifacts:
+- `LIS2-Avalonia-win-x64`, `LIS2-Avalonia-linux-x64`, `LIS2-Avalonia-linux-arm64`: selbstständige Archive mit SHA-256-Dateien.
+- `LIS2-Debian-linux-x64`, `LIS2-Debian-linux-arm64`: installierbare Debian-Pakete mit Prüfsummen.
+- `LIS2-ProtocolTester-win-x64`: selbstständiger Avalonia-Protokolltester; seine Oberfläche wird unter Windows und Linux nativ geprüft.
+- `gen_lis2-win32`: natives x86-Winamp-Plug-in.
 
-- `LIS2-Control-Center-win-x64`
-- `LIS2-ProtocolTester-win-x64`
-- `gen_lis2-win32`
-
-Tagged releases additionally contain portable ZIP packages and `SHA256SUMS.txt`. See [Release process](docs/release.md).
-
-Der separate Workflow `linux-portable.yml` prüft `feature/linux-avalonia` einschließlich nativem Windows-/Linux-X11-Smoke und erzeugt `LIS2-Avalonia-win-x64`, `LIS2-Avalonia-linux-x64` und `LIS2-Avalonia-linux-arm64`. Smoke-Screenshots und Ergebnisdateien werden separat hochgeladen. Der Workflow erzeugt zusätzlich `LIS2-ProtocolTester-win-x64` und `gen_lis2-win32` wie main. Das Windows-App-Paket enthält den GSMTC-Anbieter samt WinRT-Abhängigkeiten und wird mit einem Anbieter-Starttest geprüft. Jedes Avalonia-Paketartefakt enthält ein Archiv und eine SHA-256-Datei; die Aufbewahrung beträgt 14 Tage. Tag-Releases veröffentlichen derzeit weiterhin WPF. Der Avalonia-Workflow führt keine WPF-Tests aus.
+Die Windows-App enthält den GSMTC-Anbieter und seine WinRT-Abhängigkeiten. Screenshots und Prüfergebnisse werden als eigene Artefakte hochgeladen. Tag-Releases verwenden denselben Avalonia-Paketbau mit der Tag-Version und veröffentlichen drei portable App-Archive, zwei Debian-Pakete, den Windows-Protokolltester, das Winamp-Plug-in und `SHA256SUMS.txt`. Einzelheiten stehen im [Paketierungsleitfaden](docs/release.md).
 
 Zusätzlich entstehen `LIS2-Debian-linux-x64` und `LIS2-Debian-linux-arm64` mit installierbaren `.deb`-Paketen und SHA-256-Prüfsummen. Sie enthalten die .NET-Laufzeit, einen Startmenüeintrag und das Anwendungssymbol. Installation mit `sudo apt install ./lis2-control-center_<Paketversion>_amd64.deb`, auf ARM64 mit `_arm64.deb`. Einzelheiten und Debian-Prüfungen stehen im [Paketierungsleitfaden](docs/release.md#debian-pakete).
 

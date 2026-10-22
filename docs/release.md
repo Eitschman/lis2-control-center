@@ -1,17 +1,17 @@
 # Builds, Prüfnachweise und Pakete
 
-Stand: 22.10.2026. Die Workflows unterscheiden Avalonia-Entwicklung, Windows-WPF-Referenz und getaggte Windows-Releases.
+Stand: 22.10.2026. App und Protokolltester verwenden Avalonia. Hauptbranch, Entwicklungsbranch und Tag-Releases verwenden denselben Paketbau.
 
 ## Avalonia-Branch
 
-[linux-portable.yml](../.github/workflows/linux-portable.yml) startet bei Push auf `feature/linux-avalonia`, Pull Requests nach `main` und manueller Auslösung. Neuere Läufe derselben Workflow-/Branchgruppe brechen überholte Läufe ab.
+[linux-portable.yml](../.github/workflows/linux-portable.yml) startet bei Push auf `feature/linux-avalonia` und manueller Auslösung. `build.yml` ruft ihn bei Push/PR nach `main` und manuell auf; `release.yml` verwendet ihn für Tag-Releases. Neuere Läufe derselben Workflow-/Branchgruppe brechen überholte Läufe ab.
 
 | Jobs | Umfang |
 | --- | --- |
 | Shared libraries auf Windows/Ubuntu | `LIS2.Core.Tests`, `LIS2.Display.Tests`, `LIS2.Fans.Tests` |
 | Avalonia shell auf Windows/Ubuntu | Release-Build und `LIS2.App.Avalonia.Tests`, einschließlich tatsächlicher Geräte-Controls und Skia-Rendering im Headless-Modus |
 | Portable app: `win-x64`, `linux-x64`, `linux-arm64` | Abhängig von erfolgreichen Bibliotheks-/Avalonia-Jobs; selbstständiges, ungetrimmtes Multi-file-Publish; ARM64 auf `ubuntu-24.04-arm` |
-| Windows Protocol Tester | Selbständiges win-x64-Publish des WPF-Protokolltesters wie auf main, Prüfung der Laufzeitdateien |
+| Windows Protocol Tester | Windows-Solution-Build, Sources-/Winamp-/WindowsMedia-/WmpLegacy-Tests, selbständiges Avalonia-win-x64-Publish, Prüfung der Laufzeitdateien und nativer virtueller UI-Smoke |
 | Winamp plugin x86 | CMake/MSVC mit Win32 und Release, gen_lis2.dll wie auf main |
 
 Für `win-x64` wird `LIS2.WindowsMedia` separat publiziert; Provider-DLL, WinRT.Runtime.dll, Microsoft.Windows.SDK.NET.dll und weitere DLL-Abhängigkeiten werden in das App-Paket übernommen. Der Paketjob startet den echten GSMTC-Anbieter, liest den Verbindungsstatus, beendet ihn und prüft die fehlende Anbieter-DLL. Linux-Medien und Tokenstore benötigen zusätzlich playerctl-/secret-tool- und Sitzungsdienste.
@@ -32,32 +32,29 @@ Die UI-Tests exportieren gerenderte Ansichten als Avalonia-device-views-Windows 
 
 Die genaue Codebasis und der zugehörige CI-Lauf stehen im [aktuellen Status](prp/linux-port-status.md). Ein neuer Commit muss separat geprüft werden.
 
-## Windows-WPF-Referenz
+## Hauptbranch und Tag-Releases
 
-[build.yml](../.github/workflows/build.yml) läuft bei Push/PR nach `main` sowie manuell. Er baut die Solution, führt deren Tests aus und startet WPF-Smoke-/UI-Regressionstests. Nicht-PR-Läufe publizieren Windows-App, ProtocolTester und nativen x86-Winamp-Plug-in.
+[build.yml](../.github/workflows/build.yml) prüft `main` und Pull Requests mit dem wiederverwendbaren Avalonia-Workflow. Native Legacy-Plug-ins bleiben deaktiviert. Die Windows-Solution enthält keine WPF-Projekte. Der Paketbau prüft die Windows-App mit Microsoft Defender.
 
-Diese WPF-Prüfungen werden durch einen gewöhnlichen Avalonia-Branch-Push nicht ausgelöst. Die erfolgreichen Avalonia-Jobs sind daher kein aktueller Nachweis für den gesamten WPF-/Windows-Workflow.
-
-## Tag-Releases
-
-[release.yml](../.github/workflows/release.yml) reagiert auf `v*`-Tags. Er validiert die Version, baut und testet die Windows-Solution, führt WPF-Smoke aus und publiziert derzeit die WPF-Anwendung, den ProtocolTester und den x86-Winamp-Plug-in.
-
-Assets:
+[release.yml](../.github/workflows/release.yml) reagiert auf `v*`-Tags, validiert die Version und führt denselben Avalonia-Workflow aus. Erst nach dessen erfolgreicher Prüfung werden die Assets veröffentlicht:
 
 - `LIS2-Control-Center-<version>-win-x64.zip`.
+- `LIS2-Control-Center-<version>-linux-x64.tar.gz` und `-linux-arm64.tar.gz`.
+- `lis2-control-center_<Debianversion>_amd64.deb` und `_arm64.deb`.
 - `LIS2-ProtocolTester-<version>-win-x64.zip`.
-- `gen_lis2.dll`.
-- `SHA256SUMS.txt`.
+- `gen_lis2.dll` und `SHA256SUMS.txt`.
 
-Die Version wird aus dem Tag übergeben. Der Tag-Workflow ist kein Avalonia-Releasepfad. Ein Tag wird nur auf ausdrücklichen Releaseauftrag erstellt oder gepusht.
+Die Tag-Version wird an App und Protokolltester übergeben. Debian-Pakete verwenden dieselbe Version; ein Bindestrich vor einer Vorabversion wird für die Debian-Sortierung durch `~` ersetzt. Portable App-Archive enthalten README und Projektlizenz. Fremdkomponentenhinweise bleiben eine separat aufgeführte Distributionsaufgabe.
+
+Ein Tag wird nur auf ausdrücklichen Releaseauftrag erstellt oder gepusht. Der Workflow kann mit einer optionalen Version manuell als Paketprobe ausgeführt werden, ohne einen Release anzulegen. Eine erfolgreiche Paketprobe ist kein Nachweis des Veröffentlichungsschritts.
 
 ## Offene Distributionsprüfungen
 
 - Archivstarts und native ARM64-Ausführung anhand des zum Commit gehörenden Paket-Smokes beurteilen.
 - Debian/KDE und Raspberry Pi 5 mit Systemdaten protokollieren; der ARM64-Runner ersetzt keinen Raspberry-Pi-Desktop.
 - Serielle Rechte, DBus-/Keyring-Verfügbarkeit und sichtbare Fehler bei fehlenden Diensten prüfen.
-- Avalonia-UI-Smoke und Versionsmetadaten in den künftigen Releasepfad aufnehmen.
-- WPF-Paketierung erst nach Windows-/Linux-Paritätsabnahme durch den gemeinsamen Avalonia-Releasepfad ersetzen.
+- Versionierte Paketprobe und gemeinsamen Hauptbranch-CI-Lauf anhand des jeweiligen Commits nachweisen.
+- Reale Tag-Veröffentlichung erst bei ausdrücklich beauftragtem Release prüfen.
 
 Portable Archive und Debian-Pakete werden nebeneinander erzeugt. AppImage und Windows-Installer sind nicht eingerichtet. Hardwareaussagen benötigen getrennte physische Nachweise; offene Protokollfragen stehen in [protocol.md](protocol.md).
 

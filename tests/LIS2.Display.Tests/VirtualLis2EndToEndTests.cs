@@ -1,7 +1,7 @@
 using LIS2.Core;
 using LIS2.Display;
 
-namespace LIS2.App.Tests;
+namespace LIS2.Display.Tests;
 
 public sealed class VirtualLis2EndToEndTests
 {

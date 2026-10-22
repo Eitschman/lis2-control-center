@@ -1,13 +1,21 @@
-name: Cross-platform portable libraries
+name: Avalonia builds and packages
 
 on:
   push:
     branches:
       - feature/linux-avalonia
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
+    inputs:
+      version:
+        description: Optional package version for a release rehearsal
+        type: string
+        default: ''
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        default: ''
+
 
 # Cancel superseded runs of this workflow on the same branch or pull request.
 # A newer push replaces older queued and in-progress builds.
@@ -19,22 +27,59 @@ permissions:
   contents: read
 
 jobs:
+  metadata:
+    name: Validate package version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate optional version before builds
+        shell: bash
+        env:
+          PACKAGE_VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -n "$PACKAGE_VERSION" && ! "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?$ ]]; then
+            echo 'Unsupported package version' >&2
+            exit 1
+          fi
   windows-tools:
     name: Windows Protocol Tester
+    needs: metadata
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - name: Build Windows solution without WPF
+        run: dotnet build LIS2ControlCenter.sln --configuration Release
+      - name: Test remaining source and media libraries
+        shell: pwsh
+        run: |
+          foreach ($project in @('Sources', 'Winamp', 'WindowsMedia', 'WmpLegacy')) {
+            dotnet test "tests/LIS2.$project.Tests/LIS2.$project.Tests.csproj" --configuration Release --no-build
+            if ($LASTEXITCODE -ne 0) { throw "Tests failed: $project" }
+          }
       - name: Publish self-contained Protocol Tester
-        run: dotnet publish tools/LIS2.ProtocolTester/LIS2.ProtocolTester.csproj --configuration Release --runtime win-x64 --self-contained true -p:DebugType=None -p:DebugSymbols=false --output artifacts/LIS2.ProtocolTester
+        run: dotnet publish tools/LIS2.ProtocolTester/LIS2.ProtocolTester.csproj --configuration Release --runtime win-x64 --self-contained true -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '1.0.0' }} --output artifacts/LIS2.ProtocolTester
       - name: Verify Protocol Tester runtime assets
         shell: pwsh
         run: |
           foreach ($file in @('LIS2.ProtocolTester.exe', 'LIS2.ProtocolTester.dll', 'LIS2.ProtocolTester.runtimeconfig.json', 'coreclr.dll')) {
             if (-not (Test-Path "artifacts/LIS2.ProtocolTester/$file")) { throw "Missing Protocol Tester asset: $file" }
           }
+      - name: Smoke published Avalonia Protocol Tester
+        shell: pwsh
+        run: |
+          $process = Start-Process 'artifacts/LIS2.ProtocolTester/LIS2.ProtocolTester.exe' -ArgumentList '--smoke-test', 'protocol-smoke' -PassThru
+          if (-not $process.WaitForExit(45000)) { $process.Kill(); throw 'Protocol Tester smoke timed out' }
+          if ($process.ExitCode -ne 0) { throw "Protocol Tester smoke failed: $($process.ExitCode)" }
+          if (-not (Test-Path 'protocol-smoke/result.txt')) { throw 'Protocol Tester smoke result missing' }
+      - name: Upload Protocol Tester evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Protocol-Tester-smoke-Windows
+          path: protocol-smoke/
+          if-no-files-found: error
       - name: Upload Protocol Tester
         uses: actions/upload-artifact@v4
         with:
@@ -45,6 +90,7 @@ jobs:
 
   winamp-plugin:
     name: Winamp plugin x86
+    needs: metadata
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -62,6 +108,7 @@ jobs:
 
   portable:
     name: .NET 8 shared libraries (${{ matrix.os }})
+    needs: metadata
     strategy:
       fail-fast: false
       matrix:
@@ -83,6 +130,7 @@ jobs:
 
   avalonia-shell:
     name: Avalonia shell (${{ matrix.os }})
+    needs: metadata
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -140,6 +188,9 @@ jobs:
           AVALONIA_SCREEN_SCALE_FACTORS: 'screen=1.5'
           LIS2_SMOKE_EXPECT_SCALE: '1.5'
         run: timeout 90s xvfb-run -a -s '-screen 0 2400x1600x24' dotnet src/LIS2.App.Avalonia/bin/Release/net8.0/LIS2.App.Avalonia.dll --desktop-smoke desktop-smoke/dpi150
+      - name: Native Protocol Tester smoke (Linux X11)
+        if: runner.os == 'Linux'
+        run: timeout 45s xvfb-run -a dotnet tools/LIS2.ProtocolTester/bin/Release/net8.0/LIS2.ProtocolTester.dll --smoke-test desktop-smoke/protocol-tester
       - name: Upload native desktop smoke
         if: always()
         uses: actions/upload-artifact@v4
@@ -171,7 +222,7 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Publish self-contained executable
-        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false --output publish/${{ matrix.rid }}
+        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '1.0.0' }} --output publish/${{ matrix.rid }}
       - name: Setup Python for Windows package tests
         if: runner.os == 'Windows'
         uses: actions/setup-python@v5
@@ -222,6 +273,9 @@ jobs:
           name: Avalonia-GSMTC-smoke-Windows
           path: media-provider-smoke/
           if-no-files-found: error
+      - name: Include package documentation
+        shell: pwsh
+        run: Copy-Item README.md, LICENSE "publish/${{ matrix.rid }}/"
       - name: Package Linux executable
         if: runner.os == 'Linux'
         shell: bash
@@ -230,6 +284,14 @@ jobs:
           tar -czf LIS2-Avalonia-${{ matrix.rid }}.tar.gz -C publish/${{ matrix.rid }} .
           sha256sum LIS2-Avalonia-${{ matrix.rid }}.tar.gz > LIS2-Avalonia-${{ matrix.rid }}.sha256
           sha256sum -c LIS2-Avalonia-${{ matrix.rid }}.sha256
+      - name: Scan Windows application with Microsoft Defender
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $defender = Join-Path $env:ProgramFiles 'Windows Defender/MpCmdRun.exe'
+          if (-not (Test-Path $defender)) { throw 'Microsoft Defender scanner unavailable' }
+          & $defender -Scan -ScanType 3 -File (Resolve-Path 'publish/win-x64').Path -DisableRemediation
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Defender scan failed: $LASTEXITCODE" }
       - name: Package Windows executable
         if: runner.os == 'Windows'
         shell: pwsh
@@ -241,10 +303,14 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
+          release_version='${{ inputs.version }}'
+          package_version="${release_version//-/~}"
+          if [ -z "$package_version" ]; then package_version="0.0~ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"; fi
+          echo "LIS2_DEBIAN_VERSION=$package_version" >> "$GITHUB_ENV"
           python3 -m unittest discover -s tools/packaging -p 'test_*.py' -v
-          python3 tools/packaging/build_debian.py --publish publish/${{ matrix.rid }} --rid ${{ matrix.rid }} --version "0.0~ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}" --output debian
+          python3 tools/packaging/build_debian.py --publish publish/${{ matrix.rid }} --rid ${{ matrix.rid }} --version "$package_version" --output debian
           cd debian
-          sha256sum -c *.deb.sha256
+          sha256sum -c ./*.deb.sha256
       - name: Install extracted Linux package smoke dependencies
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y xvfb xauth dbus libice6 libsm6 libfontconfig1
@@ -274,7 +340,7 @@ jobs:
         run: |
           architecture="$(dpkg --print-architecture)"
           for distribution in bookworm trixie; do
-            docker run --rm --mount type=bind,src="$PWD/debian",dst=/packages,readonly --mount type=bind,src="$PWD/tools/packaging",dst=/packaging,readonly "debian:$distribution-slim" sh /packaging/smoke_debian.sh "/packages/lis2-control-center_0.0~ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}_${architecture}.deb"
+            docker run --rm --mount type=bind,src="$PWD/debian",dst=/packages,readonly --mount type=bind,src="$PWD/tools/packaging",dst=/packaging,readonly "debian:$distribution-slim" sh /packaging/smoke_debian.sh "/packages/lis2-control-center_${LIS2_DEBIAN_VERSION}_${architecture}.deb"
           done
       - name: Upload Debian package
         if: runner.os == 'Linux'

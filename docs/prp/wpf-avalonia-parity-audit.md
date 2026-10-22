@@ -6,11 +6,11 @@ PORT-06 ergänzt den softwareseitigen Abgleich um benannte Glyphenschlüssel, st
 
 Windows und Linux erhalten Tray-Menüs; Linux-XDG-Autostart, ein exklusiver Instanzhandle mit benutzerbeschränkter Aktivierung und Splash sind angebunden. Beim Wiederanzeigen bleiben Transport und Runtime bestehen. Plattformabweichung: Linux beendet beim Schließen und minimiert in die Taskleiste, Windows schließt/minimiert in den Infobereich. Native Tray-Klicks, Anmeldung und Benutzerabnahme bleiben offen.
 
-Referenz: [WPF-XAML](../../src/LIS2.App/MainWindow.xaml), [WPF-Code](../../src/LIS2.App/MainWindow.xaml.cs), [Avalonia-AXAML](../../src/LIS2.App.Avalonia/MainWindow.axaml) und zugehörige partielle Dateien. Vorhandene Ansichten oder identische Controlnamen sind keine Verhaltens- oder Darstellungsabnahme.
+Referenz: [WPF-XAML](https://github.com/Eitschman/lis2-control-center/blob/922ca1b6fb7a1edf9f8c344c71c7a63686405b8a/src/LIS2.App/MainWindow.xaml), [WPF-Code](https://github.com/Eitschman/lis2-control-center/blob/922ca1b6fb7a1edf9f8c344c71c7a63686405b8a/src/LIS2.App/MainWindow.xaml.cs), [Avalonia-AXAML](../../src/LIS2.App.Avalonia/MainWindow.axaml) und zugehörige partielle Dateien. Vorhandene Ansichten oder identische Controlnamen sind keine Verhaltens- oder Darstellungsabnahme.
 
 ## Direkter main-Abgleich und Paket PORT-06A
 
-WPF-Funktionsreferenz des direkten Vergleichs: `origin/main`, Commit `922ca1b6fb7a1edf9f8c344c71c7a63686405b8a`. Die folgenden Punkte beschreiben den umgesetzten Avalonia-Stand und seine Nachweisgrenzen. WPF bleibt bis zur Paritätsabnahme erhalten.
+WPF-Funktionsreferenz des direkten Vergleichs: Git-Referenz, Commit `922ca1b6fb7a1edf9f8c344c71c7a63686405b8a`. Die folgenden Punkte beschreiben den umgesetzten Avalonia-Stand und seine Nachweisgrenzen. Die WPF-Projekte sind auf Benutzerauftrag entfernt; ihre Referenz ist über den genannten Git-Commit zugänglich.
 
 | ID | Aktueller Avalonia-Pfad | Nachweis und Grenze |
 | --- | --- | --- |
@@ -75,7 +75,7 @@ Physische Lüfterausgabe erfordert eine ausdrückliche, nicht persistierte Freig
 
 Lokal sind 451 Avalonia-Tests auf Windows erfolgreich; ein Linux-Schlüsselbundtest ist übersprungen. `Port06BUiTests` und `Port06BRuntimeTests` prüfen zwölf Fälle zur laufenden Lüfterkonfiguration, exklusiven Gerätebedienung, Rotation, Importfehlern und Bedingungsanzeige. `DeviceUiTests` prüft Gerätebedienung, Einstellungen/Import und manuelle Lüfter mit tatsächlichen Controls, Tastatur und isolierten Stores. `MenuLanguageUiTests` prüft zehn Menüseiten, About, gespeicherte Sprache, Systemstandard, dynamische Meldungen, unveränderte Daten und stabile Lüftermodi. Katalogtests prüfen Textabdeckung und Formatplatzhalter. `HomeAssistantUiTests` prüft Verbindung, Alias/Favorit, Attributseite, Speicherfehler und Deaktivierung mit tatsächlichen Controls und lokalem WebSocket-Protokollpartner. `HelpLanguageUiTests` prüft gespeicherte Hilfesprache, Systemstandard, Sprachwechsel im offenen Dialog und die Navigation durch alle Themen; lokalisierte Ansichten werden bei 840 × 600 gerendert. `HelpReferenceCatalogTests` prüft Katalogabdeckung, unveränderte Schlüssel und ausführbare Beispiele. `RuntimeHardeningTests` prüft zusätzlich zehn Ansichten, Hilfe/About, fehlende Medienanbieter, Diagnose, verzögerten Start gegen Shutdown und differenzielle Ausgabe einschließlich Teilfehlern. Native Windows-Fenster werden über `--desktop-smoke` gestartet und geordnet beendet; CI enthält denselben Windows-/Linux-X11-Pfad. Sichtprüfungen, aktuelle CI-Läufe und gezielte Gegenproben sind im [Status](linux-port-status.md) eingegrenzt. Ein automatisierter Screenshotvergleich besteht nicht.
 
-Für jede Ansicht bleiben die semantischen Fehler-/Leer-/Auswahl-/Speicherpfade und die Darstellung auf Windows/Linux zu prüfen. Manuelle Benutzerabnahme erfolgt nach dem vereinbarten Portierungsumfang; physische LIS2-Prüfung bleibt getrennt. WPF wird bis zur Paritätsabnahme erhalten. Prioritäten stehen in [TODO](../../TODO.md).
+Für jede Ansicht bleiben die semantischen Fehler-/Leer-/Auswahl-/Speicherpfade und die Darstellung auf Windows/Linux zu prüfen. Manuelle Benutzerabnahme erfolgt nach dem vereinbarten Portierungsumfang; physische LIS2-Prüfung bleibt getrennt. Die WPF-Referenz ist über Git-Commit `922ca1b` zugänglich; offene manuelle Prüfungen bleiben bestehen. Prioritäten stehen in [TODO](../../TODO.md).
 
 ## Quellengeprüftes WPF-Inventar
 

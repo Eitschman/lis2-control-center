@@ -1,7 +1,8 @@
 using System.Globalization;
 using System.IO.Ports;
-using System.Windows;
-using System.Windows.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
+using Avalonia.Controls;
 using LIS2.Core;
 
 namespace LIS2.ProtocolTester;
@@ -14,6 +15,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        VirtualModeCheckBox.IsCheckedChanged += VirtualModeChanged;
         RefreshPorts();
         Closed += MainWindow_Closed;
     }
@@ -43,13 +45,14 @@ public partial class MainWindow : Window
         Log($"INFO ports: {(ports.Length == 0 ? "<none>" : string.Join(", ", ports))}");
     }
 
-    private void VirtualModeChanged(object sender, RoutedEventArgs e)
+    private void VirtualModeChanged(object? sender, RoutedEventArgs e)
     {
         PortComboBox.IsEnabled = VirtualModeCheckBox.IsChecked != true;
     }
 
     private async void Connect_Click(object sender, RoutedEventArgs e)
     {
+        ErrorText.Text = string.Empty;
         try
         {
             if (_device?.IsConnected == true)
@@ -57,6 +60,8 @@ public partial class MainWindow : Window
                 await _device.DisposeAsync();
                 _device = null;
                 _transport = null;
+                VirtualModeCheckBox.IsEnabled = true;
+                PortComboBox.IsEnabled = VirtualModeCheckBox.IsChecked != true;
                 ConnectionStatus.Text = "Disconnected";
                 ConnectButton.Content = "Connect";
                 Log("INFO disconnected");
@@ -73,7 +78,7 @@ public partial class MainWindow : Window
             else
             {
                 if (PortComboBox.SelectedItem is not string portName)
-                    throw new InvalidOperationException("Select a COM port first.");
+                    throw new InvalidOperationException("Select a serial port first.");
 
                 _transport = new SerialLis2Transport(portName);
                 Log($"INFO using serial transport {portName} 19200 8N1; handshake=None; DTR=False; RTS=False");
@@ -86,6 +91,8 @@ public partial class MainWindow : Window
                 ? "Connected: Virtual LIS2"
                 : $"Connected: {PortComboBox.SelectedItem} @ 19200 8N1";
             ConnectButton.Content = "Disconnect";
+            VirtualModeCheckBox.IsEnabled = false;
+            PortComboBox.IsEnabled = false;
         }
         catch (Exception ex)
         {
@@ -98,6 +105,7 @@ public partial class MainWindow : Window
 
     private async void Clear_Click(object sender, RoutedEventArgs e)
     {
+        ErrorText.Text = string.Empty;
         try
         {
             await RequireDevice().ClearAsync();
@@ -111,9 +119,10 @@ public partial class MainWindow : Window
 
     private async void SendLine1_Click(object sender, RoutedEventArgs e)
     {
+        ErrorText.Text = string.Empty;
         try
         {
-            await RequireDevice().WriteLineAsync(1, Line1TextBox.Text);
+            await RequireDevice().WriteLineAsync(1, Line1TextBox.Text ?? string.Empty);
             Log($"CMD  Line1 \"{Line1TextBox.Text}\"");
         }
         catch (Exception ex)
@@ -124,9 +133,10 @@ public partial class MainWindow : Window
 
     private async void SendLine2_Click(object sender, RoutedEventArgs e)
     {
+        ErrorText.Text = string.Empty;
         try
         {
-            await RequireDevice().WriteLineAsync(2, Line2TextBox.Text);
+            await RequireDevice().WriteLineAsync(2, Line2TextBox.Text ?? string.Empty);
             Log($"CMD  Line2 \"{Line2TextBox.Text}\"");
         }
         catch (Exception ex)
@@ -137,6 +147,7 @@ public partial class MainWindow : Window
 
     private async void Brightness_Click(object sender, RoutedEventArgs e)
     {
+        ErrorText.Text = string.Empty;
         try
         {
             if (sender is not Button { Tag: string tag })
@@ -162,6 +173,7 @@ public partial class MainWindow : Window
 
     private async void SendFans_Click(object sender, RoutedEventArgs e)
     {
+        ErrorText.Text = string.Empty;
         try
         {
             var values = new[]
@@ -183,12 +195,13 @@ public partial class MainWindow : Window
 
     private async void ProgramCharacter_Click(object sender, RoutedEventArgs e)
     {
+        ErrorText.Text = string.Empty;
         try
         {
             if (!int.TryParse(CharacterSlotTextBox.Text, out var slot) || slot is < 1 or > 8)
                 throw new InvalidOperationException("Character slot must be between 1 and 8.");
 
-            var rowTokens = CharacterRowsTextBox.Text
+            var rowTokens = (CharacterRowsTextBox.Text ?? string.Empty)
                 .Split([' ', ',', ';', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
 
             if (rowTokens.Length != 8)
@@ -218,7 +231,7 @@ public partial class MainWindow : Window
         return _device;
     }
 
-    private static int ParsePercent(string text, string name)
+    private static int ParsePercent(string? text, string name)
     {
         if (!int.TryParse(text, out var value) || value is < 0 or > 100)
             throw new InvalidOperationException($"{name} must be between 0 and 100.");
@@ -232,14 +245,19 @@ public partial class MainWindow : Window
     private void ShowError(Exception ex)
     {
         Log($"ERR  {ex.Message}");
-        MessageBox.Show(this, ex.Message, "LIS2 Protocol Tester", MessageBoxButton.OK, MessageBoxImage.Error);
+        ErrorText.Text = ex.Message;
     }
 
     private void Log(string text)
     {
-        LogTextBox.AppendText($"[{DateTime.Now:HH:mm:ss.fff}] {text}{Environment.NewLine}");
-        LogTextBox.ScrollToEnd();
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(() => Log(text));
+            return;
+        }
+        LogTextBox.Text += $"[{DateTime.Now:HH:mm:ss.fff}] {text}{Environment.NewLine}";
+        LogTextBox.CaretIndex = LogTextBox.Text.Length;
     }
 
-    private void ClearLog_Click(object sender, RoutedEventArgs e) => LogTextBox.Clear();
+    private void ClearLog_Click(object sender, RoutedEventArgs e) => LogTextBox.Text = string.Empty;
 }

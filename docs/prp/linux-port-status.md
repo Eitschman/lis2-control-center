@@ -7,6 +7,14 @@ Codegrundlage: `a6a839f` auf `feature/linux-avalonia`, geprüft mit CI `39750384
 
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
+## WPF-Entfernung und Übernahme nach main
+
+Die Solution enthält die Avalonia-App, deren Tests und Runtime sowie den auf Avalonia portierten Protokolltester. Die vier bisher verlinkten Hilfekataloge liegen im Avalonia-Projekt. `UiTranslationCatalog` gehört zur gemeinsamen Oberfläche. Die vier virtuellen Ende-zu-Ende-Tests liegen im Display-Testprojekt; die WPF-spezifischen SettingsStore-Tests entfallen zusammen mit ihrem Implementierungsprojekt. Die vorhandenen Workspace-, Import- und Tokenspeicherungstests prüfen die Avalonia-Persistenz.
+
+`build.yml` verwendet denselben Paketbau wie der Branch. Der Tag-Workflow verwendet ebenfalls die geprüften Avalonia-Paketjobs, übergibt die Version und veröffentlicht Windows-/Linux-Archive, Debian-Pakete, Protokolltester und Winamp-Plug-in. Es wurde kein Release-Tag angelegt. Die Übernahme nach main erfolgt nach erfolgreichem Branch-CI-Lauf.
+
+Lokaler Nachweis: Windows-Solution Release-Build ohne Warnungen/Fehler; 605 Tests erfolgreich, ein Linux-Schlüsselbundtest unter Windows übersprungen. Anschließend bestehen acht Protokolltester-UI-Tests einschließlich aller vier Helligkeiten, fehlender Portauswahl, ungültiger Lüfter-/Glypheneingaben und Trennen. Der native Windows-Protokolltester besteht virtuelle Display-/Lüfter-/Glyphenbefehle, Eingabeprüfung und Trennen mit Exit 0. Die gerenderte Oberfläche wurde bei 920 × 720 und 820 × 640 sowie als natives Fenster angesehen. 13 Paketregressionen und actionlint bestehen. Die Release-Zusammenstellung wurde mit sieben Testartefakten einschließlich Prüfsummen sowie mit fehlendem Linux-Archiv und fehlendem Debian-Paket geprüft; die fehlenden Artefakte werden abgelehnt. Das sind isolierte Zusammenstellungsprüfungen, keine echte Tag-Veröffentlichung. CI-Nachweise werden nach dem Push ergänzt.
+
 ## Aktuelle Verifikation
 
 - Pi-Praxisnachweis vom Benutzer am 22.10.2026: **Raspberry Pi 5, 16 GB RAM, Debian GNU/Linux 13 Trixie, ARM64/aarch64, KDE Plasma 6.3.6, Wayland-Sitzung**. Die installierte Debian-Paketversion `lis2-control-center_0.0~ci622.1_arm64.deb` startet erfolgreich. [CI-Build 622](https://github.com/Eitschman/lis2-control-center/actions/runs/39748001109) ist über die GitHub-API dem Commit `c1b74ea` zugeordnet. Das ist ein Benutzer-Praxisnachweis des installierten Debian-Pakets auf dem echten Pi 5, kein Archivtest. DPI, tatsächlicher App-Displaybackend, Tray/Anmeldung, Live-Medien/HA, Keyring und physische LIS2-Ausgabe wurden mit dieser Rückmeldung nicht einzeln bestätigt. Weiterführende Desktopprüfungen übernimmt der Benutzer anhand von `docs/release.md`.
@@ -87,7 +95,7 @@ Lokalisierte Hilfedialoge wurden unter Windows mit Skia bei 840 × 600 Pixeln ge
 
 ## Verbindliche Grenzen und Weiterarbeit
 
-Eine gemeinsame Avalonia-Oberfläche bleibt das Ziel; WPF bleibt Referenz bis zur Paritätsabnahme. Der modale Variablenbrowser und eine ausdrücklich gewählte lokale Linux-AES-Speicherung sind genehmigt. Der automatische Tokenstore-Ausweichpfad entfällt. Weitere zusätzliche oder versteckte Bedienelemente gegenüber WPF bleiben im Paritätsaudit zu prüfen.
+App und Protokolltester verwenden Avalonia. Die Entfernung der WPF-Projekte und die anschließende Übernahme nach `main` sind ausdrücklich vom Benutzer beauftragt. Die WPF-Funktionsreferenz bleibt über Git-Commit `922ca1b` zugänglich. Der modale Variablenbrowser und eine ausdrücklich gewählte lokale Linux-AES-Speicherung sind genehmigt. Der automatische Tokenstore-Ausweichpfad entfällt. Weitere zusätzliche oder versteckte Bedienelemente gegenüber WPF bleiben im Paritätsaudit zu prüfen.
 
 Native Dateiauswahl, Tray-Menübedienung, OS-Abmeldung, DPI-/Theme-/Sprachmatrix, Live-HA-/Player-/Sensorintegration, extrahierter Paketstart, ARM64-Ausführung auf ARM64 und physische LIS2-Ausgabe sind durch den Smoke nicht nachgewiesen.
 

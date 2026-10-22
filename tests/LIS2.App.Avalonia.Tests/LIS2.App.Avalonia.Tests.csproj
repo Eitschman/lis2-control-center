@@ -12,6 +12,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <ProjectReference Include="../../src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj" />
+    <ProjectReference Include="../../tools/LIS2.ProtocolTester/LIS2.ProtocolTester.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />

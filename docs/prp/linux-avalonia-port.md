@@ -5,7 +5,7 @@ Implementierungsstand: PORT-06B; genaue Prüfnachweise im [Status](linux-port-st
 
 ## Ziel und verbindlicher Umfang
 
-Eine gemeinsame Avalonia-Anwendung ersetzt die WPF-Anwendung auf Windows x64 und unterstützt Linux x64 sowie Linux ARM64. Die vorhandene WPF-Anwendung ist während der Portierung die Referenz für Funktionen, Anordnung, Interaktionen, Einstellungen und Vorlagen. Sie bleibt bis zum nachgewiesenen Abgleich und zur Benutzerabnahme erhalten. Keine dauerhafte zweite Windows-Oberfläche und kein WPF-Runtime-Adapter.
+Eine gemeinsame Avalonia-Anwendung ersetzt die WPF-Anwendung auf Windows x64 und unterstützt Linux x64 sowie Linux ARM64. Die WPF-Funktionsreferenz für Funktionen, Anordnung, Interaktionen, Einstellungen und Vorlagen liegt im Git-Commit `922ca1b`. Der Benutzer beauftragt die Entfernung der WPF-Projekte und anschließend die Übernahme nach `main`. App und Protokolltester verwenden ausschließlich Avalonia; offene manuelle Desktop- und Hardwareprüfungen bleiben separat dokumentiert.
 
 Die zehn Hauptansichten bleiben Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics und Home Assistant. Windows behält Winamp und GSMTC; Linux erhält die passenden Sensor- und Medienanbieter. Home Assistant bleibt lesend. Eigene OctoPrint-, Plex- oder Docker-Datenquellen sind für bereits über HA verfügbare Werte nicht vorgesehen.
 
@@ -95,7 +95,7 @@ PORT-06A-Nachweis: Die Tests prüfen Snapshot → Spektrumvariable → Preset �
 - [x] Pakete `win-x64`, `linux-x64` und `linux-arm64` werden selbstständig veröffentlicht und mit SHA-256-Dateien hochgeladen.
 - [x] Extrahierte Pakete starten; ARM64 nativ ausführen und Laufzeitabhängigkeiten dokumentieren. CI-Nachweis `39750384348` zu `a6a839f`; manuelle Desktop-/Geräteabnahme bleibt getrennt.
 - [x] Support-/Lizenzstatus von .NET/Avalonia anhand offizieller Quellen geprüft; .NET-Supportende, Avalonia-Patchstand und fehlende Distributionshinweise in `release.md`/TODO festgehalten. Die nötigen Umstellungs- und Lizenzarbeiten sind dadurch nicht erledigt.
-- [ ] WPF-Projekt und WPF-Releasepfad erst nach Paritätsnachweis und Benutzerabnahme entfernen.
+- [x] WPF-App und deren Testprojekt auf Benutzerauftrag entfernen, Hilfetexte übernehmen und den Protokolltester auf Avalonia portieren. Solution und Releasepfad verwenden Avalonia. Übernahme- und CI-Nachweis stehen im Status.
 
 ## Sicherheits- und Abnahmeregeln
 

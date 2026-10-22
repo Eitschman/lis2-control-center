@@ -1,12 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <UseWPF>true</UseWPF>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>LIS2.ProtocolTester</AssemblyName>
     <RootNamespace>LIS2.ProtocolTester</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.6" />
     <PackageReference Include="System.IO.Ports" Version="8.0.0" />
     <ProjectReference Include="..\..\src\LIS2.Core\LIS2.Core.csproj" />
   </ItemGroup>

@@ -2,7 +2,7 @@
 
 ## Project status
 
-**LIS2 Control Center** steuert das **VL System L.I.S. 2** mit 20x2-VFD und vier Lüfterkanälen. Auf `feature/linux-avalonia` wird eine gemeinsame Windows-/Linux-App entwickelt. Die WPF-App bleibt bis zum Paritätsnachweis die Referenz.
+**LIS2 Control Center** steuert das **VL System L.I.S. 2** mit 20x2-VFD und vier Lüfterkanälen. Die gemeinsame Windows-/Linux-App und der Protokolltester verwenden Avalonia. WPF-Projekte sind aus dem Quellbaum entfernt; Git-Commit `922ca1b` ist die Funktionsreferenz für den dokumentierten Paritätsabgleich.
 
 - Repository: `Eitschman/lis2-control-center`
 - Zielplattformen: Windows x64, Linux x64 und Linux ARM64.
@@ -53,7 +53,6 @@ src/
   LIS2.WmpLegacy/
   LIS2.Runtime/
   LIS2.App.Avalonia/
-  LIS2.App/
 
 tests/
   LIS2.Core.Tests/
@@ -63,7 +62,6 @@ tests/
   LIS2.Winamp.Tests/
   LIS2.WindowsMedia.Tests/
   LIS2.WmpLegacy.Tests/
-  LIS2.App.Tests/
   LIS2.App.Avalonia.Tests/
 
 tools/

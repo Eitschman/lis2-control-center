@@ -1,23 +1,5 @@
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Media;
-
-namespace LIS2.App;
-
-public enum AppLanguageMode
-{
-    System,
-    English,
-    German,
-    French,
-    Turkish,
-    Russian
-}
-
-public static class LocalizationService
+namespace LIS2.App.Avalonia;
+internal static class UiTranslationCatalog
 {
     private static readonly Dictionary<string, Dictionary<string, string>> Translations =
         new(StringComparer.OrdinalIgnoreCase)
@@ -1073,187 +1055,57 @@ public static class LocalizationService
             }
         };
 
-    private sealed class OriginalValues
+    private static readonly Dictionary<string, string> NavigationAliases = new(StringComparer.Ordinal)
     {
-        public string? Text { get; set; }
-        public string? Content { get; set; }
-        public string? Header { get; set; }
-        public string? ToolTip { get; set; }
-        public bool TextCaptured { get; set; }
-        public bool ContentCaptured { get; set; }
-        public bool HeaderCaptured { get; set; }
-        public bool ToolTipCaptured { get; set; }
+        ["Genel Bakış"] = "Dashboard",
+        ["Обзор"] = "Dashboard",
+        ["Tableau de bord"] = "Dashboard",
+        ["Übersicht"] = "Dashboard"
+    };
+
+    // Build once: UI localization visits hundreds of controls on navigation and
+    // language changes. Scanning every language dictionary per label is expensive.
+    private static readonly HashSet<string> EnglishKeys = Translations.Values
+        .SelectMany(dictionary => dictionary.Keys)
+        .ToHashSet(StringComparer.Ordinal);
+
+    private static readonly Dictionary<string, string> EnglishByTranslation = BuildReverseCatalog();
+
+    private static Dictionary<string, string> BuildReverseCatalog()
+    {
+        var reverse = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var dictionary in Translations.Values)
+            foreach (var pair in dictionary)
+                reverse.TryAdd(pair.Value, pair.Key);
+        return reverse;
     }
 
-    private static readonly ConditionalWeakTable<DependencyObject, OriginalValues> Originals = new();
-
-    private static AppLanguageMode _mode = AppLanguageMode.System;
-    private static string _languageCode = "en";
-
-    public static AppLanguageMode Mode => _mode;
-    public static string LanguageCode => _languageCode;
-    public static event EventHandler? LanguageChanged;
-
-    public static void Apply(AppLanguageMode mode)
+    internal static string FindEnglishSource(string value)
     {
-        _mode = mode;
-        _languageCode = ResolveLanguageCode(mode);
-        LanguageChanged?.Invoke(null, EventArgs.Empty);
+        if (string.IsNullOrEmpty(value)) return value;
+        if (NavigationAliases.TryGetValue(value, out var navigationKey))
+            return navigationKey;
+        // Never mistake an English catalog key for a translation that happens
+        // to have the same spelling in another language.
+        if (EnglishKeys.Contains(value)) return value;
+        return EnglishByTranslation.TryGetValue(value, out var source) ? source : value;
     }
 
-    public static string Translate(string english)
+    internal static bool HasTranslation(string source, string language) =>
+        Translations.TryGetValue(language, out var dictionary) && dictionary.ContainsKey(source);
+
+    internal static string Translate(string value, string language)
     {
-        if (string.IsNullOrEmpty(english) || _languageCode == "en")
-            return english;
-
-        return Translations.TryGetValue(_languageCode, out var language) &&
-               language.TryGetValue(english, out var translated)
-            ? translated
-            : english;
-    }
-
-    public static string Format(string english, params object?[] args) =>
-        string.Format(CultureInfo.CurrentCulture, Translate(english), args);
-
-    public static void ApplyTo(DependencyObject root)
-    {
-        ArgumentNullException.ThrowIfNull(root);
-
-        var visited = new HashSet<DependencyObject>(ReferenceEqualityComparer.Instance);
-        ApplyTo(root, visited);
-    }
-
-    private static void ApplyTo(
-        DependencyObject root,
-        HashSet<DependencyObject> visited)
-    {
-        if (!visited.Add(root))
-            return;
-
-        var originals = Originals.GetOrCreateValue(root);
-
-        if (root is TextBlock textBlock &&
-            !BindingOperations.IsDataBound(textBlock, TextBlock.TextProperty))
+        if (string.IsNullOrEmpty(value)) return value;
+        var source = FindEnglishSource(value);
+        if (language == "en" || !Translations.TryGetValue(language, out var dictionary)) return source;
+        if (dictionary.TryGetValue(source, out var translated)) return translated;
+        foreach (var pair in dictionary)
         {
-            if (!originals.TextCaptured)
-            {
-                originals.Text = FindEnglishSource(textBlock.Text);
-                originals.TextCaptured = true;
-            }
-
-            textBlock.Text = TranslateKnown(originals.Text ?? string.Empty);
+            if (source.EndsWith(pair.Key, StringComparison.Ordinal) &&
+                source[..^pair.Key.Length].All(c => !char.IsLetterOrDigit(c)))
+                return source[..^pair.Key.Length] + pair.Value;
         }
-
-        if (root is ContentControl contentControl &&
-            !BindingOperations.IsDataBound(contentControl, ContentControl.ContentProperty) &&
-            contentControl.Content is string content)
-        {
-            if (!originals.ContentCaptured)
-            {
-                originals.Content = FindEnglishSource(content);
-                originals.ContentCaptured = true;
-            }
-
-            contentControl.Content = TranslateKnown(originals.Content ?? string.Empty);
-        }
-
-        if (root is HeaderedContentControl headered &&
-            !BindingOperations.IsDataBound(headered, HeaderedContentControl.HeaderProperty) &&
-            headered.Header is string header)
-        {
-            if (!originals.HeaderCaptured)
-            {
-                originals.Header = FindEnglishSource(header);
-                originals.HeaderCaptured = true;
-            }
-
-            headered.Header = TranslateKnown(originals.Header ?? string.Empty);
-        }
-
-        if (root is FrameworkElement element &&
-            !BindingOperations.IsDataBound(element, FrameworkElement.ToolTipProperty) &&
-            element.ToolTip is string tooltip)
-        {
-            if (!originals.ToolTipCaptured)
-            {
-                originals.ToolTip = FindEnglishSource(tooltip);
-                originals.ToolTipCaptured = true;
-            }
-
-            element.ToolTip = TranslateKnown(originals.ToolTip ?? string.Empty);
-        }
-
-        // WPF only materializes the visual content of the selected TabItem.
-        // Walk logical Content explicitly so controls on every page are localized,
-        // not only the currently visible page.
-        if (root is ContentControl { Content: DependencyObject contentObject })
-            ApplyTo(contentObject, visited);
-
-        if (root is HeaderedContentControl { Header: DependencyObject headerObject })
-            ApplyTo(headerObject, visited);
-
-        if (root is ItemsControl itemsControl)
-        {
-            foreach (var item in itemsControl.Items.OfType<DependencyObject>())
-                ApplyTo(item, visited);
-        }
-
-        var count = VisualTreeHelper.GetChildrenCount(root);
-        for (var index = 0; index < count; index++)
-            ApplyTo(VisualTreeHelper.GetChild(root, index), visited);
-    }
-
-    private static string TranslateKnown(string value)
-    {
-        var english = FindEnglishSource(value);
-
-        if (!string.Equals(english, value, StringComparison.Ordinal))
-            return Translate(english);
-
-        foreach (var language in Translations.Values)
-        {
-            foreach (var pair in language)
-            {
-                if (value.EndsWith(pair.Key, StringComparison.Ordinal))
-                {
-                    var prefix = value[..^pair.Key.Length];
-                    if (prefix.All(ch => !char.IsLetterOrDigit(ch)))
-                        return prefix + Translate(pair.Key);
-                }
-            }
-        }
-
-        return Translate(value);
-    }
-
-    private static string FindEnglishSource(string value)
-    {
-        foreach (var language in Translations.Values)
-        {
-            foreach (var pair in language)
-            {
-                if (string.Equals(pair.Value, value, StringComparison.Ordinal))
-                    return pair.Key;
-            }
-        }
-
-        return value;
-    }
-
-    private static string ResolveLanguageCode(AppLanguageMode mode) =>
-        mode switch
-        {
-            AppLanguageMode.English => "en",
-            AppLanguageMode.German => "de",
-            AppLanguageMode.French => "fr",
-            AppLanguageMode.Turkish => "tr",
-            AppLanguageMode.Russian => "ru",
-            _ => ResolveSystemLanguage()
-        };
-
-    private static string ResolveSystemLanguage()
-    {
-        var code = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToLowerInvariant();
-        return code is "de" or "fr" or "tr" or "ru" ? code : "en";
+        return source;
     }
 }

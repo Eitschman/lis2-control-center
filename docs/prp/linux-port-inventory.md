@@ -5,16 +5,17 @@ Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Ko
 
 ## Umfang und Projekte
 
-Der mit `rg --files` ermittelte Quellbestand unter `src`, `tests`, `tools` und `native` umfasst 312 Dateien, darunter 260 C#-Dateien und 22 C#-Projektdateien. Es gibt neun Testprojekte. Das Avalonia-Testprojekt enthält 54 `*Tests.cs`-Dateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
+Der mit `rg --files` ermittelte Quellbestand unter `src`, `tests`, `tools` und `native` umfasst 269 Dateien, darunter 228 C#-Dateien und 20 C#-Projektdateien. Es gibt acht Testprojekte. Dateizahlen ändern sich mit den gepflegten Quell- und Testdateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
 
 | Gruppe | Projekte | Target |
 | --- | --- | --- |
 | Portable Bibliotheken | Core, Display, Fans, Sources, Winamp, WmpLegacy, Runtime | `net8.0` |
 | Gemeinsame Desktop-App | App.Avalonia | `net8.0`, Avalonia 11.3.6 |
-| Windows-Referenz und Anbieter | App, WindowsMedia | Geerbtes `net8.0-windows10.0.19041.0` |
+| Windows-Anbieter | WindowsMedia | Geerbtes `net8.0-windows10.0.19041.0` |
 | Portable Testprojekte | Core.Tests, Display.Tests, Fans.Tests, App.Avalonia.Tests | `net8.0` |
-| Windows-Testprojekte | App.Tests, Sources.Tests, Winamp.Tests, WindowsMedia.Tests, WmpLegacy.Tests | Geerbtes Windows-Target |
-| Tools | ProtocolTester, WinampSimulator, WmpLegacySimulator | Geerbtes Windows-Target |
+| Windows-Testprojekte | Sources.Tests, Winamp.Tests, WindowsMedia.Tests, WmpLegacy.Tests | Geerbtes Windows-Target |
+| Portables Tool | ProtocolTester | `net8.0`, Avalonia 11.3.6 |
+| Windows-Simulatoren | WinampSimulator, WmpLegacySimulator | Geerbtes Windows-Target |
 
 `Directory.Build.props` setzt Nullable, implizite Usings, Warnings-as-errors und das Windows-Target. Portable Projekte überschreiben ihr Target ausdrücklich. `LIS2.Sources` und `LIS2.App.Avalonia` referenzieren LibreHardwareMonitorLib 0.9.6. Der direkte Windows-Provider bleibt hinter einer OS-Auswahl; Paketabhängigkeit allein ist kein Linux-Runtime-Nachweis.
 
@@ -34,7 +35,7 @@ Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin`
 | Geheimnisse | PortableHaTokenStore, LegacyHaTokenStore; DPAPI, secret-tool und ausdrücklich gewählter lokaler Linux-AES-Dateipfad |
 | Hardware | LinuxSystemSensors/LinuxHwmonFanSensors, WindowsHardwareFanSensors, HardwareSensorCatalog und HardwareDisplayPresetBuilder |
 | Medien | MainWindow.Media, WindowsMediaBridge, WindowsMediaSmoke und LinuxMprisSource; aktive Windows-Quellen Winamp/WindowsMedia; gespeicherte Linux-Playerauswahl und Spielposition; Legacy unbenutzt |
-| Hilfe/Sprachen | HelpReferenceCatalog mit eigenem HelpReferenceLocalization-Katalog für fünf Sprachen, MainWindow.HelpAbout, UiTranslations/UiMessage, WpfTranslationCatalog, Settings-/UI-/Browser-Lokalisierung und sprachabhängige Statusmeldungen |
+| Hilfe/Sprachen | HelpReferenceCatalog mit eigenem HelpReferenceLocalization-Katalog für fünf Sprachen, MainWindow.HelpAbout, UiTranslations/UiMessage, UiTranslationCatalog, Settings-/UI-/Browser-Lokalisierung und sprachabhängige Statusmeldungen |
 
 Die `IPlatform*`-Verträge haben derzeit keine entsprechenden Adapterimplementierungen. UI-unabhängige Schleifen bestehen neben weiterer Orchestrierung in den MainWindow-Dateien.
 
@@ -95,6 +96,6 @@ Avalonia-Testgruppen:
 
 ## Referenzen
 
-Die WPF-Referenz bleibt in `src/LIS2.App`, einschließlich MainWindow, UI-Regression, HelpWindow, AboutWindow, Themes, SettingsStore und Plattformdiensten. Das [Paritätsaudit](wpf-avalonia-parity-audit.md) enthält das quellengeprüfte Inventar der 126 benannten WPF-Tab-Controls und 71 tabbezogenen XAML-Handlerverwendungen sowie den aktuellen Avalonia-Abgleich.
+App und Protokolltester verwenden Avalonia. Die WPF-Referenz ist über Git-Commit `922ca1b` zugänglich. Das [Paritätsaudit](wpf-avalonia-parity-audit.md) enthält das quellengeprüfte Inventar der 126 benannten WPF-Tab-Controls und 71 tabbezogenen XAML-Handlerverwendungen sowie den aktuellen Avalonia-Abgleich.
 
 Protokollunsicherheiten werden ausschließlich in [protocol.md](../protocol.md) und [reverse-engineering.md](../reverse-engineering.md) gepflegt. Nächste Implementierungsschritte stehen in [TODO](../../TODO.md).
