@@ -1,9 +1,74 @@
-# TODO: Avalonia-Portierung
+# TODO: Projektroadmap und Restarbeiten
 
 Stand: 22.10.2026. Hauptbranch: `main`.
 Implementierungsstand: PORT-08 mit Avalonia 11.3.22 und .NET 10. Windows Media Player Legacy ist zusätzlich über Hintergrund- und Visualisierungs-Plug-in angebunden. Aktuelle Prüfergebnisse und offene Zielsystemnachweise stehen im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
+
+## Roadmap: Weiterentwicklung nach v0.1.3
+
+Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nicht implementiert. Die Reihenfolge priorisiert Update-Hinweise und Debian-Verteilung, danach die Unterstützung bei Seitenkonfiguration und Fehlersuche. Der automatische Windows-Dateiaustausch bleibt ein eigenes Arbeitspaket. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
+
+### ROAD-01: Update-Hinweise
+
+- [ ] Neue Versionen erkennen und die installierte Version mit der verfügbaren Version anzeigen.
+- [ ] Versionshinweise und den zur Plattform beziehungsweise Installationsart passenden Download anbieten.
+- [ ] Automatische Update-Prüfung abschaltbar machen; manuelle Prüfung anbieten.
+- [ ] Portable Linux-Pakete zunächst durch Hinweis und passenden Download unterstützen.
+- [ ] Vertrauensmodell und Verifikation für Updateinformationen und heruntergeladene Pakete festlegen und prüfen; fehlgeschlagene Prüfungen verhindern die Installation.
+
+### ROAD-02: APT-Repository für Debian-Pakete
+
+- [ ] Ein signiertes APT-Repository für amd64 und arm64 einrichten und den Veröffentlichungsworkflow anbinden.
+- [ ] Einrichtung, Signaturschlüssel und Aktualisierung über die Paketverwaltung dokumentieren.
+- [ ] Debian-Installationen über die Paketverwaltung aktualisieren; die Anwendung darf deren Dateien nicht selbst ersetzen.
+- [ ] Installation und Upgrade einschließlich Erhalt der Benutzerdaten auf beiden Architekturen prüfen.
+
+### ROAD-03: Vorlagenprüfung im Seiteneditor
+
+- [ ] Unbekannte Variablen, ungültige Formatierungen und fehlende Glyphen direkt am betroffenen Ausdruck markieren.
+- [ ] Fehlerhafte Ausdrücke von gültigen, aber aktuell nicht verfügbaren Quellen unterscheiden.
+- [ ] Korrektur und anschließende Vorschau mit gültigen, fehlerhaften und vorübergehend fehlenden Quelldaten prüfen.
+
+### ROAD-04: Datenaktualität anzeigen
+
+- [ ] Bei Sensoren, Home Assistant und Medien den Zeitpunkt beziehungsweise das Alter der letzten gültigen Daten anzeigen.
+- [ ] Veraltete Daten, Verbindungsverlust und Wiederverbindung erkennbar darstellen.
+- [ ] Zeitablauf und Wiederherstellung für die unterschiedlichen Quelltypen prüfen.
+
+### ROAD-05: Automatische Windows-Updates
+
+- [ ] Das portable Windows-Paket über einen separaten Updateprozess aktualisieren: verifiziert herunterladen, Anwendung geordnet beenden, Dateien austauschen und neu starten.
+- [ ] Laufende Display- und Lüfterausgaben vor dem Austausch geordnet beenden; geltende Regeln zur seriellen Freigabe beim Neustart erhalten.
+- [ ] Wiederherstellung der vorherigen Version bei fehlgeschlagenem Update vorsehen und mit gezielt unterbrochenen Updates prüfen.
+- [ ] Dateisperren, fehlende Schreibrechte und fehlgeschlagenen Neustart prüfen; Fehler sichtbar melden.
+- [ ] Automatische Installation als eigene Einstellung behandeln; eine aktivierte Versionsprüfung allein erlaubt noch keine Installation.
+
+### ROAD-06: Sensor- und Lüfterverlauf
+
+- [ ] Temperatur, Sollwert und tatsächliche Lüfterdrehzahl über einen gemeinsamen Zeitraum darstellen.
+- [ ] Die Verlaufssicht zur Einstellung von Lüfterkurven nutzbar machen; Messlücken und nicht verfügbare Drehzahlsensoren kenntlich machen.
+- [ ] Aufbewahrung und Speicherbedarf begrenzen; konkrete Dauer und Persistenz vor der Umsetzung festlegen.
+
+### ROAD-07: Gezielter Verbindungstest
+
+- [ ] Für die ausgewählte Quelle die Verbindungsschritte einzeln prüfen und den fehlgeschlagenen Schritt benennen, etwa HA-Anmeldung, Medien-Pipe oder serieller Port.
+- [ ] Ergebnisse mit konkreten Fehlermeldungen und passenden Handlungsmöglichkeiten anzeigen; Zugangsdaten nicht ausgeben.
+- [ ] Serielle Tests ohne unbekannte Protokollkommandos und ohne ungefragt aktivierte Lüfterausgabe gestalten.
+- [ ] Erfolgreiche Verbindung, fehlende Voraussetzungen und Verbindungsfehler gezielt prüfen.
+
+### ROAD-08: Virtueller Testlauf für Seiten
+
+- [ ] Eine Seitenfolge mit gezielt veränderbaren Testwerten durchspielen.
+- [ ] Sichtbarkeitsbedingungen, Scrolling und Ereignisse einschließlich Prioritäten und Ablaufzeiten einbeziehen.
+- [ ] Testwerte und virtuellen Betrieb eindeutig anzeigen; Testwerte dürfen keine echte Quelle oder Geräteausgabe unbemerkt ersetzen.
+- [ ] Den Ablauf vom eingestellten Testwert bis zur sichtbaren virtuellen Displayausgabe prüfen.
+
+### ROAD-09: Benachrichtigungen bei relevanten Ausfällen
+
+- [ ] Konfigurierbare Benachrichtigungen für Geräteverlust und aktivierte Lüfter-Fail-safe-Regelung ergänzen.
+- [ ] Wiederholungen zusammenfassen und Meldungsfluten verhindern; Wiederherstellung des Zustands berücksichtigen.
+- [ ] Ausfall, anhaltenden Fehler, Wiederverbindung und deaktivierte Benachrichtigungen prüfen.
 
 ## Vorhandene Basis
 
