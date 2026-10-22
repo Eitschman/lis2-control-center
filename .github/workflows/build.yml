@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/linux-portable.yml
 
   wmp-legacy-plugin:
-    if: github.repository == 'disabled/WMP-Legacy' # Legacy-Plug-ins bleiben außerhalb des Produktumfangs.
+    if: ${{ false }} # Legacy-Plug-ins bleiben außerhalb des Produktumfangs.
     name: WMP Legacy plugin ${{ matrix.arch }}
     runs-on: windows-latest
 
@@ -67,7 +67,7 @@ jobs:
 
 
   wmp-legacy-visualization:
-    if: github.repository == 'disabled/WMP-Legacy' # Legacy-Plug-ins bleiben außerhalb des Produktumfangs.
+    if: ${{ false }} # Legacy-Plug-ins bleiben außerhalb des Produktumfangs.
     name: WMP Legacy visualization ${{ matrix.arch }}
     runs-on: windows-latest
 

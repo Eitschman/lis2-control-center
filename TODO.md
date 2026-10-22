@@ -148,7 +148,7 @@ Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standa
 - [ ] Windows-Runtimepatch angleichen: geprüfte Pakete enthalten Windows .NET 8.0.31 gegenüber Linux 8.0.32.
 - [ ] Lizenztexte/Fremdkomponentenhinweise und nötige Quellverweise zu den tatsächlich verteilten NuGet-Paketen in Archive und Debian-Pakete aufnehmen; MPL-2.0-Pakete, HidSharp und Mono.Posix gesondert abgleichen.
 - [x] Hauptbranch- und Tag-Workflows auf denselben Avalonia-Paketbau umstellen. Tag-Version an App, Protokolltester und Debian-Pakete übergeben; kein Release-Tag angelegt.
-- [ ] Main-Übernahme und ersten gemeinsamen CI-Lauf nachweisen.
+- [x] Geprüfte Avalonia-Quellbasis nach `main` übernehmen und den gemeinsamen Buildworkflow verwenden. Commitbezogene Prüfläufe sind im [Main-Buildworkflow](https://github.com/Eitschman/lis2-control-center/actions/workflows/build.yml?query=branch%3Amain) einzusehen.
 
 ## Physische Validierung, getrennt von Softwarepaketen
 
