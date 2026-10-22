@@ -5,6 +5,20 @@ internal static class UiTranslations
 {
     private static readonly IReadOnlyDictionary<string, string[]> Texts = new Dictionary<string, string[]>(StringComparer.Ordinal)
     {
+        ["Changed"] = ["Geändert", "Modifié", "Değiştirildi", "Изменено"],
+        ["Saving…"] = ["Speichern…", "Enregistrement…", "Kaydediliyor…", "Сохранение…"],
+        ["Saved"] = ["Gespeichert", "Enregistré", "Kaydedildi", "Сохранено"],
+        ["Save failed: {0}"] = ["Speichern fehlgeschlagen: {0}", "Échec de l’enregistrement : {0}", "Kaydetme başarısız: {0}", "Ошибка сохранения: {0}"],
+        ["Saved and sent to display."] = ["Gespeichert und an das Display gesendet.", "Enregistré et envoyé à l’écran.", "Kaydedildi ve ekrana gönderildi.", "Сохранено и отправлено на дисплей."],
+        ["Saved; sending to display failed or is busy."] = ["Gespeichert; Senden an das Display fehlgeschlagen oder beschäftigt.", "Enregistré ; envoi à l’écran impossible ou occupé.", "Kaydedildi; ekrana gönderme başarısız veya meşgul.", "Сохранено; отправка на дисплей не удалась или занята."],
+        ["Use selected variable"] = ["Ausgewählte Variable übernehmen", "Utiliser la variable sélectionnée", "Seçili değişkeni kullan", "Использовать выбранную переменную"],
+        ["Linux system sensors"] = ["Linux-Systemsensoren", "Capteurs système Linux", "Linux sistem sensörleri", "Системные датчики Linux"],
+        ["Windows hardware sensors"] = ["Windows-Hardwaresensoren", "Capteurs matériels Windows", "Windows donanım sensörleri", "Аппаратные датчики Windows"],
+        ["Test tools"] = ["Prüfwerkzeuge", "Outils de test", "Test araçları", "Средства проверки"],
+        ["Curve points"] = ["Kurvenpunkte", "Points de courbe", "Eğri noktaları", "Точки кривой"],
+        ["Apply point"] = ["Punkt übernehmen", "Appliquer le point", "Noktayı uygula", "Применить точку"],
+        ["Error log"] = ["Fehlerprotokoll", "Journal des erreurs", "Hata günlüğü", "Журнал ошибок"],
+        ["Named pipe: {0} · Last update: {1}"] = ["Named Pipe: {0} · Letzte Aktualisierung: {1}", "Canal nommé : {0} · Dernière mise à jour : {1}", "Adlandırılmış kanal: {0} · Son güncelleme: {1}", "Именованный канал: {0} · Обновление: {1}"],
         ["Desktop startup"] = ["Desktopstart", "Démarrage du bureau", "Masaüstü başlangıcı", "Запуск с рабочим столом"],
         ["Start LIS2 Control Center at login (minimized)"] = ["LIS2 Control Center bei der Anmeldung minimiert starten", "Démarrer LIS2 Control Center à la connexion (réduit)", "Oturum açıldığında LIS2 Control Center’ı simge durumunda başlat", "Запускать LIS2 Control Center при входе (свёрнутым)"],
         ["Desktop startup enabled."] = ["Desktopstart aktiviert.", "Démarrage du bureau activé.", "Masaüstü başlangıcı etkin.", "Запуск с рабочим столом включён."],

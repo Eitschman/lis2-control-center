@@ -19,9 +19,21 @@ public partial class MainWindow
     private readonly Dictionary<string, string> _mediaErrors = new();
     private string? _selectedMediaPlayer;
     private bool _updatingMediaPlayers;
+    private readonly ProgressBar[] _winampSpectrumBars = new ProgressBar[20];
 
     private void InitializeMedia()
     {
+        var spectrum = this.FindControl<Grid>("WinampSpectrumBars")!;
+        spectrum.ColumnDefinitions = new ColumnDefinitions(string.Join(",", Enumerable.Repeat("*", 20)));
+        for (var index = 0; index < _winampSpectrumBars.Length; index++)
+        {
+            var bar = new ProgressBar { Maximum = 255, Orientation = global::Avalonia.Layout.Orientation.Vertical,
+                MinHeight = 0, Height = 70,
+                HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch };
+            Grid.SetColumn(bar, index);
+            spectrum.Children.Add(bar);
+            _winampSpectrumBars[index] = bar;
+        }
         this.FindControl<Border>("LinuxMediaCard")!.IsVisible = OperatingSystem.IsLinux();
         this.FindControl<Border>("WinampMediaCard")!.IsVisible = OperatingSystem.IsWindows();
         this.FindControl<Border>("WindowsMediaCard")!.IsVisible = OperatingSystem.IsWindows();
@@ -132,12 +144,14 @@ public partial class MainWindow
     {
         var values = _windowsMedia.Values;
         _pageSources.UpdateMedia("WindowsMedia", values);
-        string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
+        var connected = values.GetValueOrDefault("Connected") is true;
+        string Read(string key) => (connected || key == "Connected") && values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
         SetUiText("WindowsMediaStatus", Read("Connected") == "True" ? "Connected" : "Disconnected");
         this.FindControl<TextBlock>("WindowsMediaTitle")!.Text = Read("Title");
         this.FindControl<TextBlock>("WindowsMediaArtist")!.Text = Read("Artist");
         this.FindControl<TextBlock>("WindowsMediaAlbum")!.Text = Read("Album");
         SetUiText("WindowsMediaPlayback", Read("State"));
+        this.FindControl<TextBlock>("WindowsMediaSource")!.Text = Read("SourceAppUserModelId");
         this.FindControl<TextBlock>("WindowsMediaTime")!.Text = Read("Elapsed") + " / " + Read("Duration");
     }
 
@@ -213,11 +227,12 @@ public partial class MainWindow
         }
     }
 
-    private void RefreshMediaSource(string id, IReadOnlyDictionary<string, object?> values)
+    internal void RefreshMediaSource(string id, IReadOnlyDictionary<string, object?> values)
     {
         _pageSources.UpdateMedia(id, values);
         var prefix = "WinampMedia";
-        string Read(string key) => values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
+        var connected = values.GetValueOrDefault("Connected") is true;
+        string Read(string key) => (connected || key == "Connected") && values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
         SetUiText(prefix + "Status", Read("Connected") == "True" ? "Connected" : "Disconnected");
         SetUiText(prefix + "Title", string.IsNullOrWhiteSpace(Read("Title")) ? "Nothing playing" : (UiMessage)$"{Read("Title")}");
         this.FindControl<TextBlock>(prefix + "Artist")!.Text = Read("Artist");
@@ -233,6 +248,16 @@ public partial class MainWindow
                 FormatValue("BitrateKbps") + " kbps / " + FormatValue("SampleRateHz") + " Hz";
         }
         SetUiText(prefix + "Telemetry", $"VU: {Read("Vu")}  Spectrum: {Read("Spectrum")}");
+        int Level(string key) => connected && values.GetValueOrDefault(key) is int value ? Math.Clamp(value, 0, 255) : 0;
+        this.FindControl<ProgressBar>("WinampVuLeft")!.Value = Level("VuLeft");
+        this.FindControl<ProgressBar>("WinampVuRight")!.Value = Level("VuRight");
+        this.FindControl<TextBlock>("WinampVuLeftValue")!.Text = connected ? Level("VuLeft").ToString() : "-";
+        this.FindControl<TextBlock>("WinampVuRightValue")!.Text = connected ? Level("VuRight").ToString() : "-";
+        var levels = connected && values.GetValueOrDefault("SpectrumRaw") is IReadOnlyList<int> raw ? raw : [];
+        var maximum = levels.Take(20).DefaultIfEmpty().Max() <= 15 ? 15d : 255d;
+        for (var index = 0; index < 20; index++)
+            _winampSpectrumBars[index].Value = index < levels.Count ? Math.Clamp(levels[index], 0, (int)maximum) / maximum * 255 : 0;
+        SetUiText("WinampMediaConnection", $"Named pipe: {(UiMessage)@"\\.\pipe\LIS2ControlCenter.Winamp"} · Last update: {(UiMessage)(_mediaWinamp.LastSnapshotAt?.ToLocalTime().ToString("HH:mm:ss") ?? "-")}");
     }
 
     private static UiMessage MediaErrorMessage(string provider, Exception exception) =>

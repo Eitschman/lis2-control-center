@@ -1,6 +1,6 @@
 # PRP: LIS2 Control Center mit Avalonia
 
-Stand: 21.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
+Stand: 22.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
 Implementierungsstand: PORT-06; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
@@ -19,7 +19,7 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal bestehen 416 Avalonia-Tests; der zusätzliche Linux-Schlüsselbundtest ist unter Windows übersprungen. HA-Verbindungsabläufe verwenden einen lokalen WebSocket-Protokollpartner. Linux-CI führt die Suite mit isoliertem echtem Secret Service aus; der aktuelle Nachweis steht im [Status](linux-port-status.md). Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu.
+Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal bestehen 439 Avalonia-Tests; der zusätzliche Linux-Schlüsselbundtest ist unter Windows übersprungen. HA-Verbindungsabläufe verwenden einen lokalen WebSocket-Protokollpartner. Linux-CI führt die Suite mit isoliertem echtem Secret Service aus; der aktuelle Nachweis steht im [Status](linux-port-status.md). Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu.
 
 ## Implementierungsstand
 
@@ -28,8 +28,8 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Bereich | Stand | Offener Umfang |
 | --- | --- | --- |
 | Projektstruktur | Avalonia 11.3.6, .NET 8, portable Bibliotheken und `LIS2.Runtime` vorhanden | Plattformverträge sind noch nicht durchgängig angebunden; UI-Code enthält weitere Orchestrierung |
-| Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen; gemeinsame Geräteaktionen und differenzielle Spannen am angewendeten Transport | PORT-06A: Winamp-Spektrumvariable und Glyphenvorschau korrigieren; physische Ausgabe offen |
-| Seiteneditor | Seitenpflege, Vorlagen, Bedingungen, Presets, animierte Vorschau, Variablenbrowser, validierter JSON-Import/-Export und gemeinsamer Entwurfsschutz für Quellenaktionen vorhanden | PORT-06A: gespeicherte Bedingungen in Builderfelder übernehmen, Variablenauswahl anbinden, Presets vereinheitlichen |
+| Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen; gemeinsame Geräteaktionen und differenzielle Spannen am angewendeten Transport | Spektrumvariable und Glyphenvorschau mit virtueller Ausgabe geprüft; physische Ausgabe offen |
+| Seiteneditor | Seitenpflege, Vorlagen, Bedingungen, Presets, animierte Vorschau, Variablenbrowser, validierter JSON-Import/-Export und gemeinsamer Entwurfsschutz für Quellenaktionen vorhanden | Bedingungsfelder und Variablenbrowser angebunden; gemeinsame Hardware- und plattformgerechte Medienpresets geprüft |
 | Glyphen | Acht 5x8-Slots, Dateien, Namen, Spektrumset und Ersetzungsdialog vorhanden | Physische Zeichenprüfung und UI-/Transportabgleich offen |
 | Sensoren | LibreHardwareMonitor auf Windows; procfs/sysfs/hwmon auf Linux; Aliase, Favoriten und fehlende Sensoren berücksichtigt | Stabile Identitäten und Rechte auf Zielsystemen prüfen |
 | Lüfter | Vier Modi plus Off, Kurven, Hysterese, Fail-safe, Simulation, freizugebende serielle Regelung und Dashboard-Handausgabe mit Kanalgrenzen | Weitere WPF-Interaktionen abgleichen; Hardware bleibt ungeprüft |
@@ -37,7 +37,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Home Assistant | WebSocket-Quelle, Reconnect und Stop, Entitäten, Attributwerte, wirksame Aliase, Favoriten und Seitenaktionen; ausdrückliche lokale Linux-Tokenauswahl | Reale HA-Instanz und Desktop-Schlüsselbund auf Zielsystemen prüfen |
 | Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache, Windows-/Linux-Tray und plattformeigener Autostart | Nativer Dateidialog, Tray-Bedienung und Anmeldung auf Zielsystemen offen |
 | Hilfe und About | Kontextbezogene Hilfe mit zehn Themen in fünf Sprachen, Live-Schlüsseln, statischen Variablenbeschreibungen und numerischen/benannten Glyphen; F1 und Hilfe am Titel; About folgt der Sprache | Native Desktop-Bedienung und Benutzerabnahme offen |
-| Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Export mit zeitgestempeltem Anwendungs-/Transportjournal | PORT-06A: WPF-Diagnosefelder und Start-/Absturzfehlerdatei ergänzen; nativen Dateidialog prüfen |
+| Diagnose | Zustandsübersicht, virtuelle Zustände, dekodierte Historie und Export mit zeitgestempeltem Anwendungs-/Transportjournal | Version, UTC, Transport/Port, Frame, Quellen-/Lüfterdetails und Start-/Absturzdatei vorhanden; nativen Dateidialog prüfen |
 | CI und Pakete | Windows-/Ubuntu-Builds, vier Testprojekte je OS, nativer Desktop-Smoke und drei selbstständige Pakete mit Prüfsummen | Archivstart und echte ARM64-Ausführung fehlen |
 
 ## Prüffähige Checkliste
@@ -74,9 +74,9 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 
 ### Oberfläche und Verifikation
 
-Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. Statische Texte, Formatargumente und unveränderte Nutzdaten werden automatisiert geprüft; die Sichtprüfung und Plattformgrenzen stehen im Status. HA-Verbindung, Attribute, Aliase und Tokenspeicherung sind in PORT-05 mit isolierten Daten geprüft; reale HA-/Playernachweise bleiben offen. Nächstes Paket ist **PORT-06A: Paritätskorrekturen und Bedienung** gemäß [TODO](../../TODO.md). Der direkte Abgleich mit `origin/main` (`922ca1b`) zeigt trotz vorhandener Ansichten konkrete Funktions- und Bedienlücken; Quellstellen stehen im [Paritätsaudit](wpf-avalonia-parity-audit.md#direkter-main-abgleich-und-nächstes-paket-port-06a).
+Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. PORT-06A ergänzt Spektrum-/Glyphenvorschau, den Bedingungsbrowser, Sensorauswahl, grafische Medienpegel, Diagnosefelder, Speicherrückmeldungen und konsistente Presets. Das klickbare Pixelraster und die Kurvenpunktbearbeitung verwenden dieselben Textformate; Temperaturen bleiben präzise. Hilfe und fünf Sprachkataloge beschreiben diese Bedienung. Die Sichtprüfung und Plattformgrenzen stehen im [Status](linux-port-status.md). Nächstes Paket ist **PORT-07: Pakete und Zielsysteme** gemäß [TODO](../../TODO.md).
 
-Abnahmekriterien für PORT-06A: Das Spektrumpreset rendert aus echten Winamp-Snapshotwerten eine nicht leere, zum aktiven Glyphensatz passende Zeile; Bildschirmvorschauen bilden die VFD-Glyphen sichtbar ab. Gespeicherte Sichtbarkeitsregeln sind im Builder bearbeitbar, numerische Sensoren direkt im Lüftereditor auswählbar. Medien-/Diagnoseangaben und Glyphensatzwechsel entsprechen den dokumentierten WPF-Abläufen. Hardware-Presets wählen in beiden Ansichten konsistent; Plattformvorlagen und Quellenbeschriftungen passen zum Betriebssystem. Speichern meldet den tatsächlichen Schreibabschluss, Fehler erhalten den Entwurf. HA-Kopieraktionen, zusammenhängende Lüfterbedienung und die Bewertung von Pixel-/Kurveneditoren sind im selben Paket erfasst. Neue UI-Pfade benötigen funktionale Gegenproben und Sichtprüfungen; physische Freigaben und genehmigte Abweichungen bleiben bestehen. Danach folgt PORT-07.
+PORT-06A-Nachweis: Die lokalen Tests prüfen Snapshot → Spektrumvariable → Preset → sichtbare Vorschau → virtuellen Transport, Quellenverlust, Bedingungsfelder/-browser, fünf identische Hardware-Presets, gespeicherte fehlende Sensoren, Glyphensynchronisierung nur bei aktiver Option, Speicherfehler mit erhaltenem Entwurf und präzise Kurvenpunkte. Die betroffenen Ansichten sind in fünf Sprachen bei 950 × 600 gerendert und angesehen. Physische LIS2-Ausgabe, native Linux-Ausführung dieses Standes und reale HA-/Playernachweise bleiben getrennte Zielsystemprüfungen.
 
 - [x] Zehn Hauptansichten, Hilfe und About sind angelegt und angebunden.
 - [x] System/Light/Dark sowie System/English/German/French/Turkish/Russian sind auswählbar.

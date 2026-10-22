@@ -163,7 +163,8 @@
               </StackPanel>
               <Border Grid.Column="3" Background="#07190E" CornerRadius="5" Padding="16">
                 <StackPanel Spacing="10">
-                  <TextBlock Name="GlyphPixelPreview" Text="·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····&#10;·····" FontFamily="Consolas" FontSize="22" Foreground="#F7FBFF" />
+                  <UniformGrid Name="GlyphPixelGrid" Rows="8" Columns="5" HorizontalAlignment="Left" />
+                  <TextBlock Name="GlyphPixelStatus" TextWrapping="Wrap" Foreground="#F7FBFF" />
                 </StackPanel>
               </Border>
             </Grid>
@@ -175,6 +176,7 @@
               <Button Name="SaveGlyphSet" Content="Save set..." />
               <Button Name="LoadExampleGlyphs" Content="Load examples" />
             </WrapPanel>
+            <TextBlock Name="GlyphSaveStatus" TextWrapping="Wrap" />
           </StackPanel>
         </Border>
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
@@ -209,6 +211,7 @@
                 <ComboBoxItem Content="Winamp · VU"/>
                 <ComboBoxItem Content="Winamp · Spectrum"/>
                 <ComboBoxItem Content="Media · Windows Media Now Playing"/>
+                <ComboBoxItem Content="Linux MPRIS players (playerctl)"/>
               </ComboBox>
               <Button Name="PageCreatePreset" Content="Create from preset" HorizontalAlignment="Stretch"/>
               <ListBox Name="PagesList" MinHeight="250" MaxHeight="420">
@@ -252,10 +255,11 @@
                   <TextBlock Margin="0,0,8,8" Text="Refresh (ms)" VerticalAlignment="Center" />
                   <TextBox Margin="0,0,8,8" Name="PageRefresh" Width="90" />
                 </WrapPanel>
-                <TextBlock Grid.Row="4" Text="Visible when" />
+                <TextBlock Grid.Row="4" Text="Visible when" TextWrapping="Wrap" />
                 <StackPanel Grid.Row="4" Grid.Column="1" Spacing="5">
                   <WrapPanel>
                     <TextBox Margin="0,0,7,7" Name="PageConditionKey" Width="185" Watermark="Template key" />
+                    <Button Margin="0,0,7,7" Name="PageConditionBrowse" Content="Browse variables…" />
                     <ComboBox Margin="0,0,7,7" Name="PageConditionOperator" Width="85">
                       <ComboBoxItem Content="=" /><ComboBoxItem Content="!=" />
                       <ComboBoxItem Content="&gt;" /><ComboBoxItem Content="&gt;=" />
@@ -287,6 +291,7 @@
                 <Button Margin="0,0,8,8" Name="PageVariableBrowser" Content="Browse variables…" MinWidth="180" />
               </WrapPanel>
               <TextBlock Name="PageVariableStatus" Opacity="0.65" />
+              <TextBlock Name="PageSaveStatus" TextWrapping="Wrap" />
               <Separator Margin="0,5"/>
               <Grid ColumnDefinitions="*,Auto" Margin="0,5,0,0">
                 <TextBlock Text="Live VFD preview" FontWeight="SemiBold" FontSize="16"/>
@@ -322,7 +327,8 @@
             <TextBlock Name="WindowsMediaTitle" Text="Nothing playing" FontSize="24" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
             <TextBlock Name="WindowsMediaArtist" TextTrimming="CharacterEllipsis" FontSize="16"/>
             <TextBlock Name="WindowsMediaAlbum" TextTrimming="CharacterEllipsis" Opacity="0.7"/>
-            <TextBlock Name="WindowsMediaPlayback" FontWeight="SemiBold" IsVisible="False"/>
+            <TextBlock Name="WindowsMediaPlayback" FontWeight="SemiBold"/>
+            <TextBlock Name="WindowsMediaSource" TextWrapping="Wrap"/>
             <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
               <TextBlock Name="WindowsMediaTime" FontFamily="Consolas" FontSize="16" Opacity="0.7" VerticalAlignment="Center"/>
               <Button Grid.Column="1" Name="WindowsMediaPage" Content="Create playback page"/>
@@ -363,17 +369,25 @@
               <StackPanel Grid.Column="2" Spacing="3">
                 <TextBlock Text="Playlist" FontWeight="SemiBold"/>
                 <TextBlock Name="WinampMediaPlaylist" Text="- / -" FontSize="18" FontWeight="SemiBold"/>
-                <TextBlock Text="Current position / total tracks" Opacity="0.7"/>
               </StackPanel>
               <StackPanel Grid.Column="4" Spacing="3">
                 <TextBlock Text="Audio" FontWeight="SemiBold"/>
-                <TextBlock Name="WinampMediaAudio" Text="-" FontSize="18" FontWeight="SemiBold"/>
-                <TextBlock Text="Bitrate / sample rate" Opacity="0.7"/>
+                <TextBlock Name="WinampMediaAudio" Text="-" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" ToolTip.Tip="Bitrate / sample rate"/>
               </StackPanel>
             </Grid>
             <Separator/>
             <TextBlock Text="VU / Spectrum" FontWeight="SemiBold"/>
+            <Grid ColumnDefinitions="25,*,45" RowDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="8">
+              <TextBlock Text="L" VerticalAlignment="Center"/>
+              <ProgressBar Name="WinampVuLeft" Grid.Column="1" Maximum="255" Height="14"/>
+              <TextBlock Name="WinampVuLeftValue" Grid.Column="2"/>
+              <TextBlock Text="R" Grid.Row="1" VerticalAlignment="Center"/>
+              <ProgressBar Name="WinampVuRight" Grid.Row="1" Grid.Column="1" Maximum="255" Height="14"/>
+              <TextBlock Name="WinampVuRightValue" Grid.Row="1" Grid.Column="2"/>
+            </Grid>
+            <Grid Name="WinampSpectrumBars" Height="70" ColumnSpacing="3"/>
             <TextBlock Name="WinampMediaTelemetry" FontFamily="Consolas" TextWrapping="Wrap"/>
+            <TextBlock Name="WinampMediaConnection" TextWrapping="Wrap"/>
             <Button Name="WinampMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
         </Border>
@@ -419,7 +433,7 @@
               <TextBlock Grid.Column="3" Text="State" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,6,0"/>
               <TextBlock Grid.Column="4" Text="Template key" FontWeight="SemiBold" TextWrapping="Wrap"/>
             </Grid>
-            <ListBox Name="HaEntityList" MinHeight="160" MaxHeight="330">
+            <ListBox Name="HaEntityList" Focusable="True" MinHeight="160" MaxHeight="330">
               <ListBox.ItemTemplate>
                 <DataTemplate>
                   <Grid ColumnDefinitions="34,2.4*,1.4*,1*,1.7*" Margin="2,4">
@@ -438,10 +452,11 @@
           <StackPanel Spacing="10">
             <TextBlock Text="Selected entity" FontWeight="SemiBold" FontSize="18"/>
             <TextBlock Name="HaSelectedEntity" Text="Select an entity above." />
+            <TextBlock Name="HaPreferenceStatus" TextWrapping="Wrap" />
             <WrapPanel><TextBlock Margin="0,0,8,8" Text="Alias" VerticalAlignment="Center" /><TextBox Margin="0,0,8,8" Name="HaAlias" Width="220" /><CheckBox Margin="0,0,8,8" Name="HaFavorite" Content="Favorite" /><Button Margin="0,0,8,8" Name="HaSaveEntity" Content="Save entity" /></WrapPanel>
             <WrapPanel><Button Margin="0,0,8,8" Name="HaCopyKey" Content="Copy key" /><Button Margin="0,0,8,8" Name="HaCreatePage" Content="Create display page" /></WrapPanel>
             <TextBlock Text="Attributes" FontWeight="SemiBold" />
-            <ListBox Name="HaAttributes" Height="150">
+            <ListBox Name="HaAttributes" Focusable="True" Height="150">
               <ListBox.ItemTemplate>
                 <DataTemplate>
                   <Grid ColumnDefinitions="2*,3*" Margin="2,4">
@@ -490,7 +505,11 @@
             </WrapPanel>
             <Grid ColumnDefinitions="180,240" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
               <TextBlock Grid.Row="0" Text="Name" /><TextBox Grid.Row="0" Grid.Column="1" Name="FanName" />
-              <TextBlock Grid.Row="1" Text="Sensor key" /><TextBox Grid.Row="1" Grid.Column="1" Name="FanSensorKey" />
+              <TextBlock Grid.Row="1" Text="Sensor key" />
+              <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5">
+                <TextBox Name="FanSensorKey" />
+                <ComboBox Name="FanSensorChoices" HorizontalAlignment="Stretch" PlaceholderText="Select a sensor above." />
+              </StackPanel>
               <TextBlock Grid.Row="2" Text="Fixed percent" /><TextBox Grid.Row="2" Grid.Column="1" Name="FanFixed" />
               <TextBlock Grid.Row="3" Text="Minimum / maximum" />
               <WrapPanel Grid.Row="3" Grid.Column="1">
@@ -514,13 +533,32 @@
                 </StackPanel>
               </Border>
             </Grid>
+            <Expander Name="FanCurvePointsExpander" Header="Curve points" HorizontalAlignment="Stretch">
+              <StackPanel Spacing="7">
+                <ListBox Name="FanCurvePointsList" MaxHeight="150"/>
+                <WrapPanel>
+                  <TextBlock Margin="0,0,8,8" Text="Temperature" VerticalAlignment="Center"/>
+                  <TextBox Margin="0,0,8,8" Name="FanPointTemperature" Width="180"/>
+                  <TextBlock Margin="0,0,8,8" Text="Fixed percent" VerticalAlignment="Center"/>
+                  <TextBox Margin="0,0,8,8" Name="FanPointOutput" Width="80"/>
+                  <Button Margin="0,0,8,8" Name="FanPointNew" Content="Add"/>
+                  <Button Margin="0,0,8,8" Name="FanPointApply" Content="Apply point"/>
+                  <Button Margin="0,0,8,8" Name="FanPointDelete" Content="Delete"/>
+                </WrapPanel>
+              </StackPanel>
+            </Expander>
+            <TextBlock Name="FanCurveStatus" TextWrapping="Wrap"/>
+            <WrapPanel>
+              <Button Margin="0,0,8,8" Name="FanSave" Content="Save fan channel" />
+            </WrapPanel>
+            <Expander Name="FanTestTools" Header="Test tools" HorizontalAlignment="Stretch">
+              <StackPanel Spacing="10">
             <WrapPanel>
               <TextBlock Margin="0,0,8,8" Text="Simulated sensor temperature" VerticalAlignment="Center" />
               <TextBox Margin="0,0,8,8" Name="FanSimulatedTemperature" Width="90" Text="50" />
-              <Button Margin="0,0,8,8" Name="FanSave" Content="Save fan channel" />
               <Button Margin="0,0,8,8" Name="FanPreview" Content="Simulate all four channels" />
             </WrapPanel>
-            <TextBlock Text="System temperature sensors (Linux hwmon, read-only)" FontWeight="SemiBold" />
+            <TextBlock Name="FanSensorSource" Text="Hardware" FontWeight="SemiBold" />
             <WrapPanel>
               <Button Margin="0,0,8,8" Name="FanReadSensors" Content="List detected sensors" />
               <Button Margin="0,0,8,8" Name="FanLivePreview" Content="Preview with real sensor values (dry run)" />
@@ -534,6 +572,8 @@
               <Button Margin="0,0,8,8" Name="FanVirtualStart" Content="Start virtual four-fan controller" />
               <Button Margin="0,0,8,8" Name="FanVirtualStop" Content="Stop and restore safety frame" IsEnabled="False" />
             </WrapPanel>
+              </StackPanel>
+            </Expander>
             <TextBlock Text="Physical LIS2 fans: explicit per-connection authorization (experimental)" FontWeight="SemiBold" />
             <TextBlock Text="Only use with a connected LIS2 and verified fan wiring. The first fan command sets all four fans to 100%. Stopping restores 100%. This feature is never auto-enabled by saved settings." TextWrapping="Wrap" />
             <CheckBox Name="FanHardwareConsent">
@@ -606,6 +646,7 @@
             <Button Margin="0,0,8,8" Name="HardwareSavePreference" Content="Save sensor preference" />
           </WrapPanel>
           <TextBlock Name="HardwareSensorStatus" Text="Refresh to discover available sensors." TextWrapping="Wrap" />
+          <TextBlock Name="HardwareSaveStatus" TextWrapping="Wrap" />
           <WrapPanel>
             <Button Margin="0,0,8,8" Name="HardwareUseForFan" Content="Use for Fan 1" IsEnabled="False" />
             <Button Margin="0,0,8,8" Name="HardwareUseForFan2" Content="Fan 2" IsEnabled="False" />
@@ -631,7 +672,7 @@
         <Grid ColumnDefinitions="*,12,*" RowDefinitions="Auto,12,Auto" Margin="0,0,8,8">
           <Border Background="{DynamicResource Lis2CardBrush}" Grid.Row="0" Grid.Column="0" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
-              <TextBlock Text="Diagnostics Snapshot" FontSize="18" FontWeight="SemiBold" />
+              <TextBlock Text="Diagnostics Snapshot" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" />
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <Button Name="DiagnosticsExport" Content="Export report..." />
                 <Button Name="DiagnosticsRefresh" Content="Refresh" />
@@ -641,19 +682,19 @@
           </Border>
           <Border Background="{DynamicResource Lis2CardBrush}" Grid.Row="0" Grid.Column="2" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
-              <TextBlock Text="Virtual LIS2 state" FontSize="18" FontWeight="SemiBold" />
+              <TextBlock Text="Virtual LIS2 state" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" />
               <TextBox Name="DiagnosticsVirtualState" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
             </StackPanel>
           </Border>
           <Border Background="{DynamicResource Lis2CardBrush}" Grid.Row="2" Grid.Column="0" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
-              <TextBlock Text="Decoded command history" FontSize="18" FontWeight="SemiBold" />
+              <TextBlock Text="Decoded command history" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" />
               <TextBox Name="DiagnosticsCommandHistory" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
             </StackPanel>
           </Border>
           <Border Background="{DynamicResource Lis2CardBrush}" Grid.Row="2" Grid.Column="2" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
-              <TextBlock Text="Protocol Log" FontSize="18" FontWeight="SemiBold" />
+              <TextBlock Text="Protocol Log" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" />
               <TextBox Name="DiagnosticsProtocolLog" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" Height="245" FontFamily="Consolas" />
             </StackPanel>
           </Border>

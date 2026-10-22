@@ -17,6 +17,20 @@ public partial class MainWindow
     private Task? _fanMonitorTask;
     private bool _fanEditorLoading;
     private int _fanEditingChannelIndex;
+    private sealed record FanSensorChoice(string Key, string Label)
+    {
+        public override string ToString() => Label;
+    }
+
+    /// <summary>Die Auswahl ergänzt freie Schlüssel; ausgefallene konfigurierte Sensoren bleiben editierbar.</summary>
+    private void RefreshFanSensorChoices()
+    {
+        var key = this.FindControl<TextBox>("FanSensorKey")!.Text;
+        var entries = HardwareSensorCatalog.Build(_hardwareSensors, _hardwarePreferences,
+            trackedKeys: string.IsNullOrWhiteSpace(key) ? [] : new[] { key });
+        this.FindControl<ComboBox>("FanSensorChoices")!.ItemsSource = entries.Select(entry =>
+            new FanSensorChoice(entry.Key, (entry with { Language = CurrentUiLanguage() }).ToString())).ToArray();
+    }
 
     private void UpdateFanOutputPreview(IReadOnlyList<int> percentages)
     {
@@ -56,7 +70,14 @@ public partial class MainWindow
 
     private void InitializeFanEditor()
     {
-        this.FindControl<TextBox>("FanCurve")!.TextChanged += (_, _) => RefreshFanCurvePreview();
+        InitializeCurvePoints();
+        SetUiText("FanSensorSource", OperatingSystem.IsLinux() ? "Linux system sensors" : "Windows hardware sensors");
+        this.FindControl<ComboBox>("FanSensorChoices")!.SelectionChanged += (_, _) =>
+        {
+            if (this.FindControl<ComboBox>("FanSensorChoices")!.SelectedItem is FanSensorChoice selected)
+                this.FindControl<TextBox>("FanSensorKey")!.Text = selected.Key;
+        };
+        this.FindControl<TextBox>("FanCurve")!.TextChanged += (_, _) => { RefreshFanCurvePreview(); RefreshCurvePoints(); };
         this.FindControl<ComboBox>("FanChannelPicker")!.SelectionChanged += (_, _) =>
         {
             if (_fanEditorLoading) return;
@@ -308,6 +329,7 @@ public partial class MainWindow
                 Array.IndexOf(new[] { "Fixed", "Curve", "Follow", "External", "Off" }, channel.Mode);
             this.FindControl<TextBox>("FanName")!.Text = channel.Name;
             this.FindControl<TextBox>("FanSensorKey")!.Text = channel.SensorKey ?? "";
+            RefreshFanSensorChoices();
             this.FindControl<TextBox>("FanFixed")!.Text = channel.FixedPercent.ToString(CultureInfo.InvariantCulture);
             this.FindControl<TextBox>("FanMinimum")!.Text = channel.MinimumPercent.ToString(CultureInfo.InvariantCulture);
             this.FindControl<TextBox>("FanMaximum")!.Text = channel.MaximumPercent.ToString(CultureInfo.InvariantCulture);
@@ -325,15 +347,7 @@ public partial class MainWindow
     {
         var index = _fanEditingChannelIndex;
         int ReadInt(string name) => int.Parse(this.FindControl<TextBox>(name)!.Text ?? "", CultureInfo.InvariantCulture);
-        var curve = new List<PortableFanCurvePoint>();
-        foreach (var line in (this.FindControl<TextBox>("FanCurve")!.Text ?? "").Split('\n'))
-        {
-            if (string.IsNullOrWhiteSpace(line)) continue;
-            var parts = line.Trim().Split('=');
-            if (parts.Length != 2) throw new FormatException("Curve point must be temperature=percent.");
-            curve.Add(new PortableFanCurvePoint(double.Parse(parts[0], CultureInfo.InvariantCulture),
-                int.Parse(parts[1], CultureInfo.InvariantCulture)));
-        }
+        var curve = FanCurveEditor.Parse(this.FindControl<TextBox>("FanCurve")!.Text);
         var candidate = new PortableFanChannel
         {
             Name = this.FindControl<TextBox>("FanName")!.Text ?? "",

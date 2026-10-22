@@ -1,15 +1,17 @@
 # Avalonia-Portierung: aktueller Arbeitsstand
 
-Stand: 21.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-06 mit Desktopintegration, benannten Glyphenvariablen, vertiefter Hilfe und geprüften Sprach-/Themewechseln. Reale HA-/Playernachweise sowie Desktop-Abnahme bleiben offen.
-Nächstes Paket: **PORT-06A: Paritätskorrekturen und Bedienung**, vor PORT-07. Der direkte Vergleich mit `origin/main` (`922ca1b`) findet konkrete Lücken trotz vorhandener zehn Hauptansichten. Die Anwendung ist durch diesen Befundbericht nicht geändert.
-Geprüfter Code-Commit: `35a2df0f1e033fb26da2c6c1aaefafa1b58e338f`. Nachfolgende reine Dokumentationscommits ändern diesen Code nicht.
+Stand: 22.10.2026. Branch: `feature/linux-avalonia`.
+Implementierungsstand: PORT-06A mit Spektrum-/Glyphenvorschau, angebundenen Bedingungs- und Sensoreditoren, konsistenten Presets, grafischen Medienpegeln, Speicherstatus, erweiterten Diagnosen sowie Pixelraster und Kurvenpunkten. Reale HA-/Playernachweise sowie Desktop-Abnahme bleiben offen.
+Nächstes Paket: **PORT-07: Pakete und Zielsysteme**. A01 bis A14 sind softwareseitig umgesetzt; der aktuelle lokale Nachweis steht unten. Für diesen Arbeitsstand liegt noch kein neuer GitHub-CI-Nachweis vor.
+Codegrundlage: `feature/linux-avalonia`; die folgenden PORT-06A-Läufe prüfen die lokalen Änderungen dieser Aufgabe. Ältere CI-Links gelten ausschließlich für die jeweils dort genannten Commits.
 
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
 ## Aktuelle Verifikation
 
-- Direkter WPF-Abgleich: `origin/main` wurde frisch geholt und steht auf `922ca1b`; verglichener Avalonia-Stand ist `422f2e6`. Die isolierte Laufzeitprobe weist den fehlenden Schlüssel `Winamp.SpectrumGlyphs` nach: Winamp-Rohdaten und Textspektrum vorhanden, Spektrumpresetzeile leer. Weitere Codebefunde betreffen Glyphenvorschau, Sichtbarkeitsbuilder, Sensorauswahl, Medien-/Diagnosedetails, Glyphensatzwechsel, unterschiedliche Presetalgorithmen, Plattformbeschriftungen und HA-Doppelklick. Einzelheiten, Verbesserungsbewertung und Nachweisgrenzen stehen im [Paritätsaudit](wpf-avalonia-parity-audit.md#direkter-main-abgleich-und-nächstes-paket-port-06a), Aufgaben A01 bis A14 in [TODO](../../TODO.md#port-06a-paritätskorrekturen-und-bedienung). Die vorhandene Testsuite erkennt diese Anwendungslücken nicht pauschal.
+- PORT-06A lokal auf Windows: **439 erfolgreich, ein Linux-Schlüsselbundtest übersprungen, 440 insgesamt**, Exit 0 (`tests/LIS2.App.Avalonia.Tests/TestResults/port06a-all.trx`). Display **50/50**, Exit 0. Nativer Windows-Smoke mit isoliertem Workspace: Exit 0, `%TEMP%/lis2-port06a-native/result.txt`, mit Splash, Tray-Menü, zweitem Prozess, zehn Ansichten, Hilfe/About, fehlendem Medienanbieter, Diagnose und geordnetem Shutdown. Reale Tray-Klicks und Anmeldung sind dadurch nicht geprüft.
+- `Port06AFlowTests`, `Port06AEditorTests` und `Port06AUiTests`: 23 neue Fälle. Quelle → Spektrumvariable → Preset → Vorschau → virtuelles Gerät bei beiden Pegelbereichen; Quellenverlust, Zeichensatzwahl, ungültige Kurven, Zahlenpräzision und fehlgeschlagenes Fehlerlog. UI prüft gespeicherte/ungültige/leere Bedingungen, Schlüsselübernahme aus dem Browser, fehlende manuelle Sensoren, fünf identische Preset-Einstiege, Pixel mit Leertaste, Speicherausfall und erfolgreichen erneuten Schreibversuch. Vorhandene HA-Tests prüfen zusätzlich Strg+C und tatsächlichen Doppelklick auf Attribute.
+- Skia-Sichtprüfung mit tatsächlichen Controls bei 950 × 600 in fünf Sprachen: Bedingungseditor, Glyphenpixelraster, Kurvenpunkte, Medienpegel und Diagnose. Geprüfte Bilder: `port06a-conditions-*.png`, `port06a-glyph-pixels-*.png`, `port06a-fan-points-*.png`, `port06a-media-levels-*.png`, `port06a-diagnostics-*.png`. Überlappende Spektrumbalken, schmale Dezimalfelder und abgeschnittene Überschriften sind korrigiert und erneut angesehen. Die Linux-Plattformauswahl ist im Code vorhanden; ihre native Ausführung für diesen Stand bleibt CI-/Zielsystemarbeit.
 - Benutzernachweis am 21.10.2026: Windows gestartet und Tray positiv beurteilt. Artefaktherkunft, einzelne Tray-Aktionen und Anmeldung mit Autostart sind dabei nicht spezifiziert. Die positive Rückmeldung ersetzt diese offenen Einzelprüfungen nicht.
 - Timer-Regressionen warten auf den tatsächlichen Callback und dessen Neustart mit einer Fehlergrenze von fünf Sekunden. Lokaler Windows-Lauf: 20/20 Fälle der `PageSequenceControllerTests`; gesamte Avalonia-Suite 416 erfolgreich, ein Linux-Schlüsselbundtest übersprungen, Exit 0 (`port06-timer-all.trx`). Die Gegenprobe mit ausbleibendem Callback scheitert nach fünf Sekunden mit `TimeoutException` (`port06-timer-negative.trx`, Exit 1). [CI 39584136572](https://github.com/Eitschman/lis2-control-center/actions/runs/39584136572) prüft die Testkorrektur `0b78427`: Linux 417/417, Windows 416 erfolgreich und ein übersprungener Linux-Schlüsselbundtest; beide Avalonia-Jobs einschließlich nativer Desktop-Smokes erfolgreich.
 - PORT-06 lokal: Avalonia 416 erfolgreich, ein Linux-Schlüsselbundtest übersprungen, 417 Fälle insgesamt, Exit 0 (`port06-all.trx`); Display 50/50, Exit 0. Die Formatierungstests setzen en-US, de-DE und fr-FR ausdrücklich und stellen die vorherige Kultur wieder her.
@@ -64,7 +66,7 @@ Lokalisierte Hilfedialoge wurden unter Windows mit Skia bei 840 × 600 Pixeln ge
 | --- | --- | --- |
 | Runtime | Quellen-/Sequenzbesitzer, adaptive Schleifen, Start-Drain vor Dispose; Cleanup weiterer Ressourcen trotz Einzelfehlern | UI-Orchestrierung weiterhin teilweise in MainWindow; Vertragsabgleich im Inventar |
 | Display | Gemeinsamer `DisplayFrameWriter` in virtueller und serieller Session; geänderte Spannen, Cache-Reset bei manuellen Befehlen, Reconnect und Teilfehlern | Physische Übernahme nicht geprüft |
-| Pages | Pflege, Vorlagen, Timing, Sichtbarkeit, Presets, JSON-Validierung, animierte Vorschau, Variablenbrowser und Entwurfsschutz/Reload | Semantische Bedienparität weiter offen |
+| Pages | Pflege, Vorlagen, Timing, Sichtbarkeit, Presets, JSON-Validierung, animierte Vorschau, Variablenbrowser und Entwurfsschutz/Reload | Native Datei- und Zielsystembedienung offen |
 | Events/Glyphen | Ereignisqueue, Ablauf/Abbruch, acht Glyphenslots, Dateien, Namen und Spektrumset | Dialogparität und physische Zeichen offen |
 | Hardware/Fans | Windows LibreHardwareMonitor, Linux procfs/sysfs/hwmon; vier Kanäle, Grenzen, Hysterese, Fail-safe, virtuelle/serielle Regelung und Handausgabe | Reale Treiber, Sensorwechsel und Sicherheitszustände nicht geprüft |
 | Medien | Windows Winamp/GSMTC; Legacy deaktiviert. Linux-playerctl mit gespeicherter Auswahl, Spielposition, sicherem XML-Format und Abbruch/Timeout. Fehler entfernen alte Metadaten | Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen offen; keine eigene D-Bus-Subscription |
@@ -72,7 +74,7 @@ Lokalisierte Hilfedialoge wurden unter Windows mit Skia bei 840 × 600 Pixeln ge
 | Einstellungen | Persistierter Transport/Port/HA-Aktivierung, Helligkeit, Windows-Import, Theme/Sprache, Windows-/Linux-Tray und Autostart | Native Dateiauswahl, Tray-Bedienung und Autostart bei Anmeldung offen |
 | Tokenstore | DPAPI, secret-tool; Linux-AES nur nach ausdrücklicher Auswahl; verifizierte Migration, beschädigte Dateien und Löschfehler; echter privater Linux-Keyring und Unix-Dateirechte in CI geprüft | Benutzer-Schlüsselbund auf Zielsystem offen |
 | Hilfe/About | Kontextauswahl und zehn Themen in fünf Sprachen; gespeicherte Sprache, Systemstandard und offener Dialog geprüft; Inhalte gegen Code korrigiert; About mit Versions-/Laufzeitdaten und tatsächlichem Workspace-Ordner | Statische Variablenbeschreibungen und benannte Glyphen vorhanden; Hilfe am Titel und F1; native Bedienungsabnahme offen |
-| Diagnose | UTC-Journal für Anwendung und tatsächliche virtuelle/serielle Transportergebnisse, OK/ERROR, dekodierte Befehle, aktueller Export | Maximal 1000 Einträge pro Journal und zehn serielle Sitzungen; kein persistentes Logarchiv |
+| Diagnose | UTC-Journal für Anwendung und tatsächliche virtuelle/serielle Transportergebnisse, OK/ERROR, dekodierte Befehle, aktueller Export | Maximal 1000 Einträge pro Journal und zehn serielle Sitzungen; nur Start-/Absturzspuren werden dauerhaft gespeichert |
 
 ## Verbindliche Grenzen und Weiterarbeit
 
@@ -80,4 +82,4 @@ Eine gemeinsame Avalonia-Oberfläche bleibt das Ziel; WPF bleibt Referenz bis zu
 
 Native Dateiauswahl, Tray-Menübedienung, OS-Abmeldung, DPI-/Theme-/Sprachmatrix, Live-HA-/Player-/Sensorintegration, extrahierter Paketstart, ARM64-Ausführung auf ARM64 und physische LIS2-Ausgabe sind durch den Smoke nicht nachgewiesen.
 
-Die Medien- und HA-Implementierung ist mit den genannten isolierten Daten geprüft. Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen und HA auf Zielsystemen bleiben offen. Nächstes Paket: **PORT-06A: Paritätskorrekturen und Bedienung**, anschließend **PORT-07: Pakete und Zielsysteme**.
+Die Medien- und HA-Implementierung ist mit den genannten isolierten Daten geprüft. Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen und HA auf Zielsystemen bleiben offen. Nächstes Paket: **PORT-07: Pakete und Zielsysteme**.

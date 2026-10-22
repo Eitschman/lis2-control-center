@@ -29,6 +29,11 @@ public partial class MainWindow
         this.FindControl<TextBox>("HardwareSearch")!.TextChanged += (_, _) => FilterHardwareSensors();
         this.FindControl<ComboBox>("HardwareTypeFilter")!.SelectionChanged += (_, _) => FilterHardwareSensors();
         this.FindControl<CheckBox>("HardwareFavoritesOnly")!.IsCheckedChanged += (_, _) => FilterHardwareSensors();
+        this.FindControl<TextBox>("HardwareAlias")!.PropertyChanged += (_, change) =>
+        {
+            if (change.Property == TextBox.TextProperty) MarkEditorChanged("HardwareSaveStatus");
+        };
+        this.FindControl<CheckBox>("HardwareFavorite")!.IsCheckedChanged += (_, _) => MarkEditorChanged("HardwareSaveStatus");
         this.FindControl<Button>("HardwareSavePreference")!.Click += async (_, _) =>
         {
             if (this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem is not HardwareSensorEntry selected) return;
@@ -43,18 +48,16 @@ public partial class MainWindow
             var oldFavorite = preference.IsFavorite;
             preference.Alias = this.FindControl<TextBox>("HardwareAlias")!.Text?.Trim() ?? "";
             preference.IsFavorite = this.FindControl<CheckBox>("HardwareFavorite")!.IsChecked == true;
-            try
+            if (await PersistEditorAsync("HardwareSaveStatus"))
             {
-                await SavePortableWorkspaceAsync(true);
                 FilterHardwareSensors();
             }
-            catch (Exception ex)
+            else
             {
                 preference.Alias = oldAlias;
                 preference.IsFavorite = oldFavorite;
                 if (created)
                     _hardwarePreferences.Remove(preference);
-                SetUiText("HardwareSensorStatus", $"Preference save failed: {(UiMessage)ex.Message}");
             }
         };
         this.FindControl<ListBox>("HardwareSensorList")!.SelectionChanged += (_, _) =>
@@ -138,6 +141,7 @@ public partial class MainWindow
             _hardwareSensors.Clear();
             foreach (var item in snapshot) _hardwareSensors[item.Key] = item.Value;
             _pageSources.UpdateHardware(_hardwareSensors);
+            RefreshFanSensorChoices();
             RefreshPageVariables();
             _hardwareSourceError = snapshot.Count == 0 && _liveFanSensors is WindowsHardwareFanSensors windows
                 ? windows.Diagnostic
@@ -148,6 +152,7 @@ public partial class MainWindow
         {
             _hardwareSensors.Clear();
             _pageSources.UpdateHardware(_hardwareSensors);
+            RefreshFanSensorChoices();
             RefreshPageVariables();
             _hardwareSourceError = ex.Message;
             if (_hardwareListLiveUpdates || _selectedSection == 5) FilterHardwareSensors();

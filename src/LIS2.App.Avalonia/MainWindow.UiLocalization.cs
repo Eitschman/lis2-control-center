@@ -12,8 +12,9 @@ public partial class MainWindow
     // Diese Felder enthalten Nutzdaten. Auch ein Titel wie "Connected" bleibt unverändert.
     private static readonly HashSet<string> DataTextFields = new(StringComparer.Ordinal)
     {
-        "PreviewLine1", "PreviewLine2", "PagePreview1", "PagePreview2", "GlyphTemplateKey", "GlyphPixelPreview",
-        "WindowsMediaTitle", "WindowsMediaArtist", "WindowsMediaAlbum", "WindowsMediaTime",
+        "PreviewLine1", "PreviewLine2", "PagePreview1", "PagePreview2", "GlyphTemplateKey",
+        "WindowsMediaTitle", "WindowsMediaArtist", "WindowsMediaAlbum", "WindowsMediaTime", "WindowsMediaSource",
+        "WinampVuLeftValue", "WinampVuRightValue",
         "LinuxMediaTitle", "LinuxMediaArtist", "LinuxMediaAlbum", "LinuxMediaDuration",
         "WinampMediaArtist", "WinampMediaAlbum", "WinampMediaTime", "WinampMediaPlaylist", "WinampMediaAudio",
         "WmpLegacyMediaArtist", "WmpLegacyMediaAlbum", "WmpLegacyMediaTime"
@@ -208,6 +209,7 @@ public partial class MainWindow
     private readonly Dictionary<Control, string> _originalTooltips = new();
     private readonly Dictionary<TextBox, string> _originalWatermarks = new();
     private readonly Dictionary<ComboBoxItem, string> _originalComboLabels = new();
+    private readonly Dictionary<Expander, string> _originalExpanderLabels = new();
 
     private IEnumerable<T> LocalizableControls<T>() where T : global::Avalonia.Visual
     {
@@ -234,6 +236,13 @@ public partial class MainWindow
 
     private void ApplyPageLocalization()
     {
+        foreach (var expander in LocalizableControls<Expander>())
+        {
+            if (expander.Header is not string header) continue;
+            if (!_originalExpanderLabels.TryGetValue(expander, out var original))
+                _originalExpanderLabels[expander] = original = UiTranslations.FindEnglishSource(header);
+            expander.Header = UiTranslations.Translate(original, CurrentUiLanguage());
+        }
         // Logical descendants include controls in inactive/hidden pages and do not
         // depend on the visual template being attached at the moment of translation.
         // Restrict translations to a known set of static labels. Never overwrite live

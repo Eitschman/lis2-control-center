@@ -16,9 +16,16 @@ public partial class MainWindow
     private readonly PageEditorPreview _editorPreview = new();
     private readonly DispatcherTimer _editorPreviewTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private bool _editorPreviewConfigured;
+    private Task<bool> _pagePersistence = Task.FromResult(true);
 
     private void InitializePagesEditor()
     {
+        var presetPicker = this.FindControl<ComboBox>("PagePresetPicker")!;
+        for (var index = 7; index <= 11; index++)
+        {
+            var item = (ComboBoxItem)presetPicker.Items[index]!;
+            item.IsVisible = item.IsEnabled = index == 11 ? OperatingSystem.IsLinux() : OperatingSystem.IsWindows();
+        }
         _editorPreviewTimer.Tick += (_, _) => TickEditorPreview();
         Closed += (_, _) => _editorPreviewTimer.Stop();
         this.FindControl<ListBox>("PagesList")!.SelectionChanged += async (_, _) => await HandlePageSelectionAsync();
@@ -85,7 +92,7 @@ public partial class MainWindow
         this.FindControl<Button>("PageDown")!.Click += async (_, _) => await MovePageAsync(1);
         this.FindControl<Button>("PageSave")!.Click += async (_, _) =>
         {
-            if (SavePageEditor()) await ReloadRunningPagesAsync();
+            if (SavePageEditor() && await _pagePersistence) await ReloadRunningPagesAsync();
         };
         this.FindControl<Button>("PageTest")!.Click += async (_, _) =>
         {
@@ -94,10 +101,23 @@ public partial class MainWindow
             var frame = _pages.Preview(i, PagePreviewValues());
             await RunSelectedDisplayActionAsync(session => session.RenderBothAsync(frame.Line1, frame.Line2));
         };
-        foreach (var name in new[] { "PageLine1", "PageLine2", "PageDuration", "PageRefresh", "PageScrollStep", "PageScrollPause" })
-            this.FindControl<TextBox>(name)!.TextChanged += (_, _) => RefreshPagePreview();
+        foreach (var name in new[] { "PageName", "PageVisibility", "PageLine1", "PageLine2", "PageDuration", "PageRefresh", "PageScrollStep", "PageScrollPause" })
+            this.FindControl<TextBox>(name)!.PropertyChanged += (_, change) =>
+            {
+                if (change.Property != TextBox.TextProperty) return;
+                RefreshPagePreview();
+                if (!_loadingPage) MarkEditorChanged("PageSaveStatus");
+            };
         foreach (var name in new[] { "PageOverflow1", "PageOverflow2" })
-            this.FindControl<ComboBox>(name)!.SelectionChanged += (_, _) => RefreshPagePreview();
+            this.FindControl<ComboBox>(name)!.SelectionChanged += (_, _) =>
+            {
+                RefreshPagePreview();
+                if (!_loadingPage) MarkEditorChanged("PageSaveStatus");
+            };
+        this.FindControl<CheckBox>("PageEnabled")!.IsCheckedChanged += (_, _) =>
+        {
+            if (!_loadingPage) MarkEditorChanged("PageSaveStatus");
+        };
         InitializePageTools();
         _pages.Add();
         RefreshPageList(0);
@@ -162,48 +182,24 @@ public partial class MainWindow
         {
             0 => PagePresetCatalog.Get(0),
             1 => PagePresetCatalog.Get(1),
-            2 => CreateHardwarePagePreset("CPU", "Load", "Temperature", "CPU", "Temp", "CPU", "Processor"),
-            3 => CreateHardwarePagePreset("GPU", "Load", "Temperature", "GPU", "Temp", "GPU", "Graphics"),
-            4 => CreateHardwarePagePreset("Memory", "Load", "Data", "RAM", "Used", "Memory", "RAM"),
-            5 => CreateHardwarePagePreset("Temperatures", "Temperature", "Temperature", "T1", "T2"),
-            6 => CreateHardwarePagePreset("Fans", "Fan", "Fan", "Fan1", "Fan2"),
+            2 => CreateHardwarePagePreset("CPU"),
+            3 => CreateHardwarePagePreset("GPU"),
+            4 => CreateHardwarePagePreset("Memory"),
+            5 => CreateHardwarePagePreset("Temperatures"),
+            6 => CreateHardwarePagePreset("Fans"),
             7 or 8 or 9 or 10 => PagePresetCatalog.Get(choice),
+            11 => new PagePresetSpec("Linux media", "{Media.Title}", "{Media.Artist}", 7,
+                "Media.State=Playing", "PingPong", "PingPong"),
             _ => throw new ArgumentOutOfRangeException(nameof(choice), "Unknown page preset.")
         };
     }
 
-    private PagePresetSpec CreateHardwarePagePreset(
-        string name, string type1, string type2, string label1, string label2,
-        params string[] matchingTerms)
+    private PagePresetSpec CreateHardwarePagePreset(string name)
     {
-        var values = _runtime.Snapshot();
-        var sensors = values.Keys
-            .Where(key => key.StartsWith("Hardware.", StringComparison.OrdinalIgnoreCase)
-                && !key.EndsWith(".Unit", StringComparison.OrdinalIgnoreCase)
-                && values.TryGetValue(key, out var value)
-                && value is not null
-                && double.TryParse(Convert.ToString(value, CultureInfo.InvariantCulture),
-                    NumberStyles.Float, CultureInfo.InvariantCulture, out _))
-            .OrderBy(key => key, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        string[] Matching(string type) => sensors.Where(key =>
-            key.Contains(type, StringComparison.OrdinalIgnoreCase) &&
-            (matchingTerms.Length == 0 || matchingTerms.Any(term =>
-                key.Contains(term, StringComparison.OrdinalIgnoreCase)))).ToArray();
-
-        var first = Matching(type1).FirstOrDefault();
-        var second = Matching(type2).FirstOrDefault(key => key != first);
-        if (first is null && second is null)
-            throw new InvalidOperationException($"No matching hardware sensors for '{name}'.");
-
-        string Line(string label, string? key) => key is null ? "" :
-            label + " {" + key + "}" +
-            (values.TryGetValue(key + ".Unit", out var unit) ? Convert.ToString(unit) : "");
-
-        return new PagePresetSpec(name,
-            first is null ? name : Line(label1, first),
-            Line(label2, second), Overflow1: "PingPong", Overflow2: "PingPong");
+        var page = HardwareDisplayPresetBuilder.Build(name, _hardwareSensors, _hardwarePreferences)
+            ?? throw new InvalidOperationException($"No matching hardware sensors for '{name}'.");
+        return new PagePresetSpec(page.Name, page.Line1Template, page.Line2Template,
+            Overflow1: "PingPong", Overflow2: "PingPong");
     }
 
     private sealed record PageListRow(int Index, string Name, bool Enabled);
@@ -326,6 +322,7 @@ public partial class MainWindow
         this.FindControl<TextBox>("PageDuration")!.Text = p.DurationSeconds.ToString(CultureInfo.InvariantCulture);
         this.FindControl<TextBox>("PageRefresh")!.Text = p.RefreshIntervalMilliseconds.ToString(CultureInfo.InvariantCulture);
         this.FindControl<TextBox>("PageVisibility")!.Text = p.VisibilityExpression;
+        LoadConditionEditor(p.VisibilityExpression);
         this.FindControl<ComboBox>("PageOverflow1")!.SelectedIndex = OverflowIndex(p.Line1OverflowMode);
         this.FindControl<ComboBox>("PageOverflow2")!.SelectedIndex = OverflowIndex(p.Line2OverflowMode);
         this.FindControl<TextBox>("PageScrollStep")!.Text = p.ScrollStepMilliseconds.ToString(CultureInfo.InvariantCulture);
@@ -432,8 +429,8 @@ public partial class MainWindow
             return;
         }
         var frame = _editorPreview.Tick(DateTimeOffset.UtcNow, PagePreviewValues());
-        this.FindControl<TextBlock>("PagePreview1")!.Text = frame.Line1;
-        this.FindControl<TextBlock>("PagePreview2")!.Text = frame.Line2;
+        this.FindControl<TextBlock>("PagePreview1")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line1, _glyphs.IsSpectrumSet);
+        this.FindControl<TextBlock>("PagePreview2")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line2, _glyphs.IsSpectrumSet);
         var delay = _editorPreview.NextDelay;
         _editorPreviewTimer.Interval = delay < TimeSpan.FromMilliseconds(20)
             ? TimeSpan.FromMilliseconds(20) : delay;
@@ -469,13 +466,13 @@ public partial class MainWindow
             p.Line2OverflowMode = OverflowName(this.FindControl<ComboBox>("PageOverflow2")!.SelectedIndex);
             p.Enabled = this.FindControl<CheckBox>("PageEnabled")!.IsChecked == true;
             if (refreshEditor) RefreshPageList(i);
-            SetVirtualStatus($"Saved page '{p.Name}' in editor workspace.");
-            _ = SavePortableWorkspaceAsync();
+            _pagePersistence = PersistEditorAsync("PageSaveStatus");
             return true;
         }
         catch (Exception ex)
         {
             SetVirtualStatus($"Page validation error: {(UiMessage)ex.Message}");
+            SetUiText("PageSaveStatus", $"Page validation error: {(UiMessage)ex.Message}");
             return false;
         }
     }

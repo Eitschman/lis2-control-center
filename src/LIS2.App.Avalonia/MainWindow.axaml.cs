@@ -25,17 +25,17 @@ public partial class MainWindow : Window
     /// <summary>Erlaubt isolierte UI-Prüfungen mit eigenem Workspace und simuliertem Transport.</summary>
     internal MainWindow(PortableWorkspaceStore workspaceStore, PortableHaTokenStore tokenStore,
         bool startBackgroundSources, Func<string, SerialDisplaySession> serialSessionFactory,
-        PageSourceValues? pageSources = null)
+        PageSourceValues? pageSources = null, IFanSensorSource? fanSensors = null)
     {
         _runtime = new DisplayRuntimeHost(pageSources);
         _workspaceStore = workspaceStore;
         _haTokenStore = tokenStore;
         _startBackgroundSources = startBackgroundSources;
         _serialSessionFactory = serialSessionFactory;
-        _liveFanSensors = !startBackgroundSources ? new SimulatedFanSensors() :
+        _liveFanSensors = fanSensors ?? (!startBackgroundSources ? new SimulatedFanSensors() :
             OperatingSystem.IsLinux() ? new LinuxSystemSensors() :
             OperatingSystem.IsWindows() ? new WindowsHardwareFanSensors() :
-            new SnapshotFanSensors(() => new Dictionary<string, object?>());
+            new SnapshotFanSensors(() => new Dictionary<string, object?>()));
         InitializeComponent();
         SizeChanged += (_, _) => UpdatePageEditorLayout();
 
@@ -259,10 +259,10 @@ public partial class MainWindow : Window
         if (first is null || second is null)
             return;
 
-        first.Text = SerialSelected ? _serialDisplay?.LastLine1 ?? new string(' ', 20)
-            : _virtualDevice.IsConnected ? _virtualDevice.State.Line1 : new string(' ', 20);
-        second.Text = SerialSelected ? _serialDisplay?.LastLine2 ?? new string(' ', 20)
-            : _virtualDevice.IsConnected ? _virtualDevice.State.Line2 : new string(' ', 20);
+        first.Text = LIS2.Display.GlyphRendering.Preview(SerialSelected ? _serialDisplay?.LastLine1 ?? new string(' ', 20)
+            : _virtualDevice.IsConnected ? _virtualDevice.State.Line1 : new string(' ', 20), _glyphs.IsSpectrumSet);
+        second.Text = LIS2.Display.GlyphRendering.Preview(SerialSelected ? _serialDisplay?.LastLine2 ?? new string(' ', 20)
+            : _virtualDevice.IsConnected ? _virtualDevice.State.Line2 : new string(' ', 20), _glyphs.IsSpectrumSet);
         RefreshDiagnostics();
     }
 

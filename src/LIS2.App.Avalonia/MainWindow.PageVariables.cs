@@ -50,7 +50,7 @@ public partial class MainWindow
 
     private string BrowserText(string english) => UiText(english);
 
-    private async Task ShowPageVariableBrowserAsync(string? insertTarget = null)
+    private async Task ShowPageVariableBrowserAsync(string? insertTarget = null, Action<string>? selectedAction = null)
     {
         // Snapshot is taken on opening, not on every two-second sensor refresh.
         var snapshot = PagePreviewValues();
@@ -77,6 +77,11 @@ public partial class MainWindow
         var favorite = new Button { Content = BrowserText("☆ Add favorite") };
         var insert1 = new Button { Content = BrowserText("Insert into line 1") };
         var insert2 = new Button { Content = BrowserText("Insert into line 2") };
+        if (selectedAction is not null)
+        {
+            insert1.Content = BrowserText("Use selected variable");
+            insert2.IsVisible = false;
+        }
         var close = new Button { Content = BrowserText("Close") };
         var refresh = new Button { Content = BrowserText("Refresh values") };
         var layout = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto,Auto,Auto,Auto"), RowSpacing = 10, Margin = new global::Avalonia.Thickness(16) };
@@ -154,7 +159,13 @@ public partial class MainWindow
             Filter();
             _ = SavePortableWorkspaceAsync();
         };
-        insert1.Click += (_, _) => { if (Selected() is { } key) { InsertSelectedPageVariable("PageLine1", key); dialog.Close(); } };
+        insert1.Click += (_, _) =>
+        {
+            if (Selected() is not { } key) return;
+            if (selectedAction is not null) selectedAction(key);
+            else InsertSelectedPageVariable("PageLine1", key);
+            dialog.Close();
+        };
         insert2.Click += (_, _) => { if (Selected() is { } key) { InsertSelectedPageVariable("PageLine2", key); dialog.Close(); } };
         refresh.Click += (_, _) =>
         {

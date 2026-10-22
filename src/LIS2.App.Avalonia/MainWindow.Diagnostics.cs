@@ -38,13 +38,15 @@ public partial class MainWindow
     internal string BuildDiagnosticsReport()
     {
         RefreshDiagnostics();
-        return string.Join(Environment.NewLine + Environment.NewLine, new[]
+        var report = string.Join(Environment.NewLine + Environment.NewLine, new[]
         {
             UiText("Diagnostics Snapshot") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsSnapshot")!.Text ?? ""),
             UiText("Virtual LIS2 state") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsVirtualState")!.Text ?? ""),
             UiText("Decoded command history") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsCommandHistory")!.Text ?? ""),
             UiText("Protocol Log") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsProtocolLog")!.Text ?? "")
         });
+        var token = this.FindControl<TextBox>("HaToken")!.Text;
+        return string.IsNullOrEmpty(token) ? report : report.Replace(token, "[redacted]", StringComparison.Ordinal);
     }
 
     private void RefreshDiagnostics()
@@ -59,7 +61,26 @@ public partial class MainWindow
             OperatingSystem.IsWindows() ? "Windows" : OperatingSystem.IsLinux() ? "Linux" : "Other",
             virtualConnected, serial, playback, fanMonitor, _virtualDevice.CommandCount,
             _serialBusy, sensorRefresh, fanPreviewConfigured, UiText);
-        this.FindControl<TextBox>("DiagnosticsSnapshot")!.Text = summary;
+        var details = new List<string>
+        {
+            "UTC: " + DateTimeOffset.UtcNow.ToString("O"),
+            "Version: " + typeof(MainWindow).Assembly.GetName().Version,
+            UiText("Transport") + ": " + _preferredTransportMode,
+            UiText("Serial port") + ": " + (_preferredPortName ?? "-"),
+            UiText("Line 1") + ": [" + (SerialSelected ? _serialDisplay?.LastLine1 ?? "" : _virtualDevice.State.Line1) + "]",
+            UiText("Line 2") + ": [" + (SerialSelected ? _serialDisplay?.LastLine2 ?? "" : _virtualDevice.State.Line2) + "]",
+            UiText("Error log") + ": " + FailureLog.FilePath
+        };
+        foreach (var source in _pageSources.Errors)
+            details.Add(source.Key + ": " + (source.Value ?? "OK"));
+        details.Add("Hardware: " + (_hardwareSourceError ?? "OK"));
+        details.Add("Home Assistant: " + (_pageSources.HomeAssistant.IsConnected ? UiText("Connected") : UiText("Disconnected")) +
+            " " + _pageSources.HomeAssistant.LastError);
+        foreach (var source in _mediaErrors) details.Add(source.Key + ": " + source.Value);
+        foreach (var channel in _fanSettings.Channels)
+            details.Add($"{channel.Name}: {channel.Mode}, sensor={channel.SensorKey ?? "-"}, fixed={channel.FixedPercent}%, " +
+                $"min={channel.MinimumPercent}%, max={channel.MaximumPercent}%, fail-safe={channel.FailSafePercent}%");
+        this.FindControl<TextBox>("DiagnosticsSnapshot")!.Text = summary + Environment.NewLine + string.Join(Environment.NewLine, details);
         var state = _virtualDevice.State;
         var stateLines = new List<string>
         {
@@ -88,5 +109,12 @@ public partial class MainWindow
             UiText("Virtual transport") + Environment.NewLine + _virtualDevice.Journal.Snapshot() + Environment.NewLine +
             string.Join(Environment.NewLine, _serialJournals.Select((journal, index) =>
                 UiFormat($"Serial session {index + 1}") + Environment.NewLine + journal.Snapshot()));
+        var token = this.FindControl<TextBox>("HaToken")!.Text;
+        if (!string.IsNullOrEmpty(token))
+            foreach (var name in new[] { "DiagnosticsSnapshot", "DiagnosticsVirtualState", "DiagnosticsCommandHistory", "DiagnosticsProtocolLog" })
+            {
+                var control = this.FindControl<TextBox>(name)!;
+                control.Text = control.Text?.Replace(token, "[redacted]", StringComparison.Ordinal);
+            }
     }
 }

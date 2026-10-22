@@ -11,8 +11,13 @@ public sealed class PageSourceValues : IAsyncDisposable
     private readonly Dictionary<string, object?> _media = new(StringComparer.OrdinalIgnoreCase);
     private KeyValuePair<string, string>[] _haAliases = [];
     private string[] _glyphNames = [];
+    private bool _spectrumSet;
 
-    public void SetGlyphNames(IEnumerable<string> names) => _glyphNames = names.Take(8).ToArray();
+    public void SetGlyphNames(IEnumerable<string> names, bool spectrumSet = false)
+    {
+        _glyphNames = names.Take(8).ToArray();
+        _spectrumSet = spectrumSet;
+    }
 
     /// <summary>Verwendet dieselben ASCII-Schlüssel wie die WPF-Funktionsreferenz.</summary>
     public static string NormalizeGlyphName(string? name)
@@ -80,6 +85,10 @@ public sealed class PageSourceValues : IAsyncDisposable
         }
         foreach (var pair in _hardware) values[pair.Key] = pair.Value;
         foreach (var pair in _media) values[pair.Key] = pair.Value;
+        values["Winamp.SpectrumGlyphs"] = _spectrumSet &&
+            values.TryGetValue("Winamp.SpectrumRaw", out var raw) && raw is IReadOnlyList<int> spectrum
+            ? LIS2.Display.GlyphRendering.Spectrum(spectrum)
+            : values.GetValueOrDefault("Winamp.Spectrum") ?? string.Empty;
         foreach (var pair in PageClockValues.Create(now))
             values.TryAdd(pair.Key, pair.Value);
         for (var slot = 1; slot <= 8; slot++)

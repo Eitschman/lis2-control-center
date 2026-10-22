@@ -1,7 +1,7 @@
 # TODO: Avalonia-Portierung
 
-Stand: 21.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-06 mit Desktopintegration, benannten Glyphenvariablen und vertiefter Hilfe. Lokal 416 Avalonia-Tests erfolgreich, ein Linux-Schlüsselbundtest unter Windows übersprungen; 50 Displaytests erfolgreich. CI-Nachweise und Zielsystemprüfungen im [Status](docs/prp/linux-port-status.md).
+Stand: 22.10.2026. Branch: `feature/linux-avalonia`.
+Implementierungsstand: PORT-06A mit Paritätskorrekturen, direkten Sensor-/Bedingungseditoren, grafischer Medienanzeige, Pixelraster und Kurvenpunkten. Lokal 439 Avalonia-Tests erfolgreich, ein Linux-Schlüsselbundtest unter Windows übersprungen; 50 Displaytests erfolgreich. CI-Nachweise und Zielsystemprüfungen im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -41,7 +41,7 @@ Das Übersetzungspaket vor PORT-04 ist umgesetzt und mit isolierten Avalonia-Fen
 
 - [x] [CI 39565668081](https://github.com/Eitschman/lis2-control-center/actions/runs/39565668081) für `c22048d`: alle sieben Jobs erfolgreich, je OS 359/359 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes und drei Pakete erfolgreich. Linux-Sichtprüfung zusätzlich anhand der Workflow-Screenshots.
 
-Nächstes Paket ist **PORT-06A: Paritätskorrekturen und Bedienung**. Grundlage ist der direkte Vergleich von `origin/main` (`922ca1b`) mit dem Avalonia-Stand `422f2e6`. PORT-07 folgt danach. Offene Zielsystem- und Abnahmeprüfungen aus PORT-04 bis PORT-06 bleiben ausdrücklich aufgeführt.
+Nächstes Paket ist **PORT-07: Pakete und Zielsysteme**. Die softwareseitigen Punkte A01 bis A14 aus PORT-06A sind umgesetzt. Offene Zielsystem- und Abnahmeprüfungen aus PORT-04 bis PORT-06 bleiben ausdrücklich aufgeführt.
 
 ## Weitere Implementierungs- und Prüfaufgaben
 
@@ -106,29 +106,24 @@ Technischer Nachweis: [CI 39581947442](https://github.com/Eitschman/lis2-control
 
 ### PORT-06A: Paritätskorrekturen und Bedienung
 
-Dieses Paket ist als Nächstes beauftragt. Es erfasst die Befunde und Bewertungspunkte des WPF-Vergleichs; die Anwendung ist dadurch noch nicht geändert. Quellstellen und Nachweisgrenzen stehen im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md#direkter-main-abgleich-und-nächstes-paket-port-06a).
+A01 bis A14 sind softwareseitig umgesetzt. Lokaler Windows-Nachweis: 439 erfolgreiche Avalonia-Tests und ein übersprungener Linux-Schlüsselbundtest, 50 erfolgreiche Displaytests und nativer Windows-Smoke mit Exit 0. Aktueller CI-Lauf sowie Zielsystemprüfungen stehen im [Status](docs/prp/linux-port-status.md). WPF bleibt bis zur Paritätsabnahme erhalten.
 
-#### Funktionsfehler und fehlende WPF-Abläufe
+- [x] **A01: Winamp-Spektrum.** `Winamp.SpectrumGlyphs` verwendet den aktiven Spektrumzeichensatz, sonst das Textspektrum. Quelle, Preset, Vorschau und virtuelles Gerät werden mit 0..15-/0..255-Pegeln und Quellenverlust geprüft.
+- [x] **A02: Glyphenvorschau.** Gemeinsame Abbildung in Dashboard und Seiteneditor: Slotmarkierungen für eigene Zeichen, Balken für Spektrumstufen. Der Gerätepfad behält die privaten VFD-Zeichen.
+- [x] **A03: Bedingungseditor.** Rohtext und Seitenwechsel befüllen Schlüssel, Operator und Wert. Der genehmigte Variablenbrowser übernimmt aktuelle Schlüssel; ungültige Ausdrücke bleiben bearbeitbar.
+- [x] **A04: Sensorauswahl.** Direkte Liste mit Namen, Wert und Einheit im Lüftereditor; manuelle und gespeicherte fehlende Schlüssel bleiben erhalten. Physische Freigabe bleibt ausdrücklich erforderlich.
+- [x] **A05: Medien.** Grafische Stereopegel und zwanzig Spektrumbänder, Pipe und letzte Snapshotzeit; sichtbare Windows-Medienquelle und Wiedergabe. Quellenverlust leert Metadaten und Pegel.
+- [x] **A06: Diagnose.** Version, UTC-Zeit, angewendeter Transport/Port, gesendeter Frame, Quellenfehler und vier Lüfterkonfigurationen im Bericht. Virtueller Zustand separat; dauerhafte Start-/Absturzspuren ohne Ausnahmemeldungen und Tokens in `avalonia-errors.log`.
+- [x] **A07: Glyphensatzwechsel.** Geladene Datei-/Beispielsätze werden nach erfolgreichem Speichern bei aktivierter Glyphenoption an den verbundenen angewendeten Transport gesendet. Gespeichert und gesendet werden getrennt gemeldet; ohne Option keine zusätzliche Programmierung.
+- [x] **A08: Hardware-Presets.** Beide Einstiege verwenden denselben Sensorkatalog, dieselben Favoriten/Aliase und Einheiten. Fünf Presetabläufe werden mit derselben Sensor-Fixture verglichen.
+- [x] **A09: Plattformumfang.** Windows-Vorlagen und Linux-MPRIS-Vorlage passend zur Plattform; bestehende/importierte Seiten bleiben erhalten. Lüfterquellenbeschriftung folgt dem Betriebssystem.
+- [x] **A10: Home Assistant.** Entitäts-/Attributschlüssel per Doppelklick und Strg+C; fokussierbare Listen. Attributkopie mit tatsächlichen Maus- und Tastatureingaben gegen lokalen WebSocket-Protokollpartner geprüft.
+- [x] **A11: Speicherstatus.** Seiten, Glyphen, Sensor- und HA-Präferenzen zeigen geändert, speichern, gespeichert oder Fehler am Editor. Erfolg folgt dem Schreibabschluss; ältere Abschlüsse bestätigen keine neueren Eingaben. Blockierte Workspace-Schreibdatei hält Seiten-/Glyphenentwürfe und lässt erneutes Speichern zu.
+- [x] **A12: Lüfterbedienung.** Reguläre Konfiguration vor den aufklappbaren Prüfwerkzeugen; physische Freigabe bleibt getrennt und nicht persistiert.
+- [x] **A13: Editoren.** Klickbares 5×8-Raster mit Leertastenbedienung; Kurvenpunkte anlegen, ändern und löschen. Beide schreiben in die bestehenden Textformate; Dezimaltemperaturen bleiben ohne Rundung erhalten, Ausgaben bleiben ganzzahlig bei 0..100.
+- [x] **A14: Nachweise.** Durchgängige Spektrumregression, Bedingungsbrowser, Speicherfehler, Glyphenoption, Presetabgleich und Quellenverlust. Seitenbedingungen, Pixelraster, Kurvenpunkte, Medienpegel und Diagnose mit Skia bei 950 × 600 in Englisch, Deutsch, Französisch, Türkisch und Russisch gerendert und angesehen. Hilfe, Audit und Arbeitsdokumente beschreiben diese Abläufe.
 
-- [ ] **A01: Winamp-Spektrum schließen.** `Winamp.SpectrumGlyphs` aus den Rohdaten und dem tatsächlich aktiven Glyphensatz erzeugen. Das vorhandene Preset liefert derzeit eine leere zweite Zeile. WPF-Verhalten bei passendem und unpassendem Glyphensatz beachten; Gegenproben mit 0..15- und 0..255-Pegeln sowie Quellenverlust ergänzen.
-- [ ] **A02: Glyphen in Bildschirmvorschauen darstellen.** Dashboard und Seitenvorschau geben derzeit private Unicode-Zeichen ab U+E000 direkt an TextBlocks. Eigene Glyphen wie WPF sichtbar repräsentieren, Spektrumstufen als Balken; den Gerätezeichenpfad unverändert erhalten. Normale Zeichen, numerische und benannte Glyphen sowie Spektrum prüfen.
-- [ ] **A03: Bedingungseditor anbinden.** Gespeicherte Sichtbarkeitsausdrücke beim Seitenwechsel in Schlüssel, Operator und Wert zerlegen; aktuell wird nur der Rohtext geladen. Variablen mit aktuellen Werten auswählbar machen, den genehmigten Browser wiederverwenden. Leere, gültige und ungültige Ausdrücke sowie Seitenwechsel und manuelle Eingabe prüfen.
-- [ ] **A04: Sensorauswahl im Lüftereditor ergänzen.** WPF bietet eine editierbare Liste numerischer Sensoren; Avalonia ein freies Schlüsselfeld und den Umweg über Hardware. Direkte Auswahl mit Name, Wert und Einheit anbieten; gespeicherte fehlende Sensoren und manuelle Schlüssel erhalten. Die ausdrückliche Hardwarefreigabe bleibt bestehen.
-- [ ] **A05: Medienanzeigen angleichen.** Winamp-VU links/rechts und das 20-Band-Spektrum grafisch darstellen; Verbindungsdetails und Zeitpunkt des letzten Snapshots ergänzen. Windows-Medienquelle und Wiedergabestatus sichtbar machen; der befüllte Playback-TextBlock ist derzeit dauerhaft ausgeblendet. Datenverlust und veraltete Daten erkennbar darstellen.
-- [ ] **A06: Diagnosebericht auf WPF-Inhaltstiefe bringen.** Version, Zeitpunkt, angewendeten Port/Transport, aktuellen Frame, Quellenzustände/-fehler und Konfiguration der vier Lüfter ergänzen. Virtuellen Zustand klar vom seriellen Ist-/Sendestand unterscheiden. Startup-/Absturzdiagnose wie im WPF-App-Einstieg dauerhaft sichern; Zugangsdaten und Tokens ausschließen. Sitzungsjournal und Diagnoseexport erhalten.
-- [ ] **A07: Glyphensatzwechsel angleichen.** WPF synchronisiert geladene Sätze bei aktivierter Glyphenprogrammierung mit einem verbundenen Gerät. Avalonia lädt Datei/Beispiel nur in den Workspace. Den angewendeten Transport und die gespeicherte Glyphenoption berücksichtigen; den Zustand gespeichert/gesendet erkennbar machen. Ohne aktivierte Option keine zusätzliche automatische Programmierung.
-- [ ] **A08: Hardware-Presets vereinheitlichen.** Seitenansicht und Hardwareansicht verwenden verschiedene Auswahlalgorithmen. Beide auf dieselben Regeln für Sensorart, Favoriten, Aliase und Einheiten führen und mit derselben Sensor-Fixture vergleichen.
-- [ ] **A09: Plattformumfang in der UI abbilden.** Die Presetauswahl bietet auf Linux weiterhin Winamp-/WindowsMedia-Vorlagen ohne dortigen Anbieter; eine MPRIS-Vorlage gibt es nur auf der Medienseite. Auswahl plattformgerecht anbieten und importierte Vorlagen erhalten. Die feste Linux-hwmon-Beschriftung im gemeinsamen Lüftereditor durch die tatsächliche Plattform-/Quellenangabe ersetzen.
-- [ ] **A10: HA-Bedienkomfort angleichen.** WPF kopiert Entitäts- und Attributschlüssel auch per Doppelklick; Avalonia bindet die Kopierschaltflächen, aber diesen Ablauf nicht an. Doppelklick und Tastaturzugang für dieselbe Aktion prüfen und ergänzen.
-
-#### Bewertung und gezielte Verbesserungen
-
-- [ ] **A11: Speicherrückmeldungen vereinheitlichen.** Seiten, Glyphen, Sensor- und HA-Präferenzen auf eindeutige Zustände geändert/gespeichert/Fehler prüfen. Glyphenspeichern meldet bereits vor dem asynchronen Workspace-Schreiben Erfolg; Fehler landen in der allgemeinen Statuszeile. Erfolg erst nach erfolgreichem Schreiben melden, Entwürfe bei Fehlern erhalten und Rückmeldung am betroffenen Editor anzeigen.
-- [ ] **A12: Lüfterbedienung bündeln.** Die reguläre Konfiguration sowie einmalige Simulation, Dauer-Dry-run, virtuelle Regelung und physische Freigabe verständlich ordnen. Die häufige Konfiguration priorisieren; Prüfaktionen in einem gezielt geöffneten Bereich zusammenhalten. Keine Sicherheitsfreigabe entfernen und keine automatische physische Ausgabe ergänzen.
-- [ ] **A13: Neue Editorfunktionen bewerten.** Klickbares 5x8-Pixelraster und bearbeitbare Kurvenpunkte sind passende Erweiterungen zur vorhandenen Bitmap-/Kurventexteingabe. Als Verbesserungsvorschläge innerhalb dieses Pakets bewerten; sie sind keine fehlenden WPF-Funktionen. Vor Umsetzung Umfang und Auswirkungen auf Tastaturbedienung, Zahlenpräzision und bestehende Textformate festlegen.
-- [ ] **A14: Nachweise an Benutzerabläufen ausrichten.** Durchgängige Fälle Quelle → Variablen → Preset → Vorschau → virtueller Transport ergänzen. Sichtbarkeitseditor, Quellenverlust, Glyphensatzwechsel, Speicherfehler und Plattformauswahl gezielt prüfen. Betroffene Ansichten in fünf Sprachen und bei Mindestgröße rendern und tatsächlich ansehen; Hilfe, Audit und Status an den umgesetzten Stand anpassen. Vorhandene grüne Tests belegen A01 bis A10 nicht pauschal.
-
-Neue eigenständige HA-Parallelquellen, WMP Legacy, ein zusätzlicher allgemeiner Settings-Import/-Export, Wiederherstellen von Standardwerten und ein Einrichtungsassistent werden durch dieses Paket nicht beauftragt. Der vorhandene Windows-Import bleibt erhalten. WPF bleibt bis zur Paritätsabnahme erhalten.
+Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standardwerte-Wiederherstellung und Einrichtungsassistent sind nicht Teil dieses Pakets. Der vorhandene Windows-Import bleibt erhalten.
 
 ### PORT-07: Pakete und Zielsysteme
 

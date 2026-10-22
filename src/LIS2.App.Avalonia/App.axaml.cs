@@ -42,6 +42,7 @@ public partial class App : Application
                 }
                 catch (Exception exception)
                 {
+                    FailureLog.Write("Startup", exception);
                     System.Diagnostics.Trace.TraceError("Startup failed: {0}", exception);
                     if (smokeDirectory is not null)
                     {

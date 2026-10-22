@@ -2,6 +2,8 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
+using Avalonia.Input;
+using Avalonia;
 
 namespace LIS2.App.Avalonia.Tests;
 
@@ -53,6 +55,16 @@ public sealed class HomeAssistantUiTests
             Click(window, "HaSaveEntity");
             await HomeAssistantServer.WaitAsync(() => workspace.Load().HomeAssistantEntityPreferences.Any(preference => preference.Alias == "Room Temp"));
             window.FindControl<ListBox>("HaAttributes")!.SelectedIndex = 0;
+            var attributes = window.FindControl<ListBox>("HaAttributes")!;
+            attributes.BringIntoView();
+            Assert.True(attributes.Focus());
+            window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
+            window.KeyReleaseQwerty(PhysicalKey.C, RawInputModifiers.Control);
+            await Task.Delay(30);
+            Assert.Equal("{HA.Room_Temp.attribute.battery}", await window.Clipboard!.GetTextAsync());
+            await window.Clipboard.SetTextAsync("");
+            await DoubleClickFirstRow(window, attributes);
+            Assert.Equal("{HA.Room_Temp.attribute.battery}", await window.Clipboard.GetTextAsync());
             Click(window, "HaCreateAttributePage");
             await HomeAssistantServer.WaitAsync(() => workspace.Load().Pages.Any(page => page.Line2Template == "{HA.Room_Temp.attribute.battery|fallback:--}"));
             Assert.Equal(87L, sources.Snapshot(DateTimeOffset.Now)["HA.Room_Temp.attribute.battery"]);
@@ -137,6 +149,21 @@ public sealed class HomeAssistantUiTests
     }
 
     private static void Click(Window window, string name) => window.FindControl<Button>(name)!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
+    private static async Task DoubleClickFirstRow(Window window, ListBox list)
+    {
+        list.BringIntoView();
+        await Task.Delay(60);
+        window.UpdateLayout();
+        var row = list.ContainerFromIndex(0)!;
+        var point = row.TranslatePoint(new Point(15, 15), window)!.Value;
+        for (var count = 0; count < 2; count++)
+        {
+            window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+        }
+        await Task.Delay(30);
+    }
 
     private static async Task CaptureAsync(Window window, string name)
     {

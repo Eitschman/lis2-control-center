@@ -35,6 +35,7 @@ internal static class HelpReferenceCatalog
                 Add("Display", "Use the Display section for direct physical or virtual LIS2 output. Manual commands interrupt page scheduling.");
                 Add("Lines and brightness", "Lines, characters and brightness use the applied transport. Brightness supports 100%, 75%, 50% and 25%, is saved and reapplied on connection. The serial preview shows sent content, without feedback from the physical display.");
                 Add("Custom glyphs", "Eight programmable 5x8 slots are available. Use {Glyph.1} through {Glyph.8} in templates.");
+                Add("Custom glyphs", "Click pixels or edit the eight binary rows. With programming on connect enabled, loading a glyph set also programs the connected display. Saved and sent states are separate. Previews show slot markers or spectrum bars.");
                 foreach (var glyph in glyphNames.Take(8).Select((name, index) => (name, slot: index + 1))
                              .Where(glyph => !string.IsNullOrWhiteSpace(glyph.name)))
                 {
@@ -52,6 +53,7 @@ internal static class HelpReferenceCatalog
                 AddExample("Template syntax", "{Variable}  {Variable|fallback:--}  {Variable|number:1}  {Variable|percent:0}  {Variable|bytes:1}");
                 Add("Formatting", "Operations may be chained: prefix, suffix, upper, lower, fallback, number, percent and bytes.");
                 Add("Visibility", "Use =, !=, >, >=, < or <=. Example: HA.sensor.temperature>=25");
+                Add("Visibility", "The condition fields follow the raw expression and selected page. Browse variables selects a current key for the condition. Invalid raw expressions remain editable. Save feedback appears beside the editor; a failed save keeps the draft.");
                 Add("Formatting details", "number and percent accept 0 to 6 decimal places. percent appends % without multiplying by 100; bytes uses powers of 1024. Numbers follow the operating system culture. Missing values return fallback directly, without further formatting. Visibility uses one condition without braces; numeric comparisons use a decimal point. Missing keys hide the page.");
                 AddExample("Clock", "{Clock.Time}  {Clock.Date}  {Clock.Day}");
                 content.AddRange(HelpVariableCatalog.Get("Clock.", language));
@@ -66,6 +68,7 @@ internal static class HelpReferenceCatalog
                 Add("Media", "Connected players supply read-only playback status, track metadata, elapsed time, duration and audio telemetry where supported.");
                 AddExample("Winamp", "{Winamp.State}  {Winamp.Artist}  {Winamp.Title}  {Winamp.Album}  {Winamp.Elapsed}  {Winamp.Duration}");
                 Add("Spectrum", "{Winamp.Vu}  {Winamp.Spectrum}  {Winamp.SpectrumGlyphs} require a supported source of live audio telemetry.");
+                Add("Spectrum", "The Winamp card shows stereo levels, twenty spectrum bands, the pipe and last snapshot time. Disconnection clears metadata and levels. SpectrumGlyphs uses the active spectrum glyph set; other sets use the text spectrum.");
                 AddExample("Windows media", "{WindowsMedia.State}  {WindowsMedia.Artist}  {WindowsMedia.Title}  {WindowsMedia.Connected}");
                 Add("Linux and Windows", "Linux uses MPRIS through playerctl, which must be installed. Select an automatic or specific player; the selection is saved. An unavailable selected player stays disconnected. Media.* provides Player, State, Title, Artist, Album, Elapsed, Duration and Connected, but no VU or spectrum. Values are refreshed every second. Windows uses WindowsMedia.* for GSMTC and Winamp.* for the Winamp plug-in. WMP Legacy is deferred and is not started. Create a page from the relevant media card. No plug-in is needed for GSMTC.");
                 AddExample("Media", "{Media.Player}  {Media.State}  {Media.Title}  {Media.Artist}  {Media.Album}  {Media.Elapsed}  {Media.Duration}  {Media.Connected}");
@@ -85,6 +88,7 @@ internal static class HelpReferenceCatalog
                 Add("Linux and Windows", "Available temperature, utilization, fan and storage sensors depend on the host and installed drivers.");
                 break;
             case 6:
+                Add("Regulation", "Choose an available sensor directly or type a key, including a missing sensor. Curve points and raw text share decimal temperatures without rounding. Test tools contains simulations and preview controls. Physical authorization stays separate and is never saved.");
                 Add("Fan Control", "Configure four channels, each with sensor assignment, mode and safe minimum/maximum output.");
                 Add("Regulation", "Fixed uses the configured percentage. Curve interpolates temperature=percent points and applies hysteresis. Follow rounds the sensor value to a percentage. External uses the fail-safe value because this application supplies no external control percentage. Off outputs zero only with AllowStop; otherwise it uses the minimum. Minimum and maximum limit normal outputs.");
                 Add("Fail-safe", "Missing or invalid sensors in Curve and Follow use the configured fail-safe value within the channel limits. Preview and simulation do not control physical fans. Physical output requires explicit authorization for the current serial connection. Start sends 100% first; stop and orderly disconnect send 100%. A broken physical connection cannot guarantee delivery of a safety frame.");
@@ -97,6 +101,7 @@ internal static class HelpReferenceCatalog
                 Add("Settings", "Autostart uses the Windows user registry or a Linux XDG autostart entry. Windows closes to tray; Linux closes the application and keeps minimized windows in the taskbar. Tray menus offer Open and Exit. A second launch activates the existing instance. F1 opens help for the current section.");
                 break;
             case 8:
+                Add("Export", "Diagnostics includes version, UTC time, applied transport and port, last transmitted frame, source errors and four fan configurations. The virtual state is separate. Startup and crash traces persist in avalonia-errors.log without exception messages or tokens.");
                 Add("Diagnostics", "Inspect the current device snapshot, decoded command history and protocol log.");
                 Add("Export", "Export diagnostic information for troubleshooting or hardware-validation sessions.");
                 Add("Virtual LIS2", "The virtual device permits protocol tests without physical hardware.");

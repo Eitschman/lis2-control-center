@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
+using Avalonia.Input;
 using LIS2.Sources;
 
 namespace LIS2.App.Avalonia;
@@ -63,6 +64,30 @@ public partial class MainWindow
                 picker.SelectedItem = row.EntityId;
         };
         this.FindControl<ComboBox>("HaDomainFilter")!.SelectionChanged += (_, _) => RefreshHaEntities();
+        this.FindControl<TextBox>("HaAlias")!.PropertyChanged += (_, change) =>
+        {
+            if (change.Property == TextBox.TextProperty) MarkEditorChanged("HaPreferenceStatus");
+        };
+        this.FindControl<CheckBox>("HaFavorite")!.IsCheckedChanged += (_, _) => MarkEditorChanged("HaPreferenceStatus");
+        this.FindControl<ListBox>("HaEntityList")!.DoubleTapped += async (_, _) =>
+        {
+            if (SelectedHaEntityId() is { } entity) await CopyHaKeyAsync(HaEntityKey(entity));
+        };
+        this.FindControl<ListBox>("HaAttributes")!.DoubleTapped += async (_, _) =>
+        {
+            if (SelectedHaEntityId() is { } entity && SelectedHaAttribute() is { } attribute)
+                await CopyHaKeyAsync(HaAttributeKey(entity, attribute));
+        };
+        foreach (var name in new[] { "HaEntityList", "HaAttributes" })
+            this.FindControl<ListBox>(name)!.AddHandler(InputElement.KeyDownEvent, async (_, args) =>
+            {
+                if (args.Key != Key.C || !args.KeyModifiers.HasFlag(KeyModifiers.Control)) return;
+                if (SelectedHaEntityId() is not { } entity) return;
+                var attribute = name == "HaAttributes" ? SelectedHaAttribute() : null;
+                if (name == "HaAttributes" && attribute is null) return;
+                await CopyHaKeyAsync(attribute is null ? HaEntityKey(entity) : HaAttributeKey(entity, attribute));
+                args.Handled = true;
+            }, global::Avalonia.Interactivity.RoutingStrategies.Tunnel);
         this.FindControl<Button>("HaSaveEntity")!.Click += async (_, _) =>
         {
             if (SelectedHaEntityId() is not string id) return;
@@ -75,7 +100,7 @@ public partial class MainWindow
             preference.Alias = this.FindControl<TextBox>("HaAlias")!.Text?.Trim() ?? string.Empty;
             preference.IsFavorite = this.FindControl<CheckBox>("HaFavorite")!.IsChecked == true;
             ApplyHaAliases();
-            await SavePortableWorkspaceAsync();
+            await PersistEditorAsync("HaPreferenceStatus");
             RefreshHaEntities();
         };
         this.FindControl<Button>("HaCopyKey")!.Click += async (_, _) =>
@@ -160,8 +185,12 @@ public partial class MainWindow
 
     private async Task CopyHaKeyAsync(string key)
     {
-        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-        if (clipboard is not null) await clipboard.SetTextAsync(key);
+        try
+        {
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+            if (clipboard is not null) await clipboard.SetTextAsync(key);
+        }
+        catch (Exception exception) { SetUiText("HaActionStatus", (UiMessage)exception.Message); }
     }
 
     private void RefreshHaEntities()

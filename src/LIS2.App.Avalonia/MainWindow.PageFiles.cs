@@ -11,12 +11,28 @@ public partial class MainWindow
     {
         this.FindControl<ComboBox>("PageConditionOperator")!.SelectedIndex = 0;
         this.FindControl<Button>("PageApplyCondition")!.Click += (_, _) => ApplyPageCondition();
-        this.FindControl<TextBox>("PageVisibility")!.TextChanged += (_, _) => UpdateConditionStatus();
+        this.FindControl<Button>("PageConditionBrowse")!.Click += async (_, _) =>
+            await ShowPageVariableBrowserAsync(selectedAction: key => this.FindControl<TextBox>("PageConditionKey")!.Text = key);
+        this.FindControl<TextBox>("PageVisibility")!.TextChanged += (_, _) =>
+        {
+            LoadConditionEditor(this.FindControl<TextBox>("PageVisibility")!.Text);
+            UpdateConditionStatus();
+        };
         this.FindControl<TextBox>("PageConditionKey")!.TextChanged += (_, _) => UpdateConditionStatus();
         this.FindControl<TextBox>("PageConditionValue")!.TextChanged += (_, _) => UpdateConditionStatus();
         this.FindControl<ComboBox>("PageConditionOperator")!.SelectionChanged += (_, _) => UpdateConditionStatus();
         this.FindControl<Button>("PageImport")!.Click += async (_, _) => await RunPageFileActionAsync(LoadPagesAsync);
         this.FindControl<Button>("PageExport")!.Click += async (_, _) => await RunPageFileActionAsync(SavePagesAsync);
+    }
+
+    /// <summary>Ein Seitenwechsel darf keine Bedingungsfelder der zuvor gewählten Seite stehen lassen.</summary>
+    private void LoadConditionEditor(string? expression)
+    {
+        var valid = VisibilityEvaluator.TryParse(expression, out var key, out var comparison, out var value);
+        this.FindControl<TextBox>("PageConditionKey")!.Text = valid ? key : "";
+        this.FindControl<TextBox>("PageConditionValue")!.Text = valid ? value : "";
+        this.FindControl<ComboBox>("PageConditionOperator")!.SelectedIndex = valid
+            ? Array.IndexOf(new[] { "=", "!=", ">", ">=", "<", "<=" }, comparison) : 0;
     }
 
     private void ApplyPageCondition()
