@@ -32,7 +32,11 @@ sudo apt install ./lis2-control-center_0.1.2_amd64.deb
 lis2-control-center
 ```
 
-On ARM64, use `lis2-control-center_0.1.2_arm64.deb` instead. The application also appears in the application menu. Serial port permissions and a desktop keyring must be configured for your system; see the [packaging guide](docs/release.md#debian-pakete).
+On ARM64, use `lis2-control-center_0.1.2_arm64.deb` instead. The application also appears in the application menu. Configure serial port permissions when using physical LIS2 hardware.
+
+Linux Home Assistant token storage normally uses `secret-tool` and an unlocked desktop keyring; local AES storage is available only after explicitly selecting it in the application. A keyring is not required for features that do not use Home Assistant.
+
+Linux media integration requires `playerctl`. The Debian packages recommend `libsecret-tools` and `playerctl`; see the [packaging guide](docs/release.md#debian-pakete).
 
 Also available: the [Windows Protocol Tester](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/LIS2-ProtocolTester-0.1.2-win-x64.zip), [Winamp plug-in gen_lis2.dll](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/gen_lis2.dll) and [SHA-256 checksums](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/SHA256SUMS.txt). Place the Winamp plug-in in the `Plugins` directory of 32-bit Winamp. The [release notes](docs/release-notes.md) describe the release scope and outstanding manual checks. Application and Protocol Tester packages include license texts, third-party notices and source references.
 
@@ -75,7 +79,8 @@ The following features belong to the Avalonia application. The porting status re
 
 ### PC hardware and fan control
 
-- LibreHardwareMonitor source
+- Windows sensors through LibreHardwareMonitor
+- Linux sensors through `/proc`, `/sys` and hwmon: CPU load/frequency, memory/swap, disk/network throughput, filesystem usage, temperatures and fan speeds, depending on available system data
 - searchable/filterable hardware browser grouped by device
 - aliases and favorites
 - configured-but-missing sensors remain visible as unavailable
@@ -86,6 +91,8 @@ The following features belong to the Avalonia application. The porting status re
 - fan-curve editor/preview, live input/output display and optional hysteresis
 
 ### Winamp
+
+The Winamp integration runs on Windows; Linux media players use the MPRIS integration described below.
 
 - native 32-bit `gen_lis2.dll` general-purpose plug-in
 - JSON snapshots over `\\.\pipe\LIS2ControlCenter.Winamp`
@@ -109,6 +116,16 @@ The modern Windows 11 Media Player is integrated directly through **Global Syste
 - dedicated Media-page card alongside Winamp
 
 Windows Media Player Legacy remains outside the current product scope. The application does not start the Legacy source or display a Legacy card. Native Legacy CI artifacts are disabled.
+
+### Linux media players
+
+- MPRIS-compatible desktop players queried through `playerctl`
+- automatic player selection or a saved selection of a specific player
+- title, artist, album, playback state and elapsed/duration values when supplied by the player
+- `Media.*` display variables and direct page creation from the Media view
+- a selected player remains disconnected while unavailable instead of switching to another player
+
+Install `playerctl` for this integration, for example with `sudo apt install playerctl` on Debian/Ubuntu. It is a recommended dependency of the Debian package. Winamp VU/spectrum telemetry and the Windows GSMTC provider are separate Windows integrations.
 
 ### Home Assistant
 
@@ -137,14 +154,16 @@ Dedicated LIS2 integrations are therefore only useful when they provide a concre
 
 See [docs/home-assistant-integration.md](docs/home-assistant-integration.md).
 
-### Windows application
+### Desktop application
 
-- tray operation and Windows autostart
-- Light, Dark and Windows-system themes
+- tray support, subject to the tray integration available on the Linux desktop
+- autostart through the Windows user registry or a Linux XDG autostart entry
+- Light, Dark and system themes
 - runtime localization: System, English, German, French, Turkish and Russian with English fallback
 - context-sensitive in-app help on every main page, including complete page/template configuration reference, all static display variables, dynamic hardware-variable discovery and detailed Home Assistant examples for states, aliases, attributes, formatting and visibility
-- application/version/about information
+- application/version/about information, including the Avalonia version, MIT license and access to the packaged license files
 - persistent JSON settings under the user's local application data
+- migration of legacy WPF `settings.json` files, plus separate page and custom-glyph file loading/saving
 - custom LIS2 application/tray/taskbar icon
 - diagnostics/logging
 - decoded virtual-LIS2 command history and full virtual state inspection
@@ -155,22 +174,27 @@ See [docs/home-assistant-integration.md](docs/home-assistant-integration.md).
 ## Architecture
 
 ```text
-Clock / Hardware / Winamp / Windows Media / Home Assistant
-                  |
-                  v
-          DataSourceRegistry
-                  |
-                  v
-      Display runtime / events
-                  |
-                  v
-        DisplayFrameWriter
-                  |
-                  v
-            Lis2Device
-             /     \
-            v       v
-        Serial    Virtual
+Clock / Home Assistant           Windows/Linux sensors and media
+          |                                    |
+          v                                    |
+SourceRuntime / DataSourceRegistry              |
+          |                                    |
+          +------------------+-----------------+
+                             |
+                             v
+                     PageSourceValues
+                             |
+                             v
+                  Display runtime / events
+                             |
+                             v
+                    DisplayFrameWriter
+                             |
+                             v
+                         Lis2Device
+                          /     \
+                         v       v
+                     Serial    Virtual
 ```
 
 The projects are deliberately separated:
@@ -209,12 +233,20 @@ Data sources are source-agnostic from the display engine's point of view. Typica
 {WindowsMedia.Elapsed}
 {WindowsMedia.Duration}
 
+{Media.Artist}
+{Media.Title}
+{Media.State}
+{Media.Elapsed}
+{Media.Duration}
+
 {HA.sensor.example}
 {HA.sensor.example.Unit}
 {HA.sensor.example.attribute.some_attribute}
 ```
 
 Aliases provide shorter stable names for hardware/Home Assistant values where configured.
+
+`Winamp.*` and `WindowsMedia.*` refer to the Windows integrations; `Media.*` refers to Linux MPRIS players. Available hardware keys depend on the operating system and detected sensors; use the variable browser to select actual keys.
 
 Template values can be formatted inline:
 
@@ -299,7 +331,7 @@ The Debian packages include the .NET runtime, an application menu entry and the 
 
 Several ideas have deliberately **not** been added:
 
-- no settings import/export
+- no general full-settings import/export; legacy WPF settings migration and separate page/custom-glyph files are supported
 - no restore-defaults workflow
 - no first-run wizard
 - no direct LIS2 hardware access from the Winamp plug-in
