@@ -190,6 +190,7 @@ public partial class MainWindow
                     if (child is TextBlock block) block.Text = SettingsTranslate(SectionNames[i]);
         }
         ApplyPageLocalization();
+        UpdateConditionStatus();
         if (this.FindControl<Button>("PageVariableBrowser") is { } browser)
             browser.Content = BrowserText("Browse variables…");
         if (this.FindControl<TextBlock>("PageVariableStatus") is not null)

@@ -4,9 +4,9 @@ using LIS2.Runtime;
 namespace LIS2.App.Avalonia;
 
 /// <summary>
-/// Explicit opt-in hardware fan runtime. The first serial command is the safe
-/// fan frame; the periodic loop must be drained before the device is closed.
-/// UI wiring deliberately remains disabled until hardware safety review.
+/// Lüfterruntime mit ausdrücklicher Freigabe. Der erste Befehl ist der Sicherheitsframe;
+/// vor dem Trennen muss die periodische Schleife geleert werden. Die UI nutzt diesen
+/// Helfer für den virtuellen Protokolltest; physische Regelung läuft über SerialDisplaySession.
 /// </summary>
 public sealed class AuthorizedFanRuntimeSession : IAsyncDisposable
 {
@@ -52,6 +52,14 @@ public sealed class AuthorizedFanRuntimeSession : IAsyncDisposable
             await _device.DisconnectAsync(CancellationToken.None).ConfigureAwait(false);
             throw;
         }
+    }
+
+    /// <summary>Ändert die Kanäle einer laufenden Sitzung; eine gestoppte Sitzung bleibt ohne Ausgabe.</summary>
+    public async Task<bool> ConfigureAsync(IReadOnlyList<LIS2.Fans.FanChannelConfiguration> channels)
+    {
+        if (_disposed || !_started || LastFault is not null) return false;
+        await _runtime.ConfigureAsync(channels).ConfigureAwait(false);
+        return true;
     }
 
     public async Task StopAsync()

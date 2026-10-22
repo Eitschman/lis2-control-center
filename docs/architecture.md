@@ -52,9 +52,9 @@ Clock / Hardware / HA / Winamp / WindowsMedia / Media
 
 `PageWorkspaceActions` verbindet die Seitenerzeugung aus HA, Medien und Hardware-Presets mit dem Editor und der Wiedergabe. Ungültige Editorentwürfe verhindern Änderungen an Liste, Auswahl und Persistenz. Gültige Entwürfe werden übernommen, danach folgen neue Seite, Auswahl, Reload beider laufender Sequenzen, Speicherung und Navigation zum Editor. Die UI liefert diese Aktionen als Delegates; der Ablauf wird mit echten Sequenzcontrollern und temporären Workspace-Dateien headless geprüft.
 
-`PageFrameDispatcher` unterdrückt identische ganze Frames und löscht bei leerer Ausgabe. Der Avalonia-Livepfad ruft `RenderBothAsync` auf und nutzt den differenziellen `DisplayFrameWriter` aus `LIS2.Display` nicht. Die in der WPF-/Displaybibliothek vorhandene Ausgabe geänderter Spannen ist deshalb kein Nachweis für diesen Pfad.
+`PageFrameDispatcher` unterdrückt identische ganze Frames und löscht bei leerer Ausgabe. `RenderBothAsync` verwendet in `VirtualDeviceSession` und `UnifiedLis2Session` den differenziellen `DisplayFrameWriter` aus `LIS2.Display`. Direkte Zeilenausgaben, Clear und ROM-Ausgaben setzen dessen Zustand zurück.
 
-Ereignisse können eine temporäre Sequenz starten. Nach Ablauf wird zur normalen Seite zurückgekehrt oder die nur für das Ereignis gestartete Ausgabe beendet. Manuelle Aktionen stoppen und leeren ausstehende Sequenzschreibvorgänge, bevor sie selbst schreiben.
+Ereignisse können eine temporäre Sequenz starten. Nach Ablauf wird zur normalen Seite zurückgekehrt oder die nur für das Ereignis gestartete Ausgabe beendet. Manuelle Bildausgaben stoppen und leeren ausstehende Sequenzschreibvorgänge, bevor sie selbst schreiben. Helligkeit und Glyphenprogrammierung drainieren nur den Timer und verwenden das Frame-Gate von `PageSequenceController.RunExclusiveAsync`. Zeitplan, Scrollzustand und Ereignisse bleiben erhalten; nur ein zuvor laufender Timer wird wieder aufgenommen. Fehler stoppen die betroffene Sequenz.
 
 ## Gerätezugriff und Lüfter
 
@@ -63,6 +63,8 @@ Ereignisse können eine temporäre Sequenz starten. Nach Ablauf wird zur normale
 Die Dashboard-Handausgabe verwendet `PortableFanSettings.CalculateManualOutputs` und `FanController` für Minimum, Maximum und AllowStop. Der gespeicherte Regelmodus bleibt erhalten. `SerialDisplaySession.ApplyManualFansAsync` benötigt ausdrückliche Freigabe, teilt das Lifecycle-Gate mit Start/Stop/Disconnect und lehnt parallele automatische Regelung ab. Erstfreigabe schreibt 100 Prozent; Stop, Trennen und Schreibfehler entziehen die Freigabe und versuchen die Sicherheitsausgabe. Die UI verbraucht jede manuelle Freigabe nach einer Aktion.
 
 `UnifiedLis2Session` schützt serielle Display-, Glyphen-, Helligkeits- und Lüfterkommandos mit einem gemeinsamen Semaphore-Gate. Die normale Verbindung startet ohne Lüfterfreigabe. `SerialDisplaySession.StartFansAsync` setzt nach ausdrücklichem UI-Consent zuerst vier 100-%-Werte, aktiviert die `FanRuntime` und startet die zweisekündige `FanRuntimeLoop`.
+
+Nach erfolgreichem Speichern übergibt `UpdateRunningFanConfigurationAsync` die vier Kanäle an die laufende serielle/virtuelle Regelung und den kontinuierlichen Dry-run. `FanRuntime.ConfigureAsync` übernimmt die Konfiguration unter ihrem Gate und verwirft den alten Hysterese-/Ausgabeverlauf. Der nächste Regeltakt verwendet diese Werte. Konfiguration aktiviert weder eine gestoppte Sitzung noch eine neue Lüfterfreigabe.
 
 Die Freigabe wird nicht gespeichert. Stop/Fehler/Disconnect sollen die Regelung leeren, die Freigabe widerrufen und den Sicherheitsframe anfordern. Ein gescheiterter Hardware-Schreibvorgang ist keine Garantie für den tatsächlichen Lüfterzustand. Virtuelle Fehlereinspeisung prüft Reihenfolge und Softwareverhalten.
 

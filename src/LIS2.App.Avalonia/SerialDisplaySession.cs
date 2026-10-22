@@ -80,6 +80,20 @@ public sealed class SerialDisplaySession : IDisplaySession
         finally { _fanTransition = false; _lifecycle.Release(); }
     }
 
+    /// <summary>Aktualisiert nur eine bereits laufende Regelung, ohne Ausgabe zu aktivieren oder eine Freigabe zu erneuern.</summary>
+    public async Task<bool> ConfigureFansAsync(IReadOnlyList<FanChannelConfiguration> channels)
+    {
+        await _lifecycle.WaitAsync();
+        try
+        {
+            if (_disposed || _closing || _disconnected || _fanRuntime is null || _fanLoop is null || FanFault is not null)
+                return false;
+            await _fanRuntime.ConfigureAsync(channels);
+            return true;
+        }
+        finally { _lifecycle.Release(); }
+    }
+
     public async Task StopFansAsync()
     {
         await _lifecycle.WaitAsync();

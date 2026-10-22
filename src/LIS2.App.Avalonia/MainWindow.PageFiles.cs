@@ -122,7 +122,7 @@ public partial class MainWindow
         _pages.ImportJson(imported);
         RefreshPageList(_pages.Pages.Count > 0 ? 0 : -1);
         await ReloadRunningPagesAsync();
-        await SavePortableWorkspaceAsync();
+        await SavePortableWorkspaceAsync(true);
         SetVirtualStatus("Page definitions imported.");
     }
 }

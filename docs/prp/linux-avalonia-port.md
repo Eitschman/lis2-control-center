@@ -1,7 +1,7 @@
 # PRP: LIS2 Control Center mit Avalonia
 
 Stand: 22.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-06; genaue Prüfnachweise im [Status](linux-port-status.md).
+Implementierungsstand: PORT-06B; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
 
@@ -19,7 +19,9 @@ Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anst
 - [TODO](../../TODO.md): priorisierte Restarbeiten und nächstes Arbeitspaket.
 - [Architektur](../architecture.md), [Protokoll](../protocol.md) und [Release-Verfahren](../release.md).
 
-Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal bestehen 439 Avalonia-Tests; der zusätzliche Linux-Schlüsselbundtest ist unter Windows übersprungen. HA-Verbindungsabläufe verwenden einen lokalen WebSocket-Protokollpartner. Linux-CI führt die Suite mit isoliertem echtem Secret Service aus; der aktuelle Nachweis steht im [Status](linux-port-status.md). Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu.
+Builds, Tests, nativer Desktop-Smoke und Pakete werden über `.github/workflows/linux-portable.yml` geprüft. Lokal bestehen 451 Avalonia-Tests; der zusätzliche Linux-Schlüsselbundtest ist unter Windows übersprungen. HA-Verbindungsabläufe verwenden einen lokalen WebSocket-Protokollpartner. Linux-CI führt die Suite mit isoliertem echtem Secret Service aus; der aktuelle Nachweis steht im [Status](linux-port-status.md). Dieser ordnet CI-Läufe dem jeweiligen Code-Commit zu.
+
+PORT-06B bindet gespeicherte Lüfterkanäle an laufende Regler und Dry-runs an, ohne Ausgaben zu aktivieren. Helligkeit und Glyphenprogrammierung erhalten die Seitenrotation und aktive Ereignisse. Seitenimporte melden Speicherfehler; die Bedingungsanzeige folgt Quelldaten und Sprache. Die zwölf zusätzlichen Regressionen verwenden isolierte Stores, tatsächliche Controls und virtuelle Protokollpartner für beide Transportpfade.
 
 ## Implementierungsstand
 

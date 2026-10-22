@@ -56,7 +56,7 @@ public partial class MainWindow
                 await (_serialDisplay ?? throw new InvalidOperationException("Serial display not connected."))
                     .ProgramAllGlyphsAsync(_glyphs.Glyphs);
                 SetSerialStatus("Programmed all 8 glyph slots on serial LIS2.");
-            });
+            }, preservePlayback: true);
         this.FindControl<Button>("SerialApplyBrightness")!.Click += async (_, _) =>
             await RunSerialActionAsync(async () =>
             {
@@ -77,7 +77,7 @@ public partial class MainWindow
                 };
                 await SavePortableWorkspaceAsync(true);
                 SetSerialStatus("Serial LIS2 brightness updated.");
-            });
+            }, preservePlayback: true);
         InitializeSerialPlayback();
         RefreshSerialPorts();
     }
@@ -137,24 +137,33 @@ public partial class MainWindow
         UpdateSerialControls();
     }
 
-    private async Task RunSerialActionAsync(Func<Task> action)
+    private async Task RunSerialActionAsync(Func<Task> action, bool preservePlayback = false)
     {
         if (_serialBusy) return;
-        if ((_serialSequence?.IsBusy == true)) return;
+        if (!preservePlayback && _serialSequence?.IsBusy == true) return;
         // Manual writes, brightness and glyph programming must never race a
         // queued playback write, even when the sequence is already stopped.
         _serialBusy = true;
-        StopSerialPlayback();
+        var resumeTimer = preservePlayback && _serialPlaybackTimer.IsRunning;
+        if (!preservePlayback) StopSerialPlayback();
         UpdateSerialControls();
         try
         {
             await _serialPlaybackTimer.StopAndDrainAsync();
-            if (_serialSequence is not null)
+            if (!preservePlayback && _serialSequence is not null)
                 await _serialSequence.StopAndDrainAsync();
-            await action();
+            if (preservePlayback && _serialSequence is not null)
+                await _serialSequence.RunExclusiveAsync(action);
+            else await action();
         }
-        catch (Exception ex) { SetSerialStatus($"Serial display error: {(UiMessage)ex.Message}"); }
-        finally { _serialBusy = false; UpdatePreview(); UpdateSerialControls(); }
+        catch (Exception ex) { StopSerialPlayback(); SetSerialStatus($"Serial display error: {(UiMessage)ex.Message}"); }
+        finally
+        {
+            _serialBusy = false;
+            if (resumeTimer && _serialSequence?.IsRunning == true && _serialDisplay?.IsConnected == true) _serialPlaybackTimer.Start();
+            UpdatePreview();
+            UpdateSerialControls();
+        }
     }
 
     private void UpdateSerialControls()

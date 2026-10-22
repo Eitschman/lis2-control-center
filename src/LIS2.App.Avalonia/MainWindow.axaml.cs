@@ -94,7 +94,7 @@ public partial class MainWindow : Window
         this.FindControl<Button>("SendGlyphSlot")!.Click += async (_, _) =>
             await RunSelectedDisplayActionAsync(session => session.ProgramGlyphAsync(
                 this.FindControl<ComboBox>("GlyphSlot")!.SelectedIndex + 1,
-                GlyphBitmap.Parse(this.FindControl<TextBox>("GlyphBitmapEditor")!.Text)));
+                GlyphBitmap.Parse(this.FindControl<TextBox>("GlyphBitmapEditor")!.Text)), preservePlayback: true);
 
         InitializeSerialDisplay();
         InitializeDashboardFans();
@@ -190,22 +190,25 @@ public partial class MainWindow : Window
         StopHomeAssistantUi();
     }
 
-    private async Task RunVirtualActionAsync(Func<Task> action)
+    private async Task RunVirtualActionAsync(Func<Task> action, bool preservePlayback = false)
     {
-        if (_busy || _virtualSequence?.IsBusy == true)
+        if (_busy || (!preservePlayback && _virtualSequence?.IsBusy == true))
             return;
 
         // Reserve manual ownership before awaiting any drain. A scheduled
         // playback callback must finish before a manual command can be sent.
         _busy = true;
-        StopPagePlayback();
+        var resumeTimer = preservePlayback && _pageTimer.IsRunning;
+        if (!preservePlayback) StopPagePlayback();
         UpdateVirtualControls();
         try
         {
             await _pageTimer.StopAndDrainAsync();
-            if (_virtualSequence is not null)
+            if (!preservePlayback && _virtualSequence is not null)
                 await _virtualSequence.StopAndDrainAsync();
-            await action();
+            if (preservePlayback && _virtualSequence is not null)
+                await _virtualSequence.RunExclusiveAsync(action);
+            else await action();
             UpdatePreview();
             SetVirtualStatus(_virtualDevice.IsConnected
                 ? (UiMessage)$"Virtual LIS2: connected ({_virtualDevice.CommandCount} commands)"
@@ -213,11 +216,14 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
+            StopPagePlayback();
             SetVirtualStatus($"Virtual LIS2 error: {(UiMessage)ex.Message}");
         }
         finally
         {
             _busy = false;
+            if (resumeTimer && _virtualSequence?.IsRunning == true && _virtualDevice.IsConnected) _pageTimer.Start();
+            UpdatePagePlaybackControls();
             UpdateVirtualControls();
         }
     }

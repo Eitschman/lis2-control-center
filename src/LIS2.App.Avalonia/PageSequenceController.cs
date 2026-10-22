@@ -74,6 +74,15 @@ public sealed class PageSequenceController
         _tickGate.Release();
     }
 
+    /// <summary>Geräteeinstellungen werden zwischen zwei Frames geändert; Zeitplan, Scrollposition und Overlay bleiben erhalten.</summary>
+    public async Task RunExclusiveAsync(Func<Task> action, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        await _tickGate.WaitAsync(cancellationToken);
+        try { await action(); }
+        finally { _tickGate.Release(); }
+    }
+
     public async Task<bool> TickAsync(
         DateTimeOffset now,
         IReadOnlyDictionary<string, object?> values,

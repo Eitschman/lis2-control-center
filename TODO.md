@@ -1,7 +1,7 @@
 # TODO: Avalonia-Portierung
 
 Stand: 22.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-06A mit Paritätskorrekturen, direkten Sensor-/Bedingungseditoren, grafischer Medienanzeige, Pixelraster und Kurvenpunkten. Lokal 439 Avalonia-Tests erfolgreich, ein Linux-Schlüsselbundtest unter Windows übersprungen; 50 Displaytests erfolgreich. CI-Nachweise und Zielsystemprüfungen im [Status](docs/prp/linux-port-status.md).
+Implementierungsstand: PORT-06B mit laufender Lüfterkonfiguration, erhaltener Seitenrotation bei Helligkeit/Glyphen, sichtbaren Importfehlern und aktueller Bedingungsanzeige. Lokal 451 Avalonia-Tests erfolgreich, ein Linux-Schlüsselbundtest unter Windows übersprungen. Nativer Windows-Smoke mit Exit 0. CI-Nachweise und Zielsystemprüfungen im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -106,7 +106,7 @@ Technischer Nachweis: [CI 39581947442](https://github.com/Eitschman/lis2-control
 
 ### PORT-06A: Paritätskorrekturen und Bedienung
 
-A01 bis A14 sind softwareseitig umgesetzt. Lokaler Windows-Nachweis: 439 erfolgreiche Avalonia-Tests und ein übersprungener Linux-Schlüsselbundtest, 50 erfolgreiche Displaytests und nativer Windows-Smoke mit Exit 0. Aktueller CI-Lauf sowie Zielsystemprüfungen stehen im [Status](docs/prp/linux-port-status.md). WPF bleibt bis zur Paritätsabnahme erhalten.
+A01 bis A14 sind softwareseitig umgesetzt und Teil der 451 erfolgreichen Avalonia-Tests des aktuellen PORT-06B-Stands; ein Linux-Schlüsselbundtest ist unter Windows übersprungen. Aktueller CI-Lauf sowie Zielsystemprüfungen stehen im [Status](docs/prp/linux-port-status.md). WPF bleibt bis zur Paritätsabnahme erhalten.
 
 - [x] **A01: Winamp-Spektrum.** `Winamp.SpectrumGlyphs` verwendet den aktiven Spektrumzeichensatz, sonst das Textspektrum. Quelle, Preset, Vorschau und virtuelles Gerät werden mit 0..15-/0..255-Pegeln und Quellenverlust geprüft.
 - [x] **A02: Glyphenvorschau.** Gemeinsame Abbildung in Dashboard und Seiteneditor: Slotmarkierungen für eigene Zeichen, Balken für Spektrumstufen. Der Gerätepfad behält die privaten VFD-Zeichen.
@@ -124,6 +124,14 @@ A01 bis A14 sind softwareseitig umgesetzt. Lokaler Windows-Nachweis: 439 erfolgr
 - [x] **A14: Nachweise.** Durchgängige Spektrumregression, Bedingungsbrowser, Speicherfehler, Glyphenoption, Presetabgleich und Quellenverlust. Seitenbedingungen, Pixelraster, Kurvenpunkte, Medienpegel und Diagnose mit Skia bei 950 × 600 in Englisch, Deutsch, Französisch, Türkisch und Russisch gerendert und angesehen. Hilfe, Audit und Arbeitsdokumente beschreiben diese Abläufe.
 
 Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standardwerte-Wiederherstellung und Einrichtungsassistent sind nicht Teil dieses Pakets. Der vorhandene Windows-Import bleibt erhalten.
+
+### PORT-06B: Laufzeit- und Speicherparität
+
+- [x] **B01: Laufende Lüfterkonfiguration.** Gespeicherte Modi, Werte, Sensoren, Grenzen und Kurven gelten ab dem nächsten Regeltakt für serielle/virtuelle Regelung und den kontinuierlichen Dry-run. Speichern startet keine Ausgabe und erneuert keine Freigabe.
+- [x] **B02: Helligkeit und Glyphen.** Geräteänderungen warten auf laufende Frames. Zeitplan, Scrollzustand, aktive Ereignisse und laufende Timer bleiben erhalten. Gestoppte Sequenzen starten dadurch nicht; manuelle Bildausgaben stoppen weiterhin die Rotation.
+- [x] **B03: Seitenimport.** Ein Fehler beim Speichern des Workspace bleibt als Fehler sichtbar. Erfolg wird erst nach dem Schreibabschluss gemeldet; die vorhandene Datei bleibt bei Schreibfehlern erhalten.
+- [x] **B04: Bedingungsanzeige.** Der Seiteneditor bewertet die Sichtbarkeitsbedingung mit den aktuellen Quelldaten und aktualisiert die Meldung beim Sprachwechsel.
+- [x] **Nachweise.** Zwölf Regressionen zu beiden Transportpfaden, Kanalgrenzen und Fail-safe, unveränderter Freigabe, Dry-run, Rotation/Ereignissen, exklusiver Ausgabe sowie gültigem/fehlgeschlagenem Import. Windows-Suite: 451 erfolgreich, ein Linux-Fall übersprungen. Bedingungsanzeige und Importfehler bei 950 × 600 gerendert und angesehen; nativer Windows-Smoke mit Exit 0.
 
 ### PORT-07: Pakete und Zielsysteme
 

@@ -15,6 +15,7 @@ public partial class MainWindow
     private VirtualLis2Transport? _virtualFanTransport;
     private CancellationTokenSource? _fanMonitorStop;
     private Task? _fanMonitorTask;
+    private FanRuntime? _fanMonitorRuntime;
     private bool _fanEditorLoading;
     private int _fanEditingChannelIndex;
     private sealed record FanSensorChoice(string Key, string Label)
@@ -103,6 +104,7 @@ public partial class MainWindow
             {
                 SaveFanEditor();
                 await SavePortableWorkspaceAsync(true);
+                await UpdateRunningFanConfigurationAsync();
                 SetFanStatus("Fan settings saved. Physical fan output requires separate authorization.");
             }
             catch (Exception ex) { SetFanStatus($"Invalid fan settings: {(UiMessage)ex.Message}"); }
@@ -277,6 +279,7 @@ public partial class MainWindow
         try
         {
             await using var runtime = new FanRuntime(_liveFanSensors, new SimulatedFanOutput(), channels);
+            _fanMonitorRuntime = runtime;
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
             do
             {
@@ -291,12 +294,22 @@ public partial class MainWindow
         }
         finally
         {
+            _fanMonitorRuntime = null;
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 this.FindControl<Button>("FanMonitorStart")!.IsEnabled = true;
                 this.FindControl<Button>("FanMonitorStop")!.IsEnabled = false;
             });
         }
+    }
+
+    /// <summary>Gespeicherte Kanäle gelten ab dem nächsten Regeltakt; bestehende Freigaben werden nicht erweitert.</summary>
+    private async Task UpdateRunningFanConfigurationAsync()
+    {
+        var channels = _fanSettings.ToRuntimeChannels();
+        if (_serialDisplay is { } serial) await serial.ConfigureFansAsync(channels);
+        if (_virtualFanSession is { } virtualSession) await virtualSession.ConfigureAsync(channels);
+        if (_fanMonitorRuntime is { } monitor) await monitor.ConfigureAsync(channels);
     }
 
     private async Task StopFanMonitorAsync()

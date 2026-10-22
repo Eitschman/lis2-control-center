@@ -49,7 +49,7 @@ public partial class MainWindow
             await SaveAndSynchronizeGlyphSetAsync();
         };
         this.FindControl<Button>("SendAllGlyphs")!.Click += async (_, _) =>
-            await RunSelectedDisplayActionAsync(session => session.ProgramAllGlyphsAsync(_glyphs.Glyphs));
+            await RunSelectedDisplayActionAsync(session => session.ProgramAllGlyphsAsync(_glyphs.Glyphs), preservePlayback: true);
         this.FindControl<Button>("SaveGlyphSet")!.Click += async (_, _) =>
             await RunGlyphFileActionAsync(SaveGlyphSetAsync);
         this.FindControl<Button>("LoadGlyphSet")!.Click += async (_, _) =>
@@ -91,7 +91,7 @@ public partial class MainWindow
             {
                 await session.ProgramAllGlyphsAsync(_glyphs.Glyphs);
                 sent = true;
-            });
+            }, preservePlayback: true);
             SetUiText("GlyphSaveStatus", sent ? "Saved and sent to display." : "Saved; sending to display failed or is busy.");
         }
         RefreshPagePreview();

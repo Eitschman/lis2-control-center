@@ -8,10 +8,10 @@ public partial class MainWindow
     private bool SerialSelected => _preferredTransportMode == "Serial";
     private IDisplaySession? SelectedDisplay => SerialSelected ? _serialDisplay : _virtualDevice;
 
-    /// <summary>Manuelle Befehle stoppen und leeren nur die Wiedergabe des gewählten Transports.</summary>
-    private Task RunSelectedDisplayActionAsync(Func<IDisplaySession, Task> action) => SerialSelected
-        ? RunSerialActionAsync(() => action(_serialDisplay ?? throw new InvalidOperationException("Serial LIS2 disconnected.")))
-        : RunVirtualActionAsync(() => action(_virtualDevice));
+    /// <summary>Bildausgaben stoppen die gewählte Wiedergabe; Geräteeinstellungen können deren Zeitplan erhalten.</summary>
+    private Task RunSelectedDisplayActionAsync(Func<IDisplaySession, Task> action, bool preservePlayback = false) => SerialSelected
+        ? RunSerialActionAsync(() => action(_serialDisplay ?? throw new InvalidOperationException("Serial LIS2 disconnected.")), preservePlayback)
+        : RunVirtualActionAsync(() => action(_virtualDevice), preservePlayback);
 
     /// <summary>Gespeicherte Displayeinstellungen gelten für beide Verbindungsarten, ohne Lüfterfreigabe.</summary>
     private async Task ApplyConnectedDisplaySettingsAsync(IDisplaySession session)
@@ -32,7 +32,7 @@ public partial class MainWindow
         await session.SetBrightnessAsync(brightness);
         _preferredBrightness = percent;
         await SavePortableWorkspaceAsync(true);
-    });
+    }, preservePlayback: true);
 
     private static Lis2Brightness BrightnessFromPercent(int percent) => percent switch
     {

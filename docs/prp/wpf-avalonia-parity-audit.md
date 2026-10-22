@@ -1,6 +1,6 @@
 # WPF-/Avalonia-Paritätsaudit
 
-Stand: 22.10.2026. Implementierungsstand: PORT-06A.
+Stand: 22.10.2026. Implementierungsstand: PORT-06B.
 
 PORT-06 ergänzt den softwareseitigen Abgleich um benannte Glyphenschlüssel, statische Variablenbeschreibungen ohne verbundene Quellen, Hilfe neben dem Bereichstitel und F1. `DesktopParityUiTests` prüft zehn Ansichten in fünf Sprachen mit drei Themes bei 950 × 600, Headergrenzen, Fokus, Kontexthilfe sowie gültige und ungültige Ereignis-/Lüftereingaben. Bestehende Geräte-, Seiten-, Medien- und HA-Tests bleiben Teil der Suite. Das ersetzt keine Abnahme nativer Dateidialoge, echter Quellen oder physischer Geräte.
 
@@ -27,9 +27,18 @@ WPF-Funktionsreferenz des direkten Vergleichs: `origin/main`, Commit `922ca1b6fb
 | A11 | Gemeinsamer versionierter Speicherstatus an Seiten-, Glyphen-, Sensor- und HA-Editoren. | Seiten-/Glyphenentwürfe bleiben bei blockierter Schreibdatei erhalten; erneuter Schreibversuch geprüft. |
 | A12 | Normale Lüfterkonfiguration vor aufklappbaren Prüfwerkzeugen; physische Freigabe separat. | Controls, Lokalisierung und Mindestgröße geprüft; Hardwarefreigabe bleibt nicht persistiert. |
 | A13 | 5×8-Toggle-Raster und einzelne Kurvenpunkte verwenden vorhandene Textformate. | Pixel mit Leertaste; Dezimalpräzision, ungültige Eingaben und Punktänderung geprüft. Die neuen Editoren sind beauftragte Erweiterungen, keine fehlenden WPF-Funktionen. |
-| A14 | Funktions- und Fehlerpfade, fünf Sprachen, Skia-Sichtprüfung und aktualisierte Hilfe. | 439 Avalonia-Tests erfolgreich, ein Linux-Fall übersprungen; weitere Nachweise und Grenzen im [Status](linux-port-status.md). |
+| A14 | Funktions- und Fehlerpfade, fünf Sprachen, Skia-Sichtprüfung und aktualisierte Hilfe. | 451 Avalonia-Tests erfolgreich, ein Linux-Fall übersprungen; weitere Nachweise und Grenzen im [Status](linux-port-status.md). |
 
 Benutzernachweis: Windows-Start und Tray wurden im Chat am 21.10.2026 positiv bestätigt. Die genaue Artefaktherkunft sowie Einzelaktionen Öffnen/Beenden/Anmeldung sind damit nicht dokumentiert; ein extrahierter Paketstart oder Autostart bei Anmeldung wird daraus nicht abgeleitet.
+
+## Laufzeit- und Speicherparität: PORT-06B
+
+| ID | Aktueller Avalonia-Pfad | Nachweis und Grenze |
+| --- | --- | --- |
+| B01 | Gespeicherte Lüfterkanäle werden an laufende serielle/virtuelle Regler und den Dry-run übergeben; der nächste Regeltakt verwendet sie. | Festwert, geänderte Grenzen, Sensorwechsel und Fail-safe mit virtuellen Protokollpartnern geprüft. Speichern aktiviert keine Ausgabe; reale Lüfter bleiben ungeprüft. |
+| B02 | Helligkeit und Glyphenprogrammierung verwenden das Frame-Gate ohne Neustart der Sequenz. | Beide Transportpfade erhalten aktuelle Seite, Timer und Overlay. Gestoppte Sequenzen bleiben gestoppt; laufender Frame und Fehlerfreigabe des Gates geprüft. |
+| B03 | Seitenimport meldet erst nach erfolgreicher Workspace-Speicherung Erfolg. | Gültige Datei sowie blockierte Schreibdatei geprüft; Fehlermeldung bleibt sichtbar und die vorhandene Workspace-Datei erhalten. Native Dateiauswahl bleibt offen. |
+| B04 | Bedingungsanzeige wird beim Vorschautakt und Sprachwechsel neu bewertet. | Wechsel von nicht erfüllt zu erfüllt mit aktuellen Sensordaten und Sprachwechsel geprüft; Skia-Sichtprüfung bei 950 × 600. |
 
 ## Aktuelle Matrix
 
@@ -64,7 +73,7 @@ Physische Lüfterausgabe erfordert eine ausdrückliche, nicht persistierte Freig
 
 ## Prüfnachweise und verbleibende Abnahme
 
-Lokal sind 439 Avalonia-Tests auf Windows erfolgreich; ein Linux-Schlüsselbundtest ist übersprungen. Der frühere Linux-CI-Nachweis mit 417/417 Fällen umfasst PORT-06A nicht; ein neuer Lauf bleibt offen. `DeviceUiTests` prüft Gerätebedienung, Einstellungen/Import und manuelle Lüfter mit tatsächlichen Controls, Tastatur und isolierten Stores. `MenuLanguageUiTests` prüft zehn Menüseiten, About, gespeicherte Sprache, Systemstandard, dynamische Meldungen, unveränderte Daten und stabile Lüftermodi. Katalogtests prüfen Textabdeckung und Formatplatzhalter. `HomeAssistantUiTests` prüft Verbindung, Alias/Favorit, Attributseite, Speicherfehler und Deaktivierung mit tatsächlichen Controls und lokalem WebSocket-Protokollpartner. `HelpLanguageUiTests` prüft gespeicherte Hilfesprache, Systemstandard, Sprachwechsel im offenen Dialog und die Navigation durch alle Themen; lokalisierte Ansichten werden bei 840 × 600 gerendert. `HelpReferenceCatalogTests` prüft Katalogabdeckung, unveränderte Schlüssel und ausführbare Beispiele. `RuntimeHardeningTests` prüft zusätzlich zehn Ansichten, Hilfe/About, fehlende Medienanbieter, Diagnose, verzögerten Start gegen Shutdown und differenzielle Ausgabe einschließlich Teilfehlern. Native Windows-Fenster werden über `--desktop-smoke` gestartet und geordnet beendet; CI enthält denselben Windows-/Linux-X11-Pfad. Sichtprüfungen, aktuelle CI-Läufe und gezielte Gegenproben sind im [Status](linux-port-status.md) eingegrenzt. Ein automatisierter Screenshotvergleich besteht nicht.
+Lokal sind 451 Avalonia-Tests auf Windows erfolgreich; ein Linux-Schlüsselbundtest ist übersprungen. `Port06BUiTests` und `Port06BRuntimeTests` prüfen zwölf Fälle zur laufenden Lüfterkonfiguration, exklusiven Gerätebedienung, Rotation, Importfehlern und Bedingungsanzeige. `DeviceUiTests` prüft Gerätebedienung, Einstellungen/Import und manuelle Lüfter mit tatsächlichen Controls, Tastatur und isolierten Stores. `MenuLanguageUiTests` prüft zehn Menüseiten, About, gespeicherte Sprache, Systemstandard, dynamische Meldungen, unveränderte Daten und stabile Lüftermodi. Katalogtests prüfen Textabdeckung und Formatplatzhalter. `HomeAssistantUiTests` prüft Verbindung, Alias/Favorit, Attributseite, Speicherfehler und Deaktivierung mit tatsächlichen Controls und lokalem WebSocket-Protokollpartner. `HelpLanguageUiTests` prüft gespeicherte Hilfesprache, Systemstandard, Sprachwechsel im offenen Dialog und die Navigation durch alle Themen; lokalisierte Ansichten werden bei 840 × 600 gerendert. `HelpReferenceCatalogTests` prüft Katalogabdeckung, unveränderte Schlüssel und ausführbare Beispiele. `RuntimeHardeningTests` prüft zusätzlich zehn Ansichten, Hilfe/About, fehlende Medienanbieter, Diagnose, verzögerten Start gegen Shutdown und differenzielle Ausgabe einschließlich Teilfehlern. Native Windows-Fenster werden über `--desktop-smoke` gestartet und geordnet beendet; CI enthält denselben Windows-/Linux-X11-Pfad. Sichtprüfungen, aktuelle CI-Läufe und gezielte Gegenproben sind im [Status](linux-port-status.md) eingegrenzt. Ein automatisierter Screenshotvergleich besteht nicht.
 
 Für jede Ansicht bleiben die semantischen Fehler-/Leer-/Auswahl-/Speicherpfade und die Darstellung auf Windows/Linux zu prüfen. Manuelle Benutzerabnahme erfolgt nach dem vereinbarten Portierungsumfang; physische LIS2-Prüfung bleibt getrennt. WPF wird bis zur Paritätsabnahme erhalten. Prioritäten stehen in [TODO](../../TODO.md).
 

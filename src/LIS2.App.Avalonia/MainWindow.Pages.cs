@@ -172,7 +172,7 @@ public partial class MainWindow
         LoadGlyphEditor();
         await SavePortableWorkspaceAsync();
         if (SelectedDisplay?.IsConnected == true)
-            await RunSelectedDisplayActionAsync(session => session.ProgramAllGlyphsAsync(_glyphs.Glyphs));
+            await RunSelectedDisplayActionAsync(session => session.ProgramAllGlyphsAsync(_glyphs.Glyphs), preservePlayback: true);
         return true;
     }
 
@@ -429,6 +429,7 @@ public partial class MainWindow
             return;
         }
         var frame = _editorPreview.Tick(DateTimeOffset.UtcNow, PagePreviewValues());
+        UpdateConditionStatus();
         this.FindControl<TextBlock>("PagePreview1")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line1, _glyphs.IsSpectrumSet);
         this.FindControl<TextBlock>("PagePreview2")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line2, _glyphs.IsSpectrumSet);
         var delay = _editorPreview.NextDelay;
