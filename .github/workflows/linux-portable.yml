@@ -116,6 +116,16 @@ jobs:
             cmake --build "native/$project/build" --config Release
             if ($LASTEXITCODE -ne 0) { throw "Build failed: $project" }
           }
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify embedded C and C++ runtime
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tools/packaging -p 'test_check_native_runtime.py' -v
+          if ($LASTEXITCODE -ne 0) { throw 'Runtime checker regression failed' }
+          python tools/packaging/check_native_runtime.py native/LIS2.WmpLegacyPlugin/build/Release/lis2_wmp_legacy.dll native/LIS2.WmpLegacyVisualization/build/Release/lis2_wmp_legacy_visualization.dll
+          if ($LASTEXITCODE -ne 0) { throw 'Legacy plug-ins depend on an external C/C++ runtime' }
       - name: Assemble plug-in package and scan with Microsoft Defender
         shell: pwsh
         run: |

@@ -8,7 +8,7 @@ Die Windows-App startet den Legacy-Anbieter und zeigt eine eigene Medienkarte. T
 
 Die Pakete `LIS2-WMP-Legacy-0.1.3-win32.zip` und `LIS2-WMP-Legacy-0.1.3-win64.zip` enthalten jeweils beide nativen DLLs, Registrierungsanleitungen und die MIT-Lizenz. Die Architektur muss zum **Legacy-Playerprozess** passen. Registrierung mit dem passenden administrativen `regsvr32`, danach den Player neu starten. Für Audio **LIS2 Control Center / Telemetry** als Visualisierung wählen. Einzelheiten und manuelle Prüfliste: [Legacy-Leitfaden](https://github.com/Eitschman/lis2-control-center/blob/v0.1.3/docs/wmp-legacy-integration.md). Kein Plug-in greift auf LIS2-Hardware zu.
 
-Die Legacy-DLLs benötigen das [Microsoft Visual C++ v14 Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) passend zur Architektur des Playerprozesses. Diese Voraussetzung vor der Registrierung installieren beziehungsweise aktualisieren.
+Die Legacy-DLLs enthalten ihre C/C++-Laufzeit durch statisches Linken. Eine separate Visual-C++-Redistributable-Installation entfällt. Die CI kontrolliert die tatsächlichen DLL-Importe. Sicherheitsaktualisierungen der eingebundenen Laufzeit erfordern einen neuen Plug-in-Build.
 
 ## Gemeinsame Windows-/Linux-Anwendung
 

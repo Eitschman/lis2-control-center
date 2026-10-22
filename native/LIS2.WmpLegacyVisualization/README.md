@@ -17,7 +17,7 @@ The visualization is telemetry-only and never talks to LIS2 hardware.
 
 ## Installation
 
-Before registration, install or update the [Microsoft Visual C++ v14 Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) matching the player process architecture (x86 or x64). Both plug-in DLLs depend on this runtime.
+The MSVC build statically links the C/C++ runtime into both plug-in DLLs (`/MT`, `/MTd` for Debug). No separate Visual C++ Redistributable installation is required. CI checks the actual PE imports before packaging. Runtime security updates require rebuilding the plug-ins with an updated toolchain. The MIT license applies to LIS2 code; Microsoft runtime components remain under their [Microsoft redistribution terms](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files).
 
 Register the DLL that matches the bitness of Windows Media Player Legacy from an
 elevated command prompt:

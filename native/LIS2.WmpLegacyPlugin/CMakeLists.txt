@@ -21,6 +21,9 @@ target_compile_definitions(lis2_wmp_legacy PRIVATE
 )
 
 if(MSVC)
+    # Eigenständige Plug-ins ohne separate Visual-C++-Laufzeitinstallation.
+    set_property(TARGET lis2_wmp_legacy PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     target_compile_options(lis2_wmp_legacy PRIVATE /W4 /permissive- /EHsc)
 endif()
 

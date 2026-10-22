@@ -127,7 +127,7 @@ Windows Media Player Legacy has a separate Windows integration through two nativ
 
 Use the plug-in package matching the **player process architecture**, independently of the x64 Control Center. CI provides `LIS2-WMP-Legacy-win32` and `LIS2-WMP-Legacy-win64`, each containing both DLLs, registration instructions and the MIT license. Register the DLLs from their permanent location using the matching elevated `regsvr32`, then restart Windows Media Player Legacy. See the [Legacy setup and test guide](docs/wmp-legacy-integration.md).
 
-Both plug-in DLLs require the [Microsoft Visual C++ v14 Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) matching the player process architecture. Install or update it before registration.
+Both Legacy plug-in DLLs embed their C/C++ runtime. No separate Visual C++ Redistributable installation is required for these plug-ins. Runtime security updates require rebuilding them with an updated toolchain. See the native package READMEs for Microsoft runtime redistribution terms.
 
 Release **v0.1.3** includes Legacy support and both plug-in architectures. Select the package matching the player process, then follow the registration instructions above.
 

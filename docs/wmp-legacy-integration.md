@@ -4,7 +4,7 @@ Die Windows-App empfängt `WmpLegacy.*` über zwei voneinander unabhängige Name
 
 ## Einrichtung
 
-Voraussetzung für beide DLLs ist das [Microsoft Visual C++ v14 Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) in der Architektur des Playerprozesses (x86 oder x64). Vor der Registrierung installieren beziehungsweise aktualisieren. Die DLL-Importtabellen enthalten `MSVCP140.dll` und `VCRUNTIME140.dll`, bei x64 zusätzlich `VCRUNTIME140_1.dll`.
+Beide DLLs binden die C/C++-Laufzeit statisch ein (`/MT` im Release-Build). Eine separate Visual-C++-Redistributable-Installation ist dafür nicht nötig. Die CI prüft die tatsächlichen PE-Importtabellen vor der Paketierung. Sicherheitsaktualisierungen dieser Laufzeit benötigen einen neuen Plug-in-Build mit aktualisierten Buildwerkzeugen. Die MIT-Lizenz gilt für den LIS2-Code; für eingebundene Microsoft-Laufzeitkomponenten gelten deren [Weitergabebedingungen](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files).
 
 1. Das zum **Playerprozess** passende CI-Artefakt `LIS2-WMP-Legacy-win32` oder `LIS2-WMP-Legacy-win64` laden und die SHA-256-Datei prüfen. Die Architektur der Control-Center-App ist dafür unerheblich. Release v0.1.3 enthält beide Architekturen als `LIS2-WMP-Legacy-0.1.3-win32.zip` und `LIS2-WMP-Legacy-0.1.3-win64.zip`.
 2. Das ZIP in einen dauerhaften Ordner entpacken. `background` enthält `lis2_wmp_legacy.dll`, `visualization` enthält `lis2_wmp_legacy_visualization.dll`. Beide Ordner enthalten eigene Anleitungen.

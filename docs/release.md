@@ -4,6 +4,8 @@ Stand: 22.10.2026. App und Protokolltester verwenden Avalonia. Hauptbranch, Entw
 
 Releaseziel ist **v0.1.3** mit drei portablen App-Archiven, zwei Debian-Paketen, Windows-Protokolltester, `gen_lis2.dll`, zwei Legacy-Plug-in-ZIPs und `SHA256SUMS.txt`. Alle neun Nutzdateien erhalten Prüfsummen. Anwendungspakete enthalten Avalonia 11.3.22, Runtime 10.0.13 und Lizenzbeilagen. Die Veröffentlichung erfolgt nach erfolgreichem Main- und Tag-Workflow; der commitbezogene Nachweis steht im [Status](prp/linux-port-status.md). Installation und Paketauswahl stehen in der [README](../README.md#download-and-installation).
 
+Beide Legacy-Plug-ins verwenden unter MSVC eine statisch eingebundene C/C++-Laufzeit. Vor dem Verpacken prüft `check_native_runtime.py` beide DLLs auf externe VC-/UCRT-Importe. Gültige PE32-/PE32+-Dateien und absichtlich eingebaute Laufzeitabhängigkeiten sind durch Regressionen abgedeckt. Eine neue Laufzeitversion wird durch einen erneuten Plug-in-Build mit aktualisiertem Toolchainstand ausgeliefert.
+
 ## Avalonia-Branch
 
 [linux-portable.yml](../.github/workflows/linux-portable.yml) startet bei Push auf `feature/linux-avalonia` und manueller Auslösung. `build.yml` ruft ihn bei Push/PR nach `main` und manuell auf; `release.yml` verwendet ihn für Tag-Releases. Neuere Läufe derselben Workflow-/Branchgruppe brechen überholte Läufe ab.
