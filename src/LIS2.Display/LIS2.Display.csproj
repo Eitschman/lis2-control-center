@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- Portable protocol/display/fan logic; Windows WPF app remains Windows-targeted. -->
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>LIS2.Display</AssemblyName>
     <RootNamespace>LIS2.Display</RootNamespace>
   </PropertyGroup>

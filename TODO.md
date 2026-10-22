@@ -143,10 +143,10 @@ Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standa
 - [ ] DPI, tatsächlich verwendeten App-Displaybackend und Abhängigkeiten auf dem Pi protokollieren; weiterführende Desktopprüfungen übernimmt der Benutzer anhand der Liste in `docs/release.md`.
 - [x] X11-/DBus-/Keyring-Umgebungen, Runtimeversion und native Bibliotheksauflösung für automatisierte Paketstarts protokollieren. Positive und negative Paketprüfungen sowie native ARM64-Ausführung nachgewiesen.
 - [ ] GTK-Dateidialoge, Wayland/XWayland, Anmeldung/Tray und serielle Zugriffsrechte auf den tatsächlichen Benutzer-Desktops prüfen; manuelle Prüfungen übernimmt der Benutzer.
-- [x] Support- und Lizenzstatus von .NET/Avalonia anhand offizieller Quellen prüfen: .NET 8.0.32, Supportende 10.11.2026; Avalonia 11.3.6 unter MIT, neuere Patches vorhanden. Befunde und Quellen in `docs/release.md`.
-- [ ] Vor Avalonia-Release ein eigenes Paket für unterstütztes .NET und Avalonia-Patchstand einplanen und prüfen.
-- [ ] Windows-Runtimepatch angleichen: geprüfte Pakete enthalten Windows .NET 8.0.31 gegenüber Linux 8.0.32.
-- [ ] Lizenztexte/Fremdkomponentenhinweise und nötige Quellverweise zu den tatsächlich verteilten NuGet-Paketen in Archive und Debian-Pakete aufnehmen; MPL-2.0-Pakete, HidSharp und Mono.Posix gesondert abgleichen.
+- [x] Supportstatus anhand offizieller Quellen prüfen: .NET 10 LTS mit Support bis 14.11.2028; Avalonia 11.3.6 unter MIT. Quellen in `docs/release.md`.
+- [ ] Avalonia-Patchstand gesondert aktualisieren und API-/Darstellungsregressionen prüfen; DBus-Sicherheitskorrektur 0.21.3 ist ausdrücklich eingebunden.
+- [x] Alle Projekte, SDK-Auswahl und CI auf .NET 10 umstellen; selbstständige Pakete verwenden einheitlich 10.0.13. Lokaler Windows-Build ohne Warnungen/Fehler, 606 Tests erfolgreich und ein Linux-Schlüsselbundtest übersprungen.
+- [x] Lizenztexte, Fremdkomponentenhinweise und feste Quellverweise aus den tatsächlich aufgelösten NuGet-Paketen beilegen; Paketbau mit fehlenden Nachweisen ausdrücklich ablehnen und mit positiven/negativen Fällen prüfen.
 - [x] Hauptbranch- und Tag-Workflows auf denselben Avalonia-Paketbau umstellen. Tag-Version an App, Protokolltester und Debian-Pakete übergeben; kein Release-Tag angelegt.
 - [x] Geprüfte Avalonia-Quellbasis nach `main` übernehmen und den gemeinsamen Buildworkflow verwenden. Commitbezogene Prüfläufe sind im [Main-Buildworkflow](https://github.com/Eitschman/lis2-control-center/actions/workflows/build.yml?query=branch%3Amain) einzusehen.
 

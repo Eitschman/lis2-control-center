@@ -18,7 +18,7 @@ Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md
 | `LIS2.WindowsMedia` | Windows-GSMTC-Anbieter, separat gebaut und für Windows-Pakete mitgeliefert |
 | `LIS2.App.Avalonia` | AXAML, partielle MainWindow-Dateien, Plattformadapter, Workspace, Tokenstore, Hilfe/About und UI-Integration |
 
-Die portablen Projekte verwenden `net8.0`. `Directory.Build.props` gibt weiterhin `net8.0-windows10.0.19041.0` vor; portable Projekte überschreiben diesen Wert. GSMTC und mehrere Windows-Test-/Simulatorprojekte erben das Windows-Ziel. Der Protokolltester verwendet ausdrücklich `net8.0`.
+Die portablen Projekte verwenden `net10.0`. `Directory.Build.props` gibt weiterhin `net10.0-windows10.0.19041.0` vor; portable Projekte überschreiben diesen Wert. GSMTC und mehrere Windows-Test-/Simulatorprojekte erben das Windows-Ziel. Der Protokolltester verwendet ausdrücklich `net10.0`.
 
 Mehrere UI-unabhängige Dateien liegen physisch unter `src/LIS2.App.Avalonia` und werden in `LIS2.Runtime.csproj` per `Compile Include/Link` eingebunden. Die App schließt deren eigene Kompilierung mit `Compile Remove` aus. Diese Klassen behalten teilweise den Namespace `LIS2.App.Avalonia`, die Runtime referenziert jedoch kein Avalonia-Paket. Eine andere physische Ablage oder ein durchgängiges ViewModel-/DI-Modell ist kein bereits umgesetzter Zustand.
 

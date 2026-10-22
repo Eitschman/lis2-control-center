@@ -1,0 +1,2 @@
+# Originaltexte behalten ihre geprüften Bytes auf allen Plattformen.
+tools/packaging/licenses/** -text -whitespace

@@ -7,7 +7,13 @@ Codegrundlage: `b01fc9b`, geprüft mit CI `39754282619`. Die nachfolgende Anpass
 
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
-## WPF-Entfernung und Übernahme nach main
+## Release v0.1.0 und .NET 10
+
+Alle Projekte verwenden .NET 10, einschließlich Windows-GSMTC und Protokolltester. `global.json` wählt ein stabiles SDK der 10.0-Reihe, die CI installiert .NET 10 und selbstständige Pakete verwenden einheitlich Runtime 10.0.13. Tmds.DBus.Protocol 0.21.3 behebt die beim erweiterten NuGet-Audit erkannte DBus-Sicherheitslücke; Avalonia bleibt 11.3.6. README und Releasebeschreibung enthalten die Paketauswahl und Installation.
+
+Lokaler Windows-Nachweis: Solution-Build mit null Warnungen und Fehlern; 606 Tests erfolgreich, ein Linux-Schlüsselbundtest übersprungen. Das selbstständige Windows-Paket enthält Runtime 10.0.13. Sein nativer Smoke besteht GSMTC-Start, Verbindungszustand und Shutdown sowie Splash, Tray-Menü, Aktivierung aus zweitem Prozess, zehn Ansichten, Hilfe/About und Diagnose. Die Seitenansicht aus diesem Lauf wurde angesehen. 24 Paketregressionen bestehen einschließlich gültiger Lizenzbeilagen, MPL-Quellarchivverweisen und Gegenproben mit fehlenden Metadaten, Lizenztexten, Quellverweisen, Laufzeitpaketen und manipulierten Originaltexten. Die Lizenzpaketierung liest tatsächliche NuGet-Assets und ergänzt originale Lizenz-/Notice-Dateien sowie feste Quellverweise. Der neue CI-/Release-Nachweis wird dem jeweiligen Commit zugeordnet.
+
+## Umfang der WPF-Entfernung
 
 Die Solution enthält die Avalonia-App, deren Tests und Runtime sowie den auf Avalonia portierten Protokolltester. Die vier bisher verlinkten Hilfekataloge liegen im Avalonia-Projekt. `UiTranslationCatalog` gehört zur gemeinsamen Oberfläche. Die vier virtuellen Ende-zu-Ende-Tests liegen im Display-Testprojekt; die WPF-spezifischen SettingsStore-Tests entfallen zusammen mit ihrem Implementierungsprojekt. Die vorhandenen Workspace-, Import- und Tokenspeicherungstests prüfen die Avalonia-Persistenz.
 

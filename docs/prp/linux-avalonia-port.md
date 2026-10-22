@@ -29,7 +29,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 
 | Bereich | Stand | Offener Umfang |
 | --- | --- | --- |
-| Projektstruktur | Avalonia 11.3.6, .NET 8, portable Bibliotheken und `LIS2.Runtime` vorhanden | Plattformverträge sind noch nicht durchgängig angebunden; UI-Code enthält weitere Orchestrierung |
+| Projektstruktur | Avalonia 11.3.6, .NET 10 LTS, portable Bibliotheken und `LIS2.Runtime` vorhanden | Plattformverträge sind noch nicht durchgängig angebunden; UI-Code enthält weitere Orchestrierung |
 | Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen; gemeinsame Geräteaktionen und differenzielle Spannen am angewendeten Transport | Spektrumvariable und Glyphenvorschau mit virtueller Ausgabe geprüft; physische Ausgabe offen |
 | Seiteneditor | Seitenpflege, Vorlagen, Bedingungen, Presets, animierte Vorschau, Variablenbrowser, validierter JSON-Import/-Export und gemeinsamer Entwurfsschutz für Quellenaktionen vorhanden | Bedingungsfelder und Variablenbrowser angebunden; gemeinsame Hardware- und plattformgerechte Medienpresets geprüft |
 | Glyphen | Acht 5x8-Slots, Dateien, Namen, Spektrumset und Ersetzungsdialog vorhanden | Physische Zeichenprüfung und UI-/Transportabgleich offen |
@@ -46,7 +46,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 
 ### Portable Laufzeit und Gerätezugriff
 
-- [x] `LIS2.Core`, `LIS2.Display`, `LIS2.Fans`, `LIS2.Sources`, `LIS2.Winamp`, `LIS2.WmpLegacy` und `LIS2.Runtime` verwenden `net8.0`.
+- [x] `LIS2.Core`, `LIS2.Display`, `LIS2.Fans`, `LIS2.Sources`, `LIS2.Winamp`, `LIS2.WmpLegacy` und `LIS2.Runtime` verwenden `net10.0`.
 - [x] Headless Display-Runtime mit Quellen-Snapshots, Ereignisqueue, Scheduler, adaptiven Schleifen und Stop/Drain vorhanden.
 - [x] Seitenänderungen laden laufende virtuelle und serielle Sequenzen neu; unveränderte Frames werden unterdrückt.
 - [x] Headless Tests für Parallelität, fehlerhafte Schreibvorgänge, Ereignisprioritäten und Wiederaufnahme vorhanden.

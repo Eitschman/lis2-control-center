@@ -1,0 +1,38 @@
+{
+  "Avalonia.txt": {
+    "url": "https://raw.githubusercontent.com/AvaloniaUI/Avalonia/d45d5f8ab70ed88539d9494c15127cf32dced9df/licence.md",
+    "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+  },
+  "MicroCom.txt": {
+    "url": "https://raw.githubusercontent.com/kekekeks/MicroCom/cd2fa3c89525fbe7b46bd13f9ec8c77bd829e815/LICENSE",
+    "sha256": "6ee769c9ac4dac9abb16b98b1341e9528ff9f4ab685481410d3376d14148f3a9"
+  },
+  "Tmds.DBus.txt": {
+    "url": "https://raw.githubusercontent.com/tmds/Tmds.DBus/8cb04f66c330b64244e996ff68f685f27f7381a0/COPYING",
+    "sha256": "aca3b49277abcc7886ccb2f115603a9f5b15fc3f96019a10c00f2974098b210c"
+  },
+  "Mono.txt": {
+    "url": "https://raw.githubusercontent.com/mono/mono/0f53e9e151d92944cacab3e24ac359410c606df6/LICENSE",
+    "sha256": "844242559dbdb96cb9cbe103b06c2bc8a349f19ad0b89d5c3cf830a8914333f6"
+  },
+  "MPL-2.0.txt": {
+    "url": "https://raw.githubusercontent.com/LibreHardwareMonitor/LibreHardwareMonitor/3d331e3370efb858411f19511373eff65a218701/LICENSE",
+    "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+  },
+  "dotnet.txt": {
+    "url": "https://raw.githubusercontent.com/dotnet/runtime/v10.0.13/LICENSE.TXT",
+    "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+  },
+  "Inter.txt": {
+    "url": "https://raw.githubusercontent.com/rsms/inter/v3.19/LICENSE.txt",
+    "sha256": "4d7d9c95e7d7f2f0ebf76d5e0b344826b74e903a34028ee18ab54bb639e45906"
+  },
+  "Apache-2.0.txt": {
+    "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  "WindowsSDK.rtf": {
+    "url": "https://download.microsoft.com/download/0/F/F/0FF2B061-47DD-4F55-89B6-FD1D8C44F14D/sdk_license.rtf",
+    "sha256": "dd07eb178e00c6bba4148457fc00ff77cd4887eb521d504186fe59c9ec8bbe62"
+  }
+}

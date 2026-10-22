@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- Portable protocol/display/fan logic; Windows WPF app remains Windows-targeted. -->
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>LIS2.Core</AssemblyName>
     <RootNamespace>LIS2.Core</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+    <PackageReference Include="System.IO.Ports" Version="10.0.0" />
   </ItemGroup>
 </Project>
