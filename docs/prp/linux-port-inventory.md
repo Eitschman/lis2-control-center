@@ -10,11 +10,11 @@ Der mit `rg --files` ermittelte Quellbestand unter `src`, `tests`, `tools` und `
 | Gruppe | Projekte | Target |
 | --- | --- | --- |
 | Portable Bibliotheken | Core, Display, Fans, Sources, Winamp, WmpLegacy, Runtime | `net10.0` |
-| Gemeinsame Desktop-App | App.Avalonia | `net10.0`, Avalonia 11.3.6 |
+| Gemeinsame Desktop-App | App.Avalonia | `net10.0`, Avalonia 11.3.22 |
 | Windows-Anbieter | WindowsMedia | Geerbtes `net10.0-windows10.0.19041.0` |
 | Portable Testprojekte | Core.Tests, Display.Tests, Fans.Tests, App.Avalonia.Tests | `net10.0` |
 | Windows-Testprojekte | Sources.Tests, Winamp.Tests, WindowsMedia.Tests, WmpLegacy.Tests | Geerbtes Windows-Target |
-| Portables Tool | ProtocolTester | `net10.0`, Avalonia 11.3.6 |
+| Portables Tool | ProtocolTester | `net10.0`, Avalonia 11.3.22 |
 | Windows-Simulatoren | WinampSimulator, WmpLegacySimulator | Geerbtes Windows-Target |
 
 `Directory.Build.props` setzt Nullable, implizite Usings, Warnings-as-errors und das Windows-Target. Portable Projekte überschreiben ihr Target ausdrücklich. `LIS2.Sources` und `LIS2.App.Avalonia` referenzieren LibreHardwareMonitorLib 0.9.6. Der direkte Windows-Provider bleibt hinter einer OS-Auswahl; Paketabhängigkeit allein ist kein Linux-Runtime-Nachweis.

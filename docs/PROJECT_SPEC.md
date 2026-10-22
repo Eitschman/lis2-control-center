@@ -6,7 +6,7 @@
 
 - Repository: `Eitschman/lis2-control-center`
 - Zielplattformen: Windows x64, Linux x64 und Linux ARM64.
-- Gemeinsame Anwendung: C# / .NET 10 LTS / Avalonia 11.3.6.
+- Gemeinsame Anwendung: C# / .NET 10 LTS / Avalonia 11.3.22.
 - Referenzanwendung: Windows-WPF unter `src/LIS2.App`.
 - Winamp plug-in: native Win32/x86
 - License: MIT

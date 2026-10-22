@@ -4,7 +4,7 @@ Steuerungssoftware für das **VL System L.I.S. 2** mit 20x2-VFD und vier Lüfter
 
 > **Status:** Gemeinsame Avalonia-Anwendung für Windows und Linux<br>
 > **Zielplattformen:** Windows x64, Linux x64 und Linux ARM64<br>
-> **Implementierung:** C# / .NET 10 LTS, Avalonia 11.3.6; Winamp-Plug-in als natives Win32/x86-Modul<br>
+> **Implementierung:** C# / .NET 10 LTS, Avalonia 11.3.22; Winamp-Plug-in als natives Win32/x86-Modul<br>
 > **License:** MIT
 
 LIS2 Control Center is an independent replacement for the obsolete VL System Multimedia Control Center (MCC). It combines direct LIS2 hardware control with programmable display pages, PC hardware monitoring, Winamp and Windows 11 Media Player telemetry, Home Assistant data and fan control.
@@ -13,28 +13,28 @@ LIS2 Control Center is an independent replacement for the obsolete VL System Mul
 
 ## Download und Installation
 
-[Release v0.1.0](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.0) enthält folgende Pakete:
+[Release v0.1.1](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.1) enthält folgende Pakete:
 
 | System | Download |
 | --- | --- |
-| Windows x64 | [Portables ZIP](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.0/LIS2-Control-Center-0.1.0-win-x64.zip) |
-| Debian/Ubuntu x64 | [Debian-Paket amd64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.0/lis2-control-center_0.1.0_amd64.deb) |
-| Debian/Ubuntu ARM64, Raspberry Pi 5 | [Debian-Paket arm64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.0/lis2-control-center_0.1.0_arm64.deb) |
-| Linux x64 | [Portables Archiv](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.0/LIS2-Control-Center-0.1.0-linux-x64.tar.gz) |
-| Linux ARM64 | [Portables Archiv](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.0/LIS2-Control-Center-0.1.0-linux-arm64.tar.gz) |
+| Windows x64 | [Portables ZIP](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/LIS2-Control-Center-0.1.1-win-x64.zip) |
+| Debian/Ubuntu x64 | [Debian-Paket amd64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/lis2-control-center_0.1.1_amd64.deb) |
+| Debian/Ubuntu ARM64, Raspberry Pi 5 | [Debian-Paket arm64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/lis2-control-center_0.1.1_arm64.deb) |
+| Linux x64 | [Portables Archiv](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/LIS2-Control-Center-0.1.1-linux-x64.tar.gz) |
+| Linux ARM64 | [Portables Archiv](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/LIS2-Control-Center-0.1.1-linux-arm64.tar.gz) |
 
 Windows: ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Linux-Archive entpacken und `./LIS2.App.Avalonia` ausführen. Die .NET-10-Laufzeit ist enthalten; eine separate .NET-Installation ist nicht erforderlich.
 
 Debian/Ubuntu, im Downloadverzeichnis:
 
 ```sh
-sudo apt install ./lis2-control-center_0.1.0_amd64.deb
+sudo apt install ./lis2-control-center_0.1.1_amd64.deb
 lis2-control-center
 ```
 
-Auf ARM64 stattdessen `lis2-control-center_0.1.0_arm64.deb` verwenden. Die App erscheint auch im Anwendungsmenü. Serielle Zugriffsrechte und ein Desktop-Schlüsselbund müssen zum jeweiligen System passen; Hinweise stehen im [Paketierungsleitfaden](docs/release.md#debian-pakete).
+Auf ARM64 stattdessen `lis2-control-center_0.1.1_arm64.deb` verwenden. Die App erscheint auch im Anwendungsmenü. Serielle Zugriffsrechte und ein Desktop-Schlüsselbund müssen zum jeweiligen System passen; Hinweise stehen im [Paketierungsleitfaden](docs/release.md#debian-pakete).
 
-Zusätzlich: [Windows-Protokolltester](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.0/LIS2-ProtocolTester-0.1.0-win-x64.zip), [Winamp-Plug-in gen_lis2.dll](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.0/gen_lis2.dll) und [SHA-256-Prüfsummen](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.0/SHA256SUMS.txt). Das Winamp-Plug-in gehört in das `Plugins`-Verzeichnis des 32-Bit-Winamp. Die [Release-Hinweise](docs/release-notes.md) nennen Umfang und offene manuelle Prüfungen. Lizenztexte, Fremdkomponentenhinweise und Quellverweise liegen den App- und Protokolltesterpaketen bei.
+Zusätzlich: [Windows-Protokolltester](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/LIS2-ProtocolTester-0.1.1-win-x64.zip), [Winamp-Plug-in gen_lis2.dll](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/gen_lis2.dll) und [SHA-256-Prüfsummen](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/SHA256SUMS.txt). Das Winamp-Plug-in gehört in das `Plugins`-Verzeichnis des 32-Bit-Winamp. Die [Release-Hinweise](docs/release-notes.md) nennen Umfang und offene manuelle Prüfungen. Lizenztexte, Fremdkomponentenhinweise und Quellverweise liegen den App- und Protokolltesterpaketen bei.
 
 ## Avalonia-Arbeitsstand
 
@@ -42,7 +42,7 @@ Stand: 22.10.2026, Implementierungsstand PORT-07 mit geprüften Archivstarts fü
 
 In CI bestehen 459 Avalonia-Tests unter Windows und 460 unter Linux; der Linux-Schlüsselbundtest ist unter Windows übersprungen. Enthalten sind acht UI-Regressionen des Avalonia-Protokolltesters. Gerätebedienung, Einstellungen und alle zehn Menüseiten werden mit tatsächlichen Avalonia-Controls und Skia-Rendering geprüft. Statische Texte und dynamische Meldungen folgen der gewählten Sprache; Metadaten und technische Schlüssel bleiben unverändert. Die Hilfe folgt Deutsch, Englisch, Französisch, Türkisch, Russisch oder der Systemsprache, auch bei geöffnetem Dialog. Native Windows-/Linux-Smokes prüfen die Hauptanwendung und den Protokolltester. Der aktuelle CI-Nachweis und die Sichtprüfungen stehen im [Status](docs/prp/linux-port-status.md). Extrahierte Paketstarts und native ARM64-Ausführung bestehen in CI; physische LIS2-Prüfung und weiterführende manuelle Desktop-Abnahme bleiben offen. Der Benutzer bestätigt den Debian-Paketstart von Build 622 auf Raspberry Pi 5 mit Debian 13, KDE Plasma 6.3.6 und Wayland-Sitzung.
 
-Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. Transport, Port, HA-Aktivierung, lokale Linux-Tokenauswahl und Helligkeit werden gespeichert. Gemeinsame Displayaktionen verwenden den angewendeten Transport. Der Windows-Import ist sichtbar; manuelle Lüfterausgaben beachten Kanalgrenzen und benötigen bei serieller Ausgabe je Aktion eine Freigabe. Live-HA und Liveplayer auf den Zielsystemen bleiben offen. PORT-06A ergänzt die Spektrumvariable, sichtbare Glyphenvorschauen, den angebundenen Bedingungsbrowser, direkte Sensorauswahl, konsistente Presets, Speicherrückmeldungen und Diagnosefelder. Pixelraster und präzise Kurvenpunkte sind bedienbar. Release v0.1.0 verwendet .NET 10 LTS und enthält Lizenzbeilagen. Avalonia-Patchpflege und manuelle Desktop-Abnahme bleiben auf der Liste.
+Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. Transport, Port, HA-Aktivierung, lokale Linux-Tokenauswahl und Helligkeit werden gespeichert. Gemeinsame Displayaktionen verwenden den angewendeten Transport. Der Windows-Import ist sichtbar; manuelle Lüfterausgaben beachten Kanalgrenzen und benötigen bei serieller Ausgabe je Aktion eine Freigabe. Live-HA und Liveplayer auf den Zielsystemen bleiben offen. PORT-06A ergänzt die Spektrumvariable, sichtbare Glyphenvorschauen, den angebundenen Bedingungsbrowser, direkte Sensorauswahl, konsistente Presets, Speicherrückmeldungen und Diagnosefelder. Pixelraster und präzise Kurvenpunkte sind bedienbar. Release v0.1.1 verwendet .NET 10 LTS und enthält Lizenzbeilagen. Weitere manuelle Desktop-Abnahme bleibt auf der Liste.
 
 ## Funktionsumfang
 

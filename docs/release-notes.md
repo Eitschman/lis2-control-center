@@ -1,18 +1,19 @@
-# LIS2 Control Center 0.1.0
+# LIS2 Control Center 0.1.1
 
-Erster Avalonia-Release für Windows x64, Linux x64 und Linux ARM64.
+## Avalonia-Patchpflege
 
-- Steuerung des LIS2-Displays mit zwei Zeilen, Helligkeit und acht programmierbaren Glyphen.
-- Seitenvorlagen, Scrollen, Sichtbarkeitsbedingungen, Ereignisse und virtuelle Geräteansicht.
-- Hardwarewerte, vier Lüfterkanäle, Home Assistant und Medienquellen.
-- Deutsch, Englisch, Französisch, Türkisch und Russisch einschließlich kontextbezogener Hilfe.
-- Installierbare Debian-Pakete für amd64 und arm64 sowie portable App-Archive.
-- Separater Avalonia-Protokolltester für Windows und natives x86-Plug-in für Winamp.
+App, Protokolltester und Headless-Tests verwenden einheitlich **Avalonia 11.3.22**. Diese Wartungsversion enthält unter anderem Korrekturen für X11/NVIDIA und den X11-Sitzungsabbau. Die Home-Assistant-UI-Tests verwenden die aktuelle Zwischenablage-API; die DBus-Sicherheitskorrektur bleibt eingebunden.
 
-Die App-Pakete und der Protokolltester enthalten .NET 10.0.13. Eine separate .NET-Installation ist nicht nötig. Lizenztexte, Hinweise zu Fremdkomponenten und Quellverweise liegen in den Paketen unter `licenses/` und `THIRD-PARTY-NOTICES.txt`.
+## Downloads und Installation
 
-Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das zur Architektur passende Paket mit `sudo apt install ./lis2-control-center_0.1.0_amd64.deb` beziehungsweise `_arm64.deb` installieren. Die portablen Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
+Enthalten sind portable Pakete für Windows x64, Linux x64 und Linux ARM64, Debian-Pakete für amd64/arm64, der Windows-Protokolltester und das native 32-Bit-Winamp-Plug-in `gen_lis2.dll`.
 
-Die automatisierten Prüfungen verwenden ein virtuelles LIS2. Der Benutzer hat einen Debian-Paketstart auf Raspberry Pi 5 mit Debian 13, KDE Plasma 6.3.6 und Wayland-Sitzung bestätigt. Physische LIS2-Ausgabe, reale Home-Assistant-/Player-Verbindungen sowie weitere Desktop-, Tray- und Autostartprüfungen bleiben gesondert zu prüfen. Serielle Lüfterausgabe benötigt eine ausdrückliche Freigabe in der App.
+Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.1_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
 
-.NET 10 LTS wird laut [Microsoft](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core) bis 14.11.2028 unterstützt. Alle selbstständigen Pakete verwenden 10.0.13. Avalonia bleibt auf 11.3.6; die DBus-Abhängigkeit ist mit dem Sicherheitskorrekturpatch Tmds.DBus.Protocol 0.21.3 festgelegt. Ein neuerer Avalonia-Patchstand bleibt eine gesonderte Wartungsaufgabe.
+Die Anwendungspakete liefern **.NET 10.0.13** mit; .NET muss nicht separat installiert werden. Lizenztexte, Fremdkomponentenhinweise und feste Quellverweise liegen unter `licenses/` und `THIRD-PARTY-NOTICES.txt` bei. Avalonia-Lizenztext und Inter-Schrift wurden gegen den tatsächlichen Paketstand geprüft.
+
+## Prüfumfang und offene Praxisprüfungen
+
+Die Release-Pipeline prüft Bibliotheken, Avalonia-Controls, native Windows-/Linux-Oberflächen, GSMTC-Anbieterstart, extrahierte Archive und Debian-Installation auf x64 und nativem ARM64. Die Desktop-Smokes prüfen unter anderem zehn Ansichten, Hilfe/About, Aktivierung aus einem zweiten Prozess und Shutdown. Screenshots dienen der Sichtprüfung.
+
+Der Benutzer bestätigt v0.1.0 mit .NET 10 auf Raspberry Pi 5 unter Debian 13/KDE/Wayland. Diese Rückmeldung ist kein separater Praxisnachweis für v0.1.1. Reale HA-/Playerverbindungen, Anmeldung mit Autostart, weitere Desktopabläufe und physische LIS2-Ausgabe bleiben gesonderte Prüfungen. Serielle Lüfterausgabe benötigt eine ausdrückliche Freigabe in der App.

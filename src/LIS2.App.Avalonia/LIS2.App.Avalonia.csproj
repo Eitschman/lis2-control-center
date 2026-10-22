@@ -12,12 +12,12 @@
   <ItemGroup>
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
-    <PackageReference Include="Avalonia" Version="11.3.6" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.3.6" />
+    <PackageReference Include="Avalonia" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.22" />
     <!-- Sicherheitskorrektur für die von Avalonia verwendete DBus-Version, GHSA-xrw6-gwf8-vvr9. -->
     <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.6" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.22" />
     <ProjectReference Include="../LIS2.Core/LIS2.Core.csproj" />
     <ProjectReference Include="../LIS2.Winamp/LIS2.Winamp.csproj" />
     <ProjectReference Include="../LIS2.Display/LIS2.Display.csproj" />

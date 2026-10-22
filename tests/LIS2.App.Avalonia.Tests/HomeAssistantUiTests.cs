@@ -3,6 +3,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia;
 
 namespace LIS2.App.Avalonia.Tests;
@@ -61,10 +62,11 @@ public sealed class HomeAssistantUiTests
             window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
             window.KeyReleaseQwerty(PhysicalKey.C, RawInputModifiers.Control);
             await Task.Delay(30);
-            Assert.Equal("{HA.Room_Temp.attribute.battery}", await window.Clipboard!.GetTextAsync());
-            await window.Clipboard.SetTextAsync("");
+            var clipboard = Assert.IsAssignableFrom<IClipboard>(window.Clipboard);
+            Assert.Equal("{HA.Room_Temp.attribute.battery}", await clipboard.TryGetTextAsync());
+            await clipboard.SetTextAsync("");
             await DoubleClickFirstRow(window, attributes);
-            Assert.Equal("{HA.Room_Temp.attribute.battery}", await window.Clipboard.GetTextAsync());
+            Assert.Equal("{HA.Room_Temp.attribute.battery}", await clipboard.TryGetTextAsync());
             Click(window, "HaCreateAttributePage");
             await HomeAssistantServer.WaitAsync(() => workspace.Load().Pages.Any(page => page.Line2Template == "{HA.Room_Temp.attribute.battery|fallback:--}"));
             Assert.Equal(87L, sources.Snapshot(DateTimeOffset.Now)["HA.Room_Temp.attribute.battery"]);

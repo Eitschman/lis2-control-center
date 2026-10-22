@@ -2,12 +2,20 @@
 
 Stand: 22.10.2026. Hauptbranch ist `main`; Release v0.1.0 verwendet die gemeinsame Avalonia-Anwendung.
 Implementierungsstand: PORT-07 mit geprüften Archivstarts für Windows x64, Linux x64 und nativem Linux ARM64 sowie Debian-Paketen auf amd64/arm64. Die PORT-06B-Funktionen sind enthalten. Reale HA-/Playernachweise sowie Desktop-/Geräteabnahme bleiben offen.
-Aktuelles Paket: **Release v0.1.0 mit .NET 10 LTS und Lizenzbeilagen**. A01 bis A14, B01 bis B04, PORT-07 und die WPF-Entfernung sind enthalten. Die commitbezogenen Prüfläufe stehen unten; manuelle Desktop- und Geräteprüfungen bleiben getrennt offen.
+Aktuelles Paket: **PORT-08: Avalonia-Patchpflege und Release v0.1.1**. App, Protokolltester und Tests verwenden 11.3.22. Reale Quellen-, Desktop- und Geräteprüfungen bleiben getrennt offen.
 Codegrundlage: `83e3f31`, geprüft mit [Main-CI 39758853173](https://github.com/Eitschman/lis2-control-center/actions/runs/39758853173). Alle zehn aktiven Jobs sind erfolgreich. Die Legacy-Plug-ins bleiben ausdrücklich deaktiviert. CI-Links gelten für die jeweils dort genannten Commits; reine Dokumentationsänderungen verändern den geprüften Anwendungscode nicht.
 
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
-## Release v0.1.0 und .NET 10
+## PORT-08: Avalonia 11.3.22
+
+App, Protokolltester und Headless-Tests verwenden denselben Avalonia-Patchstand 11.3.22. Die HA-Tests verwenden `ClipboardExtensions.TryGetTextAsync` und prüfen weiterhin Strg+C sowie Doppelklick. Tmds.DBus.Protocol 0.21.3 bleibt eingebunden. Lizenztext und Inter-Schrift stimmen bytegenau mit den vorhandenen Beilagen überein; der Lizenz-Quellverweis nennt den Paketcommit `627ae9ef921621e27e7aa58df2796fbadb50af88`.
+
+Lokal bestehen Solution-Build ohne Warnungen/Fehler, 606 Tests mit einem übersprungenen Linux-Schlüsselbundtest sowie 24 Paketregressionen. Das selbstständige Windows-Paket besteht GSMTC-Anbieterstart und nativen Desktop-Smoke mit Tray-Menü, Aktivierung aus zweitem Prozess, zehn Ansichten, Hilfe/About, Diagnose und Shutdown. Alle zehn nativen Ansichten sowie Hilfe/About wurden gerendert und angesehen; die Dashboard-Darstellung wurde zusätzlich mit dem vorhandenen v0.1.0-Nachweis verglichen. Native Dateidialogbedienung und Anmeldung mit Autostart bleiben manuelle Zielsystemprüfungen. Der neue CI-/Release-Nachweis folgt nach dem Push.
+
+Benutzer bestätigt zusätzlich den erfolgreichen Betrieb von Release v0.1.0 mit .NET 10 auf Raspberry Pi 5. Die bekannte Umgebung ist Debian 13 Trixie, ARM64, KDE Plasma 6.3.6 und Wayland. Einzeln geprüfte HA-/Player-, Tray-/Autostart- oder Hardwareabläufe sind mit dieser Rückmeldung nicht spezifiziert.
+
+## Nachweis von v0.1.0
 
 [Release v0.1.0](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.0) ist veröffentlicht. [Release-CI 39759590063](https://github.com/Eitschman/lis2-control-center/actions/runs/39759590063) zu `83e3f31` besteht alle zwölf Jobs einschließlich Versionsprüfung und Veröffentlichung. Alle sieben heruntergeladenen Nutzdateien stimmen mit `SHA256SUMS.txt` überein. Die drei portablen App-Archive, der Windows-Protokolltester und beide Debian-Pakete enthalten jeweils Runtime 10.0.13 und Produktversion 0.1.0. Ihre Lizenzmanifeste enthalten 56 Pakete für die Windows-App, 44 für den Protokolltester und jeweils 54 für Linux. MPL-Pakete enthalten feste Quellarchivverweise. Das sind Distributions- und Laufzeitnachweise; reale LIS2-/HA-/Playerabläufe bleiben offen.
 

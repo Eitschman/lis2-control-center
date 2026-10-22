@@ -29,7 +29,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 
 | Bereich | Stand | Offener Umfang |
 | --- | --- | --- |
-| Projektstruktur | Avalonia 11.3.6, .NET 10 LTS, portable Bibliotheken und `LIS2.Runtime` vorhanden | Plattformverträge sind noch nicht durchgängig angebunden; UI-Code enthält weitere Orchestrierung |
+| Projektstruktur | Avalonia 11.3.22, .NET 10 LTS, portable Bibliotheken und `LIS2.Runtime` vorhanden | Plattformverträge sind noch nicht durchgängig angebunden; UI-Code enthält weitere Orchestrierung |
 | Display-Runtime | Scheduler, Scrolling, Quellen, Ereignisse und getrennte virtuelle/serielle Sequenzen; gemeinsame Geräteaktionen und differenzielle Spannen am angewendeten Transport | Spektrumvariable und Glyphenvorschau mit virtueller Ausgabe geprüft; physische Ausgabe offen |
 | Seiteneditor | Seitenpflege, Vorlagen, Bedingungen, Presets, animierte Vorschau, Variablenbrowser, validierter JSON-Import/-Export und gemeinsamer Entwurfsschutz für Quellenaktionen vorhanden | Bedingungsfelder und Variablenbrowser angebunden; gemeinsame Hardware- und plattformgerechte Medienpresets geprüft |
 | Glyphen | Acht 5x8-Slots, Dateien, Namen, Spektrumset und Ersetzungsdialog vorhanden | Physische Zeichenprüfung und UI-/Transportabgleich offen |
