@@ -32,6 +32,8 @@ data to the selected visualization. Metadata works independently of that selecti
 The DLL is an in-process COM server and must match the bitness of the target
 Windows Media Player process.
 
+Before registration, install or update the [Microsoft Visual C++ v14 Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) matching the player process architecture (x86 or x64). Both plug-in DLLs depend on this runtime.
+
 Run an elevated command prompt:
 
 ```text

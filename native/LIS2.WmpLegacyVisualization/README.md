@@ -17,6 +17,8 @@ The visualization is telemetry-only and never talks to LIS2 hardware.
 
 ## Installation
 
+Before registration, install or update the [Microsoft Visual C++ v14 Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) matching the player process architecture (x86 or x64). Both plug-in DLLs depend on this runtime.
+
 Register the DLL that matches the bitness of Windows Media Player Legacy from an
 elevated command prompt:
 
