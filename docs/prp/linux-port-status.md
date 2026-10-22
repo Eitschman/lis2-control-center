@@ -1,13 +1,19 @@
 # Avalonia-Portierung: aktueller Arbeitsstand
 
-Stand: 22.10.2026. Hauptbranch ist `main`; Release v0.1.0 verwendet die gemeinsame Avalonia-Anwendung.
-Implementierungsstand: PORT-07 mit geprüften Archivstarts für Windows x64, Linux x64 und nativem Linux ARM64 sowie Debian-Paketen auf amd64/arm64. Die PORT-06B-Funktionen sind enthalten. Reale HA-/Playernachweise sowie Desktop-/Geräteabnahme bleiben offen.
-Aktuelles Paket: **PORT-08: Avalonia-Patchpflege und Release v0.1.1**. App, Protokolltester und Tests verwenden 11.3.22. Reale Quellen-, Desktop- und Geräteprüfungen bleiben getrennt offen.
-Codegrundlage: `83e3f31`, geprüft mit [Main-CI 39758853173](https://github.com/Eitschman/lis2-control-center/actions/runs/39758853173). Alle zehn aktiven Jobs sind erfolgreich. Die Legacy-Plug-ins bleiben ausdrücklich deaktiviert. CI-Links gelten für die jeweils dort genannten Commits; reine Dokumentationsänderungen verändern den geprüften Anwendungscode nicht.
+Stand: 22.10.2026. Hauptbranch ist `main`; Release v0.1.1 verwendet die gemeinsame Avalonia-Anwendung.
+Implementierungsstand: PORT-08 mit geprüften Archivstarts für Windows x64, Linux x64 und nativem Linux ARM64 sowie Debian-Paketen auf amd64/arm64. Die PORT-06B-Funktionen sind enthalten. Reale HA-/Playernachweise sowie Desktop-/Geräteabnahme bleiben offen.
+Aktuelles Paket: **PORT-08: Avalonia-Patchpflege und Release v0.1.2**. App, Protokolltester und Tests verwenden 11.3.22. About ergänzt Frameworkversion, MIT-Lizenz und lokalisierte Lizenzdateiöffnung. Die README ist Englisch und nennt Fremdkomponenten. Reale Quellen-, Desktop- und Geräteprüfungen bleiben getrennt offen.
+Codegrundlage: `9b790f8`, geprüft mit [Main-CI 39765624490](https://github.com/Eitschman/lis2-control-center/actions/runs/39765624490). Alle zehn aktiven Jobs sind erfolgreich. Legacy-Plug-ins bleiben ausdrücklich deaktiviert. Reine Dokumentationsänderungen verändern den geprüften Anwendungscode nicht.
+
+Die About-/README-Ergänzung für v0.1.2 besteht lokal den Solution-Build ohne Warnungen/Fehler und 606 Tests mit einem übersprungenen Linux-Schlüsselbundtest. Die sechs Sprachvarianten prüfen Lizenz, Avalonia-Version, übersetzte Lizenzschaltfläche und die ausdrückliche Meldung fehlender Lizenzdateien. Ohne Lizenzzeile scheitern diese sechs Fälle; nach Wiederherstellung bestehen sie. Die gerenderten About-Dialoge auf Deutsch, Französisch und Russisch wurden bei 640 × 520 Pixeln einschließlich langer Beschriftungen und Fehlermeldung angesehen. Das selbstständige Windows-Paket besteht erneut GSMTC- und Desktop-Smoke; sein englisches About wurde bei 150 Prozent angesehen. CI- und Paketnachweis dieser Ergänzung folgen im zugehörigen Lauf.
 
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
 ## PORT-08: Avalonia 11.3.22
+
+[Release v0.1.1](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.1) zu `9b790f8` ist veröffentlicht. [Release-CI 39766372507](https://github.com/Eitschman/lis2-control-center/actions/runs/39766372507) besteht alle zwölf Jobs. Alle sieben heruntergeladenen Nutzdateien stimmen mit `SHA256SUMS.txt` überein. Drei App-Archive, beide Debian-Pakete und der Protokolltester enthalten Produktversion 0.1.1, Avalonia 11.3.22, Runtime 10.0.13 und Lizenzbeilagen. Die About-/README-Ergänzungen werden als v0.1.2 geprüft und veröffentlicht.
+
+[Main-CI 39765624490](https://github.com/Eitschman/lis2-control-center/actions/runs/39765624490) zu `9b790f8` besteht alle zehn aktiven Jobs. Avalonia-Tests: Windows 459 erfolgreich und ein Linux-Schlüsselbundtest übersprungen, Linux 460 erfolgreich. Native Windows-/Linux-Smokes, GSMTC-Anbieterstart, Protokolltester, Winamp-x86-DLL, drei extrahierte App-Archive sowie Debian-12-/13-Installationsprüfungen auf amd64 und nativem arm64 sind erfolgreich. Die zehn Linux-Ansichten, Hilfe/About, der Seiteneditor bei 150 Prozent und der Linux-Protokolltester wurden aus den aktuellen CI-Artefakten angesehen. Linux-X11-Smokes bei 100 und 150 Prozent bestehen; dies ist kein Wayland-/Pi-Praxisnachweis.
 
 App, Protokolltester und Headless-Tests verwenden denselben Avalonia-Patchstand 11.3.22. Die HA-Tests verwenden `ClipboardExtensions.TryGetTextAsync` und prüfen weiterhin Strg+C sowie Doppelklick. Tmds.DBus.Protocol 0.21.3 bleibt eingebunden. Lizenztext und Inter-Schrift stimmen bytegenau mit den vorhandenen Beilagen überein; der Lizenz-Quellverweis nennt den Paketcommit `627ae9ef921621e27e7aa58df2796fbadb50af88`.
 

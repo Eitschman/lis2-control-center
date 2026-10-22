@@ -72,6 +72,16 @@ public sealed class MenuLanguageUiTests
             localizedAbout.UpdateLayout();
             Assert.Contains(localizedAbout.GetVisualDescendants().OfType<TextBlock>(), text =>
                 text.Text == UiTranslations.Translate("Operating system", language));
+            var aboutTexts = localizedAbout.GetVisualDescendants().OfType<TextBlock>().Select(text => text.Text).ToArray();
+            Assert.Contains("MIT", aboutTexts);
+            Assert.Contains("11.3.22", aboutTexts);
+            Assert.Contains(UiTranslations.Translate("License", language), aboutTexts);
+            var licenses = localizedAbout.GetVisualDescendants().OfType<Button>().Single(button => button.Name == "AboutLicenses");
+            Assert.Equal(UiTranslations.Translate("Licenses", language), licenses.Content);
+            Assert.False(Directory.Exists(Path.Combine(AppContext.BaseDirectory, "licenses")));
+            licenses.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(UiTranslations.Translate("License files are not installed.", language),
+                localizedAbout.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "AboutLicenseStatus").Text);
             if (preference is "German" or "French" or "Russian") await Capture(localizedAbout, "menu-" + language + "-About");
             localizedAbout.Close();
             Click(window, "NavButton4");

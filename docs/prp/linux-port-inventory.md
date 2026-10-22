@@ -1,6 +1,6 @@
 # Inventar des Avalonia-Branches
 
-Stand: 22.10.2026. Implementierungsstand: PORT-07.
+Stand: 22.10.2026. Implementierungsstand: PORT-08.
 Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Konfiguration. Kein ZIP-Archiv als Implementierungsbaseline.
 
 ## Umfang und Projekte

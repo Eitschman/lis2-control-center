@@ -1,52 +1,52 @@
 # LIS2 Control Center
 
-Steuerungssoftware für das **VL System L.I.S. 2** mit 20x2-VFD und vier Lüfterkanälen.
+Control software for the **VL System L.I.S. 2**, featuring a 20x2 VFD and four fan channels.
 
-> **Status:** Gemeinsame Avalonia-Anwendung für Windows und Linux<br>
-> **Zielplattformen:** Windows x64, Linux x64 und Linux ARM64<br>
-> **Implementierung:** C# / .NET 10 LTS, Avalonia 11.3.22; Winamp-Plug-in als natives Win32/x86-Modul<br>
+> **Status:** Shared Avalonia application for Windows and Linux<br>
+> **Target platforms:** Windows x64, Linux x64 and Linux ARM64<br>
+> **Implementation:** C# / .NET 10 LTS, Avalonia 11.3.22; native Win32/x86 Winamp plug-in<br>
 > **License:** MIT
 
 LIS2 Control Center is an independent replacement for the obsolete VL System Multimedia Control Center (MCC). It combines direct LIS2 hardware control with programmable display pages, PC hardware monitoring, Winamp and Windows 11 Media Player telemetry, Home Assistant data and fan control.
 
 > **Preserve the hardware. Replace the limitations of its software.**
 
-## Download und Installation
+## Download and installation
 
-[Release v0.1.1](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.1) enthält folgende Pakete:
+[Release v0.1.2](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.2) includes the following packages:
 
 | System | Download |
 | --- | --- |
-| Windows x64 | [Portables ZIP](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/LIS2-Control-Center-0.1.1-win-x64.zip) |
-| Debian/Ubuntu x64 | [Debian-Paket amd64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/lis2-control-center_0.1.1_amd64.deb) |
-| Debian/Ubuntu ARM64, Raspberry Pi 5 | [Debian-Paket arm64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/lis2-control-center_0.1.1_arm64.deb) |
-| Linux x64 | [Portables Archiv](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/LIS2-Control-Center-0.1.1-linux-x64.tar.gz) |
-| Linux ARM64 | [Portables Archiv](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/LIS2-Control-Center-0.1.1-linux-arm64.tar.gz) |
+| Windows x64 | [Portable ZIP](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/LIS2-Control-Center-0.1.2-win-x64.zip) |
+| Debian/Ubuntu x64 | [Debian package for amd64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/lis2-control-center_0.1.2_amd64.deb) |
+| Debian/Ubuntu ARM64, Raspberry Pi 5 | [Debian package for arm64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/lis2-control-center_0.1.2_arm64.deb) |
+| Linux x64 | [Portable archive](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/LIS2-Control-Center-0.1.2-linux-x64.tar.gz) |
+| Linux ARM64 | [Portable archive](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/LIS2-Control-Center-0.1.2-linux-arm64.tar.gz) |
 
-Windows: ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Linux-Archive entpacken und `./LIS2.App.Avalonia` ausführen. Die .NET-10-Laufzeit ist enthalten; eine separate .NET-Installation ist nicht erforderlich.
+On Windows, extract the ZIP and run `LIS2.App.Avalonia.exe`. For portable Linux packages, extract the archive and run `./LIS2.App.Avalonia`. The .NET 10 runtime is included; no separate .NET installation is required.
 
-Debian/Ubuntu, im Downloadverzeichnis:
+On Debian/Ubuntu, run these commands from the download directory:
 
 ```sh
-sudo apt install ./lis2-control-center_0.1.1_amd64.deb
+sudo apt install ./lis2-control-center_0.1.2_amd64.deb
 lis2-control-center
 ```
 
-Auf ARM64 stattdessen `lis2-control-center_0.1.1_arm64.deb` verwenden. Die App erscheint auch im Anwendungsmenü. Serielle Zugriffsrechte und ein Desktop-Schlüsselbund müssen zum jeweiligen System passen; Hinweise stehen im [Paketierungsleitfaden](docs/release.md#debian-pakete).
+On ARM64, use `lis2-control-center_0.1.2_arm64.deb` instead. The application also appears in the application menu. Serial port permissions and a desktop keyring must be configured for your system; see the [packaging guide](docs/release.md#debian-pakete).
 
-Zusätzlich: [Windows-Protokolltester](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/LIS2-ProtocolTester-0.1.1-win-x64.zip), [Winamp-Plug-in gen_lis2.dll](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/gen_lis2.dll) und [SHA-256-Prüfsummen](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.1/SHA256SUMS.txt). Das Winamp-Plug-in gehört in das `Plugins`-Verzeichnis des 32-Bit-Winamp. Die [Release-Hinweise](docs/release-notes.md) nennen Umfang und offene manuelle Prüfungen. Lizenztexte, Fremdkomponentenhinweise und Quellverweise liegen den App- und Protokolltesterpaketen bei.
+Also available: the [Windows Protocol Tester](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/LIS2-ProtocolTester-0.1.2-win-x64.zip), [Winamp plug-in gen_lis2.dll](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/gen_lis2.dll) and [SHA-256 checksums](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.2/SHA256SUMS.txt). Place the Winamp plug-in in the `Plugins` directory of 32-bit Winamp. The [release notes](docs/release-notes.md) describe the release scope and outstanding manual checks. Application and Protocol Tester packages include license texts, third-party notices and source references.
 
-## Avalonia-Arbeitsstand
+## Project status
 
-Stand: 22.10.2026, Implementierungsstand PORT-07 mit geprüften Archivstarts für Windows x64, Linux x64 und nativem Linux ARM64 sowie Debian-Paketen auf amd64/arm64. Die gemeinsame App unter `src/LIS2.App.Avalonia` enthält zehn Hauptansichten, Display-/Seiten-/Ereignisruntime, Glyphen, Windows-/Linux-Sensoren, Lüfterregelung mit ausdrücklicher serieller Freigabe, HA, Medien, Workspace, Hilfe und About. Der modale Variablenbrowser ist eine genehmigte Abweichung von WPF.
+As of October 22, 2026, PORT-08 includes verified archive launches on Windows x64, Linux x64 and native Linux ARM64, plus Debian packages for amd64/arm64. The shared application in `src/LIS2.App.Avalonia` provides ten main views, display/page/event runtime, custom glyphs, Windows/Linux sensors, fan control with explicit authorization for serial output, Home Assistant, media sources, workspace persistence, help and About. The modal variable browser is an accepted difference from WPF.
 
-In CI bestehen 459 Avalonia-Tests unter Windows und 460 unter Linux; der Linux-Schlüsselbundtest ist unter Windows übersprungen. Enthalten sind acht UI-Regressionen des Avalonia-Protokolltesters. Gerätebedienung, Einstellungen und alle zehn Menüseiten werden mit tatsächlichen Avalonia-Controls und Skia-Rendering geprüft. Statische Texte und dynamische Meldungen folgen der gewählten Sprache; Metadaten und technische Schlüssel bleiben unverändert. Die Hilfe folgt Deutsch, Englisch, Französisch, Türkisch, Russisch oder der Systemsprache, auch bei geöffnetem Dialog. Native Windows-/Linux-Smokes prüfen die Hauptanwendung und den Protokolltester. Der aktuelle CI-Nachweis und die Sichtprüfungen stehen im [Status](docs/prp/linux-port-status.md). Extrahierte Paketstarts und native ARM64-Ausführung bestehen in CI; physische LIS2-Prüfung und weiterführende manuelle Desktop-Abnahme bleiben offen. Der Benutzer bestätigt den Debian-Paketstart von Build 622 auf Raspberry Pi 5 mit Debian 13, KDE Plasma 6.3.6 und Wayland-Sitzung.
+CI passes 459 Avalonia tests on Windows and 460 on Linux; the Linux keyring test is skipped on Windows. These include eight Protocol Tester UI regressions. Device controls, settings and all ten main views are tested using actual Avalonia controls and Skia rendering. Static text and dynamic messages follow the selected language; metadata and technical keys remain unchanged. Help supports German, English, French, Turkish, Russian or the system language, including changes while the dialog is open. Native Windows/Linux smoke tests cover the main application and Protocol Tester. See the [status report](docs/prp/linux-port-status.md) for CI evidence and visual checks. Extracted packages and native ARM64 execution pass in CI; physical LIS2 validation and further manual desktop checks remain open. The user has confirmed Debian package operation on a Raspberry Pi 5 with Debian 13, KDE Plasma 6.3.6 and a Wayland session, including release v0.1.0 with .NET 10.
 
-Die verbindlichen Ziele stehen im [Avalonia-PRP](docs/prp/linux-avalonia-port.md), der aktuelle Befund im [Status](docs/prp/linux-port-status.md), die Unterschiede zur WPF-Oberfläche im [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md). [TODO.md](TODO.md) führt die priorisierte Restarbeit. Transport, Port, HA-Aktivierung, lokale Linux-Tokenauswahl und Helligkeit werden gespeichert. Gemeinsame Displayaktionen verwenden den angewendeten Transport. Der Windows-Import ist sichtbar; manuelle Lüfterausgaben beachten Kanalgrenzen und benötigen bei serieller Ausgabe je Aktion eine Freigabe. Live-HA und Liveplayer auf den Zielsystemen bleiben offen. PORT-06A ergänzt die Spektrumvariable, sichtbare Glyphenvorschauen, den angebundenen Bedingungsbrowser, direkte Sensorauswahl, konsistente Presets, Speicherrückmeldungen und Diagnosefelder. Pixelraster und präzise Kurvenpunkte sind bedienbar. Release v0.1.1 verwendet .NET 10 LTS und enthält Lizenzbeilagen. Weitere manuelle Desktop-Abnahme bleibt auf der Liste.
+The [Avalonia PRP](docs/prp/linux-avalonia-port.md) defines the requirements, the [status report](docs/prp/linux-port-status.md) records the verified implementation, and the [parity audit](docs/prp/wpf-avalonia-parity-audit.md) describes differences from WPF. [TODO.md](TODO.md) lists the remaining priorities. Transport, port, Home Assistant enablement, Linux token storage selection and brightness are persisted. Shared display actions use the applied transport. Windows settings import is available; manual fan output respects channel limits and requires authorization for each serial operation. Live Home Assistant and media player checks on target systems remain open. PORT-06A adds the spectrum variable, visible glyph previews, an integrated condition browser, direct sensor selection, consistent presets, save feedback and diagnostic fields. The pixel grid and precise curve points are editable. Release v0.1.2 uses .NET 10 LTS and includes license notices. Further manual desktop checks remain on the list.
 
-## Funktionsumfang
+## Features
 
-Die folgenden Funktionen gehören zur Avalonia-Anwendung. Plattformabhängige Medien-, Sensor- und Desktopdienste sowie die noch offenen Zielsystemprüfungen stehen im Portierungsstatus. Die WPF-Referenz ist im Git-Commit `922ca1b` zugänglich; der aktuelle Quellbaum enthält keine WPF-Anwendung.
+The following features belong to the Avalonia application. The porting status report documents platform-specific media, sensor and desktop services and outstanding target-system checks. The WPF reference remains available at Git commit `922ca1b`; the current source tree contains no WPF application.
 
 ### LIS2 / display
 
@@ -108,7 +108,7 @@ The modern Windows 11 Media Player is integrated directly through **Global Syste
 - ready-made Now Playing page preset
 - dedicated Media-page card alongside Winamp
 
-Windows Media Player Legacy bleibt im Produktumfang zurückgestellt. Die Anwendung startet die Legacy-Quelle nicht und zeigt keine Legacy-Karte. Native Legacy-CI-Artefakte sind deaktiviert.
+Windows Media Player Legacy remains outside the current product scope. The application does not start the Legacy source or display a Legacy card. Native Legacy CI artifacts are disabled.
 
 ### Home Assistant
 
@@ -181,8 +181,8 @@ The projects are deliberately separated:
 - `src/LIS2.Fans` — fan-control modes, curves, hysteresis and fail-safe logic
 - `src/LIS2.Winamp` — named-pipe host, Winamp snapshots and display-value formatting
 - `src/LIS2.WindowsMedia` — Windows 11 GSMTC session source and Windows Media display values
-- `src/LIS2.App.Avalonia`: gemeinsame Desktop-App und Plattformadapter für Windows/Linux.
-- `src/LIS2.Runtime`: UI-unabhängige Runtime, Schleifen, Linux-Sensoren und Plattformverträge; Details in [architecture.md](docs/architecture.md).
+- `src/LIS2.App.Avalonia`: shared desktop application and platform adapters for Windows/Linux.
+- `src/LIS2.Runtime`: UI-independent runtime, background loops, Linux sensors and platform contracts; see [architecture.md](docs/architecture.md).
 - `tools/LIS2.ProtocolTester` — low-level protocol testing
 - `tools/LIS2.WinampSimulator` — Winamp testing without Winamp
 - `native/LIS2.WinampPlugin` — native x86 Winamp plug-in
@@ -244,10 +244,10 @@ See [docs/protocol.md](docs/protocol.md) and [docs/reverse-engineering.md](docs/
 
 ## Building
 
-Die folgenden Befehle bauen die Solution mit Avalonia-App, Avalonia-Protokolltester, Bibliotheken und Windows-GSMTC-Anbieter. Voraussetzungen:
+The following commands build the solution, including the Avalonia application, Avalonia protocol tester, libraries and Windows GSMTC provider. Requirements:
 
 - Windows
-- .NET 10 SDK; `global.json` wählt ein stabiles SDK der 10.0-Reihe
+- .NET 10 SDK; `global.json` selects a stable SDK from the 10.0 series
 - CMake/MSVC when building the native Winamp plug-in
 
 ```powershell
@@ -256,36 +256,36 @@ dotnet build .\LIS2ControlCenter.sln -c Release
 dotnet test .\LIS2ControlCenter.sln -c Release --no-build
 ```
 
-Unter Linux werden die portablen Projekte gezielt gebaut und geprüft:
+On Linux, build and test the portable projects directly:
 
 ```text
 dotnet build src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release
 dotnet test tests/LIS2.App.Avalonia.Tests/LIS2.App.Avalonia.Tests.csproj --configuration Release
 ```
 
-Die konkreten lokalen und GitHub-Prüfläufe stehen im Portierungsstatus. Für GSMTC enthält das Windows-Publish zusätzliche Schritte.
+Local and GitHub verification results are documented in the porting status. Publishing the Windows GSMTC provider requires additional steps.
 
 ## CI and development artifacts
 
-`build.yml` prüft `main` und Pull Requests über den wiederverwendbaren Workflow `linux-portable.yml`. Derselbe Workflow prüft den Avalonia-Branch und führt Windows-/Linux-Tests, native Desktop-Smokes, Archivstarts und Debian-Installationsprüfungen aus. Windows baut zusätzlich die gesamte Solution und prüft die Quellen- und Medienbibliotheken. Die Windows-App wird mit Microsoft Defender geprüft.
+`build.yml` validates `main` and pull requests through the reusable `linux-portable.yml` workflow. The same workflow validates the Avalonia branch and runs Windows/Linux tests, native desktop smoke tests, archive launch tests and Debian installation checks. Windows also builds the entire solution and tests the data-source and media libraries. The Windows application is scanned with Microsoft Defender.
 
-Entwicklungsartefakte:
+Development artifacts:
 
-- `LIS2-Avalonia-win-x64`, `LIS2-Avalonia-linux-x64`, `LIS2-Avalonia-linux-arm64`: selbstständige Archive mit SHA-256-Dateien.
-- `LIS2-Debian-linux-x64`, `LIS2-Debian-linux-arm64`: installierbare Debian-Pakete mit Prüfsummen.
-- `LIS2-ProtocolTester-win-x64`: selbstständiger Avalonia-Protokolltester; seine Oberfläche wird unter Windows und Linux nativ geprüft.
-- `gen_lis2-win32`: natives x86-Winamp-Plug-in.
+- `LIS2-Avalonia-win-x64`, `LIS2-Avalonia-linux-x64`, `LIS2-Avalonia-linux-arm64`: self-contained archives with SHA-256 files.
+- `LIS2-Debian-linux-x64`, `LIS2-Debian-linux-arm64`: installable Debian packages with checksums.
+- `LIS2-ProtocolTester-win-x64`: self-contained Avalonia protocol tester; its interface is tested natively on Windows and Linux.
+- `gen_lis2-win32`: native x86 Winamp plug-in.
 
-Die Windows-App enthält den GSMTC-Anbieter und seine WinRT-Abhängigkeiten. Screenshots und Prüfergebnisse werden als eigene Artefakte hochgeladen. Tag-Releases verwenden denselben Avalonia-Paketbau mit der Tag-Version und veröffentlichen drei portable App-Archive, zwei Debian-Pakete, den Windows-Protokolltester, das Winamp-Plug-in und `SHA256SUMS.txt`. Einzelheiten stehen im [Paketierungsleitfaden](docs/release.md).
+The Windows application includes the GSMTC provider and its WinRT dependencies. Screenshots and test results are uploaded as separate artifacts. Tagged releases use the same Avalonia packaging workflow with the tag version and publish three portable application archives, two Debian packages, the Windows protocol tester, the Winamp plug-in and `SHA256SUMS.txt`. See the [packaging guide](docs/release.md).
 
-Zusätzlich entstehen `LIS2-Debian-linux-x64` und `LIS2-Debian-linux-arm64` mit installierbaren `.deb`-Paketen und SHA-256-Prüfsummen. Sie enthalten die .NET-Laufzeit, einen Startmenüeintrag und das Anwendungssymbol. Installation mit `sudo apt install ./lis2-control-center_<Paketversion>_amd64.deb`, auf ARM64 mit `_arm64.deb`. Einzelheiten und Debian-Prüfungen stehen im [Paketierungsleitfaden](docs/release.md#debian-pakete).
+The Debian packages include the .NET runtime, an application menu entry and the application icon. Install with `sudo apt install ./lis2-control-center_<version>_amd64.deb`, or use the `_arm64.deb` package on ARM64. See the [Debian packaging guide](docs/release.md#debian-pakete) for details and installation checks.
 
 ## Documentation
 
-- [Avalonia-PRP](docs/prp/linux-avalonia-port.md)
-- [Aktueller Portierungsstatus](docs/prp/linux-port-status.md)
-- [Projekt- und Plattforminventar](docs/prp/linux-port-inventory.md)
-- [WPF-/Avalonia-Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md)
+- [Avalonia PRP](docs/prp/linux-avalonia-port.md)
+- [Current porting status](docs/prp/linux-port-status.md)
+- [Project and platform inventory](docs/prp/linux-port-inventory.md)
+- [WPF/Avalonia parity audit](docs/prp/wpf-avalonia-parity-audit.md)
 - [Project specification](docs/PROJECT_SPEC.md)
 - [Architecture](docs/architecture.md)
 - [Protocol notes](docs/protocol.md)
@@ -316,3 +316,25 @@ The application is not intended to clone MCC pixel-for-pixel. Historical MCC beh
 This repository does **not** contain MCC binaries, original VL System installers, proprietary VL System software, proprietary artwork or Winamp binaries.
 
 It contains independently written source code, interoperability documentation, protocol notes and project-created test vectors. Reverse-engineering findings are documented for interoperability and hardware preservation.
+
+## License and third-party software
+
+LIS2 Control Center is distributed under the [MIT License](LICENSE). Third-party components retain their own copyrights and licenses.
+
+The application uses the following components, including platform-specific and transitive dependencies:
+
+| Component | Purpose | License information |
+| --- | --- | --- |
+| Avalonia 11.3.22 and Fluent theme | Desktop interface | MIT |
+| .NET 10 and System libraries | Runtime, serial ports and operating-system integration | MIT and bundled third-party notices |
+| SkiaSharp / Skia and HarfBuzzSharp / HarfBuzz | Graphics and text rendering | Binding licenses and upstream notices included in the packages |
+| Inter font | Interface typography | SIL Open Font License 1.1 |
+| LibreHardwareMonitor, BlackSharp.Core, DiskInfoToolkit and RAMSPDToolkit-NDD | Windows hardware monitoring | MPL-2.0 |
+| HidSharp | Hardware access used by monitoring dependencies | Apache-2.0 |
+| Tmds.DBus.Protocol | Linux D-Bus communication | MIT |
+| MicroCom.Runtime | Native interoperability | MIT |
+| Mono.Posix.NETStandard | Unix interoperability | Mono license terms |
+| ANGLE | Windows graphics support | Bundled upstream license and notices |
+| Microsoft Windows SDK / WinRT | Windows media integration | Microsoft SDK terms and bundled notices |
+
+Each application and protocol-tester package includes `LICENSE`, `THIRD-PARTY-NOTICES.txt` and a `licenses/` directory with original license texts, copyright notices and NuGet metadata. `licenses/manifest.json` records exact dependency versions and source references, including source archives for MPL-2.0 components. The inventory may include dependencies for other platforms. See the [license sources](tools/packaging/licenses/sources.json) and [packaging guide](docs/release.md) for the packaging process.

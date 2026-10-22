@@ -102,7 +102,7 @@ public partial class MainWindow
         {
             Name = "AboutDialog",
             Title = SettingsTranslate("About") + " LIS2 Control Center",
-            Icon = Icon, Width = 560, MinWidth = 450, Height = 420,
+            Icon = Icon, Width = 640, MinWidth = 450, Height = 520,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = false
         };
@@ -113,6 +113,8 @@ public partial class MainWindow
         {
             ("Build", assembly.GetCustomAttribute<AssemblyConfigurationAttribute>()?.Configuration ?? "unknown"),
             ("Runtime", RuntimeInformation.FrameworkDescription),
+            ("Avalonia", typeof(Application).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0] ?? typeof(Application).Assembly.GetName().Version!.ToString()),
+            ("License", "MIT"),
             ("Architecture", RuntimeInformation.ProcessArchitecture.ToString()),
             ("Operating system", RuntimeInformation.OSDescription),
             ("Application data", dataDirectory)
@@ -124,7 +126,7 @@ public partial class MainWindow
             Grid.SetColumn(valueText, 1); row.Children.Add(valueText);
             content.Children.Add(row);
         }
-        var buttons = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+        var buttons = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"), ColumnSpacing = 12 };
         var github = new Button { Content = "GitHub", MinWidth = 100 };
         github.Click += (_, _) =>
         {
@@ -132,10 +134,26 @@ public partial class MainWindow
             catch (Exception ex) { github.Content = "GitHub: " + ex.Message; }
         };
         buttons.Children.Add(github);
+        var licenseStatus = new TextBlock { Name = "AboutLicenseStatus", TextWrapping = TextWrapping.Wrap };
+        var licenses = new Button { Name = "AboutLicenses", Content = BrowserText("Licenses"), MinWidth = 100 };
+        licenses.Click += (_, _) =>
+        {
+            // Die unveränderten Lizenztexte stammen aus dem tatsächlichen Paket, nicht aus einer zweiten UI-Liste.
+            var directory = System.IO.Path.Combine(AppContext.BaseDirectory, "licenses");
+            if (!System.IO.Directory.Exists(directory))
+            {
+                licenseStatus.Text = BrowserText("License files are not installed.");
+                return;
+            }
+            try { Process.Start(new ProcessStartInfo(directory) { UseShellExecute = true }); }
+            catch (Exception ex) { licenseStatus.Text = BrowserText("Licenses") + ": " + ex.Message; }
+        };
+        Grid.SetColumn(licenses, 1); buttons.Children.Add(licenses);
         var close = new Button { Content = BrowserText("Close"), MinWidth = 100 };
         close.Click += (_, _) => dialog.Close();
-        Grid.SetColumn(close, 1); buttons.Children.Add(close);
+        Grid.SetColumn(close, 2); buttons.Children.Add(close);
         content.Children.Add(buttons);
+        content.Children.Add(licenseStatus);
         dialog.Content = new ScrollViewer { Content = content };
         await dialog.ShowDialog(this);
     }
