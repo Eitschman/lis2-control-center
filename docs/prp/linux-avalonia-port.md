@@ -94,7 +94,7 @@ PORT-06A-Nachweis: Die lokalen Tests prüfen Snapshot → Spektrumvariable → P
 - [ ] Native Tray-Bedienung, Autostart bei Anmeldung und Plattformabweichung beim Schließen auf den Ziel-Desktops abnehmen.
 - [x] Pakete `win-x64`, `linux-x64` und `linux-arm64` werden selbstständig veröffentlicht und mit SHA-256-Dateien hochgeladen.
 - [ ] Extrahierte Pakete starten; ARM64 auf ARM64 ausführen und Laufzeitabhängigkeiten dokumentieren.
-- [ ] Support-/Lizenzstatus der verwendeten .NET-/Avalonia-Versionen vor dem Release anhand offizieller Quellen verifizieren.
+- [x] Support-/Lizenzstatus von .NET/Avalonia anhand offizieller Quellen geprüft; .NET-Supportende, Avalonia-Patchstand und fehlende Distributionshinweise in `release.md`/TODO festgehalten. Die nötigen Umstellungs- und Lizenzarbeiten sind dadurch nicht erledigt.
 - [ ] WPF-Projekt und WPF-Releasepfad erst nach Paritätsnachweis und Benutzerabnahme entfernen.
 
 ## Sicherheits- und Abnahmeregeln

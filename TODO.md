@@ -140,6 +140,7 @@ Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standa
 - [ ] Extrahierte Windows-/Linux-Pakete starten; GUI-Smoke ergänzt die bestehende Dateiprüfung.
 - [ ] Linux ARM64 auf echter ARM64-Laufzeit prüfen. Cross-Publish allein zählt nicht als Laufzeitnachweis.
 - [ ] Debian/KDE und Raspberry Pi 5 mit Distribution, Architektur, DPI, Displayserver und Abhängigkeiten protokollieren.
+- [x] Benutzer bestätigt erfolgreichen Anwendungsstart auf dem Pi am 22.10.2026; Paketstand und Systemdetails noch nicht zugeordnet. Weiterführende Desktopprüfungen übernimmt der Benutzer anhand der Liste in `docs/release.md`.
 - [ ] GTK-/X11-/Wayland-/DBus-/Keyring-Abhängigkeiten und serielle Zugriffsrechte anhand tatsächlicher Zielsysteme dokumentieren.
 - [x] Support- und Lizenzstatus von .NET/Avalonia anhand offizieller Quellen prüfen: .NET 8.0.32, Supportende 10.11.2026; Avalonia 11.3.6 unter MIT, neuere Patches vorhanden. Befunde und Quellen in `docs/release.md`.
 - [ ] Vor Avalonia-Release ein eigenes Paket für unterstütztes .NET und Avalonia-Patchstand einplanen und prüfen.

@@ -21,6 +21,11 @@ class DebianPackageTests(unittest.TestCase):
         self.publish.mkdir()
         # Ein ausführbares Fixture genügt für Metadatenprüfungen; Laufzeitprüfungen verwenden das echte Publish.
         shutil.copy2("/bin/true", self.publish / EXECUTABLE)
+        # Das Fixture bezeichnet immer x64, unabhängig von der Architektur des Testrechners.
+        executable = self.publish / EXECUTABLE
+        payload = bytearray(executable.read_bytes())
+        struct.pack_into("<H", payload, 18, ARCHITECTURES["linux-x64"][1])
+        executable.write_bytes(payload)
         for name in (EXECUTABLE + ".dll", EXECUTABLE + ".runtimeconfig.json",
                      "libcoreclr.so", "libhostfxr.so", "libSkiaSharp.so"):
             (self.publish / name).write_text("fixture", encoding="utf-8")
