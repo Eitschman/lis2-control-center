@@ -91,6 +91,8 @@ Die [.NET-Lizenzhinweise](https://github.com/dotnet/core/blob/main/license-infor
 
 ## Zielsystemnachweise
 
+Benutzerbestätigung vom 22.10.2026: Raspberry Pi 5 mit 16 GB RAM, Debian GNU/Linux 13 Trixie, ARM64/aarch64, KDE Plasma 6.3.6 und Wayland-Sitzung. Installiert wurde `lis2-control-center_0.0~ci622.1_arm64.deb`; die Anwendung startet erfolgreich. [Build 622](https://github.com/Eitschman/lis2-control-center/actions/runs/39748001109) gehört laut GitHub-API zu `c1b74ea`. Das ist ein Praxistest der installierten Debian-Paketversion. DPI und tatsächlicher App-Displaybackend sind noch nicht angegeben; die Bestätigung umfasst keine einzeln protokollierten Tray-/Autostart-, Livequellen-, Keyring- oder Hardwareabläufe.
+
 Für Debian/KDE und Raspberry Pi 5 werden zusätzlich zu den automatisierten Paketstarts Distribution/Version, CPU-Architektur, Desktopversion, X11 oder Wayland/XWayland, DPI, Theme und Sprache protokolliert. Zu prüfen sind echte Tray-Klicks, Aktivierung aus einem zweiten Prozess, Autostart nach Anmeldung, Datei-/Ordnerdialoge, Medienquelle und sicherer Tokenstore. Unter Wayland muss die tatsächlich genutzte XWayland-Verbindung festgehalten werden; ein Xvfb-Lauf belegt keine Wayland-Sitzung.
 
 Serielle Rechte werden am konkreten Gerät geprüft: Gerätepfad und Eigentümergruppe mit `ls -l /dev/serial/by-id/` und `ls -l /dev/ttyUSB0` aufnehmen, tatsächlichen Namen entsprechend ersetzen, Benutzergruppen mit `id -nG` vergleichen und Zugriff nach einer etwaigen Gruppenänderung erst nach Neuanmeldung testen. Das Paket ändert keine Rechte und sendet bei der Geräteerkennung keine Protokollkommandos. Ohne physisches Gerät bleiben Zugriff und Hardwareausgabe ungeprüft.

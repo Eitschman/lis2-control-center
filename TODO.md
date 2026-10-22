@@ -139,12 +139,13 @@ Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standa
 - [x] amd64-/arm64-Pakete in Debian 12/13 installieren, nativen GUI-Smoke als gewöhnlicher Benutzer und Deinstallation mit erhaltenen Benutzerdaten prüfen.
 - [x] Extrahierte Windows-/Linux-Pakete starten: SHA-256, frische Extraktion, nativer Apphost und GUI-Smoke für alle drei RIDs; Ergebnis, Screenshots und Laufzeitumgebung als CI-Artefakt.
 - [x] Linux ARM64 nativ auf `ubuntu-24.04-arm` prüfen; zusätzlich Debian 12/13 arm64 installieren, GUI/Keyring prüfen und deinstallieren. CI `39750384348` zu `a6a839f`, alle neun Jobs erfolgreich.
-- [ ] Debian/KDE und Raspberry Pi 5 mit Distribution, Architektur, DPI, Displayserver und Abhängigkeiten protokollieren.
-- [x] Benutzer bestätigt erfolgreichen Anwendungsstart auf dem Pi am 22.10.2026; Paketstand und Systemdetails noch nicht zugeordnet. Weiterführende Desktopprüfungen übernimmt der Benutzer anhand der Liste in `docs/release.md`.
+- [x] Benutzer bestätigt Debian-Paketstart auf Raspberry Pi 5 mit 16 GB RAM: Debian 13 Trixie, ARM64/aarch64, KDE Plasma 6.3.6, Wayland-Sitzung, `0.0~ci622.1` aus CI-Build 622 zu `c1b74ea`.
+- [ ] DPI, tatsächlich verwendeten App-Displaybackend und Abhängigkeiten auf dem Pi protokollieren; weiterführende Desktopprüfungen übernimmt der Benutzer anhand der Liste in `docs/release.md`.
 - [x] X11-/DBus-/Keyring-Umgebungen, Runtimeversion und native Bibliotheksauflösung für automatisierte Paketstarts protokollieren. Positive und negative Paketprüfungen sowie native ARM64-Ausführung nachgewiesen.
 - [ ] GTK-Dateidialoge, Wayland/XWayland, Anmeldung/Tray und serielle Zugriffsrechte auf den tatsächlichen Benutzer-Desktops prüfen; manuelle Prüfungen übernimmt der Benutzer.
 - [x] Support- und Lizenzstatus von .NET/Avalonia anhand offizieller Quellen prüfen: .NET 8.0.32, Supportende 10.11.2026; Avalonia 11.3.6 unter MIT, neuere Patches vorhanden. Befunde und Quellen in `docs/release.md`.
 - [ ] Vor Avalonia-Release ein eigenes Paket für unterstütztes .NET und Avalonia-Patchstand einplanen und prüfen.
+- [ ] Windows-Runtimepatch angleichen: geprüfte Pakete enthalten Windows .NET 8.0.31 gegenüber Linux 8.0.32.
 - [ ] Lizenztexte/Fremdkomponentenhinweise und nötige Quellverweise zu den tatsächlich verteilten NuGet-Paketen in Archive und Debian-Pakete aufnehmen; MPL-2.0-Pakete, HidSharp und Mono.Posix gesondert abgleichen.
 - [ ] Avalonia-Releaseumschaltung und Versionsmetadaten erst nach den PRP-Abnahmekriterien vornehmen; Tag-Releases veröffentlichen derzeit WPF.
 
