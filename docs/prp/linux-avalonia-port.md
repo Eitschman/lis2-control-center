@@ -76,6 +76,8 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 
 ### Oberfläche und Verifikation
 
+Zusätzlich zu den portablen Archiven entstehen Debian-Pakete für amd64 und arm64 mit Startmenüeintrag, Anwendungssymbol, Bibliotheksabhängigkeiten und Prüfsumme. Paketinstallation und GUI-Smoke auf Debian 12/13 gehören zu PORT-07. Echte ARM64-Ausführung sowie KDE-/Wayland-Abnahme bleiben getrennte Nachweise. Bedienung und Paketbau stehen in [release.md](../release.md).
+
 Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. PORT-06A ergänzt Spektrum-/Glyphenvorschau, den Bedingungsbrowser, Sensorauswahl, grafische Medienpegel, Diagnosefelder, Speicherrückmeldungen und konsistente Presets. Das klickbare Pixelraster und die Kurvenpunktbearbeitung verwenden dieselben Textformate; Temperaturen bleiben präzise. Hilfe und fünf Sprachkataloge beschreiben diese Bedienung. Die Sichtprüfung und Plattformgrenzen stehen im [Status](linux-port-status.md). Nächstes Paket ist **PORT-07: Pakete und Zielsysteme** gemäß [TODO](../../TODO.md).
 
 PORT-06A-Nachweis: Die lokalen Tests prüfen Snapshot → Spektrumvariable → Preset → sichtbare Vorschau → virtuellen Transport, Quellenverlust, Bedingungsfelder/-browser, fünf identische Hardware-Presets, gespeicherte fehlende Sensoren, Glyphensynchronisierung nur bei aktiver Option, Speicherfehler mit erhaltenem Entwurf und präzise Kurvenpunkte. Die betroffenen Ansichten sind in fünf Sprachen bei 950 × 600 gerendert und angesehen. Physische LIS2-Ausgabe, native Linux-Ausführung dieses Standes und reale HA-/Playernachweise bleiben getrennte Zielsystemprüfungen.

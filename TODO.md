@@ -135,6 +135,8 @@ Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standa
 
 ### PORT-07: Pakete und Zielsysteme
 
+- [x] Zusätzliche Debian-Pakete für amd64 und arm64 mit Startmenüeintrag, Symbol, Bibliotheksabhängigkeiten und SHA-256 in den Avalonia-Workflow integrieren.
+- [x] amd64-Paket in Debian 12/13 installieren, nativen GUI-Smoke als gewöhnlicher Benutzer und Deinstallation mit erhaltenen Benutzerdaten prüfen. Echte ARM64-Laufzeit bleibt getrennt offen.
 - [ ] Extrahierte Windows-/Linux-Pakete starten; GUI-Smoke ergänzt die bestehende Dateiprüfung.
 - [ ] Linux ARM64 auf echter ARM64-Laufzeit prüfen. Cross-Publish allein zählt nicht als Laufzeitnachweis.
 - [ ] Debian/KDE und Raspberry Pi 5 mit Distribution, Architektur, DPI, Displayserver und Abhängigkeiten protokollieren.

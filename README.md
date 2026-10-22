@@ -264,6 +264,8 @@ Tagged releases additionally contain portable ZIP packages and `SHA256SUMS.txt`.
 
 Der separate Workflow `linux-portable.yml` prüft `feature/linux-avalonia` einschließlich nativem Windows-/Linux-X11-Smoke und erzeugt `LIS2-Avalonia-win-x64`, `LIS2-Avalonia-linux-x64` und `LIS2-Avalonia-linux-arm64`. Smoke-Screenshots und Ergebnisdateien werden separat hochgeladen. Der Workflow erzeugt zusätzlich `LIS2-ProtocolTester-win-x64` und `gen_lis2-win32` wie main. Das Windows-App-Paket enthält den GSMTC-Anbieter samt WinRT-Abhängigkeiten und wird mit einem Anbieter-Starttest geprüft. Jedes Avalonia-Paketartefakt enthält ein Archiv und eine SHA-256-Datei; die Aufbewahrung beträgt 14 Tage. Tag-Releases veröffentlichen derzeit weiterhin WPF. Der Avalonia-Workflow führt keine WPF-Tests aus.
 
+Zusätzlich entstehen `LIS2-Debian-linux-x64` und `LIS2-Debian-linux-arm64` mit installierbaren `.deb`-Paketen und SHA-256-Prüfsummen. Sie enthalten die .NET-Laufzeit, einen Startmenüeintrag und das Anwendungssymbol. Installation mit `sudo apt install ./lis2-control-center_<Paketversion>_amd64.deb`, auf ARM64 mit `_arm64.deb`. Einzelheiten und Debian-Prüfungen stehen im [Paketierungsleitfaden](docs/release.md#debian-pakete).
+
 ## Documentation
 
 - [Avalonia-PRP](docs/prp/linux-avalonia-port.md)

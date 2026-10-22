@@ -232,6 +232,31 @@ jobs:
           Compress-Archive -Path "publish/${{ matrix.rid }}/*" -DestinationPath "LIS2-Avalonia-${{ matrix.rid }}.zip"
           $hash = (Get-FileHash "LIS2-Avalonia-${{ matrix.rid }}.zip" -Algorithm SHA256).Hash.ToLowerInvariant()
           "$hash  LIS2-Avalonia-${{ matrix.rid }}.zip" | Set-Content -Encoding ascii "LIS2-Avalonia-${{ matrix.rid }}.sha256"
+      - name: Build Debian package and check packaging regressions
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          python3 -m unittest discover -s tools/packaging -p 'test_*.py' -v
+          python3 tools/packaging/build_debian.py --publish publish/${{ matrix.rid }} --rid ${{ matrix.rid }} --version "0.0~ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}" --output debian
+          cd debian
+          sha256sum -c *.deb.sha256
+      - name: Install and smoke Debian amd64 package
+        if: matrix.rid == 'linux-x64'
+        shell: bash
+        run: |
+          for distribution in bookworm trixie; do
+            docker run --rm --mount type=bind,src="$PWD/debian",dst=/packages,readonly --mount type=bind,src="$PWD/tools/packaging",dst=/packaging,readonly "debian:$distribution-slim" sh /packaging/smoke_debian.sh "/packages/lis2-control-center_0.0~ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}_amd64.deb"
+          done
+      - name: Upload Debian package
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: LIS2-Debian-${{ matrix.rid }}
+          path: |
+            debian/*.deb
+            debian/*.deb.sha256
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload Linux package
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
