@@ -76,11 +76,11 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 
 ### Oberfläche und Verifikation
 
-Zusätzlich zu den portablen Archiven entstehen Debian-Pakete für amd64 und arm64 mit Startmenüeintrag, Anwendungssymbol, Bibliotheksabhängigkeiten und Prüfsumme. Paketinstallation und GUI-Smoke auf Debian 12/13 gehören zu PORT-07. Echte ARM64-Ausführung sowie KDE-/Wayland-Abnahme bleiben getrennte Nachweise. Bedienung und Paketbau stehen in [release.md](../release.md).
+Zusätzlich zu den portablen Archiven entstehen Debian-Pakete für amd64 und arm64 mit Startmenüeintrag, Anwendungssymbol, Bibliotheksabhängigkeiten und Prüfsumme. Archivstarts für alle drei RIDs sowie Paketinstallation und GUI-Smoke auf Debian 12/13 bestehen in CI. ARM64 läuft nativ auf `ubuntu-24.04-arm`, einschließlich Debian-arm64-Containern. KDE-/Wayland-Abnahme und Pi-Systemdetails bleiben getrennte Nachweise. Bedienung und Paketbau stehen in [release.md](../release.md).
 
-Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. PORT-06A ergänzt Spektrum-/Glyphenvorschau, den Bedingungsbrowser, Sensorauswahl, grafische Medienpegel, Diagnosefelder, Speicherrückmeldungen und konsistente Presets. Das klickbare Pixelraster und die Kurvenpunktbearbeitung verwenden dieselben Textformate; Temperaturen bleiben präzise. Hilfe und fünf Sprachkataloge beschreiben diese Bedienung. Die Sichtprüfung und Plattformgrenzen stehen im [Status](linux-port-status.md). Nächstes Paket ist **PORT-07: Pakete und Zielsysteme** gemäß [TODO](../../TODO.md).
+Die Übersetzungen der zehn Menüseiten einschließlich dynamischer Status-/Fehlertexte und About sind ergänzt und mit Sprachwechseln geprüft. PORT-06A ergänzt Spektrum-/Glyphenvorschau, den Bedingungsbrowser, Sensorauswahl, grafische Medienpegel, Diagnosefelder, Speicherrückmeldungen und konsistente Presets. Das klickbare Pixelraster und die Kurvenpunktbearbeitung verwenden dieselben Textformate; Temperaturen bleiben präzise. Hilfe und fünf Sprachkataloge beschreiben diese Bedienung. Sichtprüfung, PORT-07-Paketnachweise und Plattformgrenzen stehen im [Status](linux-port-status.md); verbleibende Arbeiten in [TODO](../../TODO.md).
 
-PORT-06A-Nachweis: Die lokalen Tests prüfen Snapshot → Spektrumvariable → Preset → sichtbare Vorschau → virtuellen Transport, Quellenverlust, Bedingungsfelder/-browser, fünf identische Hardware-Presets, gespeicherte fehlende Sensoren, Glyphensynchronisierung nur bei aktiver Option, Speicherfehler mit erhaltenem Entwurf und präzise Kurvenpunkte. Die betroffenen Ansichten sind in fünf Sprachen bei 950 × 600 gerendert und angesehen. Physische LIS2-Ausgabe, native Linux-Ausführung dieses Standes und reale HA-/Playernachweise bleiben getrennte Zielsystemprüfungen.
+PORT-06A-Nachweis: Die Tests prüfen Snapshot → Spektrumvariable → Preset → sichtbare Vorschau → virtuellen Transport, Quellenverlust, Bedingungsfelder/-browser, fünf identische Hardware-Presets, gespeicherte fehlende Sensoren, Glyphensynchronisierung nur bei aktiver Option, Speicherfehler mit erhaltenem Entwurf und präzise Kurvenpunkte. Die betroffenen Ansichten sind in fünf Sprachen bei 950 × 600 gerendert und angesehen. Die Linux-Suite und native Paketstarts stehen im aktuellen Status. Physische LIS2-Ausgabe und reale HA-/Playernachweise bleiben getrennte Zielsystemprüfungen.
 
 - [x] Zehn Hauptansichten, Hilfe und About sind angelegt und angebunden.
 - [x] System/Light/Dark sowie System/English/German/French/Turkish/Russian sind auswählbar.
@@ -93,7 +93,7 @@ PORT-06A-Nachweis: Die lokalen Tests prüfen Snapshot → Spektrumvariable → P
 - [x] Linux-Tray/XDG-Autostart, Single Instance mit Fensteraktivierung und Splash anbinden; Windows-Tray erhalten und Wiederherstellen ohne erneuten Geräteverbindungsaufbau prüfen.
 - [ ] Native Tray-Bedienung, Autostart bei Anmeldung und Plattformabweichung beim Schließen auf den Ziel-Desktops abnehmen.
 - [x] Pakete `win-x64`, `linux-x64` und `linux-arm64` werden selbstständig veröffentlicht und mit SHA-256-Dateien hochgeladen.
-- [ ] Extrahierte Pakete starten; ARM64 auf ARM64 ausführen und Laufzeitabhängigkeiten dokumentieren.
+- [x] Extrahierte Pakete starten; ARM64 nativ ausführen und Laufzeitabhängigkeiten dokumentieren. CI-Nachweis `39750384348` zu `a6a839f`; manuelle Desktop-/Geräteabnahme bleibt getrennt.
 - [x] Support-/Lizenzstatus von .NET/Avalonia anhand offizieller Quellen geprüft; .NET-Supportende, Avalonia-Patchstand und fehlende Distributionshinweise in `release.md`/TODO festgehalten. Die nötigen Umstellungs- und Lizenzarbeiten sind dadurch nicht erledigt.
 - [ ] WPF-Projekt und WPF-Releasepfad erst nach Paritätsnachweis und Benutzerabnahme entfernen.
 

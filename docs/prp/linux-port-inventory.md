@@ -1,11 +1,11 @@
 # Inventar des Avalonia-Branches
 
-Stand: 21.10.2026. Implementierungsstand: PORT-06.
+Stand: 22.10.2026. Implementierungsstand: PORT-07.
 Grundlage: aktueller Git-Arbeitsbaum, Projektdateien, Quelltexte und Workflow-Konfiguration. Kein ZIP-Archiv als Implementierungsbaseline.
 
 ## Umfang und Projekte
 
-Der Quellbestand unter `src`, `tests`, `tools` und `native` umfasst 291 Dateien, darunter 244 C#-Dateien und 22 C#-Projektdateien. Es gibt neun Testprojekte. Das Avalonia-Testprojekt enthält 47 `*Tests.cs`-Dateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
+Der mit `rg --files` ermittelte Quellbestand unter `src`, `tests`, `tools` und `native` umfasst 312 Dateien, darunter 260 C#-Dateien und 22 C#-Projektdateien. Es gibt neun Testprojekte. Das Avalonia-Testprojekt enthält 54 `*Tests.cs`-Dateien. Dateizahlen sind keine Testfall- oder Coverage-Angabe.
 
 | Gruppe | Projekte | Target |
 | --- | --- | --- |
@@ -18,7 +18,7 @@ Der Quellbestand unter `src`, `tests`, `tools` und `native` umfasst 291 Dateien,
 
 `Directory.Build.props` setzt Nullable, implizite Usings, Warnings-as-errors und das Windows-Target. Portable Projekte überschreiben ihr Target ausdrücklich. `LIS2.Sources` und `LIS2.App.Avalonia` referenzieren LibreHardwareMonitorLib 0.9.6. Der direkte Windows-Provider bleibt hinter einer OS-Auswahl; Paketabhängigkeit allein ist kein Linux-Runtime-Nachweis.
 
-Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin` und `native/LIS2.WmpLegacyVisualization`. Die Avalonia-Branch-CI baut keine nativen Plug-ins.
+Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin` und `native/LIS2.WmpLegacyVisualization`. Die Avalonia-Branch-CI baut und veröffentlicht das Winamp-x86-Plug-in; Legacy-Plug-ins sind deaktiviert.
 
 ## Quellbereiche
 
@@ -91,7 +91,7 @@ Avalonia-Testgruppen:
 
 `MenuLanguageUiTests` prüft die zehn Menüseiten und About in fünf Sprachen sowie Systemstandard, Meldungen beim Sprachwechsel, unveränderte Nutzdaten und das Speichern übersetzter Lüftermodi. `MenuTranslationCatalogTests` prüft statische AXAML-Texte einschließlich Tooltips/Platzhaltern, Formatargumente und verschachtelte Meldungen. `UiTranslations` ergänzt die vorhandenen Kataloge; `UiMessage` hält Textvorlagen und Daten getrennt. Hardwaretypen behalten ihre technischen Filterwerte. Windows-Traytexte folgen dem Sprachwechsel; native Traybedienung ist damit nicht geprüft.
 
-`RuntimeHardeningTests` und der native Desktop-Smoke ergänzen zehn Views, Hilfe/About, fehlende Medienanbieter, Diagnose und Shutdown. CI startet echte Windows- und Linux-X11-Prozesse. Der Tray-Menüpfad, OS-Abmeldung, native Dateiauswahl, Livequellen und extrahierte Pakete sind damit nicht nachgewiesen; beide Smokes verwenden ein virtuelles Gerät.
+`RuntimeHardeningTests` und der native Desktop-Smoke ergänzen zehn Views, Hilfe/About, fehlende Medienanbieter, Diagnose und Shutdown. CI startet echte Windows- und Linux-X11-Prozesse. `tools/packaging/smoke_portable.py` prüft zusätzlich frische Archivextraktion, Prüfsumme, native Architektur und Paketstart für Windows x64 sowie Linux x64/ARM64. ARM64 läuft auf `ubuntu-24.04-arm`. `build_debian.py` und `smoke_debian.sh` ergänzen amd64-/arm64-Installation auf Debian 12/13, Desktopdatei, GUI, isolierten Keyring und Deinstallation. Native Tray-Klicks, OS-Anmeldung/-Abmeldung, Dateiauswahl und Livequellen bleiben manuelle Zielsystemprüfungen; alle automatisierten Smokes verwenden ein virtuelles Gerät.
 
 ## Referenzen
 

@@ -41,7 +41,7 @@ Das Übersetzungspaket vor PORT-04 ist umgesetzt und mit isolierten Avalonia-Fen
 
 - [x] [CI 39565668081](https://github.com/Eitschman/lis2-control-center/actions/runs/39565668081) für `c22048d`: alle sieben Jobs erfolgreich, je OS 359/359 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes und drei Pakete erfolgreich. Linux-Sichtprüfung zusätzlich anhand der Workflow-Screenshots.
 
-Nächstes Paket ist **PORT-07: Pakete und Zielsysteme**. Die softwareseitigen Punkte A01 bis A14 aus PORT-06A sind umgesetzt. Offene Zielsystem- und Abnahmeprüfungen aus PORT-04 bis PORT-06 bleiben ausdrücklich aufgeführt.
+Die automatisierten Paketprüfungen aus **PORT-07** sind nachgewiesen, einschließlich nativer ARM64-Ausführung. Als nächste Softwarearbeit stehen Support-/Versionspflege und Distributionslizenzen an. Die softwareseitigen Punkte A01 bis A14 aus PORT-06A sind umgesetzt. Offene Zielsystem- und Abnahmeprüfungen aus PORT-04 bis PORT-07 bleiben ausdrücklich aufgeführt.
 
 ## Weitere Implementierungs- und Prüfaufgaben
 
@@ -136,12 +136,13 @@ Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standa
 ### PORT-07: Pakete und Zielsysteme
 
 - [x] Zusätzliche Debian-Pakete für amd64 und arm64 mit Startmenüeintrag, Symbol, Bibliotheksabhängigkeiten und SHA-256 in den Avalonia-Workflow integrieren.
-- [x] amd64-Paket in Debian 12/13 installieren, nativen GUI-Smoke als gewöhnlicher Benutzer und Deinstallation mit erhaltenen Benutzerdaten prüfen. Echte ARM64-Laufzeit bleibt getrennt offen.
-- [ ] Extrahierte Windows-/Linux-Pakete starten; GUI-Smoke ergänzt die bestehende Dateiprüfung.
-- [ ] Linux ARM64 auf echter ARM64-Laufzeit prüfen. Cross-Publish allein zählt nicht als Laufzeitnachweis.
+- [x] amd64-/arm64-Pakete in Debian 12/13 installieren, nativen GUI-Smoke als gewöhnlicher Benutzer und Deinstallation mit erhaltenen Benutzerdaten prüfen.
+- [x] Extrahierte Windows-/Linux-Pakete starten: SHA-256, frische Extraktion, nativer Apphost und GUI-Smoke für alle drei RIDs; Ergebnis, Screenshots und Laufzeitumgebung als CI-Artefakt.
+- [x] Linux ARM64 nativ auf `ubuntu-24.04-arm` prüfen; zusätzlich Debian 12/13 arm64 installieren, GUI/Keyring prüfen und deinstallieren. CI `39750384348` zu `a6a839f`, alle neun Jobs erfolgreich.
 - [ ] Debian/KDE und Raspberry Pi 5 mit Distribution, Architektur, DPI, Displayserver und Abhängigkeiten protokollieren.
 - [x] Benutzer bestätigt erfolgreichen Anwendungsstart auf dem Pi am 22.10.2026; Paketstand und Systemdetails noch nicht zugeordnet. Weiterführende Desktopprüfungen übernimmt der Benutzer anhand der Liste in `docs/release.md`.
-- [ ] GTK-/X11-/Wayland-/DBus-/Keyring-Abhängigkeiten und serielle Zugriffsrechte anhand tatsächlicher Zielsysteme dokumentieren.
+- [x] X11-/DBus-/Keyring-Umgebungen, Runtimeversion und native Bibliotheksauflösung für automatisierte Paketstarts protokollieren. Positive und negative Paketprüfungen sowie native ARM64-Ausführung nachgewiesen.
+- [ ] GTK-Dateidialoge, Wayland/XWayland, Anmeldung/Tray und serielle Zugriffsrechte auf den tatsächlichen Benutzer-Desktops prüfen; manuelle Prüfungen übernimmt der Benutzer.
 - [x] Support- und Lizenzstatus von .NET/Avalonia anhand offizieller Quellen prüfen: .NET 8.0.32, Supportende 10.11.2026; Avalonia 11.3.6 unter MIT, neuere Patches vorhanden. Befunde und Quellen in `docs/release.md`.
 - [ ] Vor Avalonia-Release ein eigenes Paket für unterstütztes .NET und Avalonia-Patchstand einplanen und prüfen.
 - [ ] Lizenztexte/Fremdkomponentenhinweise und nötige Quellverweise zu den tatsächlich verteilten NuGet-Paketen in Archive und Debian-Pakete aufnehmen; MPL-2.0-Pakete, HidSharp und Mono.Posix gesondert abgleichen.
