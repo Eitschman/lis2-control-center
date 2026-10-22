@@ -157,7 +157,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             rid: linux-arm64
           - os: ubuntu-latest
             rid: linux-x64
@@ -172,6 +172,11 @@ jobs:
           dotnet-version: 8.0.x
       - name: Publish self-contained executable
         run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false --output publish/${{ matrix.rid }}
+      - name: Setup Python for Windows package tests
+        if: runner.os == 'Windows'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Build and include Windows GSMTC provider
         if: runner.os == 'Windows'
         shell: pwsh
@@ -240,12 +245,36 @@ jobs:
           python3 tools/packaging/build_debian.py --publish publish/${{ matrix.rid }} --rid ${{ matrix.rid }} --version "0.0~ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}" --output debian
           cd debian
           sha256sum -c *.deb.sha256
-      - name: Install and smoke Debian amd64 package
-        if: matrix.rid == 'linux-x64'
+      - name: Install extracted Linux package smoke dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y xvfb xauth dbus libice6 libsm6 libfontconfig1
+      - name: Smoke extracted Linux portable archive on native architecture
+        if: runner.os == 'Linux'
+        shell: bash
+        run: dbus-run-session -- xvfb-run -a python3 tools/packaging/smoke_portable.py --archive LIS2-Avalonia-${{ matrix.rid }}.tar.gz --checksum LIS2-Avalonia-${{ matrix.rid }}.sha256 --rid ${{ matrix.rid }} --output portable-smoke/${{ matrix.rid }}
+      - name: Smoke extracted Windows portable archive
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tools/packaging -p 'test_smoke_portable.py' -v
+          if ($LASTEXITCODE -ne 0) { throw "Portable archive regression failed" }
+          python tools/packaging/smoke_portable.py --archive LIS2-Avalonia-win-x64.zip --checksum LIS2-Avalonia-win-x64.sha256 --rid win-x64 --output portable-smoke/win-x64
+          if ($LASTEXITCODE -ne 0) { throw "Extracted Windows package smoke failed" }
+      - name: Upload extracted package smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Avalonia-package-smoke-${{ matrix.rid }}
+          path: portable-smoke/${{ matrix.rid }}/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Install and smoke Debian package on native architecture
+        if: runner.os == 'Linux'
         shell: bash
         run: |
+          architecture="$(dpkg --print-architecture)"
           for distribution in bookworm trixie; do
-            docker run --rm --mount type=bind,src="$PWD/debian",dst=/packages,readonly --mount type=bind,src="$PWD/tools/packaging",dst=/packaging,readonly "debian:$distribution-slim" sh /packaging/smoke_debian.sh "/packages/lis2-control-center_0.0~ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}_amd64.deb"
+            docker run --rm --mount type=bind,src="$PWD/debian",dst=/packages,readonly --mount type=bind,src="$PWD/tools/packaging",dst=/packaging,readonly "debian:$distribution-slim" sh /packaging/smoke_debian.sh "/packages/lis2-control-center_0.0~ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}_${architecture}.deb"
           done
       - name: Upload Debian package
         if: runner.os == 'Linux'

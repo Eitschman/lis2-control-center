@@ -10,7 +10,7 @@ Stand: 22.10.2026. Die Workflows unterscheiden Avalonia-Entwicklung, Windows-WPF
 | --- | --- |
 | Shared libraries auf Windows/Ubuntu | `LIS2.Core.Tests`, `LIS2.Display.Tests`, `LIS2.Fans.Tests` |
 | Avalonia shell auf Windows/Ubuntu | Release-Build und `LIS2.App.Avalonia.Tests`, einschließlich tatsächlicher Geräte-Controls und Skia-Rendering im Headless-Modus |
-| Portable app: `win-x64`, `linux-x64`, `linux-arm64` | Abhängig von erfolgreichen Bibliotheks-/Avalonia-Jobs; selbstständiges, ungetrimmtes Multi-file-Publish |
+| Portable app: `win-x64`, `linux-x64`, `linux-arm64` | Abhängig von erfolgreichen Bibliotheks-/Avalonia-Jobs; selbstständiges, ungetrimmtes Multi-file-Publish; ARM64 auf `ubuntu-24.04-arm` |
 | Windows Protocol Tester | Selbständiges win-x64-Publish des WPF-Protokolltesters wie auf main, Prüfung der Laufzeitdateien |
 | Winamp plugin x86 | CMake/MSVC mit Win32 und Release, gen_lis2.dll wie auf main |
 
@@ -26,8 +26,9 @@ Artefakte mit 14 Tagen Aufbewahrung:
 - `LIS2-ProtocolTester-win-x64`: selbständiger Windows-Protokolltester einschließlich Laufzeitdateien.
 - `gen_lis2-win32`: native gen_lis2.dll für 32-Bit-Winamp.
 - `Avalonia-GSMTC-smoke-Windows`: provider.txt und result.txt oder failure.txt.
+- `Avalonia-package-smoke-<RID>`: Ergebnis des Starts aus dem extrahierten Archiv, Screenshots, Prozesslog und `environment.json` mit tatsächlicher Architektur, Laufzeitversion und unter Linux Bibliotheksauflösung.
 
-Die UI-Tests exportieren gerenderte Ansichten als Avalonia-device-views-Windows und Avalonia-device-views-Linux. Native Windows-/Linux-X11-Desktop-Smokes prüfen zehn Ansichten, Hilfe/About, fehlende Medienanbieter, Diagnose und Shutdown. Die Screenshots dienen der Sichtprüfung; es gibt keinen automatischen Bildvergleich. Die Paketprüfung kontrolliert Executable, Dateigröße, Managed Assembly, Runtimekonfiguration sowie unter Windows die GSMTC-/WinRT-DLLs und den Anbieterstart. Linux-Prüfsummen werden gegengeprüft. Start aus einem extrahierten Archiv und echte ARM64-Ausführung bleiben offen.
+Die UI-Tests exportieren gerenderte Ansichten als Avalonia-device-views-Windows und Avalonia-device-views-Linux. Native Windows-/Linux-X11-Desktop-Smokes prüfen zehn Ansichten, Hilfe/About, fehlende Medienanbieter, Diagnose und Shutdown. Die Screenshots dienen der Sichtprüfung; es gibt keinen automatischen Bildvergleich. Die Paketprüfung kontrolliert Executable, Dateigröße, Managed Assembly, Runtimekonfiguration sowie unter Windows die GSMTC-/WinRT-DLLs und den Anbieterstart. Zusätzlich werden alle drei Archive nach Prüfung ihrer SHA-256-Datei in ein neues temporäres Verzeichnis extrahiert und über ihren Apphost gestartet. Die Prüfung lehnt eine unpassende native Architektur, fehlende Linux-Bibliotheken, fehlende aktuelle Erfolgsmeldung und wiederverwendete Ergebnisverzeichnisse ab. ARM64 verwendet einen nativen GitHub-Runner, keine Emulation. Der tatsächliche CI-Nachweis steht im Status; die Workflowdefinition allein ist kein Laufzeitnachweis.
 
 Die genaue Codebasis und der zugehörige CI-Lauf stehen im [aktuellen Status](prp/linux-port-status.md). Ein neuer Commit muss separat geprüft werden.
 
@@ -52,8 +53,8 @@ Die Version wird aus dem Tag übergeben. Der Tag-Workflow ist kein Avalonia-Rele
 
 ## Offene Distributionsprüfungen
 
-- Extrahierte Windows-/Linux-Pakete starten und benötigte native Bibliotheken auf den Zielsystemen ermitteln.
-- ARM64 auf einem ARM64-System prüfen; Debian/KDE und Raspberry Pi 5 mit Systemdaten protokollieren.
+- Archivstarts und native ARM64-Ausführung anhand des zum Commit gehörenden Paket-Smokes beurteilen.
+- Debian/KDE und Raspberry Pi 5 mit Systemdaten protokollieren; der ARM64-Runner ersetzt keinen Raspberry-Pi-Desktop.
 - Serielle Rechte, DBus-/Keyring-Verfügbarkeit und sichtbare Fehler bei fehlenden Diensten prüfen.
 - Avalonia-UI-Smoke und Versionsmetadaten in den künftigen Releasepfad aufnehmen.
 - WPF-Paketierung erst nach Windows-/Linux-Paritätsabnahme durch den gemeinsamen Avalonia-Releasepfad ersetzen.
@@ -78,4 +79,18 @@ Die Bibliotheksabhängigkeiten berücksichtigen Debian 12 und 13 sowie die ICU-/
 
 Deinstallation: `sudo apt remove lis2-control-center`. Persönliche Einstellungen und Tokens bleiben erhalten. Einen in der App aktivierten Autostart vor der Deinstallation in den Einstellungen deaktivieren.
 
-`tools/packaging/build_debian.py` baut lokal mit `--publish <Verzeichnis> --rid linux-x64 --version <Paketversion> --output <Zielverzeichnis>`; für ARM64 `linux-arm64` verwenden. Der Builder prüft Publish-Dateien und ELF-Architektur. Regressionen prüfen beide Paketarchitekturen und fehlerhafte Eingaben. Die CI installiert das echte amd64-Paket in frischen Debian-12-/Debian-13-Containern, validiert den Desktopeintrag, startet den nativen GUI-Smoke als gewöhnlicher Benutzer und prüft Deinstallation sowie Erhalt von Benutzerdaten. Dies ersetzt weder KDE-/Wayland-Abnahme noch echte ARM64-Ausführung.
+`tools/packaging/build_debian.py` baut lokal mit `--publish <Verzeichnis> --rid linux-x64 --version <Paketversion> --output <Zielverzeichnis>`; für ARM64 `linux-arm64` verwenden. Der Builder prüft Publish-Dateien und ELF-Architektur. Regressionen prüfen beide Paketarchitekturen und fehlerhafte Eingaben. Die CI installiert das echte Paket auf der jeweiligen nativen Architektur in frischen Debian-12-/Debian-13-Containern, validiert den Desktopeintrag, startet den nativen GUI-Smoke als gewöhnlicher Benutzer und prüft Deinstallation sowie Erhalt von Benutzerdaten. Ein isolierter DBus-/GNOME-Schlüsselbund prüft Speichern, Lesen und Entfernen eines ausschließlich für diesen Lauf erzeugten Testwerts. Containerprotokolle nennen Distribution, Architektur und zentrale Bibliotheksversionen. Dies ersetzt keine KDE-/Wayland-Abnahme und keinen Raspberry-Pi-Test.
+
+## Support und Lizenzen
+
+Prüfdatum: 22.10.2026. Das geprüfte selbstständige Linux-Paket enthält laut Runtimekonfiguration .NET **8.0.32**. Die [Microsoft-Supportübersicht](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core) nennt dieses Patchlevel und den **10.11.2026** als Supportende von .NET 8. Für einen länger gepflegten Avalonia-Release ist daher ein gesondertes Umstellungspaket auf eine unterstützte .NET-Version nötig. Die Übersicht führt .NET 10 LTS mit Support bis 14.11.2028 auf. PORT-07 verändert das Zielframework nicht.
+
+Avalonia ist auf **11.3.6** festgelegt. Das [zu dieser Version gehörende Lizenzdokument](https://github.com/AvaloniaUI/Avalonia/blob/11.3.6/licence.md) und die [NuGet-Metadaten](https://www.nuget.org/packages/Avalonia/11.3.6) weisen MIT aus. Die Paketübersicht führt neuere Versionen, darunter 11.3.22 und 12.1.4; 11.3.6 ist damit kein aktueller Patchstand. Aus der MIT-Lizenz folgt keine Zusage für langfristigen Versionssupport. Ein verifiziertes Support-Enddatum für exakt 11.3.6 liegt nicht vor. Ein Versionswechsel einschließlich API-/Darstellungsregressionen ist gesondert zu prüfen.
+
+Die [.NET-Lizenzhinweise](https://github.com/dotnet/core/blob/main/license-information.md) unterscheiden Projektlizenz und Hinweise zu Fremdkomponenten. Im geprüften Publish fehlen eigenständige Lizenz-/Notice-Dateien. Das Debian-Paket enthält die Projektlizenz, damit sind die Hinweise zu allen mitgelieferten Abhängigkeiten nicht nachgewiesen. Vor Tag-Releases müssen die .NET-/Avalonia-Lizenztexte und die zugehörigen Fremdkomponentenhinweise Bestandteil der Pakete werden. Die aus den tatsächlichen NuGet-Metadaten geprüften Pakete `LibreHardwareMonitorLib/0.9.6`, `BlackSharp.Core/1.0.7`, `DiskInfoToolkit/1.1.2` und `RAMSPDToolkit-NDD/1.4.2` melden MPL-2.0. `HidSharp/2.6.4` verweist auf eine paketinterne Lizenzdatei; `Mono.Posix.NETStandard/1.0.0` enthält keine SPDX-Lizenzangabe. Diese Befunde verlangen einen eigenen Abgleich von Lizenztexten und Quellverweisen; die MIT-Lizenz des Repositories ist keine pauschale Lizenzfreigabe der Abhängigkeiten.
+
+## Zielsystemnachweise
+
+Für Debian/KDE und Raspberry Pi 5 werden zusätzlich zu den automatisierten Paketstarts Distribution/Version, CPU-Architektur, Desktopversion, X11 oder Wayland/XWayland, DPI, Theme und Sprache protokolliert. Zu prüfen sind echte Tray-Klicks, Aktivierung aus einem zweiten Prozess, Autostart nach Anmeldung, Datei-/Ordnerdialoge, Medienquelle und sicherer Tokenstore. Unter Wayland muss die tatsächlich genutzte XWayland-Verbindung festgehalten werden; ein Xvfb-Lauf belegt keine Wayland-Sitzung.
+
+Serielle Rechte werden am konkreten Gerät geprüft: Gerätepfad und Eigentümergruppe mit `ls -l /dev/serial/by-id/` und `ls -l /dev/ttyUSB0` aufnehmen, tatsächlichen Namen entsprechend ersetzen, Benutzergruppen mit `id -nG` vergleichen und Zugriff nach einer etwaigen Gruppenänderung erst nach Neuanmeldung testen. Das Paket ändert keine Rechte und sendet bei der Geräteerkennung keine Protokollkommandos. Ohne physisches Gerät bleiben Zugriff und Hardwareausgabe ungeprüft.
