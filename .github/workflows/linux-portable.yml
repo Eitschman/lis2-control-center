@@ -59,7 +59,7 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "Tests failed: $project" }
           }
       - name: Publish self-contained Protocol Tester
-        run: dotnet publish tools/LIS2.ProtocolTester/LIS2.ProtocolTester.csproj --configuration Release --runtime win-x64 --self-contained true -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.2' }} --output artifacts/LIS2.ProtocolTester
+        run: dotnet publish tools/LIS2.ProtocolTester/LIS2.ProtocolTester.csproj --configuration Release --runtime win-x64 --self-contained true -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.3' }} --output artifacts/LIS2.ProtocolTester
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -275,7 +275,7 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Publish self-contained executable
-        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.2' }} --output publish/${{ matrix.rid }}
+        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.3' }} --output publish/${{ matrix.rid }}
       - name: Setup Python for package tests
         uses: actions/setup-python@v5
         with:

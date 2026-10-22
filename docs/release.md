@@ -2,7 +2,7 @@
 
 Stand: 22.10.2026. App und Protokolltester verwenden Avalonia. Hauptbranch, Entwicklungsbranch und Tag-Releases verwenden denselben Paketbau.
 
-[Release v0.1.2](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.2) zu `b2331ed` enthält drei portable App-Archive, zwei Debian-Pakete, den Windows-Protokolltester, `gen_lis2.dll` und `SHA256SUMS.txt`. [Release-CI 39770589294](https://github.com/Eitschman/lis2-control-center/actions/runs/39770589294) besteht alle zwölf Jobs. Nach Download stimmen alle sieben Prüfsummen; die sechs Anwendungspakete enthalten Produktversion 0.1.2, Avalonia 11.3.22, Runtime 10.0.13 und Lizenzbeilagen. Alle fünf App-Pakete enthalten die englische README mit Lizenz- und Bibliotheksübersicht. About zeigt Avalonia-Version und MIT-Lizenz und öffnet über eine lokalisierte Schaltfläche den mitgelieferten Lizenzordner. Fehlende Dateien werden ausdrücklich gemeldet. Installation und Paketauswahl stehen in der [README](../README.md#download-and-installation).
+Releaseziel ist **v0.1.3** mit drei portablen App-Archiven, zwei Debian-Paketen, Windows-Protokolltester, `gen_lis2.dll`, zwei Legacy-Plug-in-ZIPs und `SHA256SUMS.txt`. Alle neun Nutzdateien erhalten Prüfsummen. Anwendungspakete enthalten Avalonia 11.3.22, Runtime 10.0.13 und Lizenzbeilagen. Die Veröffentlichung erfolgt nach erfolgreichem Main- und Tag-Workflow; der commitbezogene Nachweis steht im [Status](prp/linux-port-status.md). Installation und Paketauswahl stehen in der [README](../README.md#download-and-installation).
 
 ## Avalonia-Branch
 
@@ -43,7 +43,7 @@ Die genaue Codebasis und der zugehörige CI-Lauf stehen im [aktuellen Status](pr
 [release.yml](../.github/workflows/release.yml) reagiert auf `v*`-Tags, validiert die Version und führt denselben Avalonia-Workflow aus. Erst nach dessen erfolgreicher Prüfung werden die Assets veröffentlicht:
 
 - `LIS2-Control-Center-<version>-win-x64.zip`.
-- `LIS2-WMP-Legacy-<version>-win32.zip` und `-win64.zip` mit beiden Legacy-Plug-ins. Diese Erweiterung gehört zu Entwicklungsständen nach v0.1.2; das veröffentlichte v0.1.2 enthält diese Pakete nicht.
+- `LIS2-WMP-Legacy-<version>-win32.zip` und `-win64.zip` mit beiden Legacy-Plug-ins.
 - `LIS2-Control-Center-<version>-linux-x64.tar.gz` und `-linux-arm64.tar.gz`.
 - `lis2-control-center_<Debianversion>_amd64.deb` und `_arm64.deb`.
 - `LIS2-ProtocolTester-<version>-win-x64.zip`.

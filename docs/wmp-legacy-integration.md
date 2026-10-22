@@ -4,7 +4,7 @@ Die Windows-App empfängt `WmpLegacy.*` über zwei voneinander unabhängige Name
 
 ## Einrichtung
 
-1. Das zum **Playerprozess** passende CI-Artefakt `LIS2-WMP-Legacy-win32` oder `LIS2-WMP-Legacy-win64` laden und die SHA-256-Datei prüfen. Die Architektur der Control-Center-App ist dafür unerheblich. Das veröffentlichte Release v0.1.2 enthält diese Erweiterung noch nicht.
+1. Das zum **Playerprozess** passende CI-Artefakt `LIS2-WMP-Legacy-win32` oder `LIS2-WMP-Legacy-win64` laden und die SHA-256-Datei prüfen. Die Architektur der Control-Center-App ist dafür unerheblich. Release v0.1.3 enthält beide Architekturen als `LIS2-WMP-Legacy-0.1.3-win32.zip` und `LIS2-WMP-Legacy-0.1.3-win64.zip`.
 2. Das ZIP in einen dauerhaften Ordner entpacken. `background` enthält `lis2_wmp_legacy.dll`, `visualization` enthält `lis2_wmp_legacy_visualization.dll`. Beide Ordner enthalten eigene Anleitungen.
 3. Windows Media Player Legacy schließen. In einer administrativen Eingabeaufforderung beide DLLs mit ihrem vollständigen, in Anführungszeichen gesetzten Pfad registrieren. Unter 64-Bit-Windows für einen x64-Player `%SystemRoot%\System32\regsvr32.exe` verwenden, für einen x86-Player `%SystemRoot%\SysWOW64\regsvr32.exe`. Beispiel für x64:
 
