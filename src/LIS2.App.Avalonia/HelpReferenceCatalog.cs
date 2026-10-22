@@ -70,12 +70,17 @@ internal static class HelpReferenceCatalog
                 Add("Spectrum", "{Winamp.Vu}  {Winamp.Spectrum}  {Winamp.SpectrumGlyphs} require a supported source of live audio telemetry.");
                 Add("Spectrum", "The Winamp card shows stereo levels, twenty spectrum bands, the pipe and last snapshot time. Disconnection clears metadata and levels. SpectrumGlyphs uses the active spectrum glyph set; other sets use the text spectrum.");
                 AddExample("Windows media", "{WindowsMedia.State}  {WindowsMedia.Artist}  {WindowsMedia.Title}  {WindowsMedia.Connected}");
-                Add("Linux and Windows", "Linux uses MPRIS through playerctl, which must be installed. Select an automatic or specific player; the selection is saved. An unavailable selected player stays disconnected. Media.* provides Player, State, Title, Artist, Album, Elapsed, Duration and Connected, but no VU or spectrum. Values are refreshed every second. Windows uses WindowsMedia.* for GSMTC and Winamp.* for the Winamp plug-in. WMP Legacy is deferred and is not started. Create a page from the relevant media card. No plug-in is needed for GSMTC.");
+                Add("Linux and Windows", "Linux uses MPRIS through playerctl, which must be installed. Select an automatic or specific player; the selection is saved. An unavailable selected player stays disconnected. Media.* provides Player, State, Title, Artist, Album, Elapsed, Duration and Connected, but no VU or spectrum. Values are refreshed every second. Windows uses WindowsMedia.* for GSMTC and Winamp.* for the Winamp plug-in. Create a page from the relevant media card. No plug-in is needed for GSMTC.");
                 AddExample("Media", "{Media.Player}  {Media.State}  {Media.Title}  {Media.Artist}  {Media.Album}  {Media.Elapsed}  {Media.Duration}  {Media.Connected}");
                 AddExample("Example", "{Winamp.Artist|fallback:Nothing playing} / {Winamp.Title|fallback:--}");
                 content.AddRange(HelpVariableCatalog.Get("Media.", language));
                 content.AddRange(HelpVariableCatalog.Get("Winamp.", language));
                 content.AddRange(HelpVariableCatalog.Get("WindowsMedia.", language));
+                content.AddRange(HelpVariableCatalog.Get("WmpLegacy.", language));
+                content.Add((UiTranslations.Translate("Windows Media Player Legacy", language),
+                    UiTranslations.Translate("Register the matching x86/x64 WMP Legacy background and visualization DLLs with regsvr32.", language)));
+                content.Add((UiTranslations.Translate("Visualization", language), HelpLocalization.Translate(
+                    "VU and spectrum require the LIS2 Control Center visualization to be selected in Windows Media Player Legacy. Metadata and playback state continue to work through the background plug-in even when another visualization is selected.", language)));
                 break;
             case 4:
                 Add("Events", "Timed events temporarily override ordinary page output on connected displays.");

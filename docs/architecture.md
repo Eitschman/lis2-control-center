@@ -76,7 +76,7 @@ Es gibt keinen automatischen seriellen Wiederverbindungsablauf. Displayverbindun
 
 - `PageSourceValues` verwendet die gemeinsame Registry, Clock und HA sowie ergänzte Hardware-/Mediensnapshots. Die vorhandenen Template-Namensräume bleiben erhalten.
 - Windows-Hardwaresnapshots stammen aus `WindowsHardwareFanSensors` mit LibreHardwareMonitor; Linux nutzt `LinuxSystemSensors` und `LinuxHwmonFanSensors`.
-- Windows startet Winamp und den per Reflection geladenen GSMTC-Anbieter. WMP Legacy bleibt zurückgestellt und ist in Avalonia weder referenziert noch gestartet.
+- Windows startet Winamp, WMP Legacy mit getrennten Metadaten-/Audiopipes und den per Reflection geladenen GSMTC-Anbieter. Die Legacy-Medienkarte und `WmpLegacy.*` berücksichtigen die unabhängigen Verbindungsfristen; Spektrumglyphen verwenden dessen feste Byte-Pegelskala.
 - Linux liest sekündlich die Playerliste und ein XML-maskiertes Metadatenformat über playerctl. Media.* enthält Player, State, Title, Artist, Album, Elapsed, Duration und Connected. Die gespeicherte Playerauswahl bleibt bei Abwesenheit getrennt; veraltete Antworten werden verworfen. Abbruch und Timeout beenden den Kindprozess. Es besteht keine eigene MPRIS-D-Bus-Subscription.
 - Die `IPlatform*`-Schnittstellen sind definiert. Konkrete Adapter werden momentan direkt benutzt und implementieren diese Verträge nicht.
 

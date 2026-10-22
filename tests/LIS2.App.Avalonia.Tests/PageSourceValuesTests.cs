@@ -6,6 +6,44 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class PageSourceValuesTests
 {
     [Fact]
+    public async Task LegacySpectrumUsesByteLevelsAndDisconnectedMetadataDisappears()
+    {
+        await using var sources = new PageSourceValues();
+        sources.SetGlyphNames([], spectrumSet: true);
+        sources.UpdateMedia("WmpLegacy", new Dictionary<string, object?>
+        {
+            ["Connected"] = true, ["Title"] = "Legacy track",
+            ["SpectrumRaw"] = new[] { 0, 15, 128, 255 }
+        });
+        var values = sources.Snapshot(DateTimeOffset.Now);
+        Assert.Equal("Legacy track", new TemplateRenderer().Render("{WmpLegacy.Title}", values));
+        var glyphs = Assert.IsType<string>(values["WmpLegacy.SpectrumGlyphs"]);
+        Assert.Equal(' ', glyphs[0]);
+        Assert.Equal(LIS2.Core.Lis2Protocol.CustomGlyph(1), glyphs[1]);
+        Assert.Equal(LIS2.Core.Lis2Protocol.CustomGlyph(5), glyphs[2]);
+        Assert.Equal(LIS2.Core.Lis2Protocol.CustomGlyph(8), glyphs[3]);
+        sources.UpdateMedia("WmpLegacy", new Dictionary<string, object?>
+        {
+            ["Connected"] = true, ["SpectrumRaw"] = Enumerable.Repeat(15, 20).ToArray()
+        });
+        Assert.Equal(new string(LIS2.Core.Lis2Protocol.CustomGlyph(1), 20),
+            sources.Snapshot(DateTimeOffset.Now)["WmpLegacy.SpectrumGlyphs"]);
+        sources.UpdateMedia("WmpLegacy", new Dictionary<string, object?>
+        {
+            ["Connected"] = false, ["VisualizationConnected"] = true, ["Title"] = "Stale title",
+            ["SpectrumRaw"] = Enumerable.Repeat(255, 20).ToArray(), ["VuLeft"] = 192
+        });
+        values = sources.Snapshot(DateTimeOffset.Now);
+        Assert.False(values.ContainsKey("WmpLegacy.Title"));
+        Assert.Equal(192, values["WmpLegacy.VuLeft"]);
+        Assert.Equal(new string(LIS2.Core.Lis2Protocol.CustomGlyph(8), 20), values["WmpLegacy.SpectrumGlyphs"]);
+        sources.UpdateMedia("WmpLegacy", new Dictionary<string, object?> { ["Connected"] = false, ["Title"] = "Stale title" });
+        values = sources.Snapshot(DateTimeOffset.Now);
+        Assert.False(values.ContainsKey("WmpLegacy.Title"));
+        Assert.Equal("", values["WmpLegacy.SpectrumGlyphs"]);
+    }
+
+    [Fact]
     public async Task OriginalClockKeysAreAvailableAfterStart()
     {
         await using var sources = new PageSourceValues();

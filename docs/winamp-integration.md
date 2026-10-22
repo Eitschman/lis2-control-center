@@ -10,7 +10,7 @@ Linux fragt über `playerctl metadata --format` periodisch Status, Titel, Interp
 
 Die Seitenerzeugung aus allen Medienkarten verwendet `PageWorkspaceActions`: aktuellen Entwurf validieren und übernehmen, neue Seite auswählen, laufende Sequenzen aktualisieren und speichern. Ungültige Entwürfe verhindern den Wechsel.
 
-Die Avalonia-App startet unter Windows derzeit auch `WmpLegacyDataSource` und zeigt deren Karte. Das widerspricht dem zurückgestellten Legacy-Produktumfang; die Aktivierung gilt nicht als Freigabe. Native Legacy-Artefakte sind nicht Bestandteil der Avalonia-Branch-CI. Offene Abgleiche stehen in [TODO](../TODO.md).
+Die Avalonia-App startet unter Windows zusätzlich `WmpLegacyDataSource`. Eine eigene Medienkarte, `WmpLegacy.*` und drei Presets verwenden getrennte Metadaten- und Audiopipes. Der gemeinsame Workflow baut die zwei nativen Legacy-Plug-ins für x86/x64. Einrichtung und offene reale Playerprüfung stehen im [Legacy-Leitfaden](wmp-legacy-integration.md).
 
 ## Architecture
 

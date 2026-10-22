@@ -23,8 +23,9 @@ Current fields:
 - elapsed time
 - duration
 
-VU/spectrum is intentionally a separate follow-up component because Windows Media
-Player only supplies timed waveform/frequency data to an active visualization plug-in.
+VU/spectrum comes from the companion `lis2_wmp_legacy_visualization.dll`, included
+in the same package. Windows Media Player only supplies timed waveform/frequency
+data to the selected visualization. Metadata works independently of that selection.
 
 ## Registration
 
@@ -47,3 +48,9 @@ The registration installs a hidden, auto-run background WMP UI plug-in.
 
 Both x86 and x64 builds are produced by CI; install the one matching the WMP Legacy
 process that is actually used.
+
+On 64-bit Windows, use `%SystemRoot%\System32\regsvr32.exe` for an x64
+player and `%SystemRoot%\SysWOW64\regsvr32.exe` for an x86 player. Use the
+full quoted path to the DLL. Keep the DLL in its registered location; unregister
+it before moving or deleting it. Registration requires administrator rights.
+The x64 Control Center can receive telemetry from either player architecture.

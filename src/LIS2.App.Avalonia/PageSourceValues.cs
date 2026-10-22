@@ -49,11 +49,19 @@ public sealed class PageSourceValues : IAsyncDisposable
             connected is bool isConnected && !isConnected)
         {
             _media[prefix + "Connected"] = false;
+            if (sourceId == "WmpLegacy")
+                foreach (var pair in values.Where(pair => pair.Key is "VisualizationConnected" or "VisualizationAgeSeconds" ||
+                    (values.GetValueOrDefault("VisualizationConnected") is true && IsAudioValue(pair.Key))))
+                    _media[prefix + pair.Key] = pair.Value;
             return;
         }
         foreach (var pair in values)
-            _media[prefix + pair.Key] = pair.Value;
+            if (sourceId != "WmpLegacy" || values.GetValueOrDefault("VisualizationConnected") is not false || !IsAudioValue(pair.Key))
+                _media[prefix + pair.Key] = pair.Value;
     }
+
+    private static bool IsAudioValue(string key) =>
+        key is "VuLeft" or "VuRight" or "Vu" or "Spectrum" or "SpectrumRaw" or "SpectrumPeak";
 
     public void UpdateHardware(IReadOnlyDictionary<string, object?> snapshot)
     {
@@ -85,10 +93,14 @@ public sealed class PageSourceValues : IAsyncDisposable
         }
         foreach (var pair in _hardware) values[pair.Key] = pair.Value;
         foreach (var pair in _media) values[pair.Key] = pair.Value;
-        values["Winamp.SpectrumGlyphs"] = _spectrumSet &&
-            values.TryGetValue("Winamp.SpectrumRaw", out var raw) && raw is IReadOnlyList<int> spectrum
-            ? LIS2.Display.GlyphRendering.Spectrum(spectrum)
-            : values.GetValueOrDefault("Winamp.Spectrum") ?? string.Empty;
+        foreach (var source in new[] { "Winamp", "WmpLegacy" })
+        {
+            // Legacy liefert immer 0..255, auch bei einem leisen Audiosignal.
+            values[source + ".SpectrumGlyphs"] = _spectrumSet &&
+                values.TryGetValue(source + ".SpectrumRaw", out var raw) && raw is IReadOnlyList<int> spectrum
+                ? LIS2.Display.GlyphRendering.Spectrum(spectrum, source == "WmpLegacy" ? 255 : null)
+                : values.GetValueOrDefault(source + ".Spectrum") ?? string.Empty;
+        }
         foreach (var pair in PageClockValues.Create(now))
             values.TryAdd(pair.Key, pair.Value);
         for (var slot = 1; slot <= 8; slot++)

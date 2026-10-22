@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
 using LIS2.Winamp;
+using LIS2.WmpLegacy;
 using LIS2.Runtime;
 
 namespace LIS2.App.Avalonia;
@@ -8,6 +9,7 @@ namespace LIS2.App.Avalonia;
 public partial class MainWindow
 {
     private readonly WinampDataSource _mediaWinamp = new();
+    private readonly WmpLegacyDataSource _mediaLegacy = new();
     private DispatcherTimer? _mediaTimer;
     private readonly LinuxMprisSource _mpris = new();
     private readonly WindowsMediaBridge _windowsMedia = new();
@@ -20,20 +22,33 @@ public partial class MainWindow
     private string? _selectedMediaPlayer;
     private bool _updatingMediaPlayers;
     private readonly ProgressBar[] _winampSpectrumBars = new ProgressBar[20];
+    private readonly ProgressBar[] _legacySpectrumBars = new ProgressBar[20];
 
     private void InitializeMedia()
     {
-        var spectrum = this.FindControl<Grid>("WinampSpectrumBars")!;
+        InitializeSpectrumBars("WinampSpectrumBars", _winampSpectrumBars);
+        InitializeSpectrumBars("WmpLegacySpectrumBars", _legacySpectrumBars);
+        this.FindControl<Border>("WmpLegacyMediaCard")!.IsVisible = OperatingSystem.IsWindows();
+        InitializeMediaProviders();
+    }
+
+    private void InitializeSpectrumBars(string name, ProgressBar[] bars)
+    {
+        var spectrum = this.FindControl<Grid>(name)!;
         spectrum.ColumnDefinitions = new ColumnDefinitions(string.Join(",", Enumerable.Repeat("*", 20)));
-        for (var index = 0; index < _winampSpectrumBars.Length; index++)
+        for (var index = 0; index < bars.Length; index++)
         {
             var bar = new ProgressBar { Maximum = 255, Orientation = global::Avalonia.Layout.Orientation.Vertical,
                 MinHeight = 0, Height = 70,
                 HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch };
             Grid.SetColumn(bar, index);
             spectrum.Children.Add(bar);
-            _winampSpectrumBars[index] = bar;
+            bars[index] = bar;
         }
+    }
+
+    private void InitializeMediaProviders()
+    {
         this.FindControl<Border>("LinuxMediaCard")!.IsVisible = OperatingSystem.IsLinux();
         this.FindControl<Border>("WinampMediaCard")!.IsVisible = OperatingSystem.IsWindows();
         this.FindControl<Border>("WindowsMediaCard")!.IsVisible = OperatingSystem.IsWindows();
@@ -43,6 +58,8 @@ public partial class MainWindow
         this.FindControl<Button>("WindowsMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("WindowsMedia", "Windows Media Player");
         this.FindControl<Button>("WinampMediaPage")!.Click += async (_, _) =>
             await CreateMediaPageAsync("Winamp", "Winamp");
+        this.FindControl<Button>("WmpLegacyMediaPage")!.Click += async (_, _) =>
+            await CreateMediaPageAsync("WmpLegacy", "Windows Media Player Legacy");
         this.FindControl<Button>("LinuxMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("Media", "Linux media");
         this.FindControl<ComboBox>("LinuxMediaPlayer")!.SelectionChanged += async (_, _) =>
         {
@@ -59,7 +76,7 @@ public partial class MainWindow
 
     private async Task StartMediaAsync()
     {
-        // Winamp verwendet Windows-Pipes; die zurückgestellte Legacy-Quelle wird nicht gestartet.
+        // Native Player-Plug-ins verwenden Windows-Pipes; Linux verwendet MPRIS.
         if (!OperatingSystem.IsWindows())
         {
             RefreshMedia();
@@ -69,6 +86,8 @@ public partial class MainWindow
         if (_mediaStopping) return;
         this.FindControl<Border>("WindowsMediaCard")!.IsVisible = true;
         await StartMediaProviderSafeAsync("Winamp", () => _mediaWinamp.StartAsync());
+        if (_mediaStopping) return;
+        await StartMediaProviderSafeAsync("WmpLegacy", () => _mediaLegacy.StartAsync());
         if (!_mediaStopping) RefreshMedia();
     }
 
@@ -87,6 +106,7 @@ public partial class MainWindow
             {
                 "WindowsMedia" => "WindowsMediaStatus",
                 "Winamp" => "WinampMediaStatus",
+                "WmpLegacy" => "WmpLegacyMediaStatus",
                 "Media" => "LinuxMediaStatus",
                 _ => throw new ArgumentException("Unknown media provider.", nameof(provider))
             };
@@ -113,6 +133,7 @@ public partial class MainWindow
         }
         RefreshMediaProvider("WindowsMedia", RefreshWindowsMedia);
         RefreshMediaProvider("Winamp", () => RefreshMediaSource("Winamp", _mediaWinamp.Values));
+        RefreshMediaProvider("WmpLegacy", () => RefreshMediaSource("WmpLegacy", _mediaLegacy.Values));
     }
 
     private void RefreshMediaProvider(string provider, Action refresh)
@@ -131,6 +152,7 @@ public partial class MainWindow
             {
                 "WindowsMedia" => "WindowsMediaStatus",
                 "Winamp" => "WinampMediaStatus",
+                "WmpLegacy" => "WmpLegacyMediaStatus",
                 _ => throw new ArgumentException("Unknown media provider.", nameof(provider))
             };
             _pageSources.UpdateMedia(provider, new Dictionary<string, object?>());
@@ -230,9 +252,11 @@ public partial class MainWindow
     internal void RefreshMediaSource(string id, IReadOnlyDictionary<string, object?> values)
     {
         _pageSources.UpdateMedia(id, values);
-        var prefix = "WinampMedia";
+        var prefix = id + "Media";
         var connected = values.GetValueOrDefault("Connected") is true;
-        string Read(string key) => (connected || key == "Connected") && values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
+        var audioConnected = id == "WmpLegacy" ? values.GetValueOrDefault("VisualizationConnected") is true : connected;
+        string Read(string key) => (key is "Vu" or "Spectrum" ? audioConnected : connected || key == "Connected") &&
+            values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
         SetUiText(prefix + "Status", Read("Connected") == "True" ? "Connected" : "Disconnected");
         SetUiText(prefix + "Title", string.IsNullOrWhiteSpace(Read("Title")) ? "Nothing playing" : (UiMessage)$"{Read("Title")}");
         this.FindControl<TextBlock>(prefix + "Artist")!.Text = Read("Artist");
@@ -247,17 +271,28 @@ public partial class MainWindow
             this.FindControl<TextBlock>("WinampMediaAudio")!.Text =
                 FormatValue("BitrateKbps") + " kbps / " + FormatValue("SampleRateHz") + " Hz";
         }
+        else if (id == "WmpLegacy")
+        {
+            this.FindControl<TextBlock>(prefix + "Playlist")!.Text =
+                (string.IsNullOrWhiteSpace(Read("TrackNumber")) ? "-" : Read("TrackNumber")) + " / " +
+                (string.IsNullOrWhiteSpace(Read("PlaylistCount")) ? "-" : Read("PlaylistCount"));
+            SetUiText("WmpLegacyVisualizationStatus", values.GetValueOrDefault("VisualizationConnected") is true ? "Connected" : "Disconnected");
+        }
         SetUiText(prefix + "Telemetry", $"VU: {Read("Vu")}  Spectrum: {Read("Spectrum")}");
-        int Level(string key) => connected && values.GetValueOrDefault(key) is int value ? Math.Clamp(value, 0, 255) : 0;
-        this.FindControl<ProgressBar>("WinampVuLeft")!.Value = Level("VuLeft");
-        this.FindControl<ProgressBar>("WinampVuRight")!.Value = Level("VuRight");
-        this.FindControl<TextBlock>("WinampVuLeftValue")!.Text = connected ? Level("VuLeft").ToString() : "-";
-        this.FindControl<TextBlock>("WinampVuRightValue")!.Text = connected ? Level("VuRight").ToString() : "-";
-        var levels = connected && values.GetValueOrDefault("SpectrumRaw") is IReadOnlyList<int> raw ? raw : [];
-        var maximum = levels.Take(20).DefaultIfEmpty().Max() <= 15 ? 15d : 255d;
+        int Level(string key) => audioConnected && values.GetValueOrDefault(key) is int value ? Math.Clamp(value, 0, 255) : 0;
+        this.FindControl<ProgressBar>(id + "VuLeft")!.Value = Level("VuLeft");
+        this.FindControl<ProgressBar>(id + "VuRight")!.Value = Level("VuRight");
+        this.FindControl<TextBlock>(id + "VuLeftValue")!.Text = audioConnected ? Level("VuLeft").ToString() : "-";
+        this.FindControl<TextBlock>(id + "VuRightValue")!.Text = audioConnected ? Level("VuRight").ToString() : "-";
+        var levels = audioConnected && values.GetValueOrDefault("SpectrumRaw") is IReadOnlyList<int> raw ? raw : [];
+        var maximum = id == "Winamp" && levels.Take(20).DefaultIfEmpty().Max() <= 15 ? 15d : 255d;
+        var bars = id == "WmpLegacy" ? _legacySpectrumBars : _winampSpectrumBars;
         for (var index = 0; index < 20; index++)
-            _winampSpectrumBars[index].Value = index < levels.Count ? Math.Clamp(levels[index], 0, (int)maximum) / maximum * 255 : 0;
-        SetUiText("WinampMediaConnection", $"Named pipe: {(UiMessage)@"\\.\pipe\LIS2ControlCenter.Winamp"} · Last update: {(UiMessage)(_mediaWinamp.LastSnapshotAt?.ToLocalTime().ToString("HH:mm:ss") ?? "-")}");
+            bars[index].Value = index < levels.Count ? Math.Clamp(levels[index], 0, (int)maximum) / maximum * 255 : 0;
+        var lastSnapshot = id == "WmpLegacy" ? _mediaLegacy.LastSnapshotAt : _mediaWinamp.LastSnapshotAt;
+        SetUiText(prefix + "Connection", $"Named pipe: {(UiMessage)(@"\\.\pipe\LIS2ControlCenter." + id)} · Last update: {(UiMessage)(lastSnapshot?.ToLocalTime().ToString("HH:mm:ss") ?? "-")}");
+        if (id == "WmpLegacy")
+            SetUiText("WmpLegacyVisualizationConnection", $"Visualization pipe: {(UiMessage)(@"\\.\pipe\" + WmpLegacyVisualizationPipeServer.PipeName)}");
     }
 
     private static UiMessage MediaErrorMessage(string provider, Exception exception) =>
@@ -285,6 +320,8 @@ public partial class MainWindow
             () => _mediaRefresh,
             () => _windowsMedia.DisposeAsync().AsTask(),
             () => _mediaWinamp.StopAsync(),
-            () => _mediaWinamp.DisposeAsync().AsTask()));
+            () => _mediaWinamp.DisposeAsync().AsTask(),
+            () => _mediaLegacy.StopAsync(),
+            () => _mediaLegacy.DisposeAsync().AsTask()));
     }
 }

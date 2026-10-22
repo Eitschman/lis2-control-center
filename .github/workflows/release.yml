@@ -65,8 +65,12 @@ jobs:
               for path in (source / 'LIS2-ProtocolTester-win-x64').rglob('*'):
                   if path.is_file(): archive.write(path, path.relative_to(source / 'LIS2-ProtocolTester-win-x64'))
           shutil.copy2(source / 'gen_lis2-win32/gen_lis2.dll', output / 'gen_lis2.dll')
+          for architecture in ('win32', 'win64'):
+              archive = f'LIS2-WMP-Legacy-{architecture}.zip'
+              shutil.copy2(source / f'LIS2-WMP-Legacy-{architecture}' / archive,
+                           output / f'LIS2-WMP-Legacy-{version}-{architecture}.zip')
           packages = sorted(output.iterdir())
-          if len(packages) != 7: raise RuntimeError(f'Expected seven release files, got {len(packages)}')
+          if len(packages) != 9: raise RuntimeError(f'Expected nine release files, got {len(packages)}')
           (output / 'SHA256SUMS.txt').write_text(''.join(f'{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n' for path in packages))
           PYTHON
           cd release

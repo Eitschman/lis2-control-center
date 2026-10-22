@@ -102,7 +102,11 @@ public sealed class MenuLanguageUiTests
             window.FindControl<ComboBox>("FanModePicker")!.SelectedIndex = 1;
             Click(window, "FanSave");
             var timeout = DateTime.UtcNow.AddSeconds(5);
-            while (store.Load().Fans.Channels[0].Mode != "Curve" && DateTime.UtcNow < timeout) await Task.Delay(20);
+            // Die Datei kann schon sichtbar sein, bevor die asynchrone UI-Fortsetzung den Status setzt.
+            var savedStatus = UiTranslations.Translate("Fan settings saved. Physical fan output requires separate authorization.", "de");
+            while ((store.Load().Fans.Channels[0].Mode != "Curve" ||
+                window.FindControl<TextBlock>("FanPreviewStatus")!.Text != savedStatus) && DateTime.UtcNow < timeout)
+                await Task.Delay(20);
             Assert.Equal("Curve", store.Load().Fans.Channels[0].Mode);
             Assert.Equal(UiTranslations.Translate("Fan settings saved. Physical fan output requires separate authorization.", "de"),
                 window.FindControl<TextBlock>("FanPreviewStatus")!.Text);

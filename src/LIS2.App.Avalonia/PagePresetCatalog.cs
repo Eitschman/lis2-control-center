@@ -21,6 +21,12 @@ public static class PagePresetCatalog
         10 => new("Windows Media Now Playing", "{WindowsMedia.Artist|fallback:--}",
             "{WindowsMedia.Title|fallback:--}", 7,
             "WindowsMedia.State=Playing", "PingPong", "PingPong"),
+        12 => new("WMP Legacy Now Playing", "{WmpLegacy.Artist}", "{WmpLegacy.Title}", 7,
+            "WmpLegacy.State=Playing", "PingPong", "PingPong"),
+        13 => new("WMP Legacy VU", "{WmpLegacy.Title}", "{WmpLegacy.Vu}", 7,
+            "WmpLegacy.State=Playing", "PingPong", "Truncate"),
+        14 => new("WMP Legacy Spectrum", "{WmpLegacy.Artist}", "{WmpLegacy.SpectrumGlyphs}", 7,
+            "WmpLegacy.State=Playing", "PingPong", "Truncate"),
         _ => throw new ArgumentOutOfRangeException(nameof(choice), "Unknown static page preset.")
     };
 }

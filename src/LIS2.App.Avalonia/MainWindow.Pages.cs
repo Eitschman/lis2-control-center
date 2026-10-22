@@ -21,7 +21,7 @@ public partial class MainWindow
     private void InitializePagesEditor()
     {
         var presetPicker = this.FindControl<ComboBox>("PagePresetPicker")!;
-        for (var index = 7; index <= 11; index++)
+        for (var index = 7; index <= 14; index++)
         {
             var item = (ComboBoxItem)presetPicker.Items[index]!;
             item.IsVisible = item.IsEnabled = index == 11 ? OperatingSystem.IsLinux() : OperatingSystem.IsWindows();
@@ -35,7 +35,7 @@ public partial class MainWindow
             {
                 var choice = this.FindControl<ComboBox>("PagePresetPicker")!.SelectedIndex;
                 var preset = CreateWpfPagePreset(choice);
-                if (choice == 9 && !await EnsureSpectrumGlyphsAsync()) return;
+                if (choice is 9 or 14 && !await EnsureSpectrumGlyphsAsync()) return;
                 if (!CommitPendingPageEditor()) return;
                 _pages.Add();
                 var index = _pages.Pages.Count - 1;
@@ -187,7 +187,7 @@ public partial class MainWindow
             4 => CreateHardwarePagePreset("Memory"),
             5 => CreateHardwarePagePreset("Temperatures"),
             6 => CreateHardwarePagePreset("Fans"),
-            7 or 8 or 9 or 10 => PagePresetCatalog.Get(choice),
+            7 or 8 or 9 or 10 or 12 or 13 or 14 => PagePresetCatalog.Get(choice),
             11 => new PagePresetSpec("Linux media", "{Media.Title}", "{Media.Artist}", 7,
                 "Media.State=Playing", "PingPong", "PingPong"),
             _ => throw new ArgumentOutOfRangeException(nameof(choice), "Unknown page preset.")

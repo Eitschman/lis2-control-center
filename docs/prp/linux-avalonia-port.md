@@ -1,13 +1,13 @@
 # PRP: LIS2 Control Center mit Avalonia
 
-Stand: 22.10.2026. Arbeitsbranch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-06B; genaue Prüfnachweise im [Status](linux-port-status.md).
+Stand: 22.10.2026. Hauptbranch: `main`.
+Implementierungsstand: PORT-08 und Windows Media Player Legacy; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
 
 Eine gemeinsame Avalonia-Anwendung ersetzt die WPF-Anwendung auf Windows x64 und unterstützt Linux x64 sowie Linux ARM64. Die WPF-Funktionsreferenz für Funktionen, Anordnung, Interaktionen, Einstellungen und Vorlagen liegt im Git-Commit `922ca1b`. Der Benutzer beauftragt die Entfernung der WPF-Projekte und anschließend die Übernahme nach `main`. App und Protokolltester verwenden ausschließlich Avalonia; offene manuelle Desktop- und Hardwareprüfungen bleiben separat dokumentiert.
 
-Die zehn Hauptansichten bleiben Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics und Home Assistant. Windows behält Winamp und GSMTC; Linux erhält die passenden Sensor- und Medienanbieter. Home Assistant bleibt lesend. Eigene OctoPrint-, Plex- oder Docker-Datenquellen sind für bereits über HA verfügbare Werte nicht vorgesehen.
+Die zehn Hauptansichten bleiben Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics und Home Assistant. Windows unterstützt Winamp, GSMTC und Windows Media Player Legacy; Linux erhält die passenden Sensor- und Medienanbieter. Home Assistant bleibt lesend. Eigene OctoPrint-, Plex- oder Docker-Datenquellen sind für bereits über HA verfügbare Werte nicht vorgesehen.
 
 Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anstelle der großen WPF-ComboBox. Lüfterfreigabe und Sicherheitsgrenzen bleiben unabhängig von einer äußerlich gleichen Oberfläche verbindlich. Weitere Abweichungen werden im [Paritätsaudit](wpf-avalonia-parity-audit.md) erfasst, ohne sie dadurch zu genehmigen.
 
@@ -35,7 +35,7 @@ Abgehakte Punkte bezeichnen vorhandenen Code mit dem angegebenen Testumfang. Sie
 | Glyphen | Acht 5x8-Slots, Dateien, Namen, Spektrumset und Ersetzungsdialog vorhanden | Physische Zeichenprüfung und UI-/Transportabgleich offen |
 | Sensoren | LibreHardwareMonitor auf Windows; procfs/sysfs/hwmon auf Linux; Aliase, Favoriten und fehlende Sensoren berücksichtigt | Stabile Identitäten und Rechte auf Zielsystemen prüfen |
 | Lüfter | Vier Modi plus Off, Kurven, Hysterese, Fail-safe, Simulation, freizugebende serielle Regelung und Dashboard-Handausgabe mit Kanalgrenzen | Weitere WPF-Interaktionen abgleichen; Hardware bleibt ungeprüft |
-| Medien | Winamp/GSMTC auf Windows; Linux-playerctl mit gespeicherter Auswahl, Spielposition, Lifecycle und Fehleranzeige; Legacy deaktiviert | Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen offen |
+| Medien | Winamp/GSMTC auf Windows; Linux-playerctl mit gespeicherter Auswahl, Spielposition, Lifecycle und Fehleranzeige; WMP Legacy mit Metadaten, VU/Spektrum, Presets und zwei nativen Plug-ins | Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen offen |
 | Home Assistant | WebSocket-Quelle, Reconnect und Stop, Entitäten, Attributwerte, wirksame Aliase, Favoriten und Seitenaktionen; ausdrückliche lokale Linux-Tokenauswahl | Reale HA-Instanz und Desktop-Schlüsselbund auf Zielsystemen prüfen |
 | Einstellungen | Workspace einschließlich Transport/Port/HA-Aktivierung, Helligkeitsanwendung, sichtbarer Windows-Import, Theme/Sprache, Windows-/Linux-Tray und plattformeigener Autostart | Nativer Dateidialog, Tray-Bedienung und Anmeldung auf Zielsystemen offen |
 | Hilfe und About | Kontextbezogene Hilfe mit zehn Themen in fünf Sprachen, Live-Schlüsseln, statischen Variablenbeschreibungen und numerischen/benannten Glyphen; F1 und Hilfe am Titel; About folgt der Sprache | Native Desktop-Bedienung und Benutzerabnahme offen |
@@ -103,7 +103,7 @@ Kein physisches LIS2 steht für die bisherigen automatisierten Prüfungen zur Ve
 
 Der Benutzer sieht manuelle Desktop-Abnahme nach Umsetzung des Ports vor. Fehlende Desktop-Abnahme darf nicht als erfolgreicher visueller Nachweis erscheinen. Erforderliche technische und gestalterische Prüfungen der jeweils bearbeiteten Oberfläche bleiben ausdrücklich vom späteren Benutzerentscheid zu unterscheiden.
 
-Unbekannte Protokollkommandos werden nicht automatisch gesendet. 19200 Baud/8N1, serialisierte Ausgabe, Sensor-Fail-safe und nicht persistente Lüfterfreigabe bleiben verbindlich. WMP Legacy ist als Produktentscheidung zurückgestellt und wird von Avalonia nicht gestartet.
+Unbekannte Protokollkommandos werden nicht automatisch gesendet. 19200 Baud/8N1, serialisierte Ausgabe, Sensor-Fail-safe und nicht persistente Lüfterfreigabe bleiben verbindlich. WMP Legacy ist unter Windows über zwei native Plug-ins angebunden. Installation und reale Playerprüfung stehen in [wmp-legacy-integration.md](../wmp-legacy-integration.md).
 
 ## Vorgehen je Arbeitspaket
 

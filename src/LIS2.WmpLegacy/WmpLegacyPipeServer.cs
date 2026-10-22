@@ -13,6 +13,10 @@ public sealed class WmpLegacyPipeServer : IAsyncDisposable
         PropertyNameCaseInsensitive = true
     };
 
+    private readonly string _pipeName;
+
+    public WmpLegacyPipeServer(string pipeName = PipeName) => _pipeName = pipeName;
+
     private CancellationTokenSource? _cts;
     private Task? _serverTask;
 
@@ -25,7 +29,7 @@ public sealed class WmpLegacyPipeServer : IAsyncDisposable
 
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _serverTask = RunAsync(_cts.Token);
-        return Task.CompletedTask;
+        return _serverTask.IsCompleted ? _serverTask : Task.CompletedTask;
     }
 
     public async Task StopAsync()
@@ -35,20 +39,25 @@ public sealed class WmpLegacyPipeServer : IAsyncDisposable
 
         await _cts.CancelAsync().ConfigureAwait(false);
 
-        if (_serverTask is not null)
+        try
         {
-            try
+            if (_serverTask is not null)
             {
-                await _serverTask.ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
+                try { await _serverTask.ConfigureAwait(false); }
+                catch (OperationCanceledException) { }
             }
         }
+        finally
+        {
+            _cts.Dispose();
+            _cts = null;
+            _serverTask = null;
+        }
+    }
 
-        _cts.Dispose();
-        _cts = null;
-        _serverTask = null;
+    internal void ThrowIfFaulted()
+    {
+        if (_serverTask is { IsFaulted: true }) _serverTask.GetAwaiter().GetResult();
     }
 
     private async Task RunAsync(CancellationToken cancellationToken)
@@ -56,7 +65,7 @@ public sealed class WmpLegacyPipeServer : IAsyncDisposable
         while (!cancellationToken.IsCancellationRequested)
         {
             await using var pipe = new NamedPipeServerStream(
-                PipeName,
+                _pipeName,
                 PipeDirection.In,
                 1,
                 PipeTransmissionMode.Byte,
@@ -73,7 +82,14 @@ public sealed class WmpLegacyPipeServer : IAsyncDisposable
 
             while (pipe.IsConnected && !cancellationToken.IsCancellationRequested)
             {
-                var line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+                string? line;
+                try { line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false); }
+                catch (IOException exception)
+                {
+                    // Ein beendeter Player darf den Listener für die nächste Sitzung nicht beenden.
+                    System.Diagnostics.Trace.TraceWarning("Legacy pipe {0} disconnected: {1}", _pipeName, exception.Message);
+                    break;
+                }
                 if (line is null)
                     break;
 

@@ -19,7 +19,7 @@ Der mit `rg --files` ermittelte Quellbestand unter `src`, `tests`, `tools` und `
 
 `Directory.Build.props` setzt Nullable, implizite Usings, Warnings-as-errors und das Windows-Target. Portable Projekte überschreiben ihr Target ausdrücklich. `LIS2.Sources` und `LIS2.App.Avalonia` referenzieren LibreHardwareMonitorLib 0.9.6. Der direkte Windows-Provider bleibt hinter einer OS-Auswahl; Paketabhängigkeit allein ist kein Linux-Runtime-Nachweis.
 
-Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin` und `native/LIS2.WmpLegacyVisualization`. Die Avalonia-Branch-CI baut und veröffentlicht das Winamp-x86-Plug-in; Legacy-Plug-ins sind deaktiviert.
+Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin` und `native/LIS2.WmpLegacyVisualization`. Die Avalonia-Branch-CI baut und veröffentlicht das Winamp-x86-Plug-in; beide Legacy-Plug-ins werden für x86/x64 als gemeinsame Pakete gebaut und geprüft.
 
 ## Quellbereiche
 
@@ -34,7 +34,7 @@ Native Projekte: `native/LIS2.WinampPlugin` (x86), `native/LIS2.WmpLegacyPlugin`
 | Workspace | PortableWorkspaceStore, PortableFanSettings, WindowsSettingsImporter, MainWindow.Workspace/WindowsImport; PageWorkspaceActions verbindet Quellenaktionen, Editor, Sequenz-Reload und Persistenz |
 | Geheimnisse | PortableHaTokenStore, LegacyHaTokenStore; DPAPI, secret-tool und ausdrücklich gewählter lokaler Linux-AES-Dateipfad |
 | Hardware | LinuxSystemSensors/LinuxHwmonFanSensors, WindowsHardwareFanSensors, HardwareSensorCatalog und HardwareDisplayPresetBuilder |
-| Medien | MainWindow.Media, WindowsMediaBridge, WindowsMediaSmoke und LinuxMprisSource; aktive Windows-Quellen Winamp/WindowsMedia; gespeicherte Linux-Playerauswahl und Spielposition; Legacy unbenutzt |
+| Medien | MainWindow.Media, WindowsMediaBridge, WindowsMediaSmoke und LinuxMprisSource; aktive Windows-Quellen Winamp/WindowsMedia/WmpLegacy; gespeicherte Linux-Playerauswahl und Spielposition; Legacy mit separater Audiopipe |
 | Hilfe/Sprachen | HelpReferenceCatalog mit eigenem HelpReferenceLocalization-Katalog für fünf Sprachen, MainWindow.HelpAbout, UiTranslations/UiMessage, UiTranslationCatalog, Settings-/UI-/Browser-Lokalisierung und sprachabhängige Statusmeldungen |
 
 Die `IPlatform*`-Verträge haben derzeit keine entsprechenden Adapterimplementierungen. UI-unabhängige Schleifen bestehen neben weiterer Orchestrierung in den MainWindow-Dateien.

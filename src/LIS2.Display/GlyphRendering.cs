@@ -11,11 +11,12 @@ public static class GlyphRendering
             : character).ToArray());
 
     /// <summary>Winamp liefert je nach Telemetriepfad Pegel von 0..15 oder 0..255.</summary>
-    public static string Spectrum(IReadOnlyList<int> spectrum)
+    public static string Spectrum(IReadOnlyList<int> spectrum, int? maximumLevel = null)
     {
         var width = Math.Min(DisplayFrame.Width, spectrum.Count);
         var peak = spectrum.Take(width).Select(value => Math.Max(0, value)).DefaultIfEmpty().Max();
-        var maximum = peak <= 15 ? 15d : 255d;
+        var maximum = maximumLevel ?? (peak <= 15 ? 15d : 255d);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximum);
         return new string(Enumerable.Range(0, DisplayFrame.Width).Select(index =>
         {
             var value = index < width ? Math.Clamp(spectrum[index], 0, (int)maximum) : 0;

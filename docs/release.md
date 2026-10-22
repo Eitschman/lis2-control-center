@@ -14,6 +14,7 @@ Stand: 22.10.2026. App und Protokolltester verwenden Avalonia. Hauptbranch, Entw
 | Avalonia shell auf Windows/Ubuntu | Release-Build und `LIS2.App.Avalonia.Tests`, einschließlich tatsächlicher Geräte-Controls und Skia-Rendering im Headless-Modus |
 | Portable app: `win-x64`, `linux-x64`, `linux-arm64` | Abhängig von erfolgreichen Bibliotheks-/Avalonia-Jobs; selbstständiges, ungetrimmtes Multi-file-Publish; ARM64 auf `ubuntu-24.04-arm` |
 | Windows Protocol Tester | Windows-Solution-Build, Sources-/Winamp-/WindowsMedia-/WmpLegacy-Tests, selbständiges Avalonia-win-x64-Publish, Prüfung der Laufzeitdateien und nativer virtueller UI-Smoke |
+| WMP Legacy plug-ins win32/win64 | CMake/MSVC baut Hintergrund- und Visualisierungs-DLL; Defender-Prüfung, gemeinsames ZIP mit beiden Anleitungen und MIT-Lizenz, SHA-256 |
 | Winamp plugin x86 | CMake/MSVC mit Win32 und Release, gen_lis2.dll wie auf main |
 
 Für `win-x64` wird `LIS2.WindowsMedia` separat publiziert; Provider-DLL, WinRT.Runtime.dll, Microsoft.Windows.SDK.NET.dll und weitere DLL-Abhängigkeiten werden in das App-Paket übernommen. Der Paketjob startet den echten GSMTC-Anbieter, liest den Verbindungsstatus, beendet ihn und prüft die fehlende Anbieter-DLL. Linux-Medien und Tokenstore benötigen zusätzlich playerctl-/secret-tool- und Sitzungsdienste.
@@ -27,6 +28,7 @@ Artefakte mit 14 Tagen Aufbewahrung:
 - `LIS2-Debian-linux-arm64`: Debian-Paket für `arm64` und `.deb.sha256`.
 - `LIS2-ProtocolTester-win-x64`: selbständiger Windows-Protokolltester einschließlich Laufzeitdateien.
 - `gen_lis2-win32`: native gen_lis2.dll für 32-Bit-Winamp.
+- `LIS2-WMP-Legacy-win32` und `LIS2-WMP-Legacy-win64`: je ein ZIP mit Hintergrund-/Visualisierungs-DLL, Registrierungshinweisen und MIT-Lizenz sowie SHA-256.
 - `Avalonia-GSMTC-smoke-Windows`: provider.txt und result.txt oder failure.txt.
 - `Avalonia-package-smoke-<RID>`: Ergebnis des Starts aus dem extrahierten Archiv, Screenshots, Prozesslog und `environment.json` mit tatsächlicher Architektur, Laufzeitversion und unter Linux Bibliotheksauflösung.
 
@@ -36,11 +38,12 @@ Die genaue Codebasis und der zugehörige CI-Lauf stehen im [aktuellen Status](pr
 
 ## Hauptbranch und Tag-Releases
 
-[build.yml](../.github/workflows/build.yml) prüft `main` und Pull Requests mit dem wiederverwendbaren Avalonia-Workflow. Native Legacy-Plug-ins bleiben deaktiviert. Die Windows-Solution enthält keine WPF-Projekte. Der Paketbau prüft die Windows-App mit Microsoft Defender.
+[build.yml](../.github/workflows/build.yml) prüft `main` und Pull Requests mit dem wiederverwendbaren Avalonia-Workflow. Beide nativen Legacy-Plug-ins werden für x86/x64 gebaut und vor dem Verpacken mit Microsoft Defender geprüft. Die Windows-Solution enthält keine WPF-Projekte. Der Paketbau prüft die Windows-App mit Microsoft Defender.
 
 [release.yml](../.github/workflows/release.yml) reagiert auf `v*`-Tags, validiert die Version und führt denselben Avalonia-Workflow aus. Erst nach dessen erfolgreicher Prüfung werden die Assets veröffentlicht:
 
 - `LIS2-Control-Center-<version>-win-x64.zip`.
+- `LIS2-WMP-Legacy-<version>-win32.zip` und `-win64.zip` mit beiden Legacy-Plug-ins. Diese Erweiterung gehört zu Entwicklungsständen nach v0.1.2; das veröffentlichte v0.1.2 enthält diese Pakete nicht.
 - `LIS2-Control-Center-<version>-linux-x64.tar.gz` und `-linux-arm64.tar.gz`.
 - `lis2-control-center_<Debianversion>_amd64.deb` und `_arm64.deb`.
 - `LIS2-ProtocolTester-<version>-win-x64.zip`.

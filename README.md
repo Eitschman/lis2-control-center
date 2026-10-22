@@ -75,7 +75,7 @@ The following features belong to the Avalonia application. The porting status re
 - template formatting pipeline with fallbacks, numeric/percent/byte formatting, prefix/suffix and case conversion
 - scheduler-driven rotation independent from scrolling animation
 - event/overlay queue with priority and lifetime plus UI/test generation
-- ready-made presets for Clock, Status, CPU, GPU, Memory, Temperatures, Fans, Winamp Now Playing/VU/Spectrum and Windows Media Player Now Playing
+- ready-made presets for Clock, Status, CPU, GPU, Memory, Temperatures, Fans, Winamp Now Playing/VU/Spectrum, Windows Media Player Now Playing and WMP Legacy Now Playing/VU/Spectrum
 
 ### PC hardware and fan control
 
@@ -115,7 +115,17 @@ The modern Windows 11 Media Player is integrated directly through **Global Syste
 - ready-made Now Playing page preset
 - dedicated Media-page card alongside Winamp
 
-Windows Media Player Legacy remains outside the current product scope. The application does not start the Legacy source or display a Legacy card. Native Legacy CI artifacts are disabled.
+Windows Media Player Legacy has a separate Windows integration through two native COM plug-ins:
+
+- the background plug-in supplies artist, title, album, playback state, track number, playlist count and timeline;
+- the optional visualization supplies stereo VU and a 20-band spectrum while **LIS2 Control Center / Telemetry** is selected in the player;
+- a dedicated media card shows separate metadata and visualization connection states;
+- `WmpLegacy.*` variables and Now Playing, VU and Spectrum presets feed display pages;
+- stale metadata and audio are cleared independently; neither plug-in accesses LIS2 hardware.
+
+Use the plug-in package matching the **player process architecture**, independently of the x64 Control Center. CI provides `LIS2-WMP-Legacy-win32` and `LIS2-WMP-Legacy-win64`, each containing both DLLs, registration instructions and the MIT license. Register the DLLs from their permanent location using the matching elevated `regsvr32`, then restart Windows Media Player Legacy. See the [Legacy setup and test guide](docs/wmp-legacy-integration.md).
+
+Legacy support is included in current development builds. Published release **v0.1.2 does not include it**; subsequent tagged releases package both plug-in architectures.
 
 ### Linux media players
 
@@ -204,12 +214,14 @@ The projects are deliberately separated:
 - `src/LIS2.Sources` — clock, LibreHardwareMonitor and Home Assistant sources plus source registry
 - `src/LIS2.Fans` — fan-control modes, curves, hysteresis and fail-safe logic
 - `src/LIS2.Winamp` — named-pipe host, Winamp snapshots and display-value formatting
+- `src/LIS2.WmpLegacy`: background/visualization pipe sources, independent freshness checks and Legacy display values
 - `src/LIS2.WindowsMedia` — Windows 11 GSMTC session source and Windows Media display values
 - `src/LIS2.App.Avalonia`: shared desktop application and platform adapters for Windows/Linux.
 - `src/LIS2.Runtime`: UI-independent runtime, background loops, Linux sensors and platform contracts; see [architecture.md](docs/architecture.md).
 - `tools/LIS2.ProtocolTester` — low-level protocol testing
 - `tools/LIS2.WinampSimulator` — Winamp testing without Winamp
 - `native/LIS2.WinampPlugin` — native x86 Winamp plug-in
+- `native/LIS2.WmpLegacyPlugin` and `native/LIS2.WmpLegacyVisualization`: native Legacy COM plug-ins, built for x86 and x64
 
 ## Display variables
 
@@ -280,7 +292,7 @@ The following commands build the solution, including the Avalonia application, A
 
 - Windows
 - .NET 10 SDK; `global.json` selects a stable SDK from the 10.0 series
-- CMake/MSVC when building the native Winamp plug-in
+- CMake/MSVC when building native Winamp or Windows Media Player Legacy plug-ins
 
 ```powershell
 dotnet restore .\LIS2ControlCenter.sln
@@ -307,8 +319,9 @@ Development artifacts:
 - `LIS2-Debian-linux-x64`, `LIS2-Debian-linux-arm64`: installable Debian packages with checksums.
 - `LIS2-ProtocolTester-win-x64`: self-contained Avalonia protocol tester; its interface is tested natively on Windows and Linux.
 - `gen_lis2-win32`: native x86 Winamp plug-in.
+- `LIS2-WMP-Legacy-win32` and `LIS2-WMP-Legacy-win64`: background and visualization plug-ins for the matching Legacy player architecture.
 
-The Windows application includes the GSMTC provider and its WinRT dependencies. Screenshots and test results are uploaded as separate artifacts. Tagged releases use the same Avalonia packaging workflow with the tag version and publish three portable application archives, two Debian packages, the Windows protocol tester, the Winamp plug-in and `SHA256SUMS.txt`. See the [packaging guide](docs/release.md).
+The Windows application includes the GSMTC provider and its WinRT dependencies. Screenshots and test results are uploaded as separate artifacts. Tagged releases use the same Avalonia packaging workflow with the tag version and publish three portable application archives, two Debian packages, the Windows protocol tester, the Winamp plug-in, both Legacy plug-in packages and `SHA256SUMS.txt`. Published v0.1.2 predates the Legacy packages. See the [packaging guide](docs/release.md).
 
 The Debian packages include the .NET runtime, an application menu entry and the application icon. Install with `sudo apt install ./lis2-control-center_<version>_amd64.deb`, or use the `_arm64.deb` package on ARM64. See the [Debian packaging guide](docs/release.md#debian-pakete) for details and installation checks.
 
@@ -323,6 +336,7 @@ The Debian packages include the .NET runtime, an application menu entry and the 
 - [Protocol notes](docs/protocol.md)
 - [Reverse-engineering notes](docs/reverse-engineering.md)
 - [Winamp integration](docs/winamp-integration.md)
+- [Windows Media Player Legacy setup](docs/wmp-legacy-integration.md)
 - [Home Assistant integration](docs/home-assistant-integration.md)
 - [Release process](docs/release.md)
 - [Roadmap / TODO](TODO.md)

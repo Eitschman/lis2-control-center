@@ -1,13 +1,13 @@
 # TODO: Avalonia-Portierung
 
-Stand: 22.10.2026. Branch: `feature/linux-avalonia`.
-Implementierungsstand: PORT-06B mit laufender Lüfterkonfiguration, erhaltener Seitenrotation bei Helligkeit/Glyphen, sichtbaren Importfehlern und aktueller Bedingungsanzeige. Lokal 451 Avalonia-Tests erfolgreich, ein Linux-Schlüsselbundtest unter Windows übersprungen. Nativer Windows-Smoke mit Exit 0. CI-Nachweise und Zielsystemprüfungen im [Status](docs/prp/linux-port-status.md).
+Stand: 22.10.2026. Hauptbranch: `main`.
+Implementierungsstand: PORT-08 mit Avalonia 11.3.22 und .NET 10. Windows Media Player Legacy ist zusätzlich über Hintergrund- und Visualisierungs-Plug-in angebunden. Aktuelle Prüfergebnisse und offene Zielsystemnachweise stehen im [Status](docs/prp/linux-port-status.md).
 
-Diese Liste gilt für den Avalonia-Branch. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
+Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
 ## Vorhandene Basis
 
-- [x] Gemeinsame Avalonia-App für Windows/Linux und portable .NET-8-Bibliotheken.
+- [x] Gemeinsame Avalonia-App für Windows/Linux und portable .NET-10-Bibliotheken.
 - [x] Headless Seiten-/Ereignisruntime, adaptive Schleifen und virtuelle/serielle Sessionintegration.
 - [x] Seiteneditor mit Presets, Sichtbarkeit, Scrolling, Entwurfsvorschau und validiertem JSON-Import/-Export.
 - [x] Genehmigter modaler Variablenbrowser mit Suche, Livewerten und persistenten Favoriten.
@@ -70,7 +70,9 @@ Die automatisierten Paketprüfungen aus **PORT-07** sind nachgewiesen, einschlie
 - [ ] VLC und Plexamp einzeln auf realen Zielsystemen prüfen.
 - [x] Windows-GSMTC-Paket ohne laufenden Player und mit fehlender Provider-DLL lokal starten. Publish enthält WinRT-Laufzeitdateien; CI prüft Initialisierung, Verbindung, Shutdown und fehlende DLL.
 - [ ] GSMTC mit laufendem Windows Media Player auf einem Zielsystem prüfen.
-- [x] WMP Legacy bleibt zurückgestellt: Avalonia startet die Quelle nicht, zeigt keine Karte und referenziert das Legacy-Projekt nicht.
+- [x] WMP Legacy unter Windows: Medienkarte, getrennte Metadaten-/Audiostatus, `WmpLegacy.*`, drei Presets und lokalisierte Einrichtungshilfe.
+- [x] Native Legacy-Plug-ins für x86/x64 im gemeinsamen Build-/Releaseworkflow mit ZIP, Anleitung, Lizenz und SHA-256.
+- [ ] Reale Legacy-Sitzung mit registrierten Plug-ins prüfen: Titelwechsel, Pause, Seek, Playlist, VU/Spektrum, Visualisierungswechsel sowie Neustart beider Anwendungen. [Prüfliste](docs/wmp-legacy-integration.md).
 - [x] Linux liefert keine VU-/Spektrumanalyse aus MPRIS-Metadaten; Regressionstest prüft diese Grenze. Wine/Winamp bleibt optional.
 - [x] Avalonia-Branch-CI baut zusätzlich den selbständigen Windows-Protokolltester und das native Win32/x86-Winamp-Plug-in; eigene Artefakte wie auf main.
 - [x] [CI 39569558081](https://github.com/Eitschman/lis2-control-center/actions/runs/39569558081) für `cd4b779`: neun Jobs erfolgreich, je OS 375/375 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes, drei App-Pakete, GSMTC-Paketstart, Protokolltester und Winamp-DLL erfolgreich.
@@ -123,7 +125,7 @@ A01 bis A14 sind softwareseitig umgesetzt und Teil der 451 erfolgreichen Avaloni
 - [x] **A13: Editoren.** Klickbares 5×8-Raster mit Leertastenbedienung; Kurvenpunkte anlegen, ändern und löschen. Beide schreiben in die bestehenden Textformate; Dezimaltemperaturen bleiben ohne Rundung erhalten, Ausgaben bleiben ganzzahlig bei 0..100.
 - [x] **A14: Nachweise.** Durchgängige Spektrumregression, Bedingungsbrowser, Speicherfehler, Glyphenoption, Presetabgleich und Quellenverlust. Seitenbedingungen, Pixelraster, Kurvenpunkte, Medienpegel und Diagnose mit Skia bei 950 × 600 in Englisch, Deutsch, Französisch, Türkisch und Russisch gerendert und angesehen. Hilfe, Audit und Arbeitsdokumente beschreiben diese Abläufe.
 
-Neue HA-Parallelquellen, WMP Legacy, allgemeiner Settings-Import/-Export, Standardwerte-Wiederherstellung und Einrichtungsassistent sind nicht Teil dieses Pakets. Der vorhandene Windows-Import bleibt erhalten.
+Neue HA-Parallelquellen, allgemeiner Settings-Import/-Export, Standardwerte-Wiederherstellung und Einrichtungsassistent sind nicht Teil dieses Pakets. Der vorhandene Windows-Import bleibt erhalten.
 
 ### PORT-06B: Laufzeit- und Speicherparität
 

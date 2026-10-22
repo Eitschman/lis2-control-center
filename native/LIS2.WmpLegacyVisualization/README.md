@@ -33,3 +33,9 @@ Uninstall with:
 ```text
 regsvr32 /u lis2_wmp_legacy_visualization.dll
 ```
+
+On 64-bit Windows, use `%SystemRoot%\System32\regsvr32.exe` for an x64
+player and `%SystemRoot%\SysWOW64\regsvr32.exe` for an x86 player. Use the
+full quoted path to the DLL. Keep the DLL in its registered location; unregister
+it before moving or deleting it. Registration requires administrator rights.
+The x64 Control Center can receive telemetry from either player architecture.

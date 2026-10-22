@@ -1,6 +1,6 @@
 # WPF-/Avalonia-Paritätsaudit
 
-Stand: 22.10.2026. Implementierungsstand: PORT-06B.
+Stand: 22.10.2026. Implementierungsstand: PORT-08 und Windows Media Player Legacy.
 
 PORT-06 ergänzt den softwareseitigen Abgleich um benannte Glyphenschlüssel, statische Variablenbeschreibungen ohne verbundene Quellen, Hilfe neben dem Bereichstitel und F1. `DesktopParityUiTests` prüft zehn Ansichten in fünf Sprachen mit drei Themes bei 950 × 600, Headergrenzen, Fokus, Kontexthilfe sowie gültige und ungültige Ereignis-/Lüftereingaben. Bestehende Geräte-, Seiten-, Medien- und HA-Tests bleiben Teil der Suite. Das ersetzt keine Abnahme nativer Dateidialoge, echter Quellen oder physischer Geräte.
 
@@ -47,7 +47,7 @@ Benutzernachweis: Windows-Start und Tray wurden im Chat am 21.10.2026 positiv be
 | Dashboard | VFD-Vorschau und Status am angewendeten Transport; vier manuelle Fan-Regler mit WPF-Grenzen und AllowStop, serielle Freigabe je Aktion | Automatische Regelung sperrt Handausgabe. Physische Ausgabe und weiterer Live-/WPF-Abgleich offen |
 | Display | Gemeinsame Zeilen-, Clear-, Sonderzeichen-/ROM-, Glyphen- und Helligkeitsaktionen über IDisplaySession; Helligkeit gespeichert und beim Verbinden angewendet | Headless-Controltests und Sichtprüfung vorhanden; physische Zeichen und native Glyphen-Dateidialoge offen |
 | Pages | Liste, Presets, Dauer/Refresh, zwei Templates/Überlaufmodi, Sichtbarkeit, Scrolling, Vorschau, Dateifunktionen und Variablenbrowser; Quellenaktionen mit Entwurfsschutz/Reload, Wiederherstellung leerer Seitenlisten | Spektrumvariable, Glyphenvorschau, Bedingungsfelder und gemeinsame Presets geprüft; physische Darstellung und native Dateibedienung offen |
-| Media | WindowsMedia-/Winamp-Karten unter Windows, Linux-Karte mit gespeicherter Playerauswahl und Spielposition; Legacy deaktiviert; GSMTC-Paketstart ohne Player lokal geprüft | Grafische Telemetrie und Verbindungs-/Quellendetails vorhanden. Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen offen; keine eigene D-Bus-Subscription |
+| Media | WindowsMedia-/Winamp-Karten unter Windows, Linux-Karte mit gespeicherter Playerauswahl und Spielposition; Legacy-Karte mit getrenntem Audio-/Metadatenstatus und drei Presets; GSMTC-Paketstart ohne Player lokal geprüft | Grafische Telemetrie und Verbindungs-/Quellendetails vorhanden. Reale VLC-/Plexamp-/Windows-Media-Player-Sitzungen offen; keine eigene D-Bus-Subscription |
 | Events | Eingabe, Priority/Lifetime, Queue, Test, Cancel/Clear; MainWindow.Events und gemeinsame Runtime-EventQueue | Priorität/Ablauf sowie gültige/ungültige Dauer, Auswahl und Abbruch mit Controls geprüft; reale Displayüberlagerung offen |
 | Hardware | Gruppierte Liste, Suche/Typfilter, Details, Aliase/Favoriten, Fan-Zuordnung und Presets; MainWindow.Hardware | Reale Sensor-/Treiberidentität, Rechte, Auswahl-/Liveverhalten, Plattformschlüssel und exakte WPF-Bedienung prüfen |
 | Fan Control | Vier Kanäle, Modi, Grenzen, Hysterese, Kurventext/-vorschau, Dry-run, virtuelle und serielle Regelung; MainWindow.Fans | Separate Test-/Freigabeaktionen gegenüber WPF abgleichen. Sicherheit erhalten; Tastatur, fehlerhafte Kurven, Status und Werte bei aktivem Runtimepfad prüfen |
@@ -69,7 +69,7 @@ System/Light/Dark, fünf Sprachkataloge, Windows-/Linux-Tray und plattformeigene
 
 Der Benutzer hat den modalen Variablenbrowser als Ersatz der großen WPF-Variablen-ComboBox genehmigt. Er enthält Suche/Kategorien/HA-Filter, aktuelle Werte, persistente Favoriten und Einfügen in beide Zeilen. Stored Templates bleiben unverändert.
 
-Physische Lüfterausgabe erfordert eine ausdrückliche, nicht persistierte Freigabe. Eine WPF-ähnliche Schaltfläche rechtfertigt kein Umgehen dieses Pfades. Zusätzliche/verschobene Bedienelemente benötigen eine fachliche Grundlage. Die lokale Linux-Tokenspeicherung ist nur mit ausdrücklicher Auswahl in der App genehmigt; der automatische Ausweichpfad entfällt. WMP Legacy bleibt deaktiviert.
+Physische Lüfterausgabe erfordert eine ausdrückliche, nicht persistierte Freigabe. Eine WPF-ähnliche Schaltfläche rechtfertigt kein Umgehen dieses Pfades. Zusätzliche/verschobene Bedienelemente benötigen eine fachliche Grundlage. Die lokale Linux-Tokenspeicherung ist nur mit ausdrücklicher Auswahl in der App genehmigt; der automatische Ausweichpfad entfällt. WMP Legacy wird unter Windows gestartet; Hintergrund- und Visualisierungs-Plug-in bleiben vom Hardwarezugriff getrennt. Reale Playerabnahme ist offen.
 
 ## Prüfnachweise und verbleibende Abnahme
 

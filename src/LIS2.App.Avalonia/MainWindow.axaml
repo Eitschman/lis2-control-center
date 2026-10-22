@@ -212,6 +212,9 @@
                 <ComboBoxItem Content="Winamp · Spectrum"/>
                 <ComboBoxItem Content="Media · Windows Media Now Playing"/>
                 <ComboBoxItem Content="Linux MPRIS players (playerctl)"/>
+                <ComboBoxItem Content="WMP Legacy Now Playing"/>
+                <ComboBoxItem Content="WMP Legacy VU"/>
+                <ComboBoxItem Content="WMP Legacy Spectrum"/>
               </ComboBox>
               <Button Name="PageCreatePreset" Content="Create from preset" HorizontalAlignment="Stretch"/>
               <ListBox Name="PagesList" MinHeight="250" MaxHeight="420">
@@ -389,6 +392,49 @@
             <TextBlock Name="WinampMediaTelemetry" FontFamily="Consolas" TextWrapping="Wrap"/>
             <TextBlock Name="WinampMediaConnection" TextWrapping="Wrap"/>
             <Button Name="WinampMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
+          </StackPanel>
+        </Border>
+        <Border Background="{DynamicResource Lis2CardBrush}" Name="WmpLegacyMediaCard" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
+          <StackPanel Spacing="7">
+            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+              <TextBlock Text="Windows Media Player Legacy" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
+              <Border Grid.Column="1" Background="{DynamicResource Lis2StatusBrush}" CornerRadius="12" Padding="12,7">
+                <TextBlock Name="WmpLegacyMediaStatus" Text="Disconnected" Foreground="{DynamicResource Lis2StatusTextBrush}" FontWeight="SemiBold"/>
+              </Border>
+            </Grid>
+            <TextBlock Name="WmpLegacyMediaTitle" Text="Nothing playing" FontSize="24" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Name="WmpLegacyMediaArtist" Text="Waiting for Windows Media Player Legacy..." FontSize="16" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Name="WmpLegacyMediaAlbum" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
+            <Grid ColumnDefinitions="*,16,*,16,*" Margin="0,6,0,10">
+              <StackPanel Grid.Column="0" Spacing="3">
+                <TextBlock Text="Playback" FontWeight="SemiBold"/>
+                <TextBlock Name="WmpLegacyMediaPlayback" FontSize="18" FontWeight="SemiBold"/>
+                <TextBlock Name="WmpLegacyMediaTime" FontFamily="Consolas" Opacity="0.7"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2" Spacing="3">
+                <TextBlock Text="Playlist" FontWeight="SemiBold"/>
+                <TextBlock Name="WmpLegacyMediaPlaylist" Text="- / -" FontSize="18" FontWeight="SemiBold"/>
+              </StackPanel>
+              <StackPanel Grid.Column="4" Spacing="3">
+                <TextBlock Text="Visualization" FontWeight="SemiBold"/>
+                <TextBlock Name="WmpLegacyVisualizationStatus" Text="Disconnected" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Grid>
+            <Separator/>
+            <TextBlock Text="VU / Spectrum" FontWeight="SemiBold"/>
+            <Grid ColumnDefinitions="25,*,45" RowDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="8">
+              <TextBlock Text="L" VerticalAlignment="Center"/>
+              <ProgressBar Name="WmpLegacyVuLeft" Grid.Column="1" Maximum="255" Height="14"/>
+              <TextBlock Name="WmpLegacyVuLeftValue" Grid.Column="2"/>
+              <TextBlock Text="R" Grid.Row="1" VerticalAlignment="Center"/>
+              <ProgressBar Name="WmpLegacyVuRight" Grid.Row="1" Grid.Column="1" Maximum="255" Height="14"/>
+              <TextBlock Name="WmpLegacyVuRightValue" Grid.Row="1" Grid.Column="2"/>
+            </Grid>
+            <Grid Name="WmpLegacySpectrumBars" Height="70" ColumnSpacing="3"/>
+            <TextBlock Name="WmpLegacyMediaTelemetry" FontFamily="Consolas" TextWrapping="Wrap"/>
+            <TextBlock Name="WmpLegacyMediaConnection" TextWrapping="Wrap"/>
+            <TextBlock Name="WmpLegacyVisualizationConnection" TextWrapping="Wrap"/>
+            <Button Name="WmpLegacyMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
         </Border>
       </StackPanel>

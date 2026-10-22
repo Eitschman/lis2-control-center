@@ -93,6 +93,54 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  wmp-legacy-plugins:
+    name: WMP Legacy plug-ins ${{ matrix.arch }}
+    needs: metadata
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: win32
+            generator: Win32
+          - arch: win64
+            generator: x64
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build background and visualization plug-ins
+        shell: pwsh
+        run: |
+          foreach ($project in @('LIS2.WmpLegacyPlugin', 'LIS2.WmpLegacyVisualization')) {
+            cmake -S "native/$project" -B "native/$project/build" -A '${{ matrix.generator }}'
+            if ($LASTEXITCODE -ne 0) { throw "Configure failed: $project" }
+            cmake --build "native/$project/build" --config Release
+            if ($LASTEXITCODE -ne 0) { throw "Build failed: $project" }
+          }
+      - name: Assemble plug-in package and scan with Microsoft Defender
+        shell: pwsh
+        run: |
+          $package = 'artifacts/LIS2-WMP-Legacy-${{ matrix.arch }}'
+          New-Item -ItemType Directory -Path "$package/background", "$package/visualization" -Force | Out-Null
+          Copy-Item 'native/LIS2.WmpLegacyPlugin/build/Release/lis2_wmp_legacy.dll', 'native/LIS2.WmpLegacyPlugin/README.md' "$package/background/"
+          Copy-Item 'native/LIS2.WmpLegacyVisualization/build/Release/lis2_wmp_legacy_visualization.dll', 'native/LIS2.WmpLegacyVisualization/README.md' "$package/visualization/"
+          Copy-Item LICENSE "$package/LICENSE"
+          $defender = Join-Path $env:ProgramFiles 'Windows Defender/MpCmdRun.exe'
+          if (-not (Test-Path $defender)) { throw 'Microsoft Defender scanner unavailable' }
+          & $defender -Scan -ScanType 3 -File (Resolve-Path $package).Path -DisableRemediation
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Defender scan failed: $LASTEXITCODE" }
+          $archive = 'LIS2-WMP-Legacy-${{ matrix.arch }}.zip'
+          Compress-Archive -Path "$package/*" -DestinationPath $archive
+          $hash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $archive" | Set-Content "$archive.sha256" -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LIS2-WMP-Legacy-${{ matrix.arch }}
+          path: |
+            LIS2-WMP-Legacy-${{ matrix.arch }}.zip
+            LIS2-WMP-Legacy-${{ matrix.arch }}.zip.sha256
+          if-no-files-found: error
+          retention-days: 14
+
   winamp-plugin:
     name: Winamp plugin x86
     needs: metadata
@@ -256,7 +304,7 @@ jobs:
           if (-not (Test-Path "$folder/LIS2.App.Avalonia.runtimeconfig.json")) { throw "Missing runtime configuration" }
           if ("${{ runner.os }}" -eq "Windows" -and -not (Test-Path "$folder/LIS2.WindowsMedia.dll")) { throw "Missing Windows GSMTC provider in publish output" }
           if ("${{ runner.os }}" -eq "Windows") {
-            foreach ($dependency in @('WinRT.Runtime.dll', 'Microsoft.Windows.SDK.NET.dll')) {
+            foreach ($dependency in @('WinRT.Runtime.dll', 'Microsoft.Windows.SDK.NET.dll', 'LIS2.WmpLegacy.dll')) {
               if (-not (Test-Path "$folder/$dependency")) { throw "Missing GSMTC runtime dependency: $dependency" }
             }
           }

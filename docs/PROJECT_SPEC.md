@@ -310,6 +310,6 @@ Der getrennte Windows-Workflow baut/testet die Solution und führt WPF-Smoke-/UI
 
 ## Remaining scope
 
-Die priorisierte Restarbeit steht in [TODO.md](../TODO.md): Seiten-/Quellenintegration, Einstellungen und gewählter Transport, Protokolllog/GUI-Smoke, Medien-/Tokenstore-Grenzen, WPF-Parität und Zielsystemprüfung. WMP Legacy wird in Avalonia unter Windows aktuell gestartet, obwohl der Produktumfang zurückgestellt ist; dieser Widerspruch ist offen.
+Die priorisierte Restarbeit steht in [TODO.md](../TODO.md): Seiten-/Quellenintegration, Einstellungen und gewählter Transport, Protokolllog/GUI-Smoke, Medien-/Tokenstore-Grenzen, WPF-Parität und Zielsystemprüfung. WMP Legacy wird unter Windows gestartet und erhält eine eigene Medienkarte, `WmpLegacy.*` und Presets. Der gemeinsame Workflow baut die Metadaten- und Visualisierungs-Plug-ins für x86/x64. Reale Playerprüfung steht im [Legacy-Leitfaden](wmp-legacy-integration.md).
 
 Physische Geräteprüfung wird getrennt ausgewiesen und blockiert keine rein softwareseitigen Pakete. Bytegenaue Protokollunsicherheiten bleiben in [protocol.md](protocol.md) und [reverse-engineering.md](reverse-engineering.md).
