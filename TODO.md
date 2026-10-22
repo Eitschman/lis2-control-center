@@ -72,6 +72,7 @@ Die automatisierten Paketprüfungen aus **PORT-07** sind nachgewiesen, einschlie
 - [ ] GSMTC mit laufendem Windows Media Player auf einem Zielsystem prüfen.
 - [x] WMP Legacy unter Windows: Medienkarte, getrennte Metadaten-/Audiostatus, `WmpLegacy.*`, drei Presets und lokalisierte Einrichtungshilfe.
 - [x] Native Legacy-Plug-ins für x86/x64 im gemeinsamen Build-/Releaseworkflow mit ZIP, Anleitung, Lizenz und SHA-256.
+- [x] C/C++-Laufzeit in beiden Legacy-DLLs statisch einbinden; PE-Importe und COM-Objekterzeugung für x86/x64 prüfen. Release v0.1.3 enthält beide Pakete; separate Redistributable-Installation entfällt für diese Plug-ins.
 - [ ] Reale Legacy-Sitzung mit registrierten Plug-ins prüfen: Titelwechsel, Pause, Seek, Playlist, VU/Spektrum, Visualisierungswechsel sowie Neustart beider Anwendungen. [Prüfliste](docs/wmp-legacy-integration.md).
 - [x] Linux liefert keine VU-/Spektrumanalyse aus MPRIS-Metadaten; Regressionstest prüft diese Grenze. Wine/Winamp bleibt optional.
 - [x] Avalonia-Branch-CI baut zusätzlich den selbständigen Windows-Protokolltester und das native Win32/x86-Winamp-Plug-in; eigene Artefakte wie auf main.

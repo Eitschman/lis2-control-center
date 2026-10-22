@@ -2,7 +2,7 @@
 
 Stand: 22.10.2026. App und Protokolltester verwenden Avalonia. Hauptbranch, Entwicklungsbranch und Tag-Releases verwenden denselben Paketbau.
 
-Releaseziel ist **v0.1.3** mit drei portablen App-Archiven, zwei Debian-Paketen, Windows-Protokolltester, `gen_lis2.dll`, zwei Legacy-Plug-in-ZIPs und `SHA256SUMS.txt`. Alle neun Nutzdateien erhalten Prüfsummen. Anwendungspakete enthalten Avalonia 11.3.22, Runtime 10.0.13 und Lizenzbeilagen. Die Veröffentlichung erfolgt nach erfolgreichem Main- und Tag-Workflow; der commitbezogene Nachweis steht im [Status](prp/linux-port-status.md). Installation und Paketauswahl stehen in der [README](../README.md#download-and-installation).
+Veröffentlicht ist **[v0.1.3](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.3)** mit drei portablen App-Archiven, zwei Debian-Paketen, Windows-Protokolltester, `gen_lis2.dll`, zwei Legacy-Plug-in-ZIPs und `SHA256SUMS.txt`. Die neun heruntergeladenen Nutzdateien stimmen mit den veröffentlichten Prüfsummen überein. Anwendungspakete enthalten Avalonia 11.3.22, Runtime 10.0.13 und Lizenzbeilagen. Main-CI besteht zwölf Jobs, Release-CI 14; der commitbezogene Nachweis steht im [Status](prp/linux-port-status.md). Installation und Paketauswahl stehen in der [README](../README.md#download-and-installation).
 
 Beide Legacy-Plug-ins verwenden unter MSVC eine statisch eingebundene C/C++-Laufzeit. Vor dem Verpacken prüft `check_native_runtime.py` beide DLLs auf externe VC-/UCRT-Importe. Gültige PE32-/PE32+-Dateien und absichtlich eingebaute Laufzeitabhängigkeiten sind durch Regressionen abgedeckt. Eine neue Laufzeitversion wird durch einen erneuten Plug-in-Build mit aktualisiertem Toolchainstand ausgeliefert.
 
