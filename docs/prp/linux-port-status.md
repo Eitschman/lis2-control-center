@@ -1,6 +1,6 @@
 # Avalonia-Portierung: aktueller Arbeitsstand
 
-Stand: 22.10.2026. Hauptbranch ist `main`; Release v0.1.3 verwendet die gemeinsame Avalonia-Anwendung und enthält Windows Media Player Legacy.
+Stand: 23.10.2026. Hauptbranch ist `main`; veröffentlicht ist v0.1.3. Releaseziel v0.1.4 ergänzt die kompakte Dashboard-VFD-Vorschau.
 Implementierungsstand: PORT-08 mit geprüften Archivstarts für Windows x64, Linux x64 und nativem Linux ARM64 sowie Debian-Paketen auf amd64/arm64. Die PORT-06B-Funktionen sind enthalten. Reale HA-/Playernachweise sowie Desktop-/Geräteabnahme bleiben offen.
 Aktueller Zusatzumfang: **Windows Media Player Legacy** mit Medienkarte, Metadaten-/Audiopipes, VU, zwanzig Spektrumbändern, Displayvariablen, drei Presets und fünfsprachiger Hilfe. Der gemeinsame Workflow baut beide nativen Plug-ins für x86/x64; Release v0.1.3 enthält beide Pakete mit eingebundener C/C++-Laufzeit. Reale Legacy-Playerprüfung bleibt offen.
 
@@ -20,6 +20,8 @@ Die About-/README-Ergänzung für v0.1.2 besteht lokal den Solution-Build ohne W
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
 ## PORT-08: Avalonia 11.3.22
+
+Die Dashboard-VFD-Fläche richtet sich nach den tatsächlichen 20 × 2 Zeichen mit unveränderter Schriftgröße und unverändertem Innenabstand. Zwei Layoutregressionen erkennen die feste Fläche als zu groß und bestehen mit der inhaltsabhängigen Größe. Beide mit Skia gerenderten Dashboardansichten bei 950 × 600 und 1305 × 893 wurden angesehen; alle zwanzig Zeichen beider Zeilen sind sichtbar. Lokal auf Windows bestehen zwölf Geräte-UI-Tests und die gesamte Avalonia-Suite mit 471 erfolgreichen Tests sowie einem übersprungenen Linux-Schlüsselbundtest. Release v0.1.4 ist vom Benutzer nach erfolgreichen Prüfungen beauftragt.
 
 [Release v0.1.2](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.2) zu `b2331ed` ist veröffentlicht und als aktuelles Release markiert. [Release-CI 39770589294](https://github.com/Eitschman/lis2-control-center/actions/runs/39770589294) besteht alle zwölf Jobs. Alle sieben heruntergeladenen Nutzdateien stimmen mit `SHA256SUMS.txt` überein. Drei App-Archive, beide Debian-Pakete und der Protokolltester enthalten Produktversion 0.1.2, Avalonia 11.3.22, Runtime 10.0.13 und Lizenzbeilagen. Alle fünf App-Pakete enthalten die englische README einschließlich Lizenz- und Bibliotheksübersicht. Die README-Prüfung besteht mit gültigem Text und erkennt einen falschen englischen Abschnittstitel sowie den fehlenden Lizenzabschnitt in zwei isolierten Gegenproben.
 

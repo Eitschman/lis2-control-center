@@ -12,6 +12,37 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class DeviceUiTests
 {
+    [AvaloniaTheory]
+    [InlineData(950, 600)]
+    [InlineData(1305, 893)]
+    public async Task DashboardPreviewFitsTwentyColumnsAndTwoRows(int width, int height)
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace());
+        ui.Window.Width = width;
+        ui.Window.Height = height;
+        ui.Click("NavButton1");
+        ui.Control<TextBox>("Line1TextBox").Text = "12345678901234567890";
+        ui.Control<TextBox>("Line2TextBox").Text = "ABCDEFGHIJKLMNOPQRST";
+        await ui.ClickAndWaitAsync("RenderBoth");
+        ui.Click("NavButton0");
+        await ui.CaptureAsync($"dashboard-vfd-{width}x{height}");
+
+        var first = ui.Control<TextBlock>("PreviewLine1");
+        var second = ui.Control<TextBlock>("PreviewLine2");
+        var rows = Assert.IsType<StackPanel>(first.Parent);
+        var display = Assert.IsType<Border>(rows.Parent);
+        Assert.Equal(20, first.Text!.Length);
+        Assert.Equal(20, second.Text!.Length);
+        var horizontalInset = display.Padding.Left + display.Padding.Right +
+            display.BorderThickness.Left + display.BorderThickness.Right;
+        var verticalInset = display.Padding.Top + display.Padding.Bottom +
+            display.BorderThickness.Top + display.BorderThickness.Bottom;
+        Assert.InRange(display.Bounds.Width - Math.Max(first.DesiredSize.Width, second.DesiredSize.Width),
+            horizontalInset - 1, horizontalInset + 1);
+        Assert.InRange(display.Bounds.Height - first.DesiredSize.Height - second.DesiredSize.Height,
+            verticalInset - 1, verticalInset + 1);
+    }
+
     [AvaloniaFact]
     public async Task SerialStartupAndCommonActionsUseSavedDeviceAndBrightness()
     {

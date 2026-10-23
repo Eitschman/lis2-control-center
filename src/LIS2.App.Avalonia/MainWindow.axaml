@@ -50,7 +50,7 @@
               <StackPanel Spacing="12">
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
                 <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6"
-                        MaxWidth="402" Height="112" HorizontalAlignment="Stretch" ClipToBounds="True" Padding="8,12">
+                        HorizontalAlignment="Left" ClipToBounds="True" Padding="8,12">
                   <StackPanel HorizontalAlignment="Left" Spacing="0">
                     <TextBlock Name="PreviewLine1" Text="                    " FontFamily="Consolas" FontSize="24" Foreground="#F7FBFF" TextWrapping="NoWrap" />
                     <TextBlock Name="PreviewLine2" Text="                    " FontFamily="Consolas" FontSize="24" Foreground="#F7FBFF" TextWrapping="NoWrap" />
