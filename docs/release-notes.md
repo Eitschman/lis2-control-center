@@ -4,7 +4,9 @@
 
 Die blaue VFD-Fläche in der Übersicht richtet sich nach den tatsächlichen 20 × 2 Zeichen. Schriftgröße und Innenabstand bleiben erhalten; die Fläche wird nicht mehr auf eine größere feste Breite und Höhe ausgedehnt.
 
-Zwei Layoutregressionen prüfen beide gefüllten Zeilen bei 950 × 600 und 1305 × 893 Pixeln. Beide gerenderten Ansichten wurden angesehen. Der Test erkennt die zu große Fläche mit den festen Abmessungen und besteht mit der inhaltsabhängigen Größe.
+Die Vorschaukarte bekommt die dazu passende Breite. Status und Schnellzugriff nutzen den restlichen Platz. Bei ausreichend Platz stehen die Schnellzugriff-Schaltflächen nebeneinander; bei kleineren Fenstern brechen sie um.
+
+Vier Layoutregressionen prüfen beide gefüllten Zeilen und die Kartenbreite auf Deutsch und Englisch bei 950 × 600 und 1305 × 893 Pixeln. Beide deutschen gerenderten Ansichten wurden angesehen. Die Tests erkennen die zu große Vorschaufläche und die unnötig breite Karte; mit der inhaltsabhängigen Größe bestehen sie.
 
 ## Windows Media Player Legacy
 

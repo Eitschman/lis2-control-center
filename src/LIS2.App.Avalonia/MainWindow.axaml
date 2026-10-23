@@ -45,8 +45,8 @@
       </Grid>
       <ScrollViewer Name="DashboardView" Grid.Row="1">
         <StackPanel Spacing="14">
-          <Grid ColumnDefinitions="3*,14,2*">
-            <Border Background="{DynamicResource Lis2CardBrush}" Grid.Column="0" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
+          <Grid ColumnDefinitions="Auto,14,*">
+            <Border Background="{DynamicResource Lis2CardBrush}" Grid.Column="0" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16" VerticalAlignment="Top">
               <StackPanel Spacing="12">
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
                 <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6"
@@ -69,8 +69,10 @@
               <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
                 <StackPanel Spacing="10">
                   <TextBlock Text="Quick Links" FontSize="16" FontWeight="SemiBold" />
-                  <Button Name="OpenDisplayControls" Content="Open Display Controls" />
-                  <Button Name="OpenFanControl" Content="Open Fan Control" />
+                  <WrapPanel>
+                    <Button Name="OpenDisplayControls" Content="Open Display Controls" Margin="0,0,8,8" />
+                    <Button Name="OpenFanControl" Content="Open Fan Control" Margin="0,0,8,8" />
+                  </WrapPanel>
                 </StackPanel>
               </Border>
             </StackPanel>

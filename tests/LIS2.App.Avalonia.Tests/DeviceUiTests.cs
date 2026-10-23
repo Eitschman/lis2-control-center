@@ -13,19 +13,22 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class DeviceUiTests
 {
     [AvaloniaTheory]
-    [InlineData(950, 600)]
-    [InlineData(1305, 893)]
-    public async Task DashboardPreviewFitsTwentyColumnsAndTwoRows(int width, int height)
+    [InlineData(950, 600, false)]
+    [InlineData(1305, 893, false)]
+    [InlineData(950, 600, true)]
+    [InlineData(1305, 893, true)]
+    public async Task DashboardPreviewFitsTwentyColumnsAndTwoRows(int width, int height, bool german)
     {
         await using var ui = await Fixture.OpenAsync(new PortableWorkspace());
         ui.Window.Width = width;
         ui.Window.Height = height;
+        if (german) ui.Control<ComboBox>("LanguageModeComboBox").SelectedIndex = 2;
         ui.Click("NavButton1");
         ui.Control<TextBox>("Line1TextBox").Text = "12345678901234567890";
         ui.Control<TextBox>("Line2TextBox").Text = "ABCDEFGHIJKLMNOPQRST";
         await ui.ClickAndWaitAsync("RenderBoth");
         ui.Click("NavButton0");
-        await ui.CaptureAsync($"dashboard-vfd-{width}x{height}");
+        await ui.CaptureAsync($"dashboard-vfd-{(german ? "de" : "en")}-{width}x{height}");
 
         var first = ui.Control<TextBlock>("PreviewLine1");
         var second = ui.Control<TextBlock>("PreviewLine2");
@@ -41,6 +44,10 @@ public sealed class DeviceUiTests
             horizontalInset - 1, horizontalInset + 1);
         Assert.InRange(display.Bounds.Height - first.DesiredSize.Height - second.DesiredSize.Height,
             verticalInset - 1, verticalInset + 1);
+        var card = Assert.IsType<Border>(Assert.IsType<StackPanel>(display.Parent).Parent);
+        var cardInset = card.Padding.Left + card.Padding.Right +
+            card.BorderThickness.Left + card.BorderThickness.Right;
+        Assert.InRange(card.Bounds.Width - display.Bounds.Width, cardInset - 1, cardInset + 1);
     }
 
     [AvaloniaFact]

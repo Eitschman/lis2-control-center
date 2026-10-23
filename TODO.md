@@ -82,7 +82,7 @@ Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nich
 - [x] Winamp, Windows GSMTC, HA-WebSocket-Quelle und Linux-Metadaten über `playerctl`.
 - [x] Workspace, Windows-Importlogik, Theme-/Sprachauswahl, Windows-Tray und Autostart.
 - [x] Hilfe mit zehn Themen, About-Dialog, virtuelle Diagnose und Textexport.
-- [x] Kompakte Dashboard-VFD-Fläche für 20 × 2 Zeichen bei unveränderter Schriftgröße; Layoutregressionen und Sichtprüfung bei 950 × 600 sowie 1305 × 893 Pixeln.
+- [x] Kompakte Dashboard-VFD-Fläche für 20 × 2 Zeichen bei unveränderter Schriftgröße; passende Kartenbreite, restlicher Platz für Status/Schnellzugriff und umbrechende Schnellzugriff-Schaltflächen. Layoutregressionen auf Deutsch/Englisch und Sichtprüfung bei 950 × 600 sowie 1305 × 893 Pixeln.
 - [x] Windows-/Ubuntu-Builds und vier Testprojekte je OS; Pakete für `win-x64`, `linux-x64`, `linux-arm64` mit SHA-256.
 
 Abgehakt bedeutet vorhandener und im Status eingegrenzter Umfang, keine pauschale WPF- oder Hardwareparität.

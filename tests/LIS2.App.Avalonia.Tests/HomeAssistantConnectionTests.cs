@@ -47,9 +47,19 @@ public sealed class HomeAssistantConnectionTests
         var socket = await server.AcceptAsync();
         await server.InitializeAsync(socket);
         await HomeAssistantServer.WaitAsync(() => source.Values.Count > 0);
+        // Der Zustand ist erst mit Changed veröffentlicht, nicht schon beim Setzen des Fehlertexts.
+        var rejected = new TaskCompletionSource<(bool Connected, int ValueCount)>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        source.Changed += (_, _) =>
+        {
+            if (source.LastError is not null)
+                rejected.TrySetResult((source.IsConnected, source.Values.Count));
+        };
         await server.SendAsync(socket, new { id = request, type = "result", success = false, error = new { code = "test", message = "Request rejected" } });
-        await HomeAssistantServer.WaitAsync(() => source.LastError is not null);
-        Assert.False(source.IsConnected);
+        var state = await rejected.Task.WaitAsync(TimeSpan.FromSeconds(3));
+        Assert.False(state.Connected);
+        Assert.Equal(0, state.ValueCount);
+        Assert.NotNull(source.LastError);
         Assert.Empty(source.Values);
     }
 
