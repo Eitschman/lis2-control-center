@@ -17,6 +17,63 @@ public sealed class DeviceUiTests
     [InlineData(1305, 893, false)]
     [InlineData(950, 600, true)]
     [InlineData(1305, 893, true)]
+    public async Task PagePreviewMatchesDashboardForFullAndEmptyFrames(int width, int height, bool german)
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace());
+        ui.Window.Width = width;
+        ui.Window.Height = height;
+        if (german) ui.Control<ComboBox>("LanguageModeComboBox").SelectedIndex = 2;
+        ui.Click("NavButton1");
+        ui.Control<TextBox>("Line1TextBox").Text = "12345678901234567890";
+        ui.Control<TextBox>("Line2TextBox").Text = "ABCDEFGHIJKLMNOPQRST";
+        await ui.ClickAndWaitAsync("RenderBoth");
+        ui.Click("NavButton0");
+        ui.Window.UpdateLayout();
+        var dashboardFirst = ui.Control<TextBlock>("PreviewLine1");
+        var dashboardDisplay = Assert.IsType<Border>(Assert.IsType<StackPanel>(dashboardFirst.Parent).Parent);
+        var expectedSize = dashboardDisplay.Bounds.Size;
+
+        ui.Click("NavButton2");
+        ui.Click("PageAdd");
+        ui.Control<TextBox>("PageLine1").Text = "12345678901234567890";
+        ui.Control<TextBox>("PageLine2").Text = "ABCDEFGHIJKLMNOPQRST";
+        await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("PagePreview2").Text == "ABCDEFGHIJKLMNOPQRST");
+        await Task.Delay(60);
+        ui.Window.UpdateLayout();
+        var scroll = ui.Control<ScrollViewer>("PagesView");
+        scroll.Offset = new Vector(0, double.MaxValue);
+        await ui.CaptureAsync($"pages-vfd-{(german ? "de" : "en")}-{width}x{height}");
+        var first = ui.Control<TextBlock>("PagePreview1");
+        var second = ui.Control<TextBlock>("PagePreview2");
+        var display = Assert.IsType<Border>(Assert.IsType<StackPanel>(first.Parent).Parent);
+        Assert.InRange(scroll.Offset.Y, Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height) - 1,
+            Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height) + 1);
+        Assert.Equal(20, first.Text!.Length);
+        Assert.Equal(20, second.Text!.Length);
+        Assert.Equal(dashboardFirst.FontSize, first.FontSize);
+        Assert.InRange(Math.Abs(display.Bounds.Width - expectedSize.Width), 0, 1);
+        Assert.InRange(Math.Abs(display.Bounds.Height - expectedSize.Height), 0, 1);
+        Assert.True(first.Bounds.Width >= first.DesiredSize.Width - 1);
+        Assert.True(second.Bounds.Width >= second.DesiredSize.Width - 1);
+
+        ui.Control<TextBox>("PageLine1").Text = "";
+        ui.Control<TextBox>("PageLine2").Text = "";
+        await Fixture.WaitUntilAsync(() => first.Text == new string(' ', 20) && second.Text == new string(' ', 20));
+        ui.Window.UpdateLayout();
+        Assert.InRange(Math.Abs(display.Bounds.Width - expectedSize.Width), 0, 1);
+        Assert.InRange(Math.Abs(display.Bounds.Height - expectedSize.Height), 0, 1);
+        ui.Control<ListBox>("PagesList").SelectedIndex = -1;
+        await Fixture.WaitUntilAsync(() => first.Text == new string(' ', 20) && second.Text == new string(' ', 20));
+        ui.Window.UpdateLayout();
+        Assert.InRange(Math.Abs(display.Bounds.Width - expectedSize.Width), 0, 1);
+        Assert.InRange(Math.Abs(display.Bounds.Height - expectedSize.Height), 0, 1);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(950, 600, false)]
+    [InlineData(1305, 893, false)]
+    [InlineData(950, 600, true)]
+    [InlineData(1305, 893, true)]
     public async Task DashboardPreviewFitsTwentyColumnsAndTwoRows(int width, int height, bool german)
     {
         await using var ui = await Fixture.OpenAsync(new PortableWorkspace());

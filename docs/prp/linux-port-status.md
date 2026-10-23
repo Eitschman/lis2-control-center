@@ -1,6 +1,6 @@
 # Avalonia-Portierung: aktueller Arbeitsstand
 
-Stand: 23.10.2026. Hauptbranch ist `main`; veröffentlicht ist v0.1.4 mit kompakter Dashboard-VFD-Vorschau und passender Kartenanordnung.
+Stand: 23.10.2026. Hauptbranch ist `main`; veröffentlicht ist v0.1.4. Releaseziel v0.1.5 vereinheitlicht die kompakte VFD-Vorschau in Übersicht und Seiteneditor.
 Implementierungsstand: PORT-08 mit geprüften Archivstarts für Windows x64, Linux x64 und nativem Linux ARM64 sowie Debian-Paketen auf amd64/arm64. Die PORT-06B-Funktionen sind enthalten. Reale HA-/Playernachweise sowie Desktop-/Geräteabnahme bleiben offen.
 Aktueller Zusatzumfang: **Windows Media Player Legacy** mit Medienkarte, Metadaten-/Audiopipes, VU, zwanzig Spektrumbändern, Displayvariablen, drei Presets und fünfsprachiger Hilfe. Der gemeinsame Workflow baut beide nativen Plug-ins für x86/x64; Release v0.1.4 enthält beide Pakete mit eingebundener C/C++-Laufzeit. Reale Legacy-Playerprüfung bleibt offen.
 
@@ -20,6 +20,8 @@ Die About-/README-Ergänzung für v0.1.2 besteht lokal den Solution-Build ohne W
 Anforderungen stehen im [PRP](linux-avalonia-port.md), Restarbeiten in [TODO](../../TODO.md), Plattformgrenzen im [Inventar](linux-port-inventory.md) und Bedienungsunterschiede im [Paritätsaudit](wpf-avalonia-parity-audit.md).
 
 ## PORT-08: Avalonia 11.3.22
+
+Übersicht und Seiteneditor verwenden gemeinsame VFD-Styles mit Schriftgröße 24 und einer an den beiden Zeichenzeilen bemessenen Fläche. Feste Pixelmaße im Seiteneditor entfallen. Leere Zeilen und aufgehobene Seitenauswahl behalten zwanzig Zeichenplätze. Die Schriftfamilienauswahl enthält Consolas, DejaVu Sans Mono und Liberation Mono. Vier zusätzliche Layoutregressionen vergleichen beide Vorschauen auf Deutsch/Englisch bei 950 × 600 und 1305 × 893 einschließlich leerem Inhalt und aufgehobener Auswahl. Die Gegenproben mit der abweichenden Schriftgröße und mit der festen Fläche scheitern jeweils in allen vier Fällen. Die deutschen Seiteneditoransichten wurden bei beiden Fenstergrößen angesehen. Lokal bestehen 477 Avalonia-Tests mit einem übersprungenen Linux-Schlüsselbundtest; actionlint besteht. Die Suche im Anwendungs- und Werkzeugcode findet genau diese zwei VFD-Vorschauen; Glyphen- und Lüfterkurvenvorschauen bilden andere Inhalte ab.
 
 Die Dashboard-VFD-Fläche richtet sich nach den tatsächlichen 20 × 2 Zeichen mit unveränderter Schriftgröße und unverändertem Innenabstand. Die Karte erhält die passende Breite; Status und Schnellzugriff nutzen den restlichen Platz, Schnellzugriff-Schaltflächen brechen bei Bedarf um. Vier Layoutregressionen prüfen Deutsch/Englisch bei 950 × 600 und 1305 × 893. Gegenproben erkennen die feste Vorschaufläche und die zu breite Karte. Beide deutschen Windows-Skia-Ansichten sowie die Linux-Skia-Ansicht bei 950 × 600 wurden angesehen; alle zwanzig Zeichen beider Zeilen sind sichtbar. Zusätzlich wurden die nativen Dashboard-Screenshots unter Windows und Linux bei 150 Prozent angesehen. Lokal bestehen 14 Geräte-UI-Tests und die Avalonia-Suite mit 473 erfolgreichen Tests sowie einem übersprungenen Linux-Schlüsselbundtest. Die Release-Pipeline bestätigt Windows 473 erfolgreich plus einen übersprungenen Test und Linux 474 erfolgreich.
 

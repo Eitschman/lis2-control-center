@@ -5,6 +5,23 @@
         Title="LIS2 Control Center"
         Width="1305" Height="893" MinWidth="950" MinHeight="600"
         WindowStartupLocation="CenterScreen" Background="{DynamicResource Lis2SurfaceBrush}">
+  <Window.Styles>
+    <Style Selector="Border.vfdDisplay">
+      <Setter Property="Background" Value="#123B8A" />
+      <Setter Property="BorderBrush" Value="#5D8FE8" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="8,12" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="ClipToBounds" Value="True" />
+    </Style>
+    <Style Selector="TextBlock.vfdLine">
+      <Setter Property="FontFamily" Value="Consolas,DejaVu Sans Mono,Liberation Mono" />
+      <Setter Property="FontSize" Value="24" />
+      <Setter Property="Foreground" Value="#F7FBFF" />
+      <Setter Property="TextWrapping" Value="NoWrap" />
+    </Style>
+  </Window.Styles>
   <Grid ColumnDefinitions="250,*">
     <Border Grid.Column="0" Background="{DynamicResource Lis2SidebarBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="0,0,1,0">
       <Grid Margin="16" RowDefinitions="Auto,*,Auto">
@@ -49,11 +66,10 @@
             <Border Background="{DynamicResource Lis2CardBrush}" Grid.Column="0" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16" VerticalAlignment="Top">
               <StackPanel Spacing="12">
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
-                <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6"
-                        HorizontalAlignment="Left" ClipToBounds="True" Padding="8,12">
+                <Border Classes="vfdDisplay">
                   <StackPanel HorizontalAlignment="Left" Spacing="0">
-                    <TextBlock Name="PreviewLine1" Text="                    " FontFamily="Consolas" FontSize="24" Foreground="#F7FBFF" TextWrapping="NoWrap" />
-                    <TextBlock Name="PreviewLine2" Text="                    " FontFamily="Consolas" FontSize="24" Foreground="#F7FBFF" TextWrapping="NoWrap" />
+                    <TextBlock Name="PreviewLine1" Classes="vfdLine" Text="                    " />
+                    <TextBlock Name="PreviewLine2" Classes="vfdLine" Text="                    " />
                   </StackPanel>
                 </Border>
                 <Button Name="VirtualDemo" Content="Send demo display" IsEnabled="False" HorizontalAlignment="Left" />
@@ -302,10 +318,10 @@
                 <TextBlock Text="Live VFD preview" FontWeight="SemiBold" FontSize="16"/>
                 <TextBlock Grid.Column="1" Name="PagePlaybackStatus" Text="Sequence stopped" Opacity="0.75" VerticalAlignment="Center"/>
               </Grid>
-              <Border Background="#123B8A" BorderBrush="#5D8FE8" BorderThickness="1" CornerRadius="6" Padding="8,12" HorizontalAlignment="Left" Width="402" Height="112" ClipToBounds="True">
-                <StackPanel Width="384" HorizontalAlignment="Left" Spacing="0">
-                  <TextBlock Name="PagePreview1" Width="384" FontFamily="Consolas" FontSize="30" Foreground="#F7FBFF" TextWrapping="NoWrap"/>
-                  <TextBlock Name="PagePreview2" Width="384" FontFamily="Consolas" FontSize="30" Foreground="#F7FBFF" TextWrapping="NoWrap"/>
+              <Border Classes="vfdDisplay">
+                <StackPanel Spacing="0">
+                  <TextBlock Name="PagePreview1" Classes="vfdLine" Text="                    "/>
+                  <TextBlock Name="PagePreview2" Classes="vfdLine" Text="                    "/>
                 </StackPanel>
               </Border>
               <WrapPanel>

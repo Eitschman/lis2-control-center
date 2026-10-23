@@ -291,8 +291,8 @@ public partial class MainWindow
     {
         _editorPreviewTimer.Stop();
         _editorPreviewConfigured = false;
-        this.FindControl<TextBlock>("PagePreview1")!.Text = string.Empty;
-        this.FindControl<TextBlock>("PagePreview2")!.Text = string.Empty;
+        this.FindControl<TextBlock>("PagePreview1")!.Text = new string(' ', 20);
+        this.FindControl<TextBlock>("PagePreview2")!.Text = new string(' ', 20);
     }
 
     private async Task MovePageAsync(int offset)
