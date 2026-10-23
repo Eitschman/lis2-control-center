@@ -38,7 +38,10 @@ public sealed class DeviceUiTests
         ui.Control<TextBox>("PageLine1").Text = "12345678901234567890";
         ui.Control<TextBox>("PageLine2").Text = "ABCDEFGHIJKLMNOPQRST";
         await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("PagePreview2").Text == "ABCDEFGHIJKLMNOPQRST");
-        await Task.Delay(60);
+        // PageAdd fokussiert den Namen; dessen verzögertes BringIntoView darf die Aufnahme nicht zurückscrollen.
+        ui.Control<Button>("PageSave").Focus();
+        await global::Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { },
+            global::Avalonia.Threading.DispatcherPriority.Background);
         ui.Window.UpdateLayout();
         var scroll = ui.Control<ScrollViewer>("PagesView");
         scroll.Offset = new Vector(0, double.MaxValue);
