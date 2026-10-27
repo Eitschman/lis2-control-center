@@ -128,7 +128,8 @@ public partial class MainWindow
         if (_mediaStopping) return;
         if (!OperatingSystem.IsWindows())
         {
-            if (_mediaRefresh.IsCompleted) _mediaRefresh = RefreshMprisAsync();
+            // Ohne Hintergrundquellen darf auch der UI-Timer keine echten Playerabfragen starten.
+            if (_startBackgroundSources && _mediaRefresh.IsCompleted) _mediaRefresh = RefreshMprisAsync();
             return;
         }
         RefreshMediaProvider("WindowsMedia", RefreshWindowsMedia);
