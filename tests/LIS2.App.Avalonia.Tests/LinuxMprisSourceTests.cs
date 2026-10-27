@@ -4,6 +4,71 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class LinuxMprisSourceTests
 {
+    [Fact]
+    public async Task RealPlayerctlReadsRadioAndFileFromPrivateMprisBus()
+    {
+        if (!OperatingSystem.IsLinux()) return;
+        var info = new System.Diagnostics.ProcessStartInfo("dbus-run-session")
+        {
+            RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false
+        };
+        info.ArgumentList.Add("--");
+        info.ArgumentList.Add("/usr/bin/python3");
+        info.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "TestData", "mpris_service.py"));
+        using var fixture = System.Diagnostics.Process.Start(info)!;
+        var errors = fixture.StandardError.ReadToEndAsync();
+        try
+        {
+            var ready = await fixture.StandardOutput.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(10));
+            Assert.False(string.IsNullOrEmpty(ready), "Private MPRIS fixture failed: " + (fixture.HasExited ? await errors : "no startup output"));
+            using var document = System.Text.Json.JsonDocument.Parse(ready!);
+            var address = document.RootElement.GetProperty("address").GetString()!;
+            var source = new LinuxMprisSource(command: (arguments, cancellation) =>
+                LinuxMprisSource.ExecuteAsync("/usr/bin/env", new[] { "DBUS_SESSION_BUS_ADDRESS=" + address, "playerctl" }.Concat(arguments).ToArray(),
+                    cancellation, TimeSpan.FromSeconds(5)));
+            foreach (var (player, artist, title) in new[] {
+                ("lis2radio", "RADIO BOB - Symphonic Metal", "Eleine - We Are Legion"),
+                ("lis2file", "Björk", "Jóga & <Live>"),
+                ("lis2empty", "", "Artist - Combined stream title") })
+            {
+                var snapshot = await source.ReadSnapshotAsync(player);
+                Assert.Equal(true, snapshot.Values["Connected"]);
+                Assert.Equal(artist, snapshot.Values["Artist"]);
+                Assert.Equal(title, snapshot.Values["Title"]);
+            }
+        }
+        finally
+        {
+            if (!fixture.HasExited) fixture.Kill(entireProcessTree: true);
+            await fixture.WaitForExitAsync();
+            await errors;
+        }
+    }
+
+    [Theory]
+    [InlineData("RADIO BOB - Symphonic Metal", "Eleine - We Are Legion")]
+    [InlineData("Björk", "Jóga")]
+    [InlineData("", "Artist - Combined stream title")]
+    public async Task StreamAndFileMetadataStayUnmodified(string artist, string title)
+    {
+        var metadata = new System.Xml.Linq.XElement("media",
+            new System.Xml.Linq.XElement("state", "Playing"),
+            new System.Xml.Linq.XElement("artist", artist),
+            new System.Xml.Linq.XElement("title", title),
+            new System.Xml.Linq.XElement("album", ""),
+            new System.Xml.Linq.XElement("elapsed", ""),
+            new System.Xml.Linq.XElement("duration", "")).ToString();
+        var source = new LinuxMprisSource(command: (arguments, _) => Task.FromResult(
+            new PlayerctlResult(0, arguments[0] == "--list-all" ? "tuner\n" : metadata, "")));
+        var snapshot = await source.ReadSnapshotAsync("tuner");
+        Assert.Equal(artist, snapshot.Values["Artist"]);
+        Assert.Equal(title, snapshot.Values["Title"]);
+        var values = snapshot.Values.ToDictionary(pair => "Media." + pair.Key, pair => pair.Value);
+        Assert.Equal(artist.Length == 0 ? "--" : artist, new LIS2.Display.TemplateRenderer().Render(
+            "{Media.Artist|fallback:--}", values));
+        Assert.DoesNotContain("StreamName", snapshot.Values.Keys);
+    }
+
     internal const string Metadata = "<media><state>Playing</state><title>A | B &amp; &lt;C&gt;\nTitel</title>" +
         "<artist>Connected</artist><album>Album</album><elapsed>65000000</elapsed><duration>90061000000</duration></media>";
 

@@ -13,6 +13,8 @@ internal static class WindowsMediaSmoke
             await bridge.StartAsync().WaitAsync(TimeSpan.FromSeconds(15));
             if (!bridge.IsAvailable || !bridge.Values.TryGetValue("Connected", out var connected) || connected is not bool)
                 throw new InvalidOperationException("GSMTC provider did not supply its connection state.");
+            if (!bridge.Values.ContainsKey("Subtitle"))
+                throw new InvalidOperationException("GSMTC provider did not supply the subtitle contract.");
             await File.WriteAllTextAsync(Path.Combine(directory, "provider.txt"), "PASS: packaged provider loaded; Connected=" + connected);
             await bridge.DisposeAsync();
             if (bridge.IsAvailable || !Equals(bridge.Values["Connected"], false))

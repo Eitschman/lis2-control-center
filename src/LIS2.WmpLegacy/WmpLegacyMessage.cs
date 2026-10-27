@@ -7,6 +7,9 @@ public sealed class WmpLegacyMessage
     public string? Artist { get; set; }
     public string? Title { get; set; }
     public string? Album { get; set; }
+    public string? StreamName { get; set; }
+    public string? StreamUrl { get; set; }
+    public bool? IsStream { get; set; }
     public int? TrackNumber { get; set; }
     public int? PlaylistCount { get; set; }
     public double? ElapsedSeconds { get; set; }

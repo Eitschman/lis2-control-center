@@ -4,6 +4,23 @@ namespace LIS2.WindowsMedia.Tests;
 
 public sealed class WindowsMediaValuesTests
 {
+    [Theory]
+    [InlineData("Björk", "Björk")]
+    [InlineData(null, "Unveränderter Untertitel")]
+    public void SubtitleIsAnExplicitReplacementAndDoesNotOverwriteArtist(string? artist, string expected)
+    {
+        var snapshot = new WindowsMediaSnapshot("Microsoft.ZuneMusic", WindowsMediaPlaybackState.Playing,
+            artist, "Titel", null, null, null, null, null, null, null, "Unveränderter Untertitel");
+        var mapped = WindowsMediaValues.FromSnapshot(snapshot);
+        Assert.Equal(artist, mapped["Artist"]);
+        Assert.Equal("Unveränderter Untertitel", mapped["Subtitle"]);
+        Assert.DoesNotContain("StreamName", mapped.Keys);
+        var values = mapped.ToDictionary(pair => "WindowsMedia." + pair.Key, pair => pair.Value);
+        Assert.Equal(expected, new LIS2.Display.TemplateRenderer().Render(
+            "{WindowsMedia.Artist|fallbackvar:WindowsMedia.Subtitle|fallback:--}", values));
+        Assert.Null(WindowsMediaValues.FromSnapshot(snapshot with { Subtitle = null })["Subtitle"]);
+    }
+
     [Fact]
     public void Snapshot_ExposesCommonDisplayValues()
     {

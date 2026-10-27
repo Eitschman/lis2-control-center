@@ -8,4 +8,7 @@ public sealed record WmpLegacySnapshot(
     int? TrackNumber,
     int? PlaylistCount,
     TimeSpan? Elapsed,
-    TimeSpan? Duration);
+    TimeSpan? Duration,
+    string? StreamName = null,
+    string? StreamUrl = null,
+    bool? IsStream = null);

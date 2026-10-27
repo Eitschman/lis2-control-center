@@ -4,6 +4,33 @@ namespace LIS2.WmpLegacy.Tests;
 
 public sealed class WmpLegacyMappingTests
 {
+    [Theory]
+    [InlineData("Björk", "Björk")]
+    [InlineData(null, "RADIO BOB")]
+    public async Task StreamMetadataSurvivesJsonAndClearsOnFileOrOldPlugin(string? artist, string expected)
+    {
+        var message = WmpLegacyPipeServer.DeserializeMessage(
+            "{\"type\":\"snapshot\",\"state\":\"playing\",\"artist\":" +
+            System.Text.Json.JsonSerializer.Serialize(artist) +
+            ",\"title\":\"東京\",\"streamName\":\"RADIO BOB\",\"streamUrl\":\"https://example.invalid/radio\",\"isStream\":true}");
+        Assert.NotNull(message);
+        await using var source = new WmpLegacyDataSource();
+        source.ApplySnapshot(WmpLegacyPipeServer.ToSnapshot(message));
+        Assert.Equal(artist, source.Values["Artist"]);
+        Assert.Equal("東京", source.Values["Title"]);
+        Assert.Equal("https://example.invalid/radio", source.Values["StreamUrl"]);
+        Assert.Equal(true, source.Values["IsStream"]);
+        var values = source.Values.ToDictionary(pair => "WmpLegacy." + pair.Key, pair => pair.Value);
+        Assert.Equal(expected, new LIS2.Display.TemplateRenderer().Render(
+            "{WmpLegacy.Artist|fallbackvar:WmpLegacy.StreamName|fallback:--}", values));
+        source.ApplySnapshot(WmpLegacyPipeServer.ToSnapshot(new WmpLegacyMessage { Artist = "File artist", IsStream = false }));
+        Assert.Null(source.Values["StreamName"]);
+        Assert.Null(source.Values["StreamUrl"]);
+        Assert.Equal(false, source.Values["IsStream"]);
+        source.ApplySnapshot(WmpLegacyPipeServer.ToSnapshot(new WmpLegacyMessage()));
+        Assert.Null(source.Values["IsStream"]);
+    }
+
     [Fact]
     public void PipeMessage_MapsToSnapshot()
     {

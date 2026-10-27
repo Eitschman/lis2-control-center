@@ -221,7 +221,8 @@ public sealed class WindowsMediaDataSource : IDataSource
                 media.AlbumTrackCount == 0 ? null : (int?)media.AlbumTrackCount,
                 timeline.Position,
                 duration,
-                playback.PlaybackRate);
+                playback.PlaybackRate,
+                NullIfBlank(media.Subtitle));
 
             LastSnapshotAt = _timeProvider.GetUtcNow();
             Volatile.Write(ref _values, WindowsMediaValues.FromSnapshot(snapshot));
@@ -243,6 +244,7 @@ public sealed class WindowsMediaDataSource : IDataSource
             ["State"] = WindowsMediaPlaybackState.Unknown.ToString(),
             ["Artist"] = null,
             ["Title"] = null,
+            ["Subtitle"] = null,
             ["Album"] = null,
             ["AlbumArtist"] = null,
             ["TrackNumber"] = null,

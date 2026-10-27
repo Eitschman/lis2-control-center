@@ -6,7 +6,7 @@ Die Windows-App empfängt `WmpLegacy.*` über zwei voneinander unabhängige Name
 
 Beide DLLs binden die C/C++-Laufzeit statisch ein (`/MT` im Release-Build). Eine separate Visual-C++-Redistributable-Installation ist dafür nicht nötig. Die CI prüft die tatsächlichen PE-Importtabellen vor der Paketierung. Sicherheitsaktualisierungen dieser Laufzeit benötigen einen neuen Plug-in-Build mit aktualisierten Buildwerkzeugen. Die MIT-Lizenz gilt für den LIS2-Code; für eingebundene Microsoft-Laufzeitkomponenten gelten deren [Weitergabebedingungen](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files).
 
-1. Das zum **Playerprozess** passende CI-Artefakt `LIS2-WMP-Legacy-win32` oder `LIS2-WMP-Legacy-win64` laden und die SHA-256-Datei prüfen. Die Architektur der Control-Center-App ist dafür unerheblich. Release v0.1.8 enthält beide Architekturen als `LIS2-WMP-Legacy-0.1.8-win32.zip` und `LIS2-WMP-Legacy-0.1.8-win64.zip`.
+1. Das zum **Playerprozess** passende CI-Artefakt `LIS2-WMP-Legacy-win32` oder `LIS2-WMP-Legacy-win64` laden und die SHA-256-Datei prüfen. Die Architektur der Control-Center-App ist dafür unerheblich. Release v0.1.9 enthält beide Architekturen als `LIS2-WMP-Legacy-0.1.9-win32.zip` und `LIS2-WMP-Legacy-0.1.9-win64.zip`.
 2. Das ZIP in einen dauerhaften Ordner entpacken. `background` enthält `lis2_wmp_legacy.dll`, `visualization` enthält `lis2_wmp_legacy_visualization.dll`. Beide Ordner enthalten eigene Anleitungen.
 3. Windows Media Player Legacy schließen. In einer administrativen Eingabeaufforderung beide DLLs mit ihrem vollständigen, in Anführungszeichen gesetzten Pfad registrieren. Unter 64-Bit-Windows für einen x64-Player `%SystemRoot%\System32\regsvr32.exe` verwenden, für einen x86-Player `%SystemRoot%\SysWOW64\regsvr32.exe`. Beispiel für x64:
 
@@ -21,6 +21,21 @@ Beide DLLs binden die C/C++-Laufzeit statisch ein (`/MT` im Release-Build). Eine
 Zum Entfernen den Player schließen und dieselben Registrierungsbefehle mit `/u` ausführen. Erst danach die DLL-Dateien verschieben oder löschen. Die Anwendung registriert keine DLL automatisch und benötigt für ihren normalen Betrieb keine Administratorrechte.
 
 ## Medienkarte und Displayseiten
+
+### Sendername als Ersatz für den Interpreten
+
+`WmpLegacy.StreamName` liest das dokumentierte Attribut `WM/RadioStationName` des aktuellen Netzwerkmediums. Es bleibt leer, wenn der Player dieses Feld nicht liefert. `WmpLegacy.StreamUrl` enthält die Wiedergabeadresse; `WmpLegacy.IsStream` ist bei einer Nicht-Datei-URL wahr. Bei lokalen Dateien bleiben die Streamfelder leer und IsStream ist falsch. Ältere Hintergrund-DLLs liefern diese Felder nicht. Der Interpret wird nicht automatisch überschrieben, ein zusammengesetzter Titel wird nicht aufgeteilt.
+
+```text
+{WmpLegacy.Artist|fallbackvar:WmpLegacy.StreamName|fallback:--}
+{WmpLegacy.Title|fallback:--}
+```
+
+Ein echter Interpret hat Vorrang. Fehlen Interpret und Senderfeld, erscheint `--`. Der Formatierungseditor kann StreamName über seinen Ersatzvariablenbrowser einfügen. Das setzt die neue Hintergrund-DLL passend zum Playerprozess voraus. Die Visualisierungs-DLL liefert weiterhin nur Audiotelemetrie.
+
+Beim modernen Player steht stattdessen `WindowsMedia.Subtitle` für den unveränderten GSMTC-Untertitel zur Verfügung. Diese Schnittstelle hat kein eigenes Senderfeld und keine Stream-URL. `{WindowsMedia.Artist|fallbackvar:WindowsMedia.Subtitle|fallback:--}` ist eine ausdrückliche Untertitel-Auswahl, keine zugesicherte Sendererkennung.
+
+Linux übernimmt `Media.Artist` und `Media.Title` aus MPRIS unverändert. Bei Tuner kann Artist bereits den Sendernamen enthalten. MPRIS definiert kein standardisiertes Senderfeld; LIS2 erfindet deshalb keines.
 
 Die Karte zeigt Metadatenverbindung und Visualisierungsverbindung getrennt an. Metadaten gelten nach drei Sekunden ohne Snapshot als getrennt, Audio nach zwei Sekunden. Veraltete Titel verschwinden aus Karte und Seitenwerten; abgelaufene Audiowerte werden geleert. Die Listener nehmen nach dem Ende einer Playersitzung neue Verbindungen an.
 

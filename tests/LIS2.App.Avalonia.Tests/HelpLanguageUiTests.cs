@@ -101,6 +101,24 @@ public sealed class HelpLanguageUiTests
                 Assert.NotNull(frame);
                 frame.Save(Path.Combine(screenshots, "help-details-" + preference + ".png"));
             }
+            language.SelectedIndex = preference switch { "English" => 1, "French" => 3, "Turkish" => 4, "Russian" => 5, _ => 2 };
+            sections.SelectedIndex = 3;
+            await Task.Delay(50);
+            help.UpdateLayout();
+            var legacyExample = help.GetVisualDescendants().OfType<TextBlock>().Single(text =>
+                text.Text?.StartsWith("{WmpLegacy.Artist|fallbackvar:WmpLegacy.StreamName|fallback:--}") == true);
+            Assert.Contains(help.GetVisualDescendants().OfType<TextBlock>(), text =>
+                text.Text?.StartsWith("{WindowsMedia.Artist|fallbackvar:WindowsMedia.Subtitle|fallback:--}") == true);
+            Assert.Contains(help.GetVisualDescendants().OfType<TextBlock>(), text =>
+                text.Text?.StartsWith("{Media.Artist|fallback:--}\n{Media.Title|fallback:--}") == true);
+            legacyExample.BringIntoView();
+            await Task.Delay(50);
+            help.UpdateLayout();
+            using (var frame = help.CaptureRenderedFrame())
+            {
+                Assert.NotNull(frame);
+                frame.Save(Path.Combine(screenshots, "help-wmp-stream-" + preference + ".png"));
+            }
             help.Close();
         }
         finally

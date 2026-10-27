@@ -11,4 +11,5 @@ public sealed record WindowsMediaSnapshot(
     int? AlbumTrackCount,
     TimeSpan? Position,
     TimeSpan? Duration,
-    double? PlaybackRate);
+    double? PlaybackRate,
+    string? Subtitle = null);

@@ -65,7 +65,9 @@ Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nich
 
 ## Vorhandene Basis
 
-- [x] Ersatzvariablen über `fallbackvar` mit abschließendem festem Ersatztext; Editor mit eigenem Variablenbrowser und fünfsprachiger Hilfe. Winamp liefert Unicode-Streamdaten, Quellenart und Titelherkunft; native IPC-Regressionen decken Datei-/Streamwechsel ab. Aktuelle Prüfnachweise stehen im Status; reale Winamp-Wiedergabe bleibt getrennt offen.
+- [x] WMP Legacy liefert echte Radio-Senderfelder, Netzwerkadresse und Streamkennzeichen; der moderne Media Player bietet den unveränderten GSMTC-Untertitel als ausdrücklich wählbare Ersatzvariable. Die fünfsprachige Medienhilfe erklärt Unterschiede und Beispiele. Linux erhält den vom Player gelieferten Artist; echte playerctl-Abfragen auf einem privaten MPRIS-Testbus prüfen Streams und normale Musikdateien. Legacy-Installation und Praxisprüfung übernimmt der Benutzer.
+
+- [x] Ersatzvariablen über `fallbackvar` mit abschließendem festem Ersatztext; Editor mit eigenem Variablenbrowser und fünfsprachiger Hilfe. Winamp liefert Unicode-Streamdaten, Quellenart und Titelherkunft; native IPC-Regressionen decken Datei-/Streamwechsel ab. Aktuelle Prüfnachweise stehen im Status; realer Radio-BOB-Streambetrieb ist unter Winamp 5.9.2.10042 bestätigt; lokale MP3-Wiedergabe bleibt manuell offen.
 
 - [x] Leerzeichen an Anfang und Ende von Präfix, Suffix und Ersatztext erhalten; Renderer, Editorvorschau und gespeicherte Vorlagen sind durch Regressionen geprüft. Herkunft der Winamp-Felder und Verhalten bei zusammengesetzten Streamtiteln sind dokumentiert.
 

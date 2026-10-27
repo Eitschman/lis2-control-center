@@ -10,6 +10,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <ProjectReference Include="..\..\src\LIS2.WmpLegacy\LIS2.WmpLegacy.csproj" />
+    <ProjectReference Include="..\..\src\LIS2.Display\LIS2.Display.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />

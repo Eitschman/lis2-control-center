@@ -284,6 +284,35 @@ void AppendJsonString(
          << "\"";
 }
 
+struct StreamMetadata
+{
+    std::wstring name;
+    std::wstring url;
+    bool isStream = false;
+};
+
+// Nur echte Radiometadaten verwenden; Dateinamen und zusammengesetzte Titel sind keine Sendernamen.
+StreamMetadata ReadStreamMetadata(IDispatch* media)
+{
+    StreamMetadata result;
+    const auto source = ReadStringProperty(media, L"sourceURL");
+    result.isStream = source.find(L"://") != std::wstring::npos &&
+        _wcsnicmp(source.c_str(), L"file:", 5) != 0;
+    if (result.isStream)
+    {
+        result.url = source;
+        result.name = ReadItemInfo(media, L"WM/RadioStationName");
+    }
+    return result;
+}
+
+void AppendStreamMetadata(std::ostringstream& json, const StreamMetadata& metadata)
+{
+    AppendJsonString(json, "streamName", metadata.name);
+    AppendJsonString(json, "streamUrl", metadata.url);
+    json << ",\"isStream\":" << (metadata.isStream ? "true" : "false");
+}
+
 bool WritePipeLine(const std::string& payload)
 {
     HANDLE pipe = CreateFileW(
@@ -516,6 +545,7 @@ public:
         AppendJsonString(json, "artist", artist);
         AppendJsonString(json, "title", title);
         AppendJsonString(json, "album", album);
+        AppendStreamMetadata(json, ReadStreamMetadata(media));
 
         if (trackNumber >= 0)
             json << ",\"trackNumber\":" << trackNumber;

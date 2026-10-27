@@ -128,7 +128,10 @@ public sealed class WmpLegacyPipeServer : IAsyncDisposable
             message.TrackNumber,
             message.PlaylistCount,
             ToTimeSpan(message.ElapsedSeconds),
-            ToTimeSpan(message.DurationSeconds));
+            ToTimeSpan(message.DurationSeconds),
+            message.StreamName,
+            message.StreamUrl,
+            message.IsStream);
 
     private static WmpLegacyPlaybackState ParseState(string? value) =>
         value?.Trim().ToLowerInvariant() switch

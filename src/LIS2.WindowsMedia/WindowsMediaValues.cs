@@ -12,6 +12,7 @@ public static class WindowsMediaValues
             ["State"] = snapshot.State.ToString(),
             ["Artist"] = snapshot.Artist,
             ["Title"] = snapshot.Title,
+            ["Subtitle"] = snapshot.Subtitle,
             ["Album"] = snapshot.Album,
             ["AlbumArtist"] = snapshot.AlbumArtist,
             ["TrackNumber"] = snapshot.TrackNumber,
