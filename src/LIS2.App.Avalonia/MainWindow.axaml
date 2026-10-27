@@ -270,9 +270,9 @@
                 <TextBlock Grid.Row="0" Text="Name" />
                 <TextBox Name="PageName" Grid.Row="0" Grid.Column="1" />
                 <TextBlock Grid.Row="1" Text="Line 1" />
-                <TextBox Name="PageLine1" Grid.Row="1" Grid.Column="1" ToolTip.Tip="{StaticResource PageFormattingHint}" />
+                <TextBox Name="PageLine1" Grid.Row="1" Grid.Column="1" ToolTip.Tip="{StaticResource PageFormattingHint}" ToolTip.Placement="Bottom" />
                 <TextBlock Grid.Row="2" Text="Line 2" />
-                <TextBox Name="PageLine2" Grid.Row="2" Grid.Column="1" ToolTip.Tip="{StaticResource PageFormattingHint}" />
+                <TextBox Name="PageLine2" Grid.Row="2" Grid.Column="1" ToolTip.Tip="{StaticResource PageFormattingHint}" ToolTip.Placement="Bottom" />
                 <TextBlock Grid.Row="3" Text="Duration (s)" />
                 <WrapPanel Grid.Row="3" Grid.Column="1">
                   <TextBox Margin="0,0,8,8" Name="PageDuration" Width="90" />

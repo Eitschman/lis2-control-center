@@ -99,8 +99,16 @@ public sealed class DeviceUiTests
             Assert.Equal("Clock.Year", ui.Control<TextBox>("FormatVariable").Text);
             var input = ui.Control<TextBox>("PageLine1");
             input.Focus();
+            await global::Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { },
+                global::Avalonia.Threading.DispatcherPriority.Background);
             ui.Window.KeyPressQwerty(PhysicalKey.F1, RawInputModifiers.None);
             Assert.True(ToolTip.GetIsOpen(input));
+            Assert.Equal(PlacementMode.Bottom, ToolTip.GetPlacement(input));
+            if (width == 1305)
+            {
+                await Task.Delay(200);
+                await ui.CaptureAsync("formatting-tooltip-de");
+            }
             ui.Window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
             Assert.False(ToolTip.GetIsOpen(input));
             ui.Control<ListBox>("PagesList").SelectedIndex = -1;
