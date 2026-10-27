@@ -6,7 +6,7 @@
 
 Die neue Winamp-DLL fragt UTF-16-Metadaten für Dateien und Streams ab. `Winamp.StreamName`, `StreamTitle`, `StreamGenre`, `StreamUrl` und `IsStream` stehen zusätzlich bereit. `TitleSource` nennt die Titelherkunft auch im Diagnosebericht. Lokale MP3s verwenden ihre Tags; Streams bevorzugen den aktuellen Streamtitel. Der gemeinsame Streamtitel wird nicht aufgeteilt und Artist nicht automatisch durch einen Sendernamen ersetzt. Die vom Decoder gelieferte StreamUrl kann von der Wiedergabeadresse abweichen.
 
-Metadaten werden auf Winamps Fensterthread erfasst und zwischengespeichert; Pegel und Spektrum werden alle 200 ms, Metadaten spätestens nach einer Sekunde und bei erkanntem Quellen-/Anzeigetitelwechsel aktualisiert. Ein während der Abfrage erkannter Quellenwechsel verwirft den Snapshot. Quellenwechsel und Stop leeren alte Metadaten. Der Pipe-Thread überträgt nur fertige Snapshots.
+Metadaten werden auf Winamps Fensterthread erfasst und zwischengespeichert; Pegel und Spektrum werden alle 200 ms, Metadaten spätestens nach einer Sekunde und bei erkanntem Quellen-/Anzeigetitelwechsel aktualisiert. Ein während der Abfrage erkannter Quellenwechsel verwirft den Snapshot. Quellenwechsel und Stop leeren alte Metadaten. Der Pipe-Thread überträgt jeden erfassten Snapshot höchstens einmal, damit ein hängender Player als veraltet erkennbar bleibt.
 
 **Winamp 5.5 oder neuer:** Winamp schließen, `gen_lis2.dll` im Plugins-Verzeichnis ersetzen und den Player neu starten. Ältere DLLs liefern die neuen Felder nicht. Der native IPC-Test verwendet ein Testfenster; reale Wiedergabe im jeweiligen Winamp bleibt ein eigener Praxisnachweis.
 

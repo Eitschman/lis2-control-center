@@ -128,6 +128,16 @@ int main()
     {
         Require(window != nullptr, "test window creation");
         CheckMetadata(window);
+        g_pipe = CreateFileW(L"NUL", GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+            nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        Require(g_pipe != INVALID_HANDLE_VALUE, "test output creation");
+        g_latestSnapshot = BuildSnapshotJson(window);
+        Require(!g_latestSnapshot.empty(), "captured snapshot available");
+        SendSnapshot();
+        Require(g_latestSnapshot.empty(), "captured snapshots are consumed only once");
+        SendSnapshot();
+        Require(g_latestSnapshot.empty(), "no repeated stale snapshot");
+        ClosePipe();
         g_plugin.hwndParent = window;
         Require(PluginInit() == 0, "plugin initialization");
         const auto timer = g_timer;

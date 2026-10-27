@@ -363,7 +363,8 @@ void SendSnapshot()
     std::string payload;
     {
         std::lock_guard<std::mutex> lock(g_snapshotMutex);
-        payload = g_latestSnapshot;
+        // Jeder erfasste Stand wird höchstens einmal gesendet, damit ein hängender Player als veraltet erkennbar bleibt.
+        payload.swap(g_latestSnapshot);
     }
     if (payload.empty()) return;
     payload.push_back('\n');
