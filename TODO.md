@@ -7,6 +7,13 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 ## Roadmap: Weiterentwicklung nach v0.1.3
 
+### Winamp-Aktualisierung und Dashboard
+
+- [x] Winamp-Audioerfassung auf 100 ms stellen und neue Snapshots sofort an den Pipe-Worker melden.
+- [x] Empfangene Winamp-Audiowerte und moderne WMP-Metadaten über den tatsächlichen UI-Timer prüfen.
+- [x] Redundanten Systemstatusbereich und Befehlszähler aus dem Dashboard entfernen; Verbindungsanzeige oben rechts erhalten.
+- [ ] Neue Winamp-DLL im realen Player auf Zielsystemen prüfen. Nativer Erfassungs-/Übertragungstest und Gegenproben laufen in GitHub Actions.
+
 ### Aktueller Fehlernachweis: WMP-Legacy-Audio nach Titelwechsel
 
 - [x] Auslöser durch Benutzerprüfung eingegrenzt: automatischer MP3-Titelwechsel; Metadaten laufen weiter, Audiowerte fallen aus.

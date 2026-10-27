@@ -54,7 +54,7 @@ Winamp vor dem Ersetzen schließen. Der aktuelle StreamTitle hat bei Streams Vor
 
 ## Erfassung und Tests
 
-Der 200-ms-Timer erfasst Snapshots im Winamp-Fensterthread. Metadaten werden für bis zu eine Sekunde zwischengespeichert; ein Datei- oder Anzeigetitelwechsel erzwingt eine neue Abfrage. Stop leert den Cache. Datei, Anzeigetitel, Playlistposition und Wiedergabestatus werden vor dem Senden erneut geprüft. Ein abweichender Stand verwirft den Snapshot. Der Worker führt ausschließlich Pipe-I/O mit fertigen UTF-8-Snapshots aus.
+Der 100-ms-Timer erfasst Snapshots im Winamp-Fensterthread. Jeder neue Snapshot weckt den Pipe-Worker sofort; ein zweiter Polling-Takt entfällt. Metadaten werden für bis zu eine Sekunde zwischengespeichert; ein Datei- oder Anzeigetitelwechsel erzwingt eine neue Abfrage. Stop leert den Cache. Datei, Anzeigetitel, Playlistposition und Wiedergabestatus werden vor dem Senden erneut geprüft. Ein abweichender Stand verwirft den Snapshot. Der Worker führt ausschließlich Pipe-I/O mit fertigen UTF-8-Snapshots aus. Die Anwendung übernimmt empfangene Windows-Medienwerte alle 100 ms.
 
 `ctest --test-dir build -C Release --output-on-failure` prüft den echten Snapshotcode gegen ein IPC-Testfenster: Unicode, Datei-/Streamwechsel, Titelprioritäten, fehlende Tags, leere Felder, Metadatencache, Wechsel während einer Abfrage und Shutdown. Die GitHub-Windows-CI führt diesen Test vor dem Upload der DLL aus. Das ersetzt keine reale Winamp-Wiedergabe.
 

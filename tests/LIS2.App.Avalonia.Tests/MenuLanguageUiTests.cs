@@ -28,7 +28,7 @@ public sealed class MenuLanguageUiTests
         try
         {
             window.Show();
-            var markers = new[] { "System Status", "Display controls", "Pages", "Nothing playing",
+            var markers = new[] { "Quick Links", "Display controls", "Pages", "Nothing playing",
                 "Active / queued events", "Hardware monitoring", "Fan channel configuration", "Appearance",
                 "Diagnostics Snapshot", "Home Assistant entities" };
             for (var index = 0; index < markers.Length; index++)

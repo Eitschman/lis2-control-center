@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using LIS2.App.Avalonia;
 using LIS2.WmpLegacy;
+using LIS2.Winamp;
 using System.Reflection;
 using Avalonia.Threading;
 
@@ -12,6 +13,71 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class MediaUiTests
 {
+    public sealed class TestMediaProvider
+    {
+        public IReadOnlyDictionary<string, object?> Values { get; set; } = new Dictionary<string, object?>();
+    }
+
+    [AvaloniaFact]
+    public async Task WinampAudioAndModernWmpUpdatesReachControlsWithinFourHundredMilliseconds()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        var directory = Path.Combine(Path.GetTempPath(), "lis2-all-media-cadence-" + Guid.NewGuid().ToString("N"));
+        var window = new MainWindow(new PortableWorkspaceStore(Path.Combine(directory, "workspace.json")),
+            new PortableHaTokenStore(directory, "no-keyring"), false,
+            _ => throw new InvalidOperationException("No serial hardware in media cadence tests."));
+        var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        var timer = (DispatcherTimer)typeof(MainWindow).GetField("_mediaTimer", flags)!.GetValue(window)!;
+        var winamp = (WinampDataSource)typeof(MainWindow).GetField("_mediaWinamp", flags)!.GetValue(window)!;
+        var bridge = (WindowsMediaBridge)typeof(MainWindow).GetField("_windowsMedia", flags)!.GetValue(window)!;
+        var provider = new TestMediaProvider();
+        typeof(WindowsMediaBridge).GetField("_provider", flags)!.SetValue(bridge, provider);
+        typeof(WindowsMediaBridge).GetField("_values", flags)!.SetValue(bridge, typeof(TestMediaProvider).GetProperty("Values"));
+        typeof(WindowsMediaBridge).GetField("_started", flags)!.SetValue(bridge, true);
+        try
+        {
+            window.Show();
+            Click(window, "NavButton3");
+            timer.Start();
+            foreach (var level in new[] { 32, 96, 160, 224 })
+            {
+                var snapshot = WinampPipeServer.ToSnapshot(new WinampMessage
+                {
+                    State = "playing", Title = "Winamp " + level, VuLeft = level, VuRight = 255 - level,
+                    Spectrum = Enumerable.Repeat(level, 20).ToArray()
+                });
+                typeof(WinampDataSource).GetMethod("ApplySnapshot", flags)!.Invoke(winamp, [snapshot]);
+                var title = "Modern WMP " + level;
+                provider.Values = new Dictionary<string, object?>
+                {
+                    ["Connected"] = true, ["Title"] = title, ["State"] = "Playing",
+                    ["Elapsed"] = "00:" + level, ["Duration"] = "05:00"
+                };
+                var elapsed = System.Diagnostics.Stopwatch.StartNew();
+                while (window.FindControl<ProgressBar>("WinampVuLeft")!.Value != level ||
+                    window.FindControl<TextBlock>("WindowsMediaTitle")!.Text != title)
+                {
+                    Assert.True(elapsed.Elapsed < TimeSpan.FromMilliseconds(400),
+                        "Winamp or modern WMP controls retained the old sample for 400 ms.");
+                    await Task.Delay(10);
+                }
+                Assert.Equal(255 - level, window.FindControl<ProgressBar>("WinampVuRight")!.Value);
+                Assert.All(window.FindControl<Grid>("WinampSpectrumBars")!.Children.Cast<ProgressBar>(),
+                    bar => Assert.Equal(level, bar.Value));
+                Assert.Equal("00:" + level + " / 05:00", window.FindControl<TextBlock>("WindowsMediaTime")!.Text);
+            }
+        }
+        finally
+        {
+            timer.Stop();
+            typeof(WindowsMediaBridge).GetField("_provider", flags)!.SetValue(bridge, null);
+            typeof(WindowsMediaBridge).GetField("_started", flags)!.SetValue(bridge, false);
+            await window.BeginShutdownAsync();
+            window.Close();
+            if (Directory.Exists(directory)) Directory.Delete(directory, true);
+        }
+    }
+
     [AvaloniaFact]
     public async Task LegacyAudioChangesReachActualControlsWithinFourHundredMilliseconds()
     {

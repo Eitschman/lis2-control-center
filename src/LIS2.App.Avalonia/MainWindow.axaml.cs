@@ -212,7 +212,7 @@ public partial class MainWindow : Window
             else await action();
             UpdatePreview();
             SetVirtualStatus(_virtualDevice.IsConnected
-                ? (UiMessage)$"Virtual LIS2: connected ({_virtualDevice.CommandCount} commands)"
+                ? "Virtual LIS2 connected."
                 : "Virtual LIS2: disconnected");
         }
         catch (Exception ex)
@@ -305,13 +305,6 @@ public partial class MainWindow : Window
         this.FindControl<Button>("PageTest")!.IsEnabled = connected && !_settingsTransportBusy && !_serialBusy && !_busy;
         UpdatePagePlaybackControls();
         UpdateDashboardFanControls();
-        var virtualState = this.FindControl<TextBlock>("VirtualStateText");
-        if (virtualState is not null)
-            SetUiText(virtualState, SerialSelected
-                ? connected ? (UiMessage)$"LIS2 connected: {_preferredPortName}" : (UiMessage)$"LIS2 disconnected: {_preferredPortName}"
-                : _virtualDevice.IsConnected
-                    ? (UiMessage)$"Virtual LIS2 connected. Commands: {_virtualDevice.CommandCount}."
-                    : "State available when Virtual transport is active.");
     }
 
     private static readonly string[] SectionNames = { "Dashboard", "Display", "Pages", "Media", "Events", "Hardware", "Fan Control", "Settings", "Diagnostics", "Home Assistant" };

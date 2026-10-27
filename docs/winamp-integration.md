@@ -45,7 +45,7 @@ The plugin does not write to LIS2 hardware. It only gathers Winamp metadata/even
 
 Streams liefern zusätzlich `Winamp.StreamName`, `StreamTitle`, `StreamGenre`, `StreamUrl` und `IsStream`. Title bevorzugt den aktuellen StreamTitle, dann Titelmetadaten, zuletzt den Playlist-Anzeigetext. Artist bleibt ein echtes Metadatenfeld; der gemeinsame Streamtitel wird nicht aufgeteilt. `Winamp.TitleSource` nennt die Herkunft als `FileTags`, `StreamMetadata`, `StreamTitle`, `Playlist` oder `None`, auch im Diagnosebericht. StreamUrl ist die vom Decoder gelieferte URL und kann von der Wiedergabeadresse abweichen. Fehlende Felder bleiben leer; ältere DLLs liefern die neuen Felder nicht.
 
-Metadaten und Audiotelemetrie werden auf Winamps Fensterthread erfasst. Ein Cache begrenzt Metadatenabfragen auf eine Sekunde, außer bei Datei-/Anzeigetitelwechsel. Audiotelemetrie und Snapshots werden alle 200 ms erfasst. Stop und Quellenwechsel ersetzen alte Felder. Ändern sich Quelle, Anzeigetitel, Playlistposition oder Wiedergabestatus während der Erfassung, wird der Snapshot verworfen. Der Pipe-Thread überträgt nur fertige UTF-8-Nachrichten. Der native CTest prüft den Snapshotcode mit einem Winamp-IPC-Testfenster; echte Wiedergabe bleibt ein eigener Praxisnachweis.
+Metadaten und Audiotelemetrie werden auf Winamps Fensterthread erfasst. Ein Cache begrenzt Metadatenabfragen auf eine Sekunde, außer bei Datei-/Anzeigetitelwechsel. Audiotelemetrie und Snapshots werden alle 100 ms erfasst. Neue Snapshots wecken den Pipe-Worker sofort, ohne einen zweiten Polling-Takt. Stop und Quellenwechsel ersetzen alte Felder. Ändern sich Quelle, Anzeigetitel, Playlistposition oder Wiedergabestatus während der Erfassung, wird der Snapshot verworfen. Der Pipe-Thread überträgt nur fertige UTF-8-Nachrichten. Der native CTest prüft den Snapshotcode mit einem Winamp-IPC-Testfenster und die Übertragungsrate über eine echte Pipe; echte Wiedergabe bleibt ein eigener Praxisnachweis.
 
 Für Artist mit Sendername als Ersatz kann eine Seite `{Winamp.Artist|fallbackvar:Winamp.StreamName|fallback:--}` verwenden. Fehlende, leere, unknown und unavailable Werte wechseln zur Ersatzvariable; Null, false und Leerzeichen bleiben gültige Werte. Ersatzvariablen werden normal formatiert, der feste Ersatztext bleibt unverändert. Die Auswertung ist nicht rekursiv. Im Formatierungseditor gibt es dafür Ersatzvariable mit eigenem Browser.
 
@@ -145,7 +145,7 @@ The native general-purpose plug-in also retrieves Winamp's in-process visualizat
 - `IPC_GETVUDATAFUNC` supplies per-channel VU values in the range 0..255.
 - `IPC_GETSADATAFUNC` parameter 2 supplies the Winamp 5.5+ analyzer callback; the plug-in passes its own 158-byte buffer and receives 150 bytes of analyzer data. Parameter 0 is the deprecated static-buffer API and is intentionally not used.
 - `gen_lis2.dll` downsamples the analyzer data to 20 bands before sending it over the named pipe.
-- visualization snapshots are currently sent at a deliberately modest 5 Hz (200 ms) cadence so the 20x2 VFD and serial link are not treated like a high-frame-rate visualization device.
+- Audio-Snapshots werden mit 10 Hz (100 ms) erfasst und ohne zusätzlichen Worker-Polling-Takt gesendet. Die Windows-Medienanzeige übernimmt empfangene Daten ebenfalls alle 100 ms, wie bei WMP Legacy. Die Displayausgabe verwendet weiterhin differenzielle Schreibvorgänge.
 
 The named-pipe message can additionally contain:
 

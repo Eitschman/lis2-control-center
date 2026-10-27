@@ -13,6 +13,19 @@ int metadataReads = 0;
 bool changeDuringRead = false;
 DWORD windowThread = 0;
 bool wrongThread = false;
+int audioLevel = 0;
+
+int __cdecl TestVu(int channel)
+{
+    if (channel == 0) audioLevel = audioLevel % 200 + 1;
+    return channel == 0 ? audioLevel : 255 - audioLevel;
+}
+
+char* __cdecl TestSpectrum(char* buffer)
+{
+    std::fill_n(buffer, SpectrumSourceBins, static_cast<char>(audioLevel));
+    return buffer;
+}
 
 void Require(bool valid, const char* message)
 {
@@ -114,8 +127,9 @@ void CheckMetadata(HWND window)
 }
 }
 
-int main()
+int main(int argc, char** argv)
 {
+    const bool slowCountercheck = argc == 2 && std::string(argv[1]) == "--slow-audio";
     windowThread = GetCurrentThreadId();
     WNDCLASSW windowClass{};
     windowClass.lpfnWndProc = TestWindowProc;
@@ -124,6 +138,7 @@ int main()
     RegisterClassW(&windowClass);
     const auto window = CreateWindowW(windowClass.lpszClassName, L"", 0, 0, 0, 0, 0,
         HWND_MESSAGE, nullptr, windowClass.hInstance, nullptr);
+    HANDLE telemetryRead = nullptr;
     try
     {
         Require(window != nullptr, "test window creation");
@@ -138,11 +153,46 @@ int main()
         SendSnapshot();
         Require(g_latestSnapshot.empty(), "no repeated stale snapshot");
         ClosePipe();
+        // Eine echte Pipe prüft Erfassung und Worker gemeinsam, ohne einen installierten Player.
+        Require(CreatePipe(&telemetryRead, &g_pipe, nullptr, 65536) != FALSE, "audio test pipe");
         g_plugin.hwndParent = window;
         Require(PluginInit() == 0, "plugin initialization");
         const auto timer = g_timer;
         Require(timer != 0, "capture timer installed");
+        g_vuGet = TestVu;
+        g_saGet = TestSpectrum;
+        if (slowCountercheck)
+            Require(SetTimer(window, timer, 200, CaptureSnapshot) != 0, "slow countercheck timer");
+        std::string received;
+        const auto started = GetTickCount64();
+        while (GetTickCount64() - started < 900)
+        {
+            MSG message{};
+            while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) DispatchMessageW(&message);
+            DWORD available = 0;
+            Require(PeekNamedPipe(telemetryRead, nullptr, 0, nullptr, &available, nullptr) != FALSE,
+                "audio pipe remains readable");
+            if (available > 0)
+            {
+                std::vector<char> buffer(available);
+                DWORD read = 0;
+                Require(ReadFile(telemetryRead, buffer.data(), available, &read, nullptr) != FALSE,
+                    "read audio snapshots");
+                received.append(buffer.data(), read);
+            }
+            Sleep(1);
+        }
+        const auto frames = std::count(received.begin(), received.end(), '\n');
+        const bool cadencePassed = frames >= 7;
+        Require(slowCountercheck ? !cadencePassed : cadencePassed,
+            "audio cadence: require seven snapshots within 900 ms; slow countercheck must fail that limit");
+        Require(received.find("\"vuLeft\":1,\"vuRight\":254") != std::string::npos,
+            "fresh stereo peaks cross the worker pipe");
+        Require(received.find("\"spectrum\":[1,1,1,") != std::string::npos,
+            "fresh spectrum crosses the worker pipe");
         PluginQuit();
+        CloseHandle(telemetryRead);
+        telemetryRead = nullptr;
         const auto reads = metadataReads;
         CaptureSnapshot(window, 0, timer, 0);
         Require(reads == metadataReads, "no capture after shutdown");
@@ -153,6 +203,8 @@ int main()
     catch (const std::exception& error)
     {
         std::cerr << error.what() << '\n';
+        PluginQuit();
+        if (telemetryRead != nullptr) CloseHandle(telemetryRead);
         if (window) DestroyWindow(window);
         return 1;
     }

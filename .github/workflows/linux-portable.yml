@@ -59,7 +59,7 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "Tests failed: $project" }
           }
       - name: Publish self-contained Protocol Tester
-        run: dotnet publish tools/LIS2.ProtocolTester/LIS2.ProtocolTester.csproj --configuration Release --runtime win-x64 --self-contained true -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.12' }} --output artifacts/LIS2.ProtocolTester
+        run: dotnet publish tools/LIS2.ProtocolTester/LIS2.ProtocolTester.csproj --configuration Release --runtime win-x64 --self-contained true -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.13' }} --output artifacts/LIS2.ProtocolTester
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -185,6 +185,30 @@ jobs:
         run: cmake --build native/LIS2.WinampPlugin/build --config Release
       - name: Test Winamp metadata and source transitions
         run: ctest --test-dir native/LIS2.WinampPlugin/build -C Release --output-on-failure
+      - name: Verify Winamp cadence regression detects missing sender wakeup
+        shell: pwsh
+        run: |
+          $source = 'native/LIS2.WinampPlugin/plugin.cpp'
+          $original = [IO.File]::ReadAllText($source)
+          $changed = $original.Replace('if (g_snapshotReady != nullptr) SetEvent(g_snapshotReady);', '')
+          if ($changed -eq $original) { throw 'Winamp wakeup countercheck did not change its target.' }
+          try {
+            [IO.File]::WriteAllText($source, $changed)
+            cmake --build native/LIS2.WinampPlugin/build --config Release --target winamp_metadata_tests
+            if ($LASTEXITCODE -ne 0) { throw 'Winamp countercheck build failed.' }
+            $output = ctest --test-dir native/LIS2.WinampPlugin/build -C Release -R '^winamp_metadata$' --output-on-failure 2>&1
+            $result = $LASTEXITCODE
+            $output | Write-Output
+            if ($result -eq 0 -or ($output -join "`n") -notmatch 'audio cadence') {
+              throw 'Winamp cadence regression did not detect the missing sender wakeup.'
+            }
+          } finally {
+            [IO.File]::WriteAllText($source, $original)
+          }
+          cmake --build native/LIS2.WinampPlugin/build --config Release --target winamp_metadata_tests
+          if ($LASTEXITCODE -ne 0) { throw 'Restored Winamp test build failed.' }
+          ctest --test-dir native/LIS2.WinampPlugin/build -C Release --output-on-failure
+          if ($LASTEXITCODE -ne 0) { throw 'Restored Winamp tests failed.' }
       - name: Upload gen_lis2.dll
         uses: actions/upload-artifact@v4
         with:
@@ -309,7 +333,7 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Publish self-contained executable
-        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.12' }} --output publish/${{ matrix.rid }}
+        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.13' }} --output publish/${{ matrix.rid }}
       - name: Setup Python for package tests
         uses: actions/setup-python@v5
         with:

@@ -80,12 +80,6 @@
             <StackPanel Grid.Column="2" Spacing="14">
               <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
                 <StackPanel Spacing="10">
-                  <TextBlock Text="System Status" FontSize="16" FontWeight="SemiBold" />
-                  <TextBlock Name="VirtualStateText" Text="State available when Virtual transport is active." TextWrapping="Wrap" />
-                </StackPanel>
-              </Border>
-              <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
-                <StackPanel Spacing="10">
                   <TextBlock Text="Quick Links" FontSize="16" FontWeight="SemiBold" />
                   <WrapPanel>
                     <Button Name="OpenDisplayControls" Content="Open Display Controls" Margin="0,0,8,8" />

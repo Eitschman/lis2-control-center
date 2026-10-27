@@ -11,7 +11,7 @@
 namespace
 {
 constexpr wchar_t PipeName[] = L"\\\\.\\pipe\\LIS2ControlCenter.Winamp";
-constexpr DWORD PollIntervalMs = 200;
+constexpr DWORD PollIntervalMs = 100;
 constexpr int SpectrumSourceBins = 75;
 constexpr int SpectrumOutputBins = 20;
 
@@ -20,6 +20,7 @@ using SaSetReqFunc = void (__cdecl*)(int);
 using VuGetFunc = int (__cdecl*)(int);
 
 HANDLE g_stopEvent = nullptr;
+HANDLE g_snapshotReady = nullptr;
 HANDLE g_thread = nullptr;
 HANDLE g_pipe = INVALID_HANDLE_VALUE;
 UINT_PTR g_timer = 0;
@@ -351,8 +352,12 @@ void CALLBACK CaptureSnapshot(HWND window, UINT, UINT_PTR timer, DWORD)
     // Bereits zugestellte Timerbotschaften dürfen nach PluginQuit nicht mehr lesen.
     if (timer != 0 && timer != g_timer) return;
     auto snapshot = BuildSnapshotJson(window);
-    std::lock_guard<std::mutex> lock(g_snapshotMutex);
-    g_latestSnapshot = std::move(snapshot);
+    {
+        std::lock_guard<std::mutex> lock(g_snapshotMutex);
+        g_latestSnapshot = std::move(snapshot);
+    }
+    // Neue Audiowerte wecken den Sender sofort, ohne einen zweiten Polling-Takt.
+    if (g_snapshotReady != nullptr) SetEvent(g_snapshotReady);
 }
 
 void SendSnapshot()
@@ -384,16 +389,12 @@ void SendSnapshot()
 
 DWORD WINAPI WorkerThread(void*)
 {
+    const HANDLE events[] = {g_stopEvent, g_snapshotReady};
     while (true)
     {
-        SendSnapshot();
-
-        if (WaitForSingleObject(
-                g_stopEvent,
-                PollIntervalMs) != WAIT_TIMEOUT)
-        {
+        if (WaitForMultipleObjects(2, events, FALSE, INFINITE) != WAIT_OBJECT_0 + 1)
             break;
-        }
+        SendSnapshot();
     }
 
     ClosePipe();
@@ -459,11 +460,21 @@ int PluginInit()
     if (g_stopEvent == nullptr)
         return 1;
 
+    g_snapshotReady = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    if (g_snapshotReady == nullptr)
+    {
+        CloseHandle(g_stopEvent);
+        g_stopEvent = nullptr;
+        return 1;
+    }
+
     g_metadata = {};
     CaptureSnapshot(g_plugin.hwndParent, 0, 0, 0);
     g_timer = SetTimer(g_plugin.hwndParent, 0, PollIntervalMs, CaptureSnapshot);
     if (g_timer == 0)
     {
+        CloseHandle(g_snapshotReady);
+        g_snapshotReady = nullptr;
         CloseHandle(g_stopEvent);
         g_stopEvent = nullptr;
         return 1;
@@ -481,6 +492,8 @@ int PluginInit()
     {
         KillTimer(g_plugin.hwndParent, g_timer);
         g_timer = 0;
+        CloseHandle(g_snapshotReady);
+        g_snapshotReady = nullptr;
         CloseHandle(g_stopEvent);
         g_stopEvent = nullptr;
         return 1;
@@ -515,6 +528,12 @@ void PluginQuit()
         WaitForSingleObject(g_thread, 3000);
         CloseHandle(g_thread);
         g_thread = nullptr;
+    }
+
+    if (g_snapshotReady != nullptr)
+    {
+        CloseHandle(g_snapshotReady);
+        g_snapshotReady = nullptr;
     }
 
     if (g_stopEvent != nullptr)

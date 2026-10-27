@@ -289,6 +289,8 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         ui.Click("NavButton0");
         await ui.CaptureAsync($"dashboard-vfd-{(german ? "de" : "en")}-{width}x{height}");
 
+        Assert.Null(ui.Window.FindControl<TextBlock>("VirtualStateText"));
+
         var first = ui.Control<VfdLine>("PreviewLine1");
         var second = ui.Control<VfdLine>("PreviewLine2");
         var rows = Assert.IsType<StackPanel>(first.Parent);
