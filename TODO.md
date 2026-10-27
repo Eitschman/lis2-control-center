@@ -65,7 +65,7 @@ Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nich
 
 ## Vorhandene Basis
 
-- [x] WMP Legacy liefert echte Radio-Senderfelder, Netzwerkadresse und Streamkennzeichen; der moderne Media Player bietet den unveränderten GSMTC-Untertitel als ausdrücklich wählbare Ersatzvariable. Die fünfsprachige Medienhilfe erklärt Unterschiede und Beispiele. Linux erhält den vom Player gelieferten Artist; echte playerctl-Abfragen auf einem privaten MPRIS-Testbus prüfen Streams und normale Musikdateien. Legacy-Installation und Praxisprüfung übernimmt der Benutzer.
+- [x] WMP Legacy liefert echte Radio-Senderfelder, Netzwerkadresse und Streamkennzeichen; der moderne Media Player bietet den unveränderten GSMTC-Untertitel als ausdrücklich wählbare Ersatzvariable. Die fünfsprachige Medienhilfe erklärt Unterschiede und Beispiele. Linux erhält den vom Player gelieferten Artist; echte playerctl-Abfragen auf einem privaten MPRIS-Testbus prüfen Streams und normale Musikdateien. Reale Legacy-Metadaten und Audiotelemetrie sind unter Windows x86 bestätigt; weitere Praxisfälle stehen unten.
 
 - [x] Ersatzvariablen über `fallbackvar` mit abschließendem festem Ersatztext; Editor mit eigenem Variablenbrowser und fünfsprachiger Hilfe. Winamp liefert Unicode-Streamdaten, Quellenart und Titelherkunft; native IPC-Regressionen decken Datei-/Streamwechsel ab. Aktuelle Prüfnachweise stehen im Status; realer Radio-BOB-Streambetrieb ist unter Winamp 5.9.2.10042 bestätigt; lokale MP3-Wiedergabe bleibt manuell offen.
 
