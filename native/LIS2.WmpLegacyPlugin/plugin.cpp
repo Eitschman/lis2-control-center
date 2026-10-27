@@ -392,6 +392,11 @@ public:
 
     HRESULT STDMETHODCALLTYPE SetCore(IWMPCore* core) override
     {
+        // Hintergrund-Plug-ins erhalten SetCore, aber keinen Create-Aufruf für eine Oberfläche.
+        // Vor dem Freigeben sichern, falls der Player denselben Kern erneut übergibt.
+        if (core != nullptr)
+            core->AddRef();
+        StopTimer();
         if (_core != nullptr)
         {
             _core->Release();
@@ -400,8 +405,8 @@ public:
 
         if (core != nullptr)
         {
-            core->AddRef();
             _core = core;
+            return StartTimer();
         }
 
         return S_OK;
@@ -414,25 +419,9 @@ public:
         if (window == nullptr)
             return E_POINTER;
 
-        EnsureWindowClass();
-
-        _window = CreateWindowExW(
-            0,
-            WindowClassName,
-            L"",
-            0,
-            0, 0, 0, 0,
-            HWND_MESSAGE,
-            nullptr,
-            g_module,
-            this);
-
-        if (_window == nullptr)
-            return HRESULT_FROM_WIN32(GetLastError());
-
-        SetTimer(_window, PollTimerId, PollIntervalMs, nullptr);
+        const HRESULT result = StartTimer();
         *window = _window;
-        return S_OK;
+        return result;
     }
 
     HRESULT STDMETHODCALLTYPE Destroy() override
@@ -607,7 +596,7 @@ private:
         return DefWindowProcW(hwnd, message, wParam, lParam);
     }
 
-    static void EnsureWindowClass()
+    static HRESULT EnsureWindowClass()
     {
         WNDCLASSW windowClass{};
         windowClass.lpfnWndProc = WindowProc;
@@ -617,8 +606,30 @@ private:
         if (!RegisterClassW(&windowClass) &&
             GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
         {
-            return;
+            return HRESULT_FROM_WIN32(GetLastError());
         }
+        return S_OK;
+    }
+
+    // Das Nachrichtenfenster gehört dem COM-Thread des Players und benötigt keine sichtbare UI.
+    HRESULT StartTimer()
+    {
+        if (_window != nullptr)
+            return S_OK;
+        const HRESULT result = EnsureWindowClass();
+        if (FAILED(result))
+            return result;
+        _window = CreateWindowExW(0, WindowClassName, L"", 0, 0, 0, 0, 0,
+            HWND_MESSAGE, nullptr, g_module, this);
+        if (_window == nullptr)
+            return HRESULT_FROM_WIN32(GetLastError());
+        if (SetTimer(_window, PollTimerId, PollIntervalMs, nullptr) == 0)
+        {
+            const DWORD error = GetLastError();
+            StopTimer();
+            return error != ERROR_SUCCESS ? HRESULT_FROM_WIN32(error) : E_FAIL;
+        }
+        return S_OK;
     }
 
     void StopTimer()

@@ -59,7 +59,7 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "Tests failed: $project" }
           }
       - name: Publish self-contained Protocol Tester
-        run: dotnet publish tools/LIS2.ProtocolTester/LIS2.ProtocolTester.csproj --configuration Release --runtime win-x64 --self-contained true -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.9' }} --output artifacts/LIS2.ProtocolTester
+        run: dotnet publish tools/LIS2.ProtocolTester/LIS2.ProtocolTester.csproj --configuration Release --runtime win-x64 --self-contained true -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.10' }} --output artifacts/LIS2.ProtocolTester
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -119,8 +119,28 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Test Legacy radio metadata and file transitions
+      - name: Test Legacy background lifecycle and radio metadata
         run: ctest --test-dir native/LIS2.WmpLegacyPlugin/build -C Release --output-on-failure
+      - name: Prove lifecycle regression detects missing background startup
+        shell: pwsh
+        run: |
+          $source = 'native/LIS2.WmpLegacyPlugin/plugin.cpp'
+          $original = [IO.File]::ReadAllBytes($source)
+          $text = [Text.Encoding]::UTF8.GetString($original)
+          if ([regex]::Matches($text, [regex]::Escape('return StartTimer();')).Count -ne 1) { throw 'Expected one background startup' }
+          try {
+            [IO.File]::WriteAllText($source, $text.Replace('return StartTimer();', 'return S_OK;'), [Text.UTF8Encoding]::new($false))
+            cmake --build native/LIS2.WmpLegacyPlugin/build --config Release --target wmp_metadata_tests
+            if ($LASTEXITCODE -ne 0) { throw 'Lifecycle countercheck build failed' }
+            ctest --test-dir native/LIS2.WmpLegacyPlugin/build -C Release --output-on-failure
+            if ($LASTEXITCODE -eq 0) { throw 'Regression missed disabled background startup' }
+          } finally {
+            [IO.File]::WriteAllBytes($source, $original)
+          }
+          cmake --build native/LIS2.WmpLegacyPlugin/build --config Release --target wmp_metadata_tests
+          if ($LASTEXITCODE -ne 0) { throw 'Restored lifecycle build failed' }
+          ctest --test-dir native/LIS2.WmpLegacyPlugin/build -C Release --output-on-failure
+          if ($LASTEXITCODE -ne 0) { throw 'Restored lifecycle test failed' }
       - name: Verify embedded C and C++ runtime
         shell: pwsh
         run: |
@@ -289,7 +309,7 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Publish self-contained executable
-        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.9' }} --output publish/${{ matrix.rid }}
+        run: dotnet publish src/LIS2.App.Avalonia/LIS2.App.Avalonia.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -p:Version=${{ inputs.version || '0.1.10' }} --output publish/${{ matrix.rid }}
       - name: Setup Python for package tests
         uses: actions/setup-python@v5
         with:

@@ -6,7 +6,7 @@ It is telemetry-only. It never talks to LIS2 hardware.
 
 `streamName` reads the actual `WM/RadioStationName` tag for network media. `streamUrl` contains the playback URL and `isStream` identifies non-file URLs. Missing station tags remain empty; local files clear both stream fields. Artist and title are preserved. Use `{WmpLegacy.Artist|fallbackvar:WmpLegacy.StreamName|fallback:--}` in the Control Center for an explicit station-name replacement. Older plug-ins do not provide these fields.
 
-CTest exercises the COM metadata reader with Unicode radio names, missing tags, local files and unavailable media on both player architectures. These tests do not replace registration and playback checks in the actual player.
+CTest exercises the COM metadata reader with Unicode radio names, missing tags, local files and unavailable media on both player architectures. It also checks background startup through SetCore without a UI Create call, actual pipe snapshots, repeated attachment, detachment, reconnect and destruction. Disabling background startup must make this regression fail. These tests do not replace registration and playback checks in the actual player.
 
 ## Telemetry
 

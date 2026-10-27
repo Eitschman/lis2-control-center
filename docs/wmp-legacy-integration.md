@@ -6,7 +6,7 @@ Die Windows-App empfängt `WmpLegacy.*` über zwei voneinander unabhängige Name
 
 Beide DLLs binden die C/C++-Laufzeit statisch ein (`/MT` im Release-Build). Eine separate Visual-C++-Redistributable-Installation ist dafür nicht nötig. Die CI prüft die tatsächlichen PE-Importtabellen vor der Paketierung. Sicherheitsaktualisierungen dieser Laufzeit benötigen einen neuen Plug-in-Build mit aktualisierten Buildwerkzeugen. Die MIT-Lizenz gilt für den LIS2-Code; für eingebundene Microsoft-Laufzeitkomponenten gelten deren [Weitergabebedingungen](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files).
 
-1. Das zum **Playerprozess** passende CI-Artefakt `LIS2-WMP-Legacy-win32` oder `LIS2-WMP-Legacy-win64` laden und die SHA-256-Datei prüfen. Die Architektur der Control-Center-App ist dafür unerheblich. Release v0.1.9 enthält beide Architekturen als `LIS2-WMP-Legacy-0.1.9-win32.zip` und `LIS2-WMP-Legacy-0.1.9-win64.zip`.
+1. Das zum **Playerprozess** passende CI-Artefakt `LIS2-WMP-Legacy-win32` oder `LIS2-WMP-Legacy-win64` laden und die SHA-256-Datei prüfen. Die Architektur der Control-Center-App ist dafür unerheblich. Release v0.1.10 enthält beide Architekturen als `LIS2-WMP-Legacy-0.1.10-win32.zip` und `LIS2-WMP-Legacy-0.1.10-win64.zip`.
 2. Das ZIP in einen dauerhaften Ordner entpacken. `background` enthält `lis2_wmp_legacy.dll`, `visualization` enthält `lis2_wmp_legacy_visualization.dll`. Beide Ordner enthalten eigene Anleitungen.
 3. Windows Media Player Legacy schließen. In einer administrativen Eingabeaufforderung beide DLLs mit ihrem vollständigen, in Anführungszeichen gesetzten Pfad registrieren. Unter 64-Bit-Windows für einen x64-Player `%SystemRoot%\System32\regsvr32.exe` verwenden, für einen x86-Player `%SystemRoot%\SysWOW64\regsvr32.exe`. Beispiel für x64:
 
@@ -19,6 +19,12 @@ Beide DLLs binden die C/C++-Laufzeit statisch ein (`/MT` im Release-Build). Eine
 5. Für VU und Spektrum die Visualisierung **LIS2 Control Center / Telemetry** im Player auswählen. Andere Visualisierungen liefern diesem Plug-in kein Audiosignal. Metadaten funktionieren unabhängig davon.
 
 Zum Entfernen den Player schließen und dieselben Registrierungsbefehle mit `/u` ausführen. Erst danach die DLL-Dateien verschieben oder löschen. Die Anwendung registriert keine DLL automatisch und benötigt für ihren normalen Betrieb keine Administratorrechte.
+
+### Plug-in sichtbar, aber keine Verbindung
+
+Zuerst die Architektur des laufenden Players prüfen: `C:\Program Files (x86)\Windows Media Player\wmplayer.exe` benötigt das win32-Paket und die Registrierung über `SysWOW64`. Die Architektur von Windows und Control Center bestimmt diese Auswahl nicht. Das Plug-in wird nach der Registrierung beim nächsten Playerstart geladen. Die Visualisierung muss für Audiowerte zusätzlich ausgewählt sein.
+
+Das Hintergrund-Plug-in startet seine Telemetrie bei der Übergabe des Player-Kerns über `SetCore`. Dafür ist keine Plug-in-Oberfläche erforderlich. Beim Abtrennen des Kerns endet der Timer; erneutes Verbinden startet ihn wieder. Der native Test empfängt tatsächliche Pipe-Snapshots, ohne `Create` aufzurufen, und prüft Abschalten sowie Wiederverbinden.
 
 ## Medienkarte und Displayseiten
 
