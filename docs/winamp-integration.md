@@ -49,7 +49,13 @@ Metadaten und Audiotelemetrie werden auf Winamps Fensterthread erfasst. Ein Cach
 
 Für Artist mit Sendername als Ersatz kann eine Seite `{Winamp.Artist|fallbackvar:Winamp.StreamName|fallback:--}` verwenden. Fehlende, leere, unknown und unavailable Werte wechseln zur Ersatzvariable; Null, false und Leerzeichen bleiben gültige Werte. Ersatzvariablen werden normal formatiert, der feste Ersatztext bleibt unverändert. Die Auswertung ist nicht rekursiv. Im Formatierungseditor gibt es dafür Ersatzvariable mit eigenem Browser.
 
-Die [Winamp-Implementierung](https://github.com/alexfreud/winamp/blob/community/Src/Plugins/Input/in_mp3/ExtendedInfo.cpp) bietet die Streamfelder an. Der direkte ICY-Abruf von `http://streams.radiobob.de/symphmetal/mp3-192/mediaplayer/` am 27.10.2026 mit `Icy-MetaData: 1` liefert zunächst `StreamTitle='RADIO BOB - Symphonic Metal';`, dann `StreamTitle='Lacrimosa - Wenn unsere Helden sterben';`. In 120 gelesenen Metadatenintervallen über 21,1 Sekunden werden keine getrennten Artist-/Title-Felder geliefert. Tuner verwendet laut [MPRIS-Implementierung](https://github.com/tuner-labs/tuner/blob/v2.1.0/src/Services/DBusMediaPlayer.vala#L208-L215) bei fehlendem Artist den Sendernamen. Die konkreten IPC-Rohantworten des laufenden Winamp-Players wurden nicht aufgezeichnet.
+Die [Winamp-Implementierung](https://github.com/alexfreud/winamp/blob/community/Src/Plugins/Input/in_mp3/ExtendedInfo.cpp) bietet die Streamfelder an. Der direkte ICY-Abruf von `http://streams.radiobob.de/symphmetal/mp3-192/mediaplayer/` am 27.10.2026 mit `Icy-MetaData: 1` liefert zunächst `StreamTitle='RADIO BOB - Symphonic Metal';`, dann `StreamTitle='Lacrimosa - Wenn unsere Helden sterben';`. In 120 gelesenen Metadatenintervallen über 21,1 Sekunden werden keine getrennten Artist-/Title-Felder geliefert. Tuner verwendet laut [MPRIS-Implementierung](https://github.com/tuner-labs/tuner/blob/v2.1.0/src/Services/DBusMediaPlayer.vala#L208-L215) bei fehlendem Artist den Sendernamen.
+
+## Geprüfter Streambetrieb
+
+Am 27.10.2026 liefert der laufende Winamp 5.9.2.10042 für `http://streams.radiobob.de/powermetal/mp3-192/mediaplayer/` über die tatsächlichen IPC-Abfragen leere Werte für artist, title und album, `RADIO BOB - Power Metal` für streamname und `Powerwolf - Blessed & Possessed` für streamtitle. streamgenre und streamurl sind bei diesem Stream leer. Der Benutzer bestätigt die Anzeige mit `{Winamp.Artist|fallbackvar:Winamp.StreamName|fallback:--}` in LIS2 v0.1.8 nach Installation der geprüften Release-DLL. Ihre SHA-256-Prüfsumme stimmt mit dem veröffentlichten Paket überein. Lokale MP3-Wiedergabe ist durch diesen Praxisnachweis nicht abgedeckt.
+
+Winamp muss beim Austausch geschlossen sein. Maßgeblich ist das Plugins-Verzeichnis der tatsächlich gestarteten Installation; der installierte Dateihash muss zur Release-Prüfsumme passen.
 
 ## Message format
 
