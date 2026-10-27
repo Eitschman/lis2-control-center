@@ -1,7 +1,7 @@
 # TODO: Projektroadmap und Restarbeiten
 
 Stand: 27.10.2026. Hauptbranch: `main`.
-Implementierungsstand: PORT-08 mit Avalonia 11.3.22 und .NET 10. Windows Media Player Legacy ist zusätzlich über Hintergrund- und Visualisierungs-Plug-in angebunden. Aktuelle Prüfergebnisse und offene Zielsystemnachweise stehen im [Status](docs/prp/linux-port-status.md).
+Implementierungsstand: PORT-08 mit Avalonia 11.3.22 und .NET 10. Windows Media Player Legacy liefert Metadaten über sein Hintergrund-Plug-in; Pegel und Spektrum kommen direkt aus der WASAPI-Prozess-Audioerfassung. Aktuelle Prüfergebnisse und offene Zielsystemnachweise stehen im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
 
@@ -11,7 +11,9 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 - [x] Auslöser durch Benutzerprüfung eingegrenzt: automatischer MP3-Titelwechsel; Metadaten laufen weiter, Audiowerte fallen aus.
 - [x] Gegenprobe mit eingebauter WMP-Visualisierung reproduziert den Ausfall. Ansichtswechsel stellt Audio wieder her; Visualisierungswechsel, Pause/Fortsetzen und Seek helfen in dieser Prüfung nicht.
-- [ ] Automatische Wiederherstellung untersuchen und am realen Player prüfen. Kein als erfolgreich ausgegebener Fix allein anhand simuliert gelieferter Audiodaten. Befund und externe Referenz: [Legacy-Anleitung](docs/wmp-legacy-integration.md#audiowerte-fehlen-nach-automatischem-titelwechsel).
+- [x] Direkte Prozess-Audioerfassung als reguläre Anwendungsquelle integrieren. Der zehnminütige reale Prototyplauf liefert nach drei automatischen Titelwechseln weiterhin Pegel und Spektrum, auch bei minimiertem Player. Medienkarte und VFD-Vorschau verwenden die vorhandenen Variablen. Befund: [Legacy-Anleitung](docs/wmp-legacy-integration.md#audiowerte-fehlen-nach-automatischem-titelwechsel).
+- [x] Quellenabgrenzung mit pausiertem Legacy-Player und gleichzeitigem Testton eines anderen Prozesses: Pegel und Spektrum bleiben null; Fortsetzen liefert wieder Audio.
+- [ ] Direkte Audioerfassung auf weiteren Windows-Systemen und mit der anderen Playerarchitektur prüfen.
 
 Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nicht implementiert. Die Reihenfolge priorisiert Update-Hinweise, danach die Unterstützung bei Seitenkonfiguration und Fehlersuche. Der automatische Windows-Dateiaustausch bleibt ein eigenes Arbeitspaket. Debian-Pakete werden weiterhin als Release-Downloads angeboten; ein eigenes APT-Repository ist nicht vorgesehen. Die bestehenden Paketnummern bleiben erhalten. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
 

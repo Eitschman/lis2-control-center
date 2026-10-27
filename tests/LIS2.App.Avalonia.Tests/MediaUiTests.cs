@@ -28,6 +28,7 @@ public sealed class MediaUiTests
         {
             window.Show();
             Click(window, "NavButton3");
+            Assert.True(source.ProcessAudioEnabled);
             timer.Start();
             foreach (var level in new[] { 32, 96, 160, 224 })
             {
@@ -135,6 +136,14 @@ public sealed class MediaUiTests
             Assert.Equal("3 / 12", window.FindControl<TextBlock>("WmpLegacyMediaPlaylist")!.Text);
             Assert.Equal(192, window.FindControl<ProgressBar>("WmpLegacyVuLeft")!.Value);
             Assert.Equal(20, window.FindControl<Grid>("WmpLegacySpectrumBars")!.Children.Count);
+            Assert.Equal(UiTranslations.Translate("Direct player audio", language),
+                window.FindControl<TextBlock>("WmpLegacyVisualizationConnection")!.Text);
+            values["AudioCaptureError"] = "Direct audio capture requires Windows build 20348 or later.";
+            window.RefreshMediaSource("WmpLegacy", values);
+            Assert.Contains(UiTranslations.Translate("Direct audio capture requires Windows build 20348 or later.", language),
+                window.FindControl<TextBlock>("WmpLegacyVisualizationConnection")!.Text);
+            values.Remove("AudioCaptureError");
+            window.RefreshMediaSource("WmpLegacy", values);
             await Capture(window, "legacy-media-" + language + "-wide");
             window.Width = 950;
             window.Height = 600;

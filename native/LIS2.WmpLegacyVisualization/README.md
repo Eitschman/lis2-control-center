@@ -1,7 +1,8 @@
 # LIS2 WMP Legacy visualization
 
 Optional Windows Media Player Legacy visualization that forwards audio telemetry
-to LIS2 Control Center.
+to diagnostic tools. The Control Center application captures player audio
+directly through WASAPI and does not require this DLL or a visible visualization.
 
 The WMP visualization API supplies a `TimedLevel` snapshot containing 1024
 frequency bins and 1024 waveform samples for each stereo channel. The plug-in

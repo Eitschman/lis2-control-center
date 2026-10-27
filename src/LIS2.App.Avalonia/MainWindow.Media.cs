@@ -9,7 +9,7 @@ namespace LIS2.App.Avalonia;
 public partial class MainWindow
 {
     private readonly WinampDataSource _mediaWinamp = new();
-    private readonly WmpLegacyDataSource _mediaLegacy = new();
+    private readonly WmpLegacyDataSource _mediaLegacy = new(enableProcessAudio: true);
     private DispatcherTimer? _mediaTimer;
     private readonly LinuxMprisSource _mpris = new();
     private readonly WindowsMediaBridge _windowsMedia = new();
@@ -296,7 +296,16 @@ public partial class MainWindow
         var lastSnapshot = id == "WmpLegacy" ? _mediaLegacy.LastSnapshotAt : _mediaWinamp.LastSnapshotAt;
         SetUiText(prefix + "Connection", $"Named pipe: {(UiMessage)(@"\\.\pipe\LIS2ControlCenter." + id)} · Last update: {(UiMessage)(lastSnapshot?.ToLocalTime().ToString("HH:mm:ss") ?? "-")}");
         if (id == "WmpLegacy")
-            SetUiText("WmpLegacyVisualizationConnection", $"Visualization pipe: {(UiMessage)(@"\\.\pipe\" + WmpLegacyVisualizationPipeServer.PipeName)}");
+        {
+            var error = values.GetValueOrDefault("AudioCaptureError") as string;
+            if (_mediaLegacy.ProcessAudioEnabled)
+            {
+                if (string.IsNullOrWhiteSpace(error)) SetUiText("WmpLegacyVisualizationConnection", "Direct player audio");
+                else SetUiText("WmpLegacyVisualizationConnection", $"Audio capture failed: {UiTranslations.Translate(error, CurrentUiLanguage())}");
+            }
+            else
+                SetUiText("WmpLegacyVisualizationConnection", $"Visualization pipe: {(UiMessage)(@"\\.\pipe\" + WmpLegacyVisualizationPipeServer.PipeName)}");
+        }
     }
 
     private static UiMessage MediaErrorMessage(string provider, Exception exception) =>

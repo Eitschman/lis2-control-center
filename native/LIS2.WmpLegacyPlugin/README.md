@@ -27,9 +27,11 @@ Current fields:
 - elapsed time
 - duration
 
-VU/spectrum comes from the companion `lis2_wmp_legacy_visualization.dll`, included
-in the same package. Windows Media Player only supplies timed waveform/frequency
-data to the selected visualization. Metadata works independently of that selection.
+The Control Center captures VU/spectrum directly from the Legacy player process
+through WASAPI on Windows build 20348 or later. The player can be minimized, and
+no visualization must be selected. The companion visualization DLL remains in
+the package for diagnostic tools; its audio pipe is not the application's audio
+source. Metadata works independently through this background plug-in.
 
 ## Registration
 

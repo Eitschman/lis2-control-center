@@ -71,7 +71,7 @@ System/Light/Dark, fünf Sprachkataloge, Windows-/Linux-Tray und plattformeigene
 
 Der Benutzer hat den modalen Variablenbrowser als Ersatz der großen WPF-Variablen-ComboBox genehmigt. Er enthält Suche/Kategorien/HA-Filter, aktuelle Werte, persistente Favoriten und Einfügen in beide Zeilen. Stored Templates bleiben unverändert.
 
-Physische Lüfterausgabe erfordert eine ausdrückliche, nicht persistierte Freigabe. Eine WPF-ähnliche Schaltfläche rechtfertigt kein Umgehen dieses Pfades. Zusätzliche/verschobene Bedienelemente benötigen eine fachliche Grundlage. Die lokale Linux-Tokenspeicherung ist nur mit ausdrücklicher Auswahl in der App genehmigt; der automatische Ausweichpfad entfällt. WMP Legacy wird unter Windows gestartet; Hintergrund- und Visualisierungs-Plug-in bleiben vom Hardwarezugriff getrennt. Reale Playerabnahme ist offen.
+Physische Lüfterausgabe erfordert eine ausdrückliche, nicht persistierte Freigabe. Eine WPF-ähnliche Schaltfläche rechtfertigt kein Umgehen dieses Pfades. Zusätzliche/verschobene Bedienelemente benötigen eine fachliche Grundlage. Die lokale Linux-Tokenspeicherung ist nur mit ausdrücklicher Auswahl in der App genehmigt; der automatische Ausweichpfad entfällt. WMP Legacy liefert Metadaten über das Hintergrund-Plug-in und Audio direkt über WASAPI aus dem Playerprozess. Plug-ins und Audioerfassung bleiben vom Hardwarezugriff getrennt. Reale MP3-Titelwechsel und minimierte Wiedergabe sind unter Windows 11 mit dem x86-Player geprüft; weitere Zielsysteme bleiben offen.
 
 ## Prüfnachweise und verbleibende Abnahme
 

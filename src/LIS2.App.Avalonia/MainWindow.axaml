@@ -484,7 +484,7 @@
                 <TextBlock Name="WmpLegacyMediaPlaylist" Text="- / -" FontSize="18" FontWeight="SemiBold"/>
               </StackPanel>
               <StackPanel Grid.Column="4" Spacing="3">
-                <TextBlock Text="Visualization" FontWeight="SemiBold"/>
+                <TextBlock Text="Audio" FontWeight="SemiBold"/>
                 <TextBlock Name="WmpLegacyVisualizationStatus" Text="Disconnected" TextWrapping="Wrap"/>
               </StackPanel>
             </Grid>

@@ -10,6 +10,12 @@ public sealed class WmpLegacyDataSource : IDataSource
     private readonly WmpLegacyPipeServer _server;
     private readonly WmpLegacyVisualizationPipeServer _visualizationServer;
     private readonly TimeProvider _timeProvider;
+    private readonly SemaphoreSlim _lifecycle = new(1, 1);
+    private CancellationTokenSource? _audioCancellation;
+    private Task _audioTask = Task.CompletedTask;
+    private bool _started;
+    private readonly bool _processAudioEnabled;
+    public bool ProcessAudioEnabled => _processAudioEnabled;
     // Metadaten- und Audiopipe dürfen die Änderungen des jeweils anderen Listeners nicht überschreiben.
     private readonly object _snapshotLock = new();
 
@@ -91,8 +97,10 @@ public sealed class WmpLegacyDataSource : IDataSource
 
     public WmpLegacyDataSource(TimeProvider? timeProvider = null,
         string metadataPipeName = WmpLegacyPipeServer.PipeName,
-        string visualizationPipeName = WmpLegacyVisualizationPipeServer.PipeName)
+        string visualizationPipeName = WmpLegacyVisualizationPipeServer.PipeName,
+        bool enableProcessAudio = false)
     {
+        _processAudioEnabled = enableProcessAudio;
         _timeProvider = timeProvider ?? TimeProvider.System;
         _server = new(metadataPipeName);
         _visualizationServer = new(visualizationPipeName);
@@ -102,13 +110,58 @@ public sealed class WmpLegacyDataSource : IDataSource
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        await _server.StartAsync(cancellationToken).ConfigureAwait(false);
-        await _visualizationServer.StartAsync(cancellationToken).ConfigureAwait(false);
+        await _lifecycle.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            if (_started) return;
+            await _server.StartAsync(cancellationToken).ConfigureAwait(false);
+            await _visualizationServer.StartAsync(cancellationToken).ConfigureAwait(false);
+            _started = true;
+            StartProcessAudio();
+        }
+        finally { _lifecycle.Release(); }
     }
 
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
-        await Task.WhenAll(_server.StopAsync(), _visualizationServer.StopAsync()).ConfigureAwait(false);
+        await _lifecycle.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            _started = false;
+            await StopProcessAudioAsync().ConfigureAwait(false);
+            await Task.WhenAll(_server.StopAsync(), _visualizationServer.StopAsync()).ConfigureAwait(false);
+        }
+        finally { _lifecycle.Release(); }
+    }
+
+    private void StartProcessAudio()
+    {
+        if (!_started || !_processAudioEnabled) return;
+        _audioCancellation = new CancellationTokenSource();
+        _audioTask = new Audio.ProcessAudioWorker(() => IsRecentlyConnected,
+            ApplyVisualization, SetAudioCaptureError).RunAsync(_audioCancellation.Token);
+    }
+
+    private async Task StopProcessAudioAsync()
+    {
+        if (_audioCancellation is null) return;
+        _audioCancellation.Cancel();
+        try { await _audioTask.ConfigureAwait(false); }
+        finally { _audioCancellation.Dispose(); _audioCancellation = null; }
+    }
+
+    private void SetAudioCaptureError(string? error)
+    {
+        lock (_snapshotLock)
+        {
+            _lastVisualizationAt = null;
+            var next = new Dictionary<string, object?>(_values, StringComparer.OrdinalIgnoreCase)
+            {
+                ["AudioCaptureError"] = error
+            };
+            Volatile.Write(ref _values, next);
+        }
+        Changed?.Invoke(this, EventArgs.Empty);
     }
 
     private void Server_SnapshotReceived(object? sender, WmpLegacySnapshot snapshot) =>
@@ -116,8 +169,13 @@ public sealed class WmpLegacyDataSource : IDataSource
 
     private void VisualizationServer_VisualizationReceived(
         object? sender,
-        WmpLegacyVisualizationMessage message) =>
-        ApplyVisualization(message);
+        WmpLegacyVisualizationMessage message) => ApplyVisualizationPipe(message);
+
+    internal void ApplyVisualizationPipe(WmpLegacyVisualizationMessage message)
+    {
+        // Die gewählte direkte Quelle darf nicht durch Nullwerte des defekten Player-Visualisierungspfads überschrieben werden.
+        if (!_processAudioEnabled) ApplyVisualization(message);
+    }
 
     internal void ApplySnapshot(WmpLegacySnapshot snapshot)
     {
@@ -196,6 +254,9 @@ public sealed class WmpLegacyDataSource : IDataSource
     {
         _server.SnapshotReceived -= Server_SnapshotReceived;
         _visualizationServer.VisualizationReceived -= VisualizationServer_VisualizationReceived;
+        await _lifecycle.WaitAsync().ConfigureAwait(false);
+        try { _started = false; await StopProcessAudioAsync().ConfigureAwait(false); }
+        finally { _lifecycle.Release(); }
         await Task.WhenAll(_server.DisposeAsync().AsTask(), _visualizationServer.DisposeAsync().AsTask()).ConfigureAwait(false);
     }
 }

@@ -95,9 +95,9 @@ internal static class HelpReferenceCatalog
                 content.AddRange(HelpVariableCatalog.Get("WindowsMedia.", language));
                 content.AddRange(HelpVariableCatalog.Get("WmpLegacy.", language));
                 content.Add((UiTranslations.Translate("Windows Media Player Legacy", language),
-                    UiTranslations.Translate("Register the matching x86/x64 WMP Legacy background and visualization DLLs with regsvr32.", language)));
-                content.Add((UiTranslations.Translate("Visualization", language), HelpLocalization.Translate(
-                    "VU and spectrum require the LIS2 Control Center visualization to be selected in Windows Media Player Legacy. Metadata and playback state continue to work through the background plug-in even when another visualization is selected.", language)));
+                    UiTranslations.Translate("Register the matching x86/x64 WMP Legacy background DLL with regsvr32. Direct audio capture requires no visualization DLL.", language)));
+                content.Add((UiTranslations.Translate("Audio", language), HelpLocalization.Translate(
+                    "VU and spectrum are captured directly from the Legacy player process through WASAPI. No visualization needs to be selected or visible; the player may be minimized. Windows build 20348 or later is required. Metadata and playback state still come from the background plug-in.", language)));
                 break;
             case 4:
                 Add("Events", "Timed events temporarily override ordinary page output on connected displays.");
