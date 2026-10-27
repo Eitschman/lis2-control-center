@@ -12,7 +12,7 @@ Metadaten werden auf Winamps Fensterthread erfasst und zwischengespeichert; Pege
 
 ## Leerzeichen in Präfix und Suffix
 
-Der Vorlagenparser erhält führende und abschließende Leerzeichen in Präfix, Suffix und Ersatztext. Das gilt auch für Argumente, die nur aus Leerzeichen bestehen. Beispiel: `{Value|percent:0|prefix:Core 10: }` mit dem Wert `5` ergibt `Core 10: 5%`. Der Formatierungseditor zeigt die Abstände in seiner Vorschau und übernimmt sie beim Einfügen und Speichern. README und Hilfe enthalten Beispiele. Die Winamp-Metadatenverarbeitung bleibt unverändert.
+Der Vorlagenparser erhält führende und abschließende Leerzeichen in Präfix, Suffix und Ersatztext. Das gilt auch für Argumente, die nur aus Leerzeichen bestehen. Beispiel: `{Value|percent:0|prefix:Core 10: }` mit dem Wert `5` ergibt `Core 10: 5%`. Der Formatierungseditor zeigt die Abstände in seiner Vorschau und übernimmt sie beim Einfügen und Speichern. README und Hilfe enthalten Beispiele.
 
 ## Formatierungseditor und Hilfebeispiele
 

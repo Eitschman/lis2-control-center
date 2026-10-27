@@ -83,6 +83,16 @@ public sealed class HelpLanguageUiTests
                 Assert.NotNull(frame);
                 frame.Save(Path.Combine(screenshots, "help-formatting-" + preference + ".png"));
             }
+            var replacementExample = help.GetVisualDescendants().OfType<TextBlock>().Single(text =>
+                text.Text?.StartsWith("{Winamp.Artist|fallbackvar:Winamp.StreamName|fallback:--}") == true);
+            replacementExample.BringIntoView();
+            await Task.Delay(50);
+            help.UpdateLayout();
+            using (var frame = help.CaptureRenderedFrame())
+            {
+                Assert.NotNull(frame);
+                frame.Save(Path.Combine(screenshots, "help-fallback-variable-" + preference + ".png"));
+            }
             sections.SelectedIndex = preference == "French" ? 2 : 6;
             await Task.Delay(50);
             help.UpdateLayout();
