@@ -23,7 +23,7 @@ public sealed class DeviceUiTests
     public async Task FormattingEditorBuildsPreviewsAndInsertsWithoutReplacingFreeEditing(int width, int height, int languageIndex, string language)
     {
         var culture = System.Globalization.CultureInfo.CurrentCulture;
-        System.Globalization.CultureInfo.CurrentCulture = new("de-DE");
+        // Dispatcherereignisse verwenden die Systemkultur, unabhängig von der gewählten App-Sprache.
         try
         {
             await using var ui = await Fixture.OpenAsync(new PortableWorkspace());
@@ -42,7 +42,7 @@ public sealed class DeviceUiTests
             ui.Control<TextBox>("FormatSuffix").Text = "°C";
             await Fixture.WaitUntilAsync(() => ui.Control<TextBox>("FormatTemplate").Text == "{Clock.Year|number:2|suffix:°C}");
             Assert.Equal("{Clock.Year|number:2|suffix:°C}", ui.Control<TextBox>("FormatTemplate").Text);
-            Assert.Equal(DateTime.Now.Year + ",00°C", ui.Control<TextBlock>("FormatResult").Text);
+            Assert.Equal(DateTime.Now.Year.ToString("F2", culture) + "°C", ui.Control<TextBlock>("FormatResult").Text);
             Assert.Equal(UiTranslations.Translate("Formatting editor", language), ui.Control<Expander>("PageFormattingEditor").Header);
             foreach (var name in new[] { "PageLine1", "PageLine2" })
             {
