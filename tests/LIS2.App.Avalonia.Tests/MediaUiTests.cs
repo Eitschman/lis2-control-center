@@ -4,11 +4,59 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using LIS2.App.Avalonia;
+using LIS2.WmpLegacy;
+using System.Reflection;
+using Avalonia.Threading;
 
 namespace LIS2.App.Avalonia.Tests;
 
 public sealed class MediaUiTests
 {
+    [AvaloniaFact]
+    public async Task LegacyAudioChangesReachActualControlsWithinFourHundredMilliseconds()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        var directory = Path.Combine(Path.GetTempPath(), "lis2-media-cadence-" + Guid.NewGuid().ToString("N"));
+        var store = new PortableWorkspaceStore(Path.Combine(directory, "workspace.json"));
+        var window = new MainWindow(store, new PortableHaTokenStore(directory, "lis2-test-no-keyring"), false,
+            _ => throw new InvalidOperationException("No serial hardware in media cadence tests."));
+        var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        var timer = (DispatcherTimer)typeof(MainWindow).GetField("_mediaTimer", flags)!.GetValue(window)!;
+        var source = (WmpLegacyDataSource)typeof(MainWindow).GetField("_mediaLegacy", flags)!.GetValue(window)!;
+        var apply = typeof(WmpLegacyDataSource).GetMethod("ApplyVisualization", flags)!;
+        try
+        {
+            window.Show();
+            Click(window, "NavButton3");
+            timer.Start();
+            foreach (var level in new[] { 32, 96, 160, 224 })
+            {
+                apply.Invoke(source, [new WmpLegacyVisualizationMessage
+                {
+                    VuLeft = level, VuRight = 255 - level,
+                    Spectrum = Enumerable.Repeat(level, 20).ToArray()
+                }]);
+                var elapsed = System.Diagnostics.Stopwatch.StartNew();
+                while (window.FindControl<ProgressBar>("WmpLegacyVuLeft")!.Value != level)
+                {
+                    Assert.True(elapsed.Elapsed < TimeSpan.FromMilliseconds(400),
+                        "Legacy audio controls retained the old sample for 400 ms.");
+                    await Task.Delay(10);
+                }
+                Assert.Equal(255 - level, window.FindControl<ProgressBar>("WmpLegacyVuRight")!.Value);
+                Assert.All(window.FindControl<Grid>("WmpLegacySpectrumBars")!.Children.Cast<ProgressBar>(),
+                    bar => Assert.Equal(level, bar.Value));
+            }
+        }
+        finally
+        {
+            timer.Stop();
+            await window.BeginShutdownAsync();
+            window.Close();
+            if (Directory.Exists(directory)) Directory.Delete(directory, true);
+        }
+    }
+
     [AvaloniaFact]
     public async Task LegacySpectrumPresetRequiresGlyphReplacementAndHonorsCancel()
     {

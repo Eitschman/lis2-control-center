@@ -140,7 +140,8 @@ Die automatisierten Paketprüfungen aus **PORT-07** sind nachgewiesen, einschlie
 - [x] WMP Legacy unter Windows: Medienkarte, getrennte Metadaten-/Audiostatus, `WmpLegacy.*`, drei Presets und lokalisierte Einrichtungshilfe.
 - [x] Native Legacy-Plug-ins für x86/x64 im gemeinsamen Build-/Releaseworkflow mit ZIP, Anleitung, Lizenz und SHA-256.
 - [x] C/C++-Laufzeit in beiden Legacy-DLLs statisch einbinden; PE-Importe und COM-Objekterzeugung für x86/x64 prüfen. Release v0.1.3 enthält beide Pakete; separate Redistributable-Installation entfällt für diese Plug-ins.
-- [ ] Reale Legacy-Sitzung mit registrierten Plug-ins prüfen: Titelwechsel, Pause, Seek, Playlist, VU/Spektrum, Visualisierungswechsel sowie Neustart beider Anwendungen. [Prüfliste](docs/wmp-legacy-integration.md).
+- [x] Reale Legacy-Sitzung unter Windows 11 Enterprise 10.0.26200 mit Player 12.0.26100.1 x86: Metadaten, laufende Position, Playlistangabe und nach Auswahl der LIS2-Visualisierung VU/Spektrum empfangen. Die korrigierte Hintergrund-DLL verbindet sich nach Playerneustart.
+- [ ] Weitere Legacy-Abläufe prüfen: Titelwechsel, Pause, Seek, Visualisierungswechsel und Neustart des Control Centers; weitere Playerarchitektur prüfen. [Prüfliste](docs/wmp-legacy-integration.md).
 - [x] Linux liefert keine VU-/Spektrumanalyse aus MPRIS-Metadaten; Regressionstest prüft diese Grenze. Wine/Winamp bleibt optional.
 - [x] Avalonia-Branch-CI baut zusätzlich den selbständigen Windows-Protokolltester und das native Win32/x86-Winamp-Plug-in; eigene Artefakte wie auf main.
 - [x] [CI 39569558081](https://github.com/Eitschman/lis2-control-center/actions/runs/39569558081) für `cd4b779`: neun Jobs erfolgreich, je OS 375/375 Avalonia-, 55/55 Core-, 48/48 Display- und 12/12 Fans-Tests; beide nativen Smokes, drei App-Pakete, GSMTC-Paketstart, Protokolltester und Winamp-DLL erfolgreich.

@@ -52,7 +52,10 @@ public partial class MainWindow
         this.FindControl<Border>("LinuxMediaCard")!.IsVisible = OperatingSystem.IsLinux();
         this.FindControl<Border>("WinampMediaCard")!.IsVisible = OperatingSystem.IsWindows();
         this.FindControl<Border>("WindowsMediaCard")!.IsVisible = OperatingSystem.IsWindows();
-        _mediaTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        // Windows liest bereits empfangene Telemetrie; Pegel und Spektrum benötigen deren 100-ms-Takt.
+        // Linux startet externe playerctl-Abfragen und behält seinen bisherigen Abfragetakt.
+        _mediaTimer = new DispatcherTimer { Interval = OperatingSystem.IsWindows()
+            ? TimeSpan.FromMilliseconds(100) : TimeSpan.FromSeconds(1) };
         _mediaTimer.Tick += (_, _) => RefreshMedia();
         if (_startBackgroundSources) _mediaTimer.Start();
         this.FindControl<Button>("WindowsMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("WindowsMedia", "Windows Media Player");
