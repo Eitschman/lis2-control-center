@@ -9,10 +9,13 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 ### Winamp-Aktualisierung und Dashboard
 
+- [ ] Als Nächstes: Ergebnis von [Release-Workflow 40546184681](https://github.com/Eitschman/lis2-control-center/actions/runs/40546184681) für v0.1.13 prüfen; danach veröffentlichte Pakete, neun SHA-256-Prüfsummen und zehn README-Downloadlinks prüfen und den Release-Nachweis aktualisieren. Der Workflow läuft auf Benutzerwunsch über Nacht unverändert weiter.
+
 - [x] Winamp-Audioerfassung auf 100 ms stellen und neue Snapshots sofort an den Pipe-Worker melden.
 - [x] Empfangene Winamp-Audiowerte und moderne WMP-Metadaten über den tatsächlichen UI-Timer prüfen.
 - [x] Redundanten Systemstatusbereich und Befehlszähler aus dem Dashboard entfernen; Verbindungsanzeige oben rechts erhalten.
-- [ ] Neue Winamp-DLL im realen Player auf Zielsystemen prüfen. Nativer Erfassungs-/Übertragungstest und Gegenproben laufen in GitHub Actions.
+- [x] Neue Winamp-DLL unter Winamp 5.9.2.10042 im realen Radio-BOB-Stream prüfen: 155 sichtbare Pegel-/Spektrumänderungen nach Anlauf, Medianabstand 95 ms. Original-DLL gesichert, neue DLL installiert, Player anschließend wieder gestoppt.
+- [ ] Weitere Winamp-Zielsysteme und lokale MP3-Wiedergabe mit der neuen DLL prüfen.
 
 ### Aktueller Fehlernachweis: WMP-Legacy-Audio nach Titelwechsel
 
