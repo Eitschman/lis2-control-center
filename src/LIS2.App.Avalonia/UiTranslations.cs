@@ -5,6 +5,36 @@ internal static class UiTranslations
 {
     private static readonly IReadOnlyDictionary<string, string[]> Texts = new Dictionary<string, string[]>(StringComparer.Ordinal)
     {
+        ["Formatting: {Key|number:2}\n50.1234567 → 50,12 (German regional settings)\nfallback, percent, bytes, prefix, suffix, upper, lower\nMore examples: Pages help"] = [
+            "Formatierung: {Key|number:2}\n50.1234567 → 50,12 (deutsches Zahlenformat)\nfallback, percent, bytes, prefix, suffix, upper, lower\nWeitere Beispiele: Hilfe zu Seiten",
+            "Formatage : {Key|number:2}\n50.1234567 → 50,12 (paramètres régionaux allemands)\nfallback, percent, bytes, prefix, suffix, upper, lower\nAutres exemples : aide des pages",
+            "Biçimlendirme: {Key|number:2}\n50.1234567 → 50,12 (Alman bölgesel ayarları)\nfallback, percent, bytes, prefix, suffix, upper, lower\nDiğer örnekler: Sayfalar yardımı",
+            "Форматирование: {Key|number:2}\n50.1234567 → 50,12 (немецкий числовой формат)\nfallback, percent, bytes, prefix, suffix, upper, lower\nДругие примеры: справка по страницам"],
+        ["Formatting editor"] = ["Formatierungseditor", "Éditeur de formatage", "Biçimlendirme düzenleyicisi", "Редактор форматирования"],
+        ["Use a whole number from 0 to 6 for decimal places."] = ["Für Nachkommastellen eine ganze Zahl von 0 bis 6 verwenden.", "Utilisez un entier de 0 à 6 pour les décimales.", "Ondalık basamaklar için 0 ile 6 arasında bir tam sayı kullanın.", "Для числа знаков используйте целое число от 0 до 6."],
+        ["Variable"] = ["Variable", "Variable", "Değişken", "Переменная"],
+        ["Number format"] = ["Zahlenformat", "Format numérique", "Sayı biçimi", "Числовой формат"],
+        ["Unchanged"] = ["Unverändert", "Inchangé", "Değiştirilmemiş", "Без изменений"],
+        ["Number"] = ["Zahl", "Nombre", "Sayı", "Число"],
+        ["Percent"] = ["Prozent", "Pourcentage", "Yüzde", "Проценты"],
+        ["Bytes"] = ["Bytes", "Octets", "Bayt", "Байты"],
+        ["Decimal places"] = ["Nachkommastellen", "Décimales", "Ondalık basamaklar", "Знаки после запятой"],
+        ["Letter case"] = ["Groß-/Kleinschreibung", "Casse", "Harf boyutu", "Регистр"],
+        ["Uppercase"] = ["Großbuchstaben", "Majuscules", "Büyük harf", "Прописные"],
+        ["Lowercase"] = ["Kleinbuchstaben", "Minuscules", "Küçük harf", "Строчные"],
+        ["Prefix"] = ["Präfix", "Préfixe", "Önek", "Префикс"],
+        ["Suffix"] = ["Suffix", "Suffixe", "Sonek", "Суффикс"],
+        ["Missing value"] = ["Ersatz bei fehlendem Wert", "Texte si valeur absente", "Eksik değer metni", "Текст при отсутствии значения"],
+        ["Template"] = ["Vorlagenausdruck", "Expression du modèle", "Şablon ifadesi", "Выражение шаблона"],
+        ["Current result"] = ["Aktuelles Ergebnis", "Résultat actuel", "Güncel sonuç", "Текущий результат"],
+        ["Choose a variable. Braces and | are not allowed; variable keys cannot contain spaces."] = [
+            "Variable wählen. Geschweifte Klammern und | sind nicht erlaubt; Variablenschlüssel dürfen keine Leerzeichen enthalten.",
+            "Choisissez une variable. Accolades et | interdits ; les clés ne doivent pas contenir d’espaces.",
+            "Bir değişken seçin. Süslü parantezler ve | kullanılamaz; değişken anahtarları boşluk içeremez.",
+            "Выберите переменную. Фигурные скобки и | запрещены; ключи не могут содержать пробелы."],
+        ["No current value; the missing-value text is used."] = [
+            "Kein aktueller Wert; der Ersatztext wird verwendet.", "Aucune valeur actuelle ; le texte de remplacement est utilisé.",
+            "Güncel değer yok; eksik değer metni kullanılır.", "Текущее значение отсутствует; используется текст замены."],
         ["Changed"] = ["Geändert", "Modifié", "Değiştirildi", "Изменено"],
         ["Saving…"] = ["Speichern…", "Enregistrement…", "Kaydediliyor…", "Сохранение…"],
         ["Saved"] = ["Gespeichert", "Enregistré", "Kaydedildi", "Сохранено"],

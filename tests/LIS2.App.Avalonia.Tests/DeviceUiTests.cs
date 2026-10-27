@@ -5,6 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using LIS2.App.Avalonia;
 using LIS2.Core;
 
@@ -12,6 +13,102 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class DeviceUiTests
 {
+    [AvaloniaTheory]
+    [InlineData(950, 600, 1, "en")]
+    [InlineData(950, 600, 2, "de")]
+    [InlineData(1305, 893, 2, "de")]
+    [InlineData(950, 600, 3, "fr")]
+    [InlineData(950, 600, 4, "tr")]
+    [InlineData(950, 600, 5, "ru")]
+    public async Task FormattingEditorBuildsPreviewsAndInsertsWithoutReplacingFreeEditing(int width, int height, int languageIndex, string language)
+    {
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        System.Globalization.CultureInfo.CurrentCulture = new("de-DE");
+        try
+        {
+            await using var ui = await Fixture.OpenAsync(new PortableWorkspace());
+            ui.Window.Width = width;
+            ui.Window.Height = height;
+            ui.Control<ComboBox>("LanguageModeComboBox").SelectedIndex = languageIndex;
+            ui.Click("NavButton2");
+            ui.Click("PageAdd");
+            ui.Control<TextBox>("PageLine1").Text = "CPU=";
+            ui.Control<TextBox>("PageLine1").CaretIndex = 4;
+            ui.Control<TextBox>("PageLine2").Text = "";
+            ui.Control<Expander>("PageFormattingEditor").IsExpanded = true;
+            ui.Control<TextBox>("FormatVariable").Text = "Clock.Year";
+            ui.Control<ComboBox>("FormatKind").SelectedIndex = 1;
+            ui.Control<NumericUpDown>("FormatDecimals").Value = 2;
+            ui.Control<TextBox>("FormatSuffix").Text = "°C";
+            await Fixture.WaitUntilAsync(() => ui.Control<TextBox>("FormatTemplate").Text == "{Clock.Year|number:2|suffix:°C}");
+            Assert.Equal("{Clock.Year|number:2|suffix:°C}", ui.Control<TextBox>("FormatTemplate").Text);
+            Assert.Equal(DateTime.Now.Year + ",00°C", ui.Control<TextBlock>("FormatResult").Text);
+            Assert.Equal(UiTranslations.Translate("Formatting editor", language), ui.Control<Expander>("PageFormattingEditor").Header);
+            foreach (var name in new[] { "PageLine1", "PageLine2" })
+            {
+                var tip = Assert.IsType<string>(ToolTip.GetTip(ui.Control<TextBox>(name)));
+                Assert.Contains("{Key|number:2}", tip);
+                Assert.Contains("50,12", tip);
+                if (language != "en") Assert.DoesNotContain("German regional settings", tip);
+            }
+            ui.Click("FormatInsert1");
+            ui.Click("FormatInsert2");
+            Assert.Equal("CPU={Clock.Year|number:2|suffix:°C}", ui.Control<TextBox>("PageLine1").Text);
+            Assert.Equal("{Clock.Year|number:2|suffix:°C}", ui.Control<TextBox>("PageLine2").Text);
+            ui.Control<TextBox>("FormatVariable").Text = "Missing.Value";
+            ui.Control<TextBox>("FormatFallback").Text = "--";
+            await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("FormatResult").Text == "--");
+            Assert.Equal("--", ui.Control<TextBlock>("FormatResult").Text);
+            Assert.NotEmpty(ui.Control<TextBlock>("FormatStatus").Text!);
+            ui.Control<TextBox>("FormatSuffix").Text = "|upper";
+            await Fixture.WaitUntilAsync(() => !ui.Control<Button>("FormatInsert1").IsEnabled);
+            Assert.False(ui.Control<Button>("FormatInsert1").IsEnabled);
+            ui.Control<TextBox>("FormatSuffix").Text = "°C";
+            ui.Control<TextBox>("FormatVariable").Text = "Clock.Year";
+            await Fixture.WaitUntilAsync(() => ui.Control<Button>("FormatInsert1").IsEnabled);
+            ui.Control<NumericUpDown>("FormatDecimals").Value = null;
+            Assert.False(ui.Control<Button>("FormatInsert1").IsEnabled);
+            ui.Control<ComboBox>("FormatKind").SelectedIndex = 0;
+            Assert.True(ui.Control<Button>("FormatInsert1").IsEnabled);
+            ui.Control<ComboBox>("FormatKind").SelectedIndex = 1;
+            // Die Bilder verwenden eine fachlich passende Uhrzeitformatierung statt Testeinheiten am Jahr.
+            ui.Control<TextBox>("FormatVariable").Text = "Clock.Hour";
+            ui.Control<NumericUpDown>("FormatDecimals").Value = 0;
+            ui.Control<TextBox>("FormatSuffix").Text = "h";
+            await Fixture.WaitUntilAsync(() => ui.Control<TextBox>("FormatTemplate").Text?.Contains("suffix:h}") == true);
+            ui.Control<Button>("FormatInsert1").Focus();
+            await global::Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { },
+                global::Avalonia.Threading.DispatcherPriority.Background);
+            ui.Window.UpdateLayout();
+            var scroll = ui.Control<ScrollViewer>("PagesView");
+            var editor = ui.Control<Expander>("PageFormattingEditor");
+            var position = editor.TranslatePoint(default, (global::Avalonia.Visual)scroll.Content!)!.Value;
+            scroll.Offset = new Vector(0, position.Y);
+            await ui.CaptureAsync($"formatting-editor-top-{language}-{width}x{height}");
+            ui.Control<Button>("FormatInsert2").BringIntoView();
+            await ui.CaptureAsync($"formatting-editor-{language}-{width}x{height}");
+            await ui.ClickAndWaitAsync("PageSave");
+            await Fixture.WaitUntilAsync(() => ui.Store.Load().Pages.Any(page => page.Line1Template == "CPU={Clock.Year|number:2|suffix:°C}"));
+            Assert.Contains(ui.Store.Load().Pages, page => page.Line1Template == "CPU={Clock.Year|number:2|suffix:°C}");
+            ui.Click("FormatBrowse");
+            var browser = ui.Window.OwnedWindows.Single();
+            browser.GetVisualDescendants().OfType<TextBox>().Single(control => control.Name == "VariableSearch").Text = "Clock.Year";
+            await Fixture.WaitUntilAsync(() => browser.GetVisualDescendants().OfType<ListBox>().Single(control => control.Name == "VariableResults").ItemCount == 1);
+            browser.GetVisualDescendants().OfType<Button>().Single(control => control.Name == "VariableInsert1")
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal("Clock.Year", ui.Control<TextBox>("FormatVariable").Text);
+            var input = ui.Control<TextBox>("PageLine1");
+            input.Focus();
+            ui.Window.KeyPressQwerty(PhysicalKey.F1, RawInputModifiers.None);
+            Assert.True(ToolTip.GetIsOpen(input));
+            ui.Window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+            Assert.False(ToolTip.GetIsOpen(input));
+            ui.Control<ListBox>("PagesList").SelectedIndex = -1;
+            Assert.False(ui.Control<Button>("FormatInsert1").IsEnabled);
+        }
+        finally { System.Globalization.CultureInfo.CurrentCulture = culture; }
+    }
+
     [AvaloniaTheory]
     [InlineData(950, 600, false)]
     [InlineData(1305, 893, false)]

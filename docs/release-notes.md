@@ -1,16 +1,16 @@
-# LIS2 Control Center 0.1.5
+# LIS2 Control Center 0.1.6
 
-## Einheitliche VFD-Vorschau
+## Formatierungseditor und Hilfebeispiele
 
-Übersicht und Seiteneditor verwenden dieselbe kompakte VFD-Darstellung mit 20 × 2 Zeichen. Die Seitenvorschau verwendet Schriftgröße 24 ohne feste Pixelbreite oder Höhe. Auch leere Zeilen und eine aufgehobene Seitenauswahl behalten die zwanzig Zeichenplätze. Unter Linux stehen DejaVu Sans Mono und Liberation Mono in der Schriftfamilienauswahl.
+Der Seiteneditor enthält einen einklappbaren Formatierungseditor. Variablen lassen sich eingeben oder im vorhandenen Browser auswählen. Zahlenformat, 0 bis 6 Nachkommastellen, Groß-/Kleinschreibung, Präfix, Suffix und Ersatztext erzeugen einen Vorlagenausdruck mit Liveergebnis. Einfügen übernimmt ihn an die Schreibmarke in Zeile 1 oder 2; die freie Vorlageneingabe bleibt erhalten. Seite speichern sichert die eingefügten Ausdrücke. Die Hilfseditor-Einstellungen selbst werden nicht gespeichert.
 
-Die Vorschaukarte bekommt die dazu passende Breite. Status und Schnellzugriff nutzen den restlichen Platz. Bei ausreichend Platz stehen die Schnellzugriff-Schaltflächen nebeneinander; bei kleineren Fenstern brechen sie um.
+Beide Zeilenfelder besitzen wieder Formatierungshinweise. Mauszeiger oder F1 im fokussierten Zeilenfeld öffnen den Hinweis; Escape schließt ihn. Die Seitenhilfe beschreibt den Editor und enthält ausführbare Beispiele für Zahlen, Prozent, Bytes, Präfix/Suffix, Groß-/Kleinschreibung und fehlende Werte. Alle neuen Texte sind in Deutsch, Englisch, Französisch, Türkisch und Russisch verfügbar.
 
-Acht Layoutregressionen prüfen Übersicht und Seiteneditor auf Deutsch und Englisch bei 950 × 600 und 1305 × 893 Pixeln. Die Seiteneditorfälle vergleichen gefüllte und leere Vorschau sowie aufgehobene Seitenauswahl mit der Übersicht. Die Regressionen erkennen die abweichende Schriftgröße im Seiteneditor. Die Suche im Anwendungs- und Werkzeugcode findet diese beiden VFD-Vorschauen; Glyphen- und Lüfterkurvenvorschauen haben eigene Darstellungen.
+Beispiel: `{Value|number:2}` formatiert `50.1234567` mit deutschem Betriebssystem-Zahlenformat als `50,12`, mit englischem als `50.12`. Die App-Sprache verändert das Zahlenformat des Betriebssystems nicht. Prozent ergänzt nur `%`, ohne mit 100 zu multiplizieren; Bytes verwendet 1024er-Schritte. Fehlende Werte geben den Ersatztext direkt zurück, ohne weitere Formatierung oder Suffix.
 
 ## Windows Media Player Legacy
 
-Die Windows-App enthält die Legacy-Medienkarte, Metadaten und VU/Spektrum über zwei getrennte Plug-ins, `WmpLegacy.*`, drei Presets und fünfsprachige Hilfe. Die Pakete `LIS2-WMP-Legacy-0.1.5-win32.zip` und `LIS2-WMP-Legacy-0.1.5-win64.zip` enthalten jeweils beide nativen DLLs, Registrierungsanleitungen und die MIT-Lizenz. Die Architektur muss zum **Legacy-Playerprozess** passen. Registrierung mit dem passenden administrativen `regsvr32`, danach den Player neu starten. Für Audio **LIS2 Control Center / Telemetry** als Visualisierung wählen. Einzelheiten und manuelle Prüfliste: [Legacy-Leitfaden](https://github.com/Eitschman/lis2-control-center/blob/v0.1.5/docs/wmp-legacy-integration.md). Kein Plug-in greift auf LIS2-Hardware zu.
+Die Windows-App enthält die Legacy-Medienkarte, Metadaten und VU/Spektrum über zwei getrennte Plug-ins, `WmpLegacy.*`, drei Presets und fünfsprachige Hilfe. Die Pakete `LIS2-WMP-Legacy-0.1.6-win32.zip` und `LIS2-WMP-Legacy-0.1.6-win64.zip` enthalten jeweils beide nativen DLLs, Registrierungsanleitungen und die MIT-Lizenz. Die Architektur muss zum **Legacy-Playerprozess** passen. Registrierung mit dem passenden administrativen `regsvr32`, danach den Player neu starten. Für Audio **LIS2 Control Center / Telemetry** als Visualisierung wählen. Einzelheiten und manuelle Prüfliste: [Legacy-Leitfaden](https://github.com/Eitschman/lis2-control-center/blob/v0.1.6/docs/wmp-legacy-integration.md). Kein Plug-in greift auf LIS2-Hardware zu.
 
 Die Legacy-DLLs enthalten ihre C/C++-Laufzeit durch statisches Linken. Eine separate Visual-C++-Redistributable-Installation entfällt. Die CI kontrolliert die tatsächlichen DLL-Importe. Sicherheitsaktualisierungen der eingebundenen Laufzeit erfordern einen neuen Plug-in-Build.
 
@@ -22,7 +22,7 @@ App, Protokolltester und Headless-Tests verwenden **Avalonia 11.3.22**. Die DBus
 
 Enthalten sind portable Pakete für Windows x64, Linux x64 und Linux ARM64, Debian-Pakete für amd64/arm64, der Windows-Protokolltester, das native 32-Bit-Winamp-Plug-in `gen_lis2.dll` und beide Legacy-Plug-in-Pakete.
 
-Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.5_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
+Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.6_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
 
 Die Anwendungspakete liefern **.NET 10.0.13** mit; .NET muss nicht separat installiert werden. Lizenztexte, Fremdkomponentenhinweise und feste Quellverweise liegen unter `licenses/` und `THIRD-PARTY-NOTICES.txt` bei. Avalonia-Lizenztext und Inter-Schrift wurden gegen den tatsächlichen Paketstand geprüft.
 

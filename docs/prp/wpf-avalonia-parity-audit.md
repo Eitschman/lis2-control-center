@@ -1,6 +1,8 @@
 # WPF-/Avalonia-Paritätsaudit
 
-Stand: 22.10.2026. Implementierungsstand: PORT-08 und Windows Media Player Legacy.
+Stand: 27.10.2026. Implementierungsstand: PORT-08 und Windows Media Player Legacy.
+
+Die Formatierungspipeline ist gegenüber der WPF-Referenz unverändert. Die direkten Hinweise an beiden Zeilenfeldern sind lokalisiert verfügbar, einschließlich F1/Escape. Der zusätzliche einklappbare Formatierungseditor erzeugt Vorlagenausdrücke mit Liveergebnis und Einfügen an der Schreibmarke. Die Seitenhilfe beschreibt Bedienung und Beispiele für Zahlen, Prozent, Bytes, Text und fehlende Werte. Zahlen folgen dem Betriebssystem-Zahlenformat, unabhängig von der App-Sprache. Das ersetzt nicht die offene ROAD-03-Prüfung frei eingegebener Vorlagen.
 
 PORT-06 ergänzt den softwareseitigen Abgleich um benannte Glyphenschlüssel, statische Variablenbeschreibungen ohne verbundene Quellen, Hilfe neben dem Bereichstitel und F1. `DesktopParityUiTests` prüft zehn Ansichten in fünf Sprachen mit drei Themes bei 950 × 600, Headergrenzen, Fokus, Kontexthilfe sowie gültige und ungültige Ereignis-/Lüftereingaben. Bestehende Geräte-, Seiten-, Medien- und HA-Tests bleiben Teil der Suite. Das ersetzt keine Abnahme nativer Dateidialoge, echter Quellen oder physischer Geräte.
 

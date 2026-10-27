@@ -293,6 +293,7 @@ public partial class MainWindow
         _editorPreviewConfigured = false;
         this.FindControl<TextBlock>("PagePreview1")!.Text = new string(' ', 20);
         this.FindControl<TextBlock>("PagePreview2")!.Text = new string(' ', 20);
+        RefreshPageFormatting();
     }
 
     private async Task MovePageAsync(int offset)
@@ -386,6 +387,7 @@ public partial class MainWindow
     {
         // TextChanged kann bereits vor Closed in der Dispatcherqueue liegen.
         if (_loadingPage || _windowClosed) return;
+        RefreshPageFormatting();
         if (SelectedPageIndex is not int i)
         {
             ClearPageEditorPreview();
@@ -429,6 +431,7 @@ public partial class MainWindow
             return;
         }
         var frame = _editorPreview.Tick(DateTimeOffset.UtcNow, PagePreviewValues());
+        RefreshPageFormatting();
         UpdateConditionStatus();
         this.FindControl<TextBlock>("PagePreview1")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line1, _glyphs.IsSpectrumSet);
         this.FindControl<TextBlock>("PagePreview2")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line2, _glyphs.IsSpectrumSet);

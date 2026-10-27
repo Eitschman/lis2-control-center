@@ -61,7 +61,7 @@ public partial class MainWindow
             Width = 850, Height = 630,
             MinWidth = 580, MinHeight = 420, WindowStartupLocation = WindowStartupLocation.CenterOwner
         };
-        var search = new TextBox { Width = 260, MinWidth = 260, MaxWidth = 260,
+        var search = new TextBox { Name = "VariableSearch", Width = 260, MinWidth = 260, MaxWidth = 260,
             Watermark = BrowserText("Search variable keys (multiple words)…") };
         var categoryKeys = new[] { "All", "Favorites", "Home Assistant", "Hardware", "Clock", "Media / Other" };
         var category = new ComboBox
@@ -70,12 +70,12 @@ public partial class MainWindow
             SelectedIndex = 0, Width = 160
         };
         var entityPicker = new ComboBox { Width = 160 };
-        var results = new ListBox { MinHeight = 240 };
+        var results = new ListBox { Name = "VariableResults", MinHeight = 240 };
         var count = new TextBlock();
         var language = CurrentUiLanguage();
         var details = new TextBlock { TextWrapping = global::Avalonia.Media.TextWrapping.Wrap };
         var favorite = new Button { Content = BrowserText("☆ Add favorite") };
-        var insert1 = new Button { Content = BrowserText("Insert into line 1") };
+        var insert1 = new Button { Name = "VariableInsert1", Content = BrowserText("Insert into line 1") };
         var insert2 = new Button { Content = BrowserText("Insert into line 2") };
         if (selectedAction is not null)
         {

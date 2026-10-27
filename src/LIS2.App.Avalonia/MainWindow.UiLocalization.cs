@@ -12,7 +12,7 @@ public partial class MainWindow
     // Diese Felder enthalten Nutzdaten. Auch ein Titel wie "Connected" bleibt unverändert.
     private static readonly HashSet<string> DataTextFields = new(StringComparer.Ordinal)
     {
-        "PreviewLine1", "PreviewLine2", "PagePreview1", "PagePreview2", "GlyphTemplateKey",
+        "PreviewLine1", "PreviewLine2", "PagePreview1", "PagePreview2", "GlyphTemplateKey", "FormatResult",
         "WindowsMediaTitle", "WindowsMediaArtist", "WindowsMediaAlbum", "WindowsMediaTime", "WindowsMediaSource",
         "WinampVuLeftValue", "WinampVuRightValue",
         "LinuxMediaTitle", "LinuxMediaArtist", "LinuxMediaAlbum", "LinuxMediaDuration",

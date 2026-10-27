@@ -1,6 +1,6 @@
 # TODO: Projektroadmap und Restarbeiten
 
-Stand: 22.10.2026. Hauptbranch: `main`.
+Stand: 27.10.2026. Hauptbranch: `main`.
 Implementierungsstand: PORT-08 mit Avalonia 11.3.22 und .NET 10. Windows Media Player Legacy ist zusätzlich über Hintergrund- und Visualisierungs-Plug-in angebunden. Aktuelle Prüfergebnisse und offene Zielsystemnachweise stehen im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
@@ -75,6 +75,7 @@ Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nich
 - [x] Gemeinsame Avalonia-App für Windows/Linux und portable .NET-10-Bibliotheken.
 - [x] Headless Seiten-/Ereignisruntime, adaptive Schleifen und virtuelle/serielle Sessionintegration.
 - [x] Seiteneditor mit Presets, Sichtbarkeit, Scrolling, Entwurfsvorschau und validiertem JSON-Import/-Export.
+- [x] Einklappbarer Formatierungseditor mit Variablenauswahl, Zahlenformat/Nachkommastellen, Präfix/Suffix, Ersatztext, Groß-/Kleinschreibung, Liveergebnis und Einfügen in beide Zeilen. Formatierungshinweise per Maus/F1 und fünfsprachige Hilfe mit Zahlen-, Prozent-, Byte-, Text- und Ersatzwertbeispielen.
 - [x] Genehmigter modaler Variablenbrowser mit Suche, Livewerten und persistenten Favoriten.
 - [x] Glypheneditor, Dateien, acht Slots und Spektrum-Ersetzungsdialog.
 - [x] Windows-/Linux-Sensoren, Aliase, Favoriten und fehlende Sensoren im Katalog.

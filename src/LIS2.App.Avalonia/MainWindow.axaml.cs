@@ -103,6 +103,7 @@ public partial class MainWindow : Window
         InitializeDiagnostics();
         InitializeGlyphEditor();
         InitializePagesEditor();
+        InitializePageFormatting();
         InitializeMedia();
         InitializeSettings();
         InitializeEvents();

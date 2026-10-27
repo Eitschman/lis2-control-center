@@ -13,7 +13,11 @@ public sealed class MenuTranslationCatalogTests
         {
             var translated = UiTranslations.Translate(source, language);
             Assert.Equal(Placeholders(source), Placeholders(translated));
-            _ = System.Text.CompositeFormat.Parse(translated);
+            // Kopierbare Vorlagenausdrücke sind Literale, keine string.Format-Platzhalter.
+            const string templateToken = @"\{[A-Za-z][^{}]*\}";
+            var literals = System.Text.RegularExpressions.Regex.Matches(source, templateToken).Select(match => match.Value);
+            Assert.All(literals, token => Assert.Contains(token, translated));
+            _ = System.Text.CompositeFormat.Parse(System.Text.RegularExpressions.Regex.Replace(translated, templateToken, ""));
         }
     }
 

@@ -67,6 +67,22 @@ public sealed class HelpLanguageUiTests
                     text.Text == HelpReferenceLocalization.Translate(HelpReferenceCatalog.Sections[index], "de"));
             }
             language.SelectedIndex = preference == "French" ? 3 : preference == "Russian" ? 5 : 2;
+            sections.SelectedIndex = 2;
+            await Task.Delay(50);
+            help.UpdateLayout();
+            var example = help.GetVisualDescendants().OfType<TextBlock>().Single(text =>
+                text.Text?.StartsWith("{Value|number:2}:") == true);
+            Assert.Contains("50.1234567 → 50,12", example.Text);
+            Assert.Contains(help.GetVisualDescendants().OfType<TextBlock>(), text =>
+                text.Text?.Contains("{Value|fallback:--|number:2|suffix:°C}") == true);
+            example.BringIntoView();
+            await Task.Delay(50);
+            help.UpdateLayout();
+            using (var frame = help.CaptureRenderedFrame())
+            {
+                Assert.NotNull(frame);
+                frame.Save(Path.Combine(screenshots, "help-formatting-" + preference + ".png"));
+            }
             sections.SelectedIndex = preference == "French" ? 2 : 6;
             await Task.Delay(50);
             help.UpdateLayout();
