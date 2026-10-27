@@ -470,7 +470,10 @@ int PluginInit()
 
     g_metadata = {};
     CaptureSnapshot(g_plugin.hwndParent, 0, 0, 0);
-    g_timer = SetTimer(g_plugin.hwndParent, 0, PollIntervalMs, CaptureSnapshot);
+    // Bei einem HWND-Timer ist der Rückgabewert nur ein Erfolgskennzeichen, keine neue Timer-ID.
+    const auto timerId = reinterpret_cast<UINT_PTR>(&g_timer);
+    g_timer = SetTimer(g_plugin.hwndParent, timerId, PollIntervalMs, CaptureSnapshot) != 0
+        ? timerId : 0;
     if (g_timer == 0)
     {
         CloseHandle(g_snapshotReady);
