@@ -277,6 +277,8 @@ Template values can be formatted inline:
 
 Supported operations are `fallback`, `number`, `percent`, `bytes`, `prefix`, `suffix`, `upper` and `lower`. Operations can be chained.
 
+Leading and trailing spaces in text arguments are preserved. For example, `{Value|percent:0|prefix:Core 10: }` with a value of `5` displays `Core 10: 5%`; `{Value|suffix: %}` displays `5 %`.
+
 ## Protocol status
 
 The production implementation currently covers:

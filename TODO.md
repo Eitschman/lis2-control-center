@@ -72,6 +72,8 @@ Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nich
 
 ## Vorhandene Basis
 
+- [x] Leerzeichen an Anfang und Ende von Präfix, Suffix und Ersatztext erhalten; Renderer, Editorvorschau und gespeicherte Vorlagen sind durch Regressionen geprüft. Herkunft der Winamp-Felder und Verhalten bei zusammengesetzten Streamtiteln sind dokumentiert.
+
 - [x] Gemeinsame Avalonia-App für Windows/Linux und portable .NET-10-Bibliotheken.
 - [x] Headless Seiten-/Ereignisruntime, adaptive Schleifen und virtuelle/serielle Sessionintegration.
 - [x] Seiteneditor mit Presets, Sichtbarkeit, Scrolling, Entwurfsvorschau und validiertem JSON-Import/-Export.

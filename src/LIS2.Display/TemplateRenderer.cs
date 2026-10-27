@@ -32,13 +32,14 @@ public sealed partial class TemplateRenderer
         string expression,
         IReadOnlyDictionary<string, object?> values)
     {
-        var parts = expression
-            .Split('|', StringSplitOptions.TrimEntries);
+        // Textargumente enthalten gewollte Abstände, etwa "Core 10: ".
+        // Nur Schlüssel und Operationsnamen bereinigen, nicht den Text nach dem Doppelpunkt.
+        var parts = expression.Split('|');
 
         if (parts.Length == 0 || string.IsNullOrWhiteSpace(parts[0]))
             return string.Empty;
 
-        var name = parts[0];
+        var name = parts[0].Trim();
         values.TryGetValue(name, out var rawValue);
 
         var unavailable =

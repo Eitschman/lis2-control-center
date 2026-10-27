@@ -39,6 +39,14 @@ Named pipe:
 
 The plugin does not write to LIS2 hardware. It only gathers Winamp metadata/events and sends normalized messages to the host application.
 
+## Herkunft von Interpret und Titel
+
+`native/LIS2.WinampPlugin/plugin.cpp` ermittelt den aktuellen Playlistindex mit `IPC_GETLISTPOS` und dessen Datei oder Stream-URL mit `IPC_GETPLAYLISTFILE`. `GetExtendedInfo` fragt die Felder `artist`, `title` und `album` einzeln über `IPC_GET_EXTENDED_FILE_INFO_HOOKABLE` (296) ab. Wird dieser Aufruf nicht unterstützt, verwendet der vorhandene Code `IPC_GET_EXTENDED_FILE_INFO` (290). Die Werte stammen damit aus der von Winamp bereitgestellten Metadatenabfrage, abhängig vom zuständigen Eingabe-Plug-in und dessen Unterstützung für die Quelle.
+
+Bleibt `title` leer, übernimmt die DLL den Playlist-Anzeigetitel aus `IPC_GETPLAYLISTTITLE` (212). Für `artist` gibt es keine solche Ersetzung. Die DLL zerlegt zusammengesetzte Titel nicht an Bindestrichen. Ein Stream kann deshalb den ganzen angezeigten Text in `Winamp.Title` liefern, während `Winamp.Artist` leer bleibt. Die Pipe, `WinampSnapshot` und `WinampValues` übernehmen diese beiden Felder getrennt und ohne nachträgliche Aufteilung. Aus dem JSON allein lässt sich nicht unterscheiden, ob der Titel aus dem Metadatenfeld oder dem Playlist-Anzeigetitel stammt.
+
+Die [Winamp-SDK-Referenz](https://github.com/hugovk/winamp/blob/master/wa_ipc.h) beschreibt die beiden Metadatenaufrufe und ihre Abhängigkeit von `getExtendedFileInfo` im Decoder. Die [Winamp-Titelformatierungsreferenz](https://meggamusic.co.uk/winamp/docs/help/atf/atf_help.htm) führt außerdem `streamtitle` als eigenes Streamfeld auf. Das LIS2-Plug-in fragt dieses zusätzliche Feld derzeit nicht ab. Der gemeldete Radio-BOB-Fall ist mit dem beschriebenen Datenweg vereinbar; die konkreten Rohantworten des laufenden Players wurden dafür nicht aufgezeichnet. Eine automatische Interpret-/Titelaufteilung wird daraus nicht abgeleitet.
+
 ## Message format
 
 Messages are UTF-8 JSON, one object per line.

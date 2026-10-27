@@ -5,6 +5,18 @@ namespace LIS2.Display.Tests;
 
 public sealed class TemplateRendererTests
 {
+    [Theory]
+    [InlineData("{Load|percent:0|prefix:Core 10: }", "Core 10: 5%")]
+    [InlineData("{Load|percent:0|prefix: Core 10: |suffix: load }", " Core 10: 5% load ")]
+    [InlineData("{Load|percent:0|prefix: |suffix: }", " 5% ")]
+    [InlineData("{ Load | percent : 0 | prefix :Core 10: }", "Core 10: 5%")]
+    [InlineData("{Missing|fallback: -- }", " -- ")]
+    public void Render_PreservesWhitespaceInTextArguments(string template, string expected)
+    {
+        var renderer = new TemplateRenderer();
+        Assert.Equal(expected, renderer.Render(template, new Dictionary<string, object?> { ["Load"] = 5 }));
+    }
+
     [Fact]
     public void Render_ResolvesNamedGlyphValue()
     {

@@ -90,6 +90,23 @@ public sealed class DeviceUiTests
             await ui.ClickAndWaitAsync("PageSave");
             await Fixture.WaitUntilAsync(() => ui.Store.Load().Pages.Any(page => page.Line1Template == "CPU={Clock.Year|number:2|suffix:°C}"));
             Assert.Contains(ui.Store.Load().Pages, page => page.Line1Template == "CPU={Clock.Year|number:2|suffix:°C}");
+            ui.Control<TextBox>("FormatPrefix").Text = " Core 10: ";
+            ui.Control<TextBox>("FormatSuffix").Text = " % ";
+            await Fixture.WaitUntilAsync(() => ui.Control<TextBox>("FormatTemplate").Text ==
+                "{Clock.Hour|fallback:--|number:0|prefix: Core 10: |suffix: % }");
+            Assert.Equal(" Core 10: " + DateTime.Now.Hour.ToString(culture) + " % ",
+                ui.Control<TextBlock>("FormatResult").Text);
+            ui.Control<TextBox>("PageLine2").Text = "";
+            ui.Click("FormatInsert2");
+            const string spacedTemplate = "{Clock.Hour|fallback:--|number:0|prefix: Core 10: |suffix: % }";
+            Assert.Equal(spacedTemplate, ui.Control<TextBox>("PageLine2").Text);
+            await ui.ClickAndWaitAsync("PageSave");
+            await Fixture.WaitUntilAsync(() => ui.Store.Load().Pages.Any(page => page.Line2Template == spacedTemplate));
+            if (width == 1305)
+            {
+                ui.Control<Button>("FormatInsert2").BringIntoView();
+                await ui.CaptureAsync("formatting-affix-spaces-de");
+            }
             ui.Click("FormatBrowse");
             var browser = ui.Window.OwnedWindows.Single();
             browser.GetVisualDescendants().OfType<TextBox>().Single(control => control.Name == "VariableSearch").Text = "Clock.Year";

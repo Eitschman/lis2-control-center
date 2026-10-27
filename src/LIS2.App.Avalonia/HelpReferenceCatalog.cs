@@ -57,7 +57,7 @@ internal static class HelpReferenceCatalog
                 AddExample("Numbers", "{Value|number:2}: 50.1234567 → 50,12 (de-DE) / 50.12 (en-US)\n{Value|number:0}: 50.1234567 → 50\n{Value|number:2|suffix:°C}: 50.1234567 → 50,12°C (de-DE)");
                 AddExample("Percent", "{Value|percent:1}: 73.24 → 73,2% (de-DE)\n{Value|percent:0}: 0.75 → 1% (de-DE)");
                 AddExample("Bytes", "{Value|bytes:2}: 1073741824 → 1,00 GB (de-DE) / 1.00 GB (en-US)");
-                AddExample("Text", "{Value|upper|prefix:[|suffix:]}: lis2 → [LIS2]\n{Value|lower}: LIS2 → lis2");
+                AddExample("Text", "{Value|upper|prefix:[|suffix:]}: lis2 → [LIS2]\n{Value|lower}: LIS2 → lis2\n{Value|percent:0|prefix:Core 10: }: 5 → Core 10: 5%\n{Value|suffix: %}: 5 → 5 %");
                 Add("Missing values", "If Value is missing, unknown or unavailable, {Value|fallback:--|number:2|suffix:°C} displays --. The fallback is returned directly; it is not formatted and receives no suffix. A valid value of 50.1234567 displays 50,12°C with German regional settings. Percent only adds the % symbol; it does not multiply the source by 100. Bytes divides by powers of 1024.");
                 Add("Visibility", "Use =, !=, >, >=, < or <=. Example: HA.sensor.temperature>=25");
                 Add("Visibility", "The condition fields follow the raw expression and selected page. Browse variables selects a current key for the condition. Invalid raw expressions remain editable. Save feedback appears beside the editor; a failed save keeps the draft.");

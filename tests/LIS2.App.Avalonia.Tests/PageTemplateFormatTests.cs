@@ -6,6 +6,19 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class PageTemplateFormatTests
 {
+    [Fact]
+    public void GeneratedAffixesPreserveLeadingTrailingAndSpaceOnlyArguments()
+    {
+        var format = new PageTemplateFormat("Load", 2, 0, 0, " Core 10: ", " load ", " -- ");
+        Assert.True(format.TryBuild(out var template));
+        Assert.Equal("{Load|fallback: -- |percent:0|prefix: Core 10: |suffix: load }", template);
+        var renderer = new TemplateRenderer();
+        Assert.Equal(" Core 10: 5% load ", renderer.Render(template, new Dictionary<string, object?> { ["Load"] = 5 }));
+        Assert.Equal(" -- ", renderer.Render(template, new Dictionary<string, object?>()));
+        Assert.True((format with { Prefix = " ", Suffix = " " }).TryBuild(out var spaces));
+        Assert.Equal(" 5% ", renderer.Render(spaces, new Dictionary<string, object?> { ["Load"] = 5 }));
+    }
+
     [Theory]
     [InlineData("de-DE", "50,12°C", "73,2%", "1,00 GB")]
     [InlineData("en-US", "50.12°C", "73.2%", "1.00 GB")]
