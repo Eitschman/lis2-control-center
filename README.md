@@ -57,7 +57,7 @@ The following features belong to the Avalonia application. The porting status re
 ### LIS2 / display
 
 - serial LIS2 transport at 19200 baud, 8N1 plus a virtual transport
-- 20x2 VFD output, matching compact previews on the Dashboard and Pages views, clear and 25/50/75/100% brightness
+- 20x2 VFD output, compact previews with fixed character cells on the Dashboard and Pages views, clear and 25/50/75/100% brightness
 - differential display updates: only changed spans are written after the first frame
 - native uPD16314 character mapping, including German umlauts, `ß`, `°`, `µ`, arrows and useful mathematical symbols
 - raw character-ROM test support for hardware validation

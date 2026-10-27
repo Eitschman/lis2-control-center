@@ -184,7 +184,7 @@ public sealed class DeviceUiTests
         await ui.ClickAndWaitAsync("RenderBoth");
         ui.Click("NavButton0");
         ui.Window.UpdateLayout();
-        var dashboardFirst = ui.Control<TextBlock>("PreviewLine1");
+var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         var dashboardDisplay = Assert.IsType<Border>(Assert.IsType<StackPanel>(dashboardFirst.Parent).Parent);
         var expectedSize = dashboardDisplay.Bounds.Size;
 
@@ -192,7 +192,7 @@ public sealed class DeviceUiTests
         ui.Click("PageAdd");
         ui.Control<TextBox>("PageLine1").Text = "12345678901234567890";
         ui.Control<TextBox>("PageLine2").Text = "ABCDEFGHIJKLMNOPQRST";
-        await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("PagePreview2").Text == "ABCDEFGHIJKLMNOPQRST");
+        await Fixture.WaitUntilAsync(() => ui.Control<VfdLine>("PagePreview2").Text == "ABCDEFGHIJKLMNOPQRST");
         // PageAdd fokussiert den Namen; dessen verzögertes BringIntoView darf die Aufnahme nicht zurückscrollen.
         ui.Control<Button>("PageSave").Focus();
         await global::Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { },
@@ -201,8 +201,8 @@ public sealed class DeviceUiTests
         var scroll = ui.Control<ScrollViewer>("PagesView");
         scroll.Offset = new Vector(0, double.MaxValue);
         await ui.CaptureAsync($"pages-vfd-{(german ? "de" : "en")}-{width}x{height}");
-        var first = ui.Control<TextBlock>("PagePreview1");
-        var second = ui.Control<TextBlock>("PagePreview2");
+        var first = ui.Control<VfdLine>("PagePreview1");
+        var second = ui.Control<VfdLine>("PagePreview2");
         var display = Assert.IsType<Border>(Assert.IsType<StackPanel>(first.Parent).Parent);
         Assert.InRange(scroll.Offset.Y, Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height) - 1,
             Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height) + 1);
@@ -228,6 +228,50 @@ public sealed class DeviceUiTests
     }
 
     [AvaloniaTheory]
+    [InlineData(950, 600)]
+    [InlineData(1305, 893)]
+    public async Task SpectrumAndCustomGlyphFramesKeepTwentyFixedPreviewCells(int width, int height)
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace());
+        ui.Window.Width = width;
+        ui.Window.Height = height;
+        Size? expected = null;
+        foreach (var page in new[] { false, true })
+        {
+            ui.Click(page ? "NavButton2" : "NavButton0");
+            var first = ui.Control<VfdLine>(page ? "PagePreview1" : "PreviewLine1");
+            var second = ui.Control<VfdLine>(page ? "PagePreview2" : "PreviewLine2");
+            var display = Assert.IsType<Border>(Assert.IsType<StackPanel>(first.Parent).Parent);
+            var frames = new[] { new string(' ', 20), "12345678901234567890",
+                "ABCDEFGHIJKLMNOPQRST", "ÄÖÜäöüß°µ→←↑↓ ±×÷≤≥·", "▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█▁▂▃▄",
+                "①②③④⑤⑥⑦⑧①②③④⑤⑥⑦⑧①②③④" }
+                .Concat("▁▂▃▄▅▆▇█".Select(glyph => new string(glyph, 20)));
+            foreach (var frame in frames)
+            {
+                first.Text = frame;
+                second.Text = frame;
+                ui.Window.UpdateLayout();
+                expected ??= display.Bounds.Size;
+                Assert.InRange(Math.Abs(display.Bounds.Width - expected.Value.Width), 0, 1);
+                Assert.InRange(Math.Abs(display.Bounds.Height - expected.Value.Height), 0, 1);
+                Assert.InRange(first.Bounds.Width, first.DesiredSize.Width - 1, first.DesiredSize.Width + 1);
+                Assert.Equal(20, first.Text!.Length);
+                var peer = global::Avalonia.Automation.Peers.ControlAutomationPeer.CreatePeerForElement(first);
+                Assert.Equal(frame, peer.GetName());
+                Assert.Equal(global::Avalonia.Automation.Peers.AutomationControlType.Text, peer.GetAutomationControlType());
+            }
+            first.Text = "▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█▁▂▃▄";
+            second.Text = "ÄÖÜäöüß°µ→←↑↓ ±×÷≤≥·";
+            if (page)
+            {
+                ui.Control<ScrollViewer>("PagesView").Offset = new Vector(0, double.MaxValue);
+                await ui.CaptureAsync($"pages-vfd-fixed-spectrum-{width}x{height}");
+            }
+            else await ui.CaptureAsync($"dashboard-vfd-fixed-spectrum-{width}x{height}");
+        }
+    }
+
+    [AvaloniaTheory]
     [InlineData(950, 600, false)]
     [InlineData(1305, 893, false)]
     [InlineData(950, 600, true)]
@@ -245,8 +289,8 @@ public sealed class DeviceUiTests
         ui.Click("NavButton0");
         await ui.CaptureAsync($"dashboard-vfd-{(german ? "de" : "en")}-{width}x{height}");
 
-        var first = ui.Control<TextBlock>("PreviewLine1");
-        var second = ui.Control<TextBlock>("PreviewLine2");
+        var first = ui.Control<VfdLine>("PreviewLine1");
+        var second = ui.Control<VfdLine>("PreviewLine2");
         var rows = Assert.IsType<StackPanel>(first.Parent);
         var display = Assert.IsType<Border>(rows.Parent);
         Assert.Equal(20, first.Text!.Length);
@@ -291,7 +335,7 @@ public sealed class DeviceUiTests
         await ui.ClickAndWaitAsync("RenderBoth");
         Assert.StartsWith("ÄÖÜ LIS2", transport.State.Line1);
         Assert.StartsWith("Selected serial", transport.State.Line2);
-        Assert.Equal(transport.State.Line1, ui.Control<TextBlock>("PreviewLine1").Text);
+        Assert.Equal(transport.State.Line1, ui.Control<VfdLine>("PreviewLine1").Text);
         await ui.ClickAndWaitAsync("ClearDisplay");
         Assert.Equal(new string(' ', 20), transport.State.Line1);
         await ui.ClickAndWaitAsync("SendLine1");

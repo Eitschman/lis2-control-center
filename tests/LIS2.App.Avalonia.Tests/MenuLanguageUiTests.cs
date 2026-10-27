@@ -92,12 +92,12 @@ public sealed class MenuLanguageUiTests
                 window.FindControl<TextBlock>("EventStatus")!.Text);
             window.FindControl<ComboBox>("LanguageModeComboBox")!.SelectedIndex = 1;
             window.FindControl<TextBlock>("WindowsMediaTitle")!.Text = "Connected";
-            window.FindControl<TextBlock>("PreviewLine1")!.Text = "Playing";
+            window.FindControl<VfdLine>("PreviewLine1")!.Text = "Playing";
             Assert.Equal("Duration must be between 1 and 3600 seconds.", window.FindControl<TextBlock>("EventStatus")!.Text);
             Assert.Equal("Connected", window.FindControl<TextBox>("EventLine1")!.Text);
             window.FindControl<ComboBox>("LanguageModeComboBox")!.SelectedIndex = 2;
             Assert.Equal("Connected", window.FindControl<TextBlock>("WindowsMediaTitle")!.Text);
-            Assert.Equal("Playing", window.FindControl<TextBlock>("PreviewLine1")!.Text);
+            Assert.Equal("Playing", window.FindControl<VfdLine>("PreviewLine1")!.Text);
             Click(window, "NavButton6");
             window.FindControl<ComboBox>("FanModePicker")!.SelectedIndex = 1;
             Click(window, "FanSave");

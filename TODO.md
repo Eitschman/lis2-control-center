@@ -7,6 +7,12 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 ## Roadmap: Weiterentwicklung nach v0.1.3
 
+### Aktueller Fehlernachweis: WMP-Legacy-Audio nach Titelwechsel
+
+- [x] Auslöser durch Benutzerprüfung eingegrenzt: automatischer MP3-Titelwechsel; Metadaten laufen weiter, Audiowerte fallen aus.
+- [x] Gegenprobe mit eingebauter WMP-Visualisierung reproduziert den Ausfall. Ansichtswechsel stellt Audio wieder her; Visualisierungswechsel, Pause/Fortsetzen und Seek helfen in dieser Prüfung nicht.
+- [ ] Automatische Wiederherstellung untersuchen und am realen Player prüfen. Kein als erfolgreich ausgegebener Fix allein anhand simuliert gelieferter Audiodaten. Befund und externe Referenz: [Legacy-Anleitung](docs/wmp-legacy-integration.md#audiowerte-fehlen-nach-automatischem-titelwechsel).
+
 Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nicht implementiert. Die Reihenfolge priorisiert Update-Hinweise, danach die Unterstützung bei Seitenkonfiguration und Fehlersuche. Der automatische Windows-Dateiaustausch bleibt ein eigenes Arbeitspaket. Debian-Pakete werden weiterhin als Release-Downloads angeboten; ein eigenes APT-Repository ist nicht vorgesehen. Die bestehenden Paketnummern bleiben erhalten. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
 
 ### ROAD-01: Update-Hinweise

@@ -58,6 +58,8 @@ Ereignisse können eine temporäre Sequenz starten. Nach Ablauf wird zur normale
 
 ## Gerätezugriff und Lüfter
 
+Dashboard und Seiteneditor verwenden `VfdLine` für die VFD-Vorschau. Jede Zeile besitzt zwanzig feste Zeichenplätze, deren Maße aus der konfigurierten Monospace-Schrift stammen. Die acht Spektrumstufen werden direkt innerhalb dieser Zellen gezeichnet. Andere Zeichen werden je Zelle eingepasst, damit Unicode-Ersatzschriften weder die Vorschaugröße verändern noch nachfolgende Zeichen verschieben. Der Vorschautext bleibt über die Accessibility-Schnittstelle lesbar; Geräteframes und Glyphenprogrammierung sind davon unabhängig.
+
 `IDisplaySession` bündelt Displaybefehle beider Sessions. `MainWindow.DeviceActions` wählt das Ziel anhand des angewendeten, gespeicherten Transportmodus. Änderungen der Transportauswahl werden erst beim Anwenden wirksam. Der Wechsel speichert zuerst, drainiert beide Sequenzen, trennt alte Sessions und verbindet genau den gewählten Transport. Helligkeit und konfigurierte Glyphen werden beim Verbinden angewendet. Die serielle Vorschau zeigt erfolgreich gesendete Inhalte, keine Hardware-Rückmeldung.
 
 Die Dashboard-Handausgabe verwendet `PortableFanSettings.CalculateManualOutputs` und `FanController` für Minimum, Maximum und AllowStop. Der gespeicherte Regelmodus bleibt erhalten. `SerialDisplaySession.ApplyManualFansAsync` benötigt ausdrückliche Freigabe, teilt das Lifecycle-Gate mit Start/Stop/Disconnect und lehnt parallele automatische Regelung ab. Erstfreigabe schreibt 100 Prozent; Stop, Trennen und Schreibfehler entziehen die Freigabe und versuchen die Sicherheitsausgabe. Die UI verbraucht jede manuelle Freigabe nach einer Aktion.

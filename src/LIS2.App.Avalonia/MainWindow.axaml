@@ -18,11 +18,10 @@
       <Setter Property="HorizontalAlignment" Value="Left" />
       <Setter Property="ClipToBounds" Value="True" />
     </Style>
-    <Style Selector="TextBlock.vfdLine">
+    <Style Selector="local|VfdLine.vfdLine">
       <Setter Property="FontFamily" Value="Consolas,DejaVu Sans Mono,Liberation Mono" />
       <Setter Property="FontSize" Value="24" />
       <Setter Property="Foreground" Value="#F7FBFF" />
-      <Setter Property="TextWrapping" Value="NoWrap" />
     </Style>
   </Window.Styles>
   <Grid ColumnDefinitions="250,*">
@@ -71,8 +70,8 @@
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
                 <Border Classes="vfdDisplay">
                   <StackPanel HorizontalAlignment="Left" Spacing="0">
-                    <TextBlock Name="PreviewLine1" Classes="vfdLine" Text="                    " />
-                    <TextBlock Name="PreviewLine2" Classes="vfdLine" Text="                    " />
+                    <local:VfdLine Name="PreviewLine1" Classes="vfdLine" Text="                    " />
+                    <local:VfdLine Name="PreviewLine2" Classes="vfdLine" Text="                    " />
                   </StackPanel>
                 </Border>
                 <Button Name="VirtualDemo" Content="Send demo display" IsEnabled="False" HorizontalAlignment="Left" />
@@ -371,8 +370,8 @@
               </Grid>
               <Border Classes="vfdDisplay">
                 <StackPanel Spacing="0">
-                  <TextBlock Name="PagePreview1" Classes="vfdLine" Text="                    "/>
-                  <TextBlock Name="PagePreview2" Classes="vfdLine" Text="                    "/>
+                  <local:VfdLine Name="PagePreview1" Classes="vfdLine" Text="                    "/>
+                  <local:VfdLine Name="PagePreview2" Classes="vfdLine" Text="                    "/>
                 </StackPanel>
               </Border>
               <WrapPanel>

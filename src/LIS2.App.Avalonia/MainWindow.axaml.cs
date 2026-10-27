@@ -261,8 +261,8 @@ public partial class MainWindow : Window
 
     private void UpdatePreview()
     {
-        var first = this.FindControl<TextBlock>("PreviewLine1");
-        var second = this.FindControl<TextBlock>("PreviewLine2");
+        var first = this.FindControl<VfdLine>("PreviewLine1");
+        var second = this.FindControl<VfdLine>("PreviewLine2");
         if (first is null || second is null)
             return;
 

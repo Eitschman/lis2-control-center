@@ -28,6 +28,12 @@ Das Hintergrund-Plug-in startet seine Telemetrie bei der Übergabe des Player-Ke
 
 ## Medienkarte und Displayseiten
 
+### Audiowerte fehlen nach automatischem Titelwechsel
+
+Auf dem geprüften Windows-11-System fällt die Audioübergabe bei automatischem Wechsel zwischen MP3-Titeln eines Albums aus. Titel und Laufzeit bleiben aktuell, Pegel und Spektrum stehen dagegen sowohl auf der Medienseite als auch in den Displayseiten still. Die Gegenprobe des Benutzers reproduziert denselben Ausfall mit einer eingebauten WMP-Visualisierung. Ein Wechsel zur Bibliotheks-/Wiedergabelistenansicht und zurück zur Visualisierungsansicht stellt Audio wieder her. Ein bloßer Visualisierungswechsel, Pause/Fortsetzen und ein Positionssprung haben es in dieser Prüfung nicht wiederhergestellt.
+
+Der Visualisierungshersteller [SoundSpectrum dokumentiert den Ausfall nach dem ersten Titel](https://www.soundspectrum.com/g-force/Documentation/troubleshooting.html) als WMP-Fehler und verweist auf Microsofts Fehlerverfolgung. Unsere Visualisierung verwendet die vom Player gelieferten `TimedLevel`-Werte; Metadaten kommen unabhängig davon über das Hintergrund-Plug-in. Ein verifizierter automatischer Workaround ist nicht implementiert. Die Anwendung verändert weder die Wiedergabeposition noch die Playeransicht automatisch. Eine automatische Wiederherstellung muss insbesondere gegen normale stille Passagen, manuelle Titelwechsel und minimierte Player geprüft werden.
+
 ### Sendername als Ersatz für den Interpreten
 
 `WmpLegacy.StreamName` liest das dokumentierte Attribut `WM/RadioStationName` des aktuellen Netzwerkmediums. Es bleibt leer, wenn der Player dieses Feld nicht liefert. `WmpLegacy.StreamUrl` enthält die Wiedergabeadresse; `WmpLegacy.IsStream` ist bei einer Nicht-Datei-URL wahr. Bei lokalen Dateien bleiben die Streamfelder leer und IsStream ist falsch. Ältere Hintergrund-DLLs liefern diese Felder nicht. Der Interpret wird nicht automatisch überschrieben, ein zusammengesetzter Titel wird nicht aufgeteilt.

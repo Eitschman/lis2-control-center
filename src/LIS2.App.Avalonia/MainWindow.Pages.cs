@@ -291,8 +291,8 @@ public partial class MainWindow
     {
         _editorPreviewTimer.Stop();
         _editorPreviewConfigured = false;
-        this.FindControl<TextBlock>("PagePreview1")!.Text = new string(' ', 20);
-        this.FindControl<TextBlock>("PagePreview2")!.Text = new string(' ', 20);
+        this.FindControl<VfdLine>("PagePreview1")!.Text = new string(' ', 20);
+        this.FindControl<VfdLine>("PagePreview2")!.Text = new string(' ', 20);
         RefreshPageFormatting();
     }
 
@@ -433,8 +433,8 @@ public partial class MainWindow
         var frame = _editorPreview.Tick(DateTimeOffset.UtcNow, PagePreviewValues());
         RefreshPageFormatting();
         UpdateConditionStatus();
-        this.FindControl<TextBlock>("PagePreview1")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line1, _glyphs.IsSpectrumSet);
-        this.FindControl<TextBlock>("PagePreview2")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line2, _glyphs.IsSpectrumSet);
+        this.FindControl<VfdLine>("PagePreview1")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line1, _glyphs.IsSpectrumSet);
+        this.FindControl<VfdLine>("PagePreview2")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line2, _glyphs.IsSpectrumSet);
         var delay = _editorPreview.NextDelay;
         _editorPreviewTimer.Interval = delay < TimeSpan.FromMilliseconds(20)
             ? TimeSpan.FromMilliseconds(20) : delay;
