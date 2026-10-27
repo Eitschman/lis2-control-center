@@ -34,3 +34,13 @@ set_target_properties(gen_lis2 PROPERTIES
     PREFIX ""
     OUTPUT_NAME "gen_lis2"
 )
+
+enable_testing()
+add_executable(winamp_metadata_tests plugin_tests.cpp)
+target_compile_features(winamp_metadata_tests PRIVATE cxx_std_17)
+target_compile_definitions(winamp_metadata_tests PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX _CRT_SECURE_NO_WARNINGS)
+target_link_libraries(winamp_metadata_tests PRIVATE user32)
+if(MSVC)
+    target_compile_options(winamp_metadata_tests PRIVATE /W4 /permissive- /EHsc /utf-8)
+endif()
+add_test(NAME winamp_metadata COMMAND winamp_metadata_tests)

@@ -1,4 +1,14 @@
-# LIS2 Control Center 0.1.7
+# LIS2 Control Center 0.1.8
+
+## Ersatzvariablen und Winamp-Streamdaten
+
+`{Winamp.Artist|fallbackvar:Winamp.StreamName|fallback:--}` verwendet zuerst Artist, bei fehlendem oder leerem Wert StreamName und zuletzt den festen Text `--`. Ebenso fehlen unknown und unavailable; Null, false und Leerzeichen bleiben Werte. Ersatzvariablen werden formatiert, fester Ersatztext bleibt unverändert. Es gibt keine rekursive Vorlagenauswertung. Der Formatierungseditor enthält Ersatzvariable mit eigenem Browser. Hilfe und Variablenbeschreibungen sind in allen fünf Sprachen ergänzt.
+
+Die neue Winamp-DLL fragt UTF-16-Metadaten für Dateien und Streams ab. `Winamp.StreamName`, `StreamTitle`, `StreamGenre`, `StreamUrl` und `IsStream` stehen zusätzlich bereit. `TitleSource` nennt die Titelherkunft auch im Diagnosebericht. Lokale MP3s verwenden ihre Tags; Streams bevorzugen den aktuellen Streamtitel. Der gemeinsame Streamtitel wird nicht aufgeteilt und Artist nicht automatisch durch einen Sendernamen ersetzt. Die vom Decoder gelieferte StreamUrl kann von der Wiedergabeadresse abweichen.
+
+Metadaten werden auf Winamps Fensterthread erfasst und zwischengespeichert; Pegel und Spektrum werden alle 200 ms, Metadaten spätestens nach einer Sekunde und bei erkanntem Quellen-/Anzeigetitelwechsel aktualisiert. Ein während der Abfrage erkannter Quellenwechsel verwirft den Snapshot. Quellenwechsel und Stop leeren alte Metadaten. Der Pipe-Thread überträgt nur fertige Snapshots.
+
+**Winamp 5.5 oder neuer:** Winamp schließen, `gen_lis2.dll` im Plugins-Verzeichnis ersetzen und den Player neu starten. Ältere DLLs liefern die neuen Felder nicht. Der native IPC-Test verwendet ein Testfenster; reale Wiedergabe im jeweiligen Winamp bleibt ein eigener Praxisnachweis.
 
 ## Leerzeichen in Präfix und Suffix
 
@@ -14,7 +24,7 @@ Beispiel: `{Value|number:2}` formatiert `50.1234567` mit deutschem Betriebssyste
 
 ## Windows Media Player Legacy
 
-Die Windows-App enthält die Legacy-Medienkarte, Metadaten und VU/Spektrum über zwei getrennte Plug-ins, `WmpLegacy.*`, drei Presets und fünfsprachige Hilfe. Die Pakete `LIS2-WMP-Legacy-0.1.7-win32.zip` und `LIS2-WMP-Legacy-0.1.7-win64.zip` enthalten jeweils beide nativen DLLs, Registrierungsanleitungen und die MIT-Lizenz. Die Architektur muss zum **Legacy-Playerprozess** passen. Registrierung mit dem passenden administrativen `regsvr32`, danach den Player neu starten. Für Audio **LIS2 Control Center / Telemetry** als Visualisierung wählen. Einzelheiten und manuelle Prüfliste: [Legacy-Leitfaden](https://github.com/Eitschman/lis2-control-center/blob/v0.1.7/docs/wmp-legacy-integration.md). Kein Plug-in greift auf LIS2-Hardware zu.
+Die Windows-App enthält die Legacy-Medienkarte, Metadaten und VU/Spektrum über zwei getrennte Plug-ins, `WmpLegacy.*`, drei Presets und fünfsprachige Hilfe. Die Pakete `LIS2-WMP-Legacy-0.1.8-win32.zip` und `LIS2-WMP-Legacy-0.1.8-win64.zip` enthalten jeweils beide nativen DLLs, Registrierungsanleitungen und die MIT-Lizenz. Die Architektur muss zum **Legacy-Playerprozess** passen. Registrierung mit dem passenden administrativen `regsvr32`, danach den Player neu starten. Für Audio **LIS2 Control Center / Telemetry** als Visualisierung wählen. Einzelheiten und manuelle Prüfliste: [Legacy-Leitfaden](https://github.com/Eitschman/lis2-control-center/blob/v0.1.8/docs/wmp-legacy-integration.md). Kein Plug-in greift auf LIS2-Hardware zu.
 
 Die Legacy-DLLs enthalten ihre C/C++-Laufzeit durch statisches Linken. Eine separate Visual-C++-Redistributable-Installation entfällt. Die CI kontrolliert die tatsächlichen DLL-Importe. Sicherheitsaktualisierungen der eingebundenen Laufzeit erfordern einen neuen Plug-in-Build.
 
@@ -26,7 +36,7 @@ App, Protokolltester und Headless-Tests verwenden **Avalonia 11.3.22**. Die DBus
 
 Enthalten sind portable Pakete für Windows x64, Linux x64 und Linux ARM64, Debian-Pakete für amd64/arm64, der Windows-Protokolltester, das native 32-Bit-Winamp-Plug-in `gen_lis2.dll` und beide Legacy-Plug-in-Pakete.
 
-Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.7_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
+Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.8_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
 
 Die Anwendungspakete liefern **.NET 10.0.13** mit; .NET muss nicht separat installiert werden. Lizenztexte, Fremdkomponentenhinweise und feste Quellverweise liegen unter `licenses/` und `THIRD-PARTY-NOTICES.txt` bei. Avalonia-Lizenztext und Inter-Schrift wurden gegen den tatsächlichen Paketstand geprüft.
 

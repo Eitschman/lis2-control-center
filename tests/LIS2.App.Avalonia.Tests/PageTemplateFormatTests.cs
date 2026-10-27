@@ -7,6 +7,19 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class PageTemplateFormatTests
 {
     [Fact]
+    public void GeneratesVariableFallbackWithoutTreatingLiteralFallbackAsAKey()
+    {
+        var format = new PageTemplateFormat("Winamp.Artist", 0, 2, 0, "", "", "--", "Winamp.StreamName");
+        Assert.True(format.TryBuild(out var template));
+        Assert.Equal("{Winamp.Artist|fallbackvar:Winamp.StreamName|fallback:--}", template);
+        Assert.Equal("RADIO BOB", new TemplateRenderer().Render(template,
+            new Dictionary<string, object?> { ["Winamp.Artist"] = "", ["Winamp.StreamName"] = "RADIO BOB" }));
+        Assert.False((format with { FallbackVariable = "{Winamp.StreamName}" }).TryBuild(out _));
+        Assert.False((format with { FallbackVariable = "Winamp.StreamName|upper" }).TryBuild(out _));
+        Assert.False((format with { FallbackVariable = "Bad Key" }).TryBuild(out _));
+    }
+
+    [Fact]
     public void GeneratedAffixesPreserveLeadingTrailingAndSpaceOnlyArguments()
     {
         var format = new PageTemplateFormat("Load", 2, 0, 0, " Core 10: ", " load ", " -- ");

@@ -6,7 +6,7 @@
         Width="1305" Height="893" MinWidth="950" MinHeight="600"
         WindowStartupLocation="CenterScreen" Background="{DynamicResource Lis2SurfaceBrush}">
   <Window.Resources>
-    <x:String x:Key="PageFormattingHint">Formatting: {Key|number:2}&#10;50.1234567 → 50,12 (German regional settings)&#10;fallback, percent, bytes, prefix, suffix, upper, lower&#10;More examples: Pages help</x:String>
+    <x:String x:Key="PageFormattingHint">Formatting: {Key|number:2}&#10;50.1234567 → 50,12 (German regional settings)&#10;fallback, fallbackvar, percent, bytes, prefix, suffix, upper, lower&#10;More examples: Pages help</x:String>
   </Window.Resources>
   <Window.Styles>
     <Style Selector="Border.vfdDisplay">
@@ -342,6 +342,11 @@
                       </ComboBox>
                     </StackPanel>
                   </WrapPanel>
+                  <TextBlock Text="Fallback variable" />
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <TextBox Name="FormatFallbackVariable" />
+                    <Button Grid.Column="1" Name="FormatFallbackBrowse" Content="Browse variables…" />
+                  </Grid>
                   <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
                     <TextBlock Text="Prefix" VerticalAlignment="Center"/><TextBox Name="FormatPrefix" Grid.Column="1" />
                     <TextBlock Grid.Row="1" Text="Suffix" VerticalAlignment="Center"/><TextBox Name="FormatSuffix" Grid.Row="1" Grid.Column="1" />

@@ -2,6 +2,8 @@
 
 Native 32-bit Winamp General Purpose Plugin for LIS2 Control Center.
 
+Voraussetzung ist Winamp 5.5 oder neuer. Die DLL verwendet Unicode-IPC für Dateinamen, Titel und Metadaten. Die Schnittstellen sind im mitgelieferten ABI-Ausschnitt dokumentiert.
+
 ## Responsibilities
 
 The plugin runs inside Winamp and:
@@ -11,6 +13,7 @@ The plugin runs inside Winamp and:
 - reads elapsed time and duration;
 - reads bitrate and sample rate;
 - reads artist/title/album metadata;
+- reads streamname, streamtitle, streamgenre and streamurl for streams, plus source type and title origin;
 - sends normalized UTF-8 JSON snapshots to LIS2 Control Center.
 
 It does **not**:
@@ -46,6 +49,14 @@ build\Release\gen_lis2.dll
 ```
 
 Copy the DLL into Winamp's `Plugins` directory and restart Winamp.
+
+Winamp vor dem Ersetzen schließen. Der aktuelle StreamTitle hat bei Streams Vorrang vor Titelmetadaten und Playlist-Anzeigetext. Lokale Dateien verwenden ihre Tags. Der Artist wird nicht automatisch ersetzt oder aus dem Streamtitel abgetrennt. Fehlende Streamfelder bleiben leer.
+
+## Erfassung und Tests
+
+Der 200-ms-Timer erfasst Snapshots im Winamp-Fensterthread. Metadaten werden für bis zu eine Sekunde zwischengespeichert; ein Datei- oder Anzeigetitelwechsel erzwingt eine neue Abfrage. Stop leert den Cache. Datei, Anzeigetitel, Playlistposition und Wiedergabestatus werden vor dem Senden erneut geprüft. Ein abweichender Stand verwirft den Snapshot. Der Worker führt ausschließlich Pipe-I/O mit fertigen UTF-8-Snapshots aus.
+
+`ctest --test-dir build -C Release --output-on-failure` prüft den echten Snapshotcode gegen ein IPC-Testfenster: Unicode, Datei-/Streamwechsel, Titelprioritäten, fehlende Tags, leere Felder, Metadatencache, Wechsel während einer Abfrage und Shutdown. Die GitHub-Windows-CI führt diesen Test vor dem Upload der DLL aus. Das ersetzt keine reale Winamp-Wiedergabe.
 
 ## ABI
 

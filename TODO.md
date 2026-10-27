@@ -65,6 +65,8 @@ Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nich
 
 ## Vorhandene Basis
 
+- [x] Ersatzvariablen über `fallbackvar` mit abschließendem festem Ersatztext; Editor mit eigenem Variablenbrowser und fünfsprachiger Hilfe. Winamp liefert Unicode-Streamdaten, Quellenart und Titelherkunft; native IPC-Regressionen decken Datei-/Streamwechsel ab. Aktuelle Prüfnachweise stehen im Status; reale Winamp-Wiedergabe bleibt getrennt offen.
+
 - [x] Leerzeichen an Anfang und Ende von Präfix, Suffix und Ersatztext erhalten; Renderer, Editorvorschau und gespeicherte Vorlagen sind durch Regressionen geprüft. Herkunft der Winamp-Felder und Verhalten bei zusammengesetzten Streamtiteln sind dokumentiert.
 
 - [x] Gemeinsame Avalonia-App für Windows/Linux und portable .NET-10-Bibliotheken.

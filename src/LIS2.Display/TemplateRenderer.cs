@@ -42,16 +42,14 @@ public sealed partial class TemplateRenderer
         var name = parts[0].Trim();
         values.TryGetValue(name, out var rawValue);
 
-        var unavailable =
-            rawValue is null ||
-            string.Equals(
-                Convert.ToString(rawValue, CultureInfo.InvariantCulture),
-                "unknown",
-                StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(
-                Convert.ToString(rawValue, CultureInfo.InvariantCulture),
-                "unavailable",
-                StringComparison.OrdinalIgnoreCase);
+        // Ersatzvariablen sind reine Schlüssel, keine rekursiv auszuwertenden Vorlagen.
+        foreach (var operation in parts.Skip(1).Select(ParseOperation))
+        {
+            if (!IsMissingValue(rawValue)) break;
+            if (string.Equals(operation.Name, "fallbackvar", StringComparison.OrdinalIgnoreCase) &&
+                !string.IsNullOrWhiteSpace(operation.Argument))
+                values.TryGetValue(operation.Argument.Trim(), out rawValue);
+        }
 
         var fallback = parts
             .Skip(1)
@@ -63,7 +61,7 @@ public sealed partial class TemplateRenderer
                     StringComparison.OrdinalIgnoreCase))
             .Argument;
 
-        if (unavailable)
+        if (IsMissingValue(rawValue))
             return fallback ?? string.Empty;
 
         object? current = rawValue;
@@ -75,6 +73,7 @@ public sealed partial class TemplateRenderer
             switch (operation.Name.ToLowerInvariant())
             {
                 case "fallback":
+                case "fallbackvar":
                     break;
 
                 case "number":
@@ -114,6 +113,11 @@ public sealed partial class TemplateRenderer
         var result = Convert.ToString(current, CultureInfo.CurrentCulture) ?? string.Empty;
         return string.IsNullOrEmpty(result) ? fallback ?? string.Empty : result;
     }
+
+    /// <summary>Leere Werte und explizite Quellenzustände gelten als fehlend; gewollte Leerzeichen bleiben Werte.</summary>
+    public static bool IsMissingValue(object? value) => value is null || value is string text &&
+        (text.Length == 0 || text.Equals("unknown", StringComparison.OrdinalIgnoreCase) ||
+         text.Equals("unavailable", StringComparison.OrdinalIgnoreCase));
 
     private static (string Name, string? Argument) ParseOperation(string value)
     {

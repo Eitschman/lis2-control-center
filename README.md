@@ -13,34 +13,34 @@ LIS2 Control Center is an independent replacement for the obsolete VL System Mul
 
 ## Download and installation
 
-[Release v0.1.7](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.7) includes the following packages:
+[Release v0.1.8](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.8) includes the following packages:
 
 | System | Download |
 | --- | --- |
-| Windows x64 | [Portable ZIP](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.7/LIS2-Control-Center-0.1.7-win-x64.zip) |
-| Debian/Ubuntu x64 | [Debian package for amd64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.7/lis2-control-center_0.1.7_amd64.deb) |
-| Debian/Ubuntu ARM64, Raspberry Pi 5 | [Debian package for arm64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.7/lis2-control-center_0.1.7_arm64.deb) |
-| Linux x64 | [Portable archive](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.7/LIS2-Control-Center-0.1.7-linux-x64.tar.gz) |
-| Linux ARM64 | [Portable archive](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.7/LIS2-Control-Center-0.1.7-linux-arm64.tar.gz) |
+| Windows x64 | [Portable ZIP](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.8/LIS2-Control-Center-0.1.8-win-x64.zip) |
+| Debian/Ubuntu x64 | [Debian package for amd64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.8/lis2-control-center_0.1.8_amd64.deb) |
+| Debian/Ubuntu ARM64, Raspberry Pi 5 | [Debian package for arm64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.8/lis2-control-center_0.1.8_arm64.deb) |
+| Linux x64 | [Portable archive](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.8/LIS2-Control-Center-0.1.8-linux-x64.tar.gz) |
+| Linux ARM64 | [Portable archive](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.8/LIS2-Control-Center-0.1.8-linux-arm64.tar.gz) |
 
 On Windows, extract the ZIP and run `LIS2.App.Avalonia.exe`. For portable Linux packages, extract the archive and run `./LIS2.App.Avalonia`. The .NET 10 runtime is included; no separate .NET installation is required.
 
 On Debian/Ubuntu, run these commands from the download directory:
 
 ```sh
-sudo apt install ./lis2-control-center_0.1.7_amd64.deb
+sudo apt install ./lis2-control-center_0.1.8_amd64.deb
 lis2-control-center
 ```
 
-On ARM64, use `lis2-control-center_0.1.7_arm64.deb` instead. The application also appears in the application menu. Configure serial port permissions when using physical LIS2 hardware.
+On ARM64, use `lis2-control-center_0.1.8_arm64.deb` instead. The application also appears in the application menu. Configure serial port permissions when using physical LIS2 hardware.
 
 Linux Home Assistant token storage normally uses `secret-tool` and an unlocked desktop keyring; local AES storage is available only after explicitly selecting it in the application. A keyring is not required for features that do not use Home Assistant.
 
 Linux media integration requires `playerctl`. The Debian packages recommend `libsecret-tools` and `playerctl`; see the [packaging guide](docs/release.md#debian-pakete).
 
-Also available: the [Windows Protocol Tester](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.7/LIS2-ProtocolTester-0.1.7-win-x64.zip), [Winamp plug-in gen_lis2.dll](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.7/gen_lis2.dll) and [SHA-256 checksums](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.7/SHA256SUMS.txt). Place the Winamp plug-in in the `Plugins` directory of 32-bit Winamp. The [release notes](docs/release-notes.md) describe the release scope and outstanding manual checks. Application and Protocol Tester packages include license texts, third-party notices and source references.
+Also available: the [Windows Protocol Tester](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.8/LIS2-ProtocolTester-0.1.8-win-x64.zip), [Winamp plug-in gen_lis2.dll](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.8/gen_lis2.dll) and [SHA-256 checksums](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.8/SHA256SUMS.txt). Place the Winamp plug-in in the `Plugins` directory of 32-bit Winamp. The [release notes](docs/release-notes.md) describe the release scope and outstanding manual checks. Application and Protocol Tester packages include license texts, third-party notices and source references.
 
-Windows Media Player Legacy plug-ins: [x86 / 32-bit](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.7/LIS2-WMP-Legacy-0.1.7-win32.zip) or [x64 / 64-bit](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.7/LIS2-WMP-Legacy-0.1.7-win64.zip). Each ZIP contains the background and visualization DLLs, registration instructions and the MIT license.
+Windows Media Player Legacy plug-ins: [x86 / 32-bit](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.8/LIS2-WMP-Legacy-0.1.8-win32.zip) or [x64 / 64-bit](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.8/LIS2-WMP-Legacy-0.1.8-win64.zip). Each ZIP contains the background and visualization DLLs, registration instructions and the MIT license.
 
 ## Project status
 
@@ -48,7 +48,7 @@ As of October 27, 2026, PORT-08 includes verified archive launches on Windows x6
 
 The linked status report records current Windows/Linux test counts and CI evidence; the Linux keyring test is skipped on Windows. Tests include eight Protocol Tester UI regressions. Device controls, settings and all ten main views are tested using actual Avalonia controls and Skia rendering. Static text and dynamic messages follow the selected language; metadata and technical keys remain unchanged. Help supports German, English, French, Turkish, Russian or the system language, including changes while the dialog is open. Native Windows/Linux smoke tests cover the main application and Protocol Tester. See the [status report](docs/prp/linux-port-status.md) for CI evidence and visual checks. Extracted packages and native ARM64 execution pass in CI; physical LIS2 validation and further manual desktop checks remain open. The user has confirmed Debian package operation on a Raspberry Pi 5 with Debian 13, KDE Plasma 6.3.6 and a Wayland session, including release v0.1.0 with .NET 10.
 
-The [Avalonia PRP](docs/prp/linux-avalonia-port.md) defines the requirements, the [status report](docs/prp/linux-port-status.md) records the verified implementation, and the [parity audit](docs/prp/wpf-avalonia-parity-audit.md) describes differences from WPF. [TODO.md](TODO.md) lists the remaining priorities. Transport, port, Home Assistant enablement, Linux token storage selection and brightness are persisted. Shared display actions use the applied transport. Windows settings import is available; manual fan output respects channel limits and requires authorization for each serial operation. Live Home Assistant and media player checks on target systems remain open. PORT-06A adds the spectrum variable, visible glyph previews, an integrated condition browser, direct sensor selection, consistent presets, save feedback and diagnostic fields. The pixel grid and precise curve points are editable. Release v0.1.7 uses .NET 10 LTS and includes license notices. Further manual desktop checks remain on the list.
+The [Avalonia PRP](docs/prp/linux-avalonia-port.md) defines the requirements, the [status report](docs/prp/linux-port-status.md) records the verified implementation, and the [parity audit](docs/prp/wpf-avalonia-parity-audit.md) describes differences from WPF. [TODO.md](TODO.md) lists the remaining priorities. Transport, port, Home Assistant enablement, Linux token storage selection and brightness are persisted. Shared display actions use the applied transport. Windows settings import is available; manual fan output respects channel limits and requires authorization for each serial operation. Live Home Assistant and media player checks on target systems remain open. PORT-06A adds the spectrum variable, visible glyph previews, an integrated condition browser, direct sensor selection, consistent presets, save feedback and diagnostic fields. The pixel grid and precise curve points are editable. Release v0.1.8 uses .NET 10 LTS and includes license notices. Further manual desktop checks remain on the list.
 
 ## Features
 
@@ -104,6 +104,8 @@ The Winamp integration runs on Windows; Linux media players use the MPRIS integr
 - VU telemetry
 - 20-band spectrum telemetry and eight-level custom-glyph VFD spectrum
 - stale/disconnect handling
+- Unicode metadata queries for local files and streams; separate `Winamp.StreamName`, `StreamTitle`, `StreamGenre`, `StreamUrl` and `IsStream` values
+- `Winamp.TitleSource` identifies the title origin; metadata is captured on Winamp's window thread, with source changes checked before sending
 - Winamp simulator for development without Winamp
 
 ### Windows Media Player
@@ -131,7 +133,7 @@ Use the plug-in package matching the **player process architecture**, independen
 
 Both Legacy plug-in DLLs embed their C/C++ runtime. No separate Visual C++ Redistributable installation is required for these plug-ins. Runtime security updates require rebuilding them with an updated toolchain. See the native package READMEs for Microsoft runtime redistribution terms.
 
-Release **v0.1.7** includes Legacy support and both plug-in architectures. Select the package matching the player process, then follow the registration instructions above.
+Release **v0.1.8** includes Legacy support and both plug-in architectures. Select the package matching the player process, then follow the registration instructions above.
 
 ### Linux media players
 
@@ -275,7 +277,11 @@ Template values can be formatted inline:
 {Winamp.Title|fallback:Nothing playing|upper}
 ```
 
-Supported operations are `fallback`, `number`, `percent`, `bytes`, `prefix`, `suffix`, `upper` and `lower`. Operations can be chained.
+Supported operations are `fallback`, `fallbackvar`, `number`, `percent`, `bytes`, `prefix`, `suffix`, `upper` and `lower`. Operations can be chained.
+
+Use `{Winamp.Artist|fallbackvar:Winamp.StreamName|fallback:--}` to display the artist, then the station name if the artist is missing or empty, and finally `--` if neither is available. `unknown` and `unavailable` also count as missing; zero, false and spaces remain valid values. Replacement variables use the formatting pipeline, while literal fallback text is returned unchanged. Variable contents are never evaluated as templates. The formatting editor provides a separate fallback-variable field and browser.
+
+The new Winamp fields require the matching `gen_lis2.dll` and Winamp 5.5 or later. Replace the DLL while Winamp is closed, then restart the player. Local MP3 files continue to use their tags; stream titles remain intact and are not automatically split into artist/title. A decoder may leave individual fields empty. `StreamUrl` is the URL supplied by the decoder and is not necessarily the playback address.
 
 Leading and trailing spaces in text arguments are preserved. For example, `{Value|percent:0|prefix:Core 10: }` with a value of `5` displays `Core 10: 5%`; `{Value|suffix: %}` displays `5 %`.
 

@@ -77,6 +77,10 @@ public partial class MainWindow
         details.Add("Home Assistant: " + (_pageSources.HomeAssistant.IsConnected ? UiText("Connected") : UiText("Disconnected")) +
             " " + _pageSources.HomeAssistant.LastError);
         foreach (var source in _mediaErrors) details.Add(source.Key + ": " + source.Value);
+        var winamp = _mediaWinamp.Values;
+        details.Add("Winamp.Connected: " + winamp.GetValueOrDefault("Connected"));
+        details.Add("Winamp.IsStream: " + winamp.GetValueOrDefault("IsStream"));
+        details.Add("Winamp.TitleSource: " + winamp.GetValueOrDefault("TitleSource"));
         foreach (var channel in _fanSettings.Channels)
             details.Add($"{channel.Name}: {channel.Mode}, sensor={channel.SensorKey ?? "-"}, fixed={channel.FixedPercent}%, " +
                 $"min={channel.MinimumPercent}%, max={channel.MaximumPercent}%, fail-safe={channel.FailSafePercent}%");

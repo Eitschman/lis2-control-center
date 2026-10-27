@@ -5,11 +5,13 @@ internal static class UiTranslations
 {
     private static readonly IReadOnlyDictionary<string, string[]> Texts = new Dictionary<string, string[]>(StringComparer.Ordinal)
     {
-        ["Formatting: {Key|number:2}\n50.1234567 → 50,12 (German regional settings)\nfallback, percent, bytes, prefix, suffix, upper, lower\nMore examples: Pages help"] = [
-            "Formatierung: {Key|number:2}\n50.1234567 → 50,12 (deutsches Zahlenformat)\nfallback, percent, bytes, prefix, suffix, upper, lower\nWeitere Beispiele: Hilfe zu Seiten",
-            "Formatage : {Key|number:2}\n50.1234567 → 50,12 (paramètres régionaux allemands)\nfallback, percent, bytes, prefix, suffix, upper, lower\nAutres exemples : aide des pages",
-            "Biçimlendirme: {Key|number:2}\n50.1234567 → 50,12 (Alman bölgesel ayarları)\nfallback, percent, bytes, prefix, suffix, upper, lower\nDiğer örnekler: Sayfalar yardımı",
-            "Форматирование: {Key|number:2}\n50.1234567 → 50,12 (немецкий числовой формат)\nfallback, percent, bytes, prefix, suffix, upper, lower\nДругие примеры: справка по страницам"],
+        ["Fallback variable"] = ["Ersatzvariable", "Variable de remplacement", "Yedek değişken", "Резервная переменная"],
+        ["The fallback variable is used."] = ["Die Ersatzvariable wird verwendet.", "La variable de remplacement est utilisée.", "Yedek değişken kullanılıyor.", "Используется резервная переменная."],
+        ["Formatting: {Key|number:2}\n50.1234567 → 50,12 (German regional settings)\nfallback, fallbackvar, percent, bytes, prefix, suffix, upper, lower\nMore examples: Pages help"] = [
+            "Formatierung: {Key|number:2}\n50.1234567 → 50,12 (deutsches Zahlenformat)\nfallback, fallbackvar, percent, bytes, prefix, suffix, upper, lower\nWeitere Beispiele: Hilfe zu Seiten",
+            "Formatage : {Key|number:2}\n50.1234567 → 50,12 (paramètres régionaux allemands)\nfallback, fallbackvar, percent, bytes, prefix, suffix, upper, lower\nAutres exemples : aide des pages",
+            "Biçimlendirme: {Key|number:2}\n50.1234567 → 50,12 (Alman bölgesel ayarları)\nfallback, fallbackvar, percent, bytes, prefix, suffix, upper, lower\nDiğer örnekler: Sayfalar yardımı",
+            "Форматирование: {Key|number:2}\n50.1234567 → 50,12 (немецкий числовой формат)\nfallback, fallbackvar, percent, bytes, prefix, suffix, upper, lower\nДругие примеры: справка по страницам"],
         ["Formatting editor"] = ["Formatierungseditor", "Éditeur de formatage", "Biçimlendirme düzenleyicisi", "Редактор форматирования"],
         ["Use a whole number from 0 to 6 for decimal places."] = ["Für Nachkommastellen eine ganze Zahl von 0 bis 6 verwenden.", "Utilisez un entier de 0 à 6 pour les décimales.", "Ondalık basamaklar için 0 ile 6 arasında bir tam sayı kullanın.", "Для числа знаков используйте целое число от 0 до 6."],
         ["Variable"] = ["Variable", "Variable", "Değişken", "Переменная"],

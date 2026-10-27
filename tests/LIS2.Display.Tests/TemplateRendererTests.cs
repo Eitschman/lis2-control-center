@@ -6,6 +6,43 @@ namespace LIS2.Display.Tests;
 public sealed class TemplateRendererTests
 {
     [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("unknown")]
+    [InlineData("UNAVAILABLE")]
+    public void Render_UsesFallbackVariableBeforeLiteralText(string? artist)
+    {
+        var values = new Dictionary<string, object?> { ["Winamp.Artist"] = artist, ["Winamp.StreamName"] = "Radio Bob" };
+        var renderer = new TemplateRenderer();
+        const string template = "{Winamp.Artist|fallbackvar:Winamp.StreamName|fallback:--|upper|prefix:[|suffix:]}";
+        Assert.Equal("[RADIO BOB]", renderer.Render(template, values));
+        values["Winamp.Artist"] = "Björk";
+        Assert.Equal("[BJÖRK]", renderer.Render(template, values));
+        values["Winamp.Artist"] = artist;
+        values["Winamp.StreamName"] = "";
+        Assert.Equal("--", renderer.Render(template, values));
+    }
+
+    [Theory]
+    [InlineData(0, "0")]
+    [InlineData(false, "False")]
+    [InlineData(" ", " ")]
+    [InlineData("{Other}", "{Other}")]
+    public void Render_FallbackVariablesPreserveValuesWithoutRecursiveEvaluation(object replacement, string expected)
+    {
+        var values = new Dictionary<string, object?> { ["Other"] = replacement };
+        Assert.Equal(expected, new TemplateRenderer().Render("{Missing|fallbackvar:Absent|fallbackvar:Other|fallback:--}", values));
+    }
+
+    [Fact]
+    public void Render_FallbackVariableReferencesCannotRecurseAndCanBeFormatted()
+    {
+        var renderer = new TemplateRenderer();
+        Assert.Equal("--", renderer.Render("{Missing|fallbackvar:Missing|fallback:--}", new Dictionary<string, object?>()));
+        Assert.Equal("5%", renderer.Render("{Missing|fallbackvar: Load |percent:0}", new Dictionary<string, object?> { ["Load"] = 5 }));
+    }
+
+    [Theory]
     [InlineData("{Load|percent:0|prefix:Core 10: }", "Core 10: 5%")]
     [InlineData("{Load|percent:0|prefix: Core 10: |suffix: load }", " Core 10: 5% load ")]
     [InlineData("{Load|percent:0|prefix: |suffix: }", " 5% ")]

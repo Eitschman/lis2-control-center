@@ -13,4 +13,10 @@ public sealed record WinampSnapshot(
     int? SampleRateHz,
     int? VuLeft,
     int? VuRight,
-    IReadOnlyList<int>? Spectrum);
+    IReadOnlyList<int>? Spectrum,
+    string? StreamName = null,
+    string? StreamTitle = null,
+    string? StreamGenre = null,
+    string? StreamUrl = null,
+    bool? IsStream = null,
+    string? TitleSource = null);

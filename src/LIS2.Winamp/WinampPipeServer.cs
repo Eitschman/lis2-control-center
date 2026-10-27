@@ -117,7 +117,13 @@ public sealed class WinampPipeServer : IAsyncDisposable
             message.SampleRateHz,
             message.VuLeft,
             message.VuRight,
-            message.Spectrum);
+            message.Spectrum,
+            message.StreamName,
+            message.StreamTitle,
+            message.StreamGenre,
+            message.StreamUrl,
+            message.IsStream,
+            message.TitleSource);
 
     private static WinampPlaybackState ParseState(string? value) =>
         value?.Trim().ToLowerInvariant() switch

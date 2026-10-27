@@ -5,6 +5,36 @@ namespace LIS2.Winamp.Tests;
 public sealed class WinampMappingTests
 {
     [Fact]
+    public async Task StreamFieldsSurvivePipeMappingAndClearOnFileAndOldPluginSnapshots()
+    {
+        const string json = """
+            {"state":"playing","artist":"","title":"Björk - 東京","streamName":"RADIO BOB","streamTitle":"Björk - 東京","streamGenre":"Metal","streamUrl":"https://example.invalid/","isStream":true,"titleSource":"StreamTitle"}
+            """;
+        await using var source = new WinampDataSource();
+        var message = Assert.IsType<WinampMessage>(WinampPipeServer.DeserializeMessage(json));
+        source.ApplySnapshot(WinampPipeServer.ToSnapshot(message));
+        Assert.Equal("Björk - 東京", source.Values["Title"]);
+        Assert.Equal("RADIO BOB", source.Values["StreamName"]);
+        Assert.Equal("Björk - 東京", source.Values["StreamTitle"]);
+        Assert.Equal("Metal", source.Values["StreamGenre"]);
+        Assert.Equal("https://example.invalid/", source.Values["StreamUrl"]);
+        Assert.Equal(true, source.Values["IsStream"]);
+        Assert.Equal("StreamTitle", source.Values["TitleSource"]);
+        var file = new WinampMessage { State = "playing", Artist = "Artist", Title = "MP3", IsStream = false, TitleSource = "FileTags" };
+        source.ApplySnapshot(WinampPipeServer.ToSnapshot(file));
+        Assert.Equal("Artist", source.Values["Artist"]);
+        Assert.Null(source.Values["StreamName"]);
+        Assert.Null(source.Values["StreamTitle"]);
+        Assert.Null(source.Values["StreamGenre"]);
+        Assert.Null(source.Values["StreamUrl"]);
+        Assert.Equal(false, source.Values["IsStream"]);
+        source.ApplySnapshot(WinampPipeServer.ToSnapshot(new WinampMessage { Title = "Old plugin" }));
+        Assert.Null(source.Values["IsStream"]);
+        Assert.Null(source.Values["TitleSource"]);
+        Assert.Equal("Old plugin", source.Values["Title"]);
+    }
+
+    [Fact]
     public void PipeMessage_MapsToSnapshot()
     {
         var message = new WinampMessage

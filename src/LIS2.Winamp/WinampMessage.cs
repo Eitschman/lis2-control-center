@@ -7,6 +7,12 @@ public sealed class WinampMessage
     public string? Artist { get; set; }
     public string? Title { get; set; }
     public string? Album { get; set; }
+    public string? StreamName { get; set; }
+    public string? StreamTitle { get; set; }
+    public string? StreamGenre { get; set; }
+    public string? StreamUrl { get; set; }
+    public bool? IsStream { get; set; }
+    public string? TitleSource { get; set; }
     public int? PlaylistPosition { get; set; }
     public int? PlaylistCount { get; set; }
     public double? ElapsedSeconds { get; set; }

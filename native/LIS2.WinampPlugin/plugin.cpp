@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <mutex>
 
 namespace
 {
@@ -21,6 +22,9 @@ using VuGetFunc = int (__cdecl*)(int);
 HANDLE g_stopEvent = nullptr;
 HANDLE g_thread = nullptr;
 HANDLE g_pipe = INVALID_HANDLE_VALUE;
+UINT_PTR g_timer = 0;
+std::mutex g_snapshotMutex;
+std::string g_latestSnapshot;
 
 SaGetFunc g_saGet = nullptr;
 SaSetReqFunc g_saSetReq = nullptr;
@@ -81,102 +85,77 @@ std::string JsonEscape(const std::string& value)
     return output.str();
 }
 
-std::string AnsiToUtf8(const char* value)
+// Winamp liefert UTF-16. Die Umwandlung erfolgt erst für den UTF-8-Pipevertrag.
+std::string WideToUtf8(const wchar_t* value)
 {
-    if (value == nullptr || *value == '\0')
-        return {};
-
-    const int wideLength = MultiByteToWideChar(
-        CP_ACP,
-        0,
-        value,
-        -1,
-        nullptr,
-        0);
-
-    if (wideLength <= 1)
-        return {};
-
-    std::vector<wchar_t> wide(static_cast<std::size_t>(wideLength));
-
-    if (MultiByteToWideChar(
-            CP_ACP,
-            0,
-            value,
-            -1,
-            wide.data(),
-            wideLength) == 0)
-    {
-        return {};
-    }
-
-    const int utf8Length = WideCharToMultiByte(
-        CP_UTF8,
-        0,
-        wide.data(),
-        -1,
-        nullptr,
-        0,
-        nullptr,
-        nullptr);
-
-    if (utf8Length <= 1)
-        return {};
-
-    std::vector<char> utf8(static_cast<std::size_t>(utf8Length));
-
-    if (WideCharToMultiByte(
-            CP_UTF8,
-            0,
-            wide.data(),
-            -1,
-            utf8.data(),
-            utf8Length,
-            nullptr,
-            nullptr) == 0)
-    {
-        return {};
-    }
-
-    return std::string(utf8.data());
+    if (value == nullptr || *value == L'\0') return {};
+    const int length = WideCharToMultiByte(CP_UTF8, 0, value, -1, nullptr, 0, nullptr, nullptr);
+    if (length <= 1) return {};
+    std::string result(static_cast<std::size_t>(length), '\0');
+    if (!WideCharToMultiByte(CP_UTF8, 0, value, -1, result.data(), length, nullptr, nullptr)) return {};
+    result.pop_back();
+    return result;
 }
 
-std::string GetExtendedInfo(
-    HWND hwndWinamp,
-    const char* filename,
-    const char* metadata)
+std::wstring ReadCurrentText(HWND window, LPARAM message)
 {
-    if (filename == nullptr || metadata == nullptr)
-        return {};
+    const auto raw = SendMessageW(window, WM_WA_IPC, 0, message);
+    return IsValidFunctionPointer(raw) ? std::wstring(reinterpret_cast<const wchar_t*>(raw)) : std::wstring{};
+}
 
-    char buffer[2048]{};
-
-    extendedFileInfoStruct info
-    {
-        filename,
-        metadata,
-        buffer,
-        sizeof(buffer)
-    };
-
-    LRESULT result = SendMessage(
-        hwndWinamp,
-        WM_WA_IPC,
-        reinterpret_cast<WPARAM>(&info),
-        IPC_GET_EXTENDED_FILE_INFO_HOOKABLE);
-
+std::string GetExtendedInfo(HWND window, const wchar_t* filename, const wchar_t* metadata)
+{
+    if (filename == nullptr || *filename == L'\0') return {};
+    wchar_t buffer[2048]{};
+    extendedFileInfoStructW info{filename, metadata, buffer, std::size(buffer)};
+    auto result = SendMessageW(window, WM_WA_IPC, reinterpret_cast<WPARAM>(&info), IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE);
     if (result == 0)
-    {
-        result = SendMessage(
-            hwndWinamp,
-            WM_WA_IPC,
-            reinterpret_cast<WPARAM>(&info),
-            IPC_GET_EXTENDED_FILE_INFO);
-    }
+        result = SendMessageW(window, WM_WA_IPC, reinterpret_cast<WPARAM>(&info), IPC_GET_EXTENDED_FILE_INFOW);
+    return result != 0 ? WideToUtf8(buffer) : std::string{};
+}
 
-    return result != 0
-        ? AnsiToUtf8(buffer)
-        : std::string{};
+struct MetadataSnapshot
+{
+    std::wstring file;
+    std::wstring playlistTitle;
+    std::string artist, title, album, streamName, streamTitle, streamGenre, streamUrl;
+    std::string titleSource = "None";
+    bool isStream = false;
+    ULONGLONG readAt = 0;
+};
+MetadataSnapshot g_metadata;
+
+// Der Aufrufer ist Winamps Fensterthread; Zeiger werden vor der nächsten IPC-Abfrage kopiert.
+MetadataSnapshot ReadMetadata(HWND window, const std::wstring& file, const std::wstring& playlistTitle)
+{
+    MetadataSnapshot metadata;
+    metadata.file = file;
+    metadata.playlistTitle = playlistTitle;
+    metadata.readAt = GetTickCount64();
+    const auto schemeEnd = file.find(L"://");
+    metadata.isStream = schemeEnd != std::wstring::npos && _wcsnicmp(file.c_str(), L"file:", 5) != 0;
+    metadata.artist = GetExtendedInfo(window, file.c_str(), L"artist");
+    metadata.title = GetExtendedInfo(window, file.c_str(), L"title");
+    metadata.album = GetExtendedInfo(window, file.c_str(), L"album");
+    if (!metadata.title.empty()) metadata.titleSource = metadata.isStream ? "StreamMetadata" : "FileTags";
+    if (metadata.isStream)
+    {
+        metadata.streamName = GetExtendedInfo(window, file.c_str(), L"streamname");
+        metadata.streamTitle = GetExtendedInfo(window, file.c_str(), L"streamtitle");
+        metadata.streamGenre = GetExtendedInfo(window, file.c_str(), L"streamgenre");
+        metadata.streamUrl = GetExtendedInfo(window, file.c_str(), L"streamurl");
+        if (!metadata.streamTitle.empty())
+        {
+            metadata.title = metadata.streamTitle;
+            metadata.titleSource = "StreamTitle";
+        }
+    }
+    if (metadata.title.empty() && !playlistTitle.empty())
+    {
+        metadata.title = WideToUtf8(playlistTitle.c_str());
+        metadata.titleSource = "Playlist";
+    }
+    return metadata;
 }
 
 const char* PlaybackStateName(int state)
@@ -264,41 +243,23 @@ std::string BuildSnapshotJson(HWND hwndWinamp)
     const int sampleRateHz = static_cast<int>(
         SendMessage(hwndWinamp, WM_WA_IPC, 5, IPC_GETINFO));
 
-    const char* playlistFile = playlistPosition >= 0
-        ? reinterpret_cast<const char*>(
-            SendMessage(
-                hwndWinamp,
-                WM_WA_IPC,
-                static_cast<WPARAM>(playlistPosition),
-                IPC_GETPLAYLISTFILE))
-        : nullptr;
+    const auto file = ReadCurrentText(hwndWinamp, IPC_GET_PLAYING_FILENAME);
+    const auto playlistTitle = ReadCurrentText(hwndWinamp, IPC_GET_PLAYING_TITLE);
+    if (state == 0 || file.empty())
+        g_metadata = {};
+    else if (g_metadata.file != file || g_metadata.playlistTitle != playlistTitle ||
+             GetTickCount64() - g_metadata.readAt >= 1000)
+        g_metadata = ReadMetadata(hwndWinamp, file, playlistTitle);
 
-    const char* playlistTitle = playlistPosition >= 0
-        ? reinterpret_cast<const char*>(
-            SendMessage(
-                hwndWinamp,
-                WM_WA_IPC,
-                static_cast<WPARAM>(playlistPosition),
-                IPC_GETPLAYLISTTITLE))
-        : nullptr;
-
-    std::string artist = GetExtendedInfo(
-        hwndWinamp,
-        playlistFile,
-        "artist");
-
-    std::string title = GetExtendedInfo(
-        hwndWinamp,
-        playlistFile,
-        "title");
-
-    std::string album = GetExtendedInfo(
-        hwndWinamp,
-        playlistFile,
-        "album");
-
-    if (title.empty())
-        title = AnsiToUtf8(playlistTitle);
+    // Ein reentrant ausgelöster Quellenwechsel verwirft den gemischten Snapshot.
+    if (file != ReadCurrentText(hwndWinamp, IPC_GET_PLAYING_FILENAME) ||
+        playlistTitle != ReadCurrentText(hwndWinamp, IPC_GET_PLAYING_TITLE) ||
+        playlistPosition != SendMessageW(hwndWinamp, WM_WA_IPC, 0, IPC_GETLISTPOS) ||
+        state != SendMessageW(hwndWinamp, WM_WA_IPC, 0, IPC_ISPLAYING))
+    {
+        g_metadata = {};
+        return {};
+    }
 
     const int vuLeft = state == 1 ? ReadVu(0) : 0;
     const int vuRight = state == 1 ? ReadVu(1) : 0;
@@ -311,9 +272,15 @@ std::string BuildSnapshotJson(HWND hwndWinamp)
          << PlaybackStateName(state)
          << "\"";
 
-    AppendJsonString(json, "artist", artist);
-    AppendJsonString(json, "title", title);
-    AppendJsonString(json, "album", album);
+    AppendJsonString(json, "artist", g_metadata.artist);
+    AppendJsonString(json, "title", g_metadata.title);
+    AppendJsonString(json, "album", g_metadata.album);
+    AppendJsonString(json, "streamName", g_metadata.streamName);
+    AppendJsonString(json, "streamTitle", g_metadata.streamTitle);
+    AppendJsonString(json, "streamGenre", g_metadata.streamGenre);
+    AppendJsonString(json, "streamUrl", g_metadata.streamUrl);
+    AppendJsonString(json, "titleSource", g_metadata.titleSource);
+    json << ",\"isStream\":" << (g_metadata.isStream ? "true" : "false");
 
     if (playlistPosition >= 0)
         json << ",\"playlistPosition\":" << (playlistPosition + 1);
@@ -378,12 +345,27 @@ bool EnsurePipe()
     return g_pipe != INVALID_HANDLE_VALUE;
 }
 
-void SendSnapshot(HWND hwndWinamp)
+// Metadaten und Pegel werden im Fensterthread erfasst; Pipe-I/O blockiert ihn nicht.
+void CALLBACK CaptureSnapshot(HWND window, UINT, UINT_PTR timer, DWORD)
+{
+    // Bereits zugestellte Timerbotschaften dürfen nach PluginQuit nicht mehr lesen.
+    if (timer != 0 && timer != g_timer) return;
+    auto snapshot = BuildSnapshotJson(window);
+    std::lock_guard<std::mutex> lock(g_snapshotMutex);
+    g_latestSnapshot = std::move(snapshot);
+}
+
+void SendSnapshot()
 {
     if (!EnsurePipe())
         return;
 
-    std::string payload = BuildSnapshotJson(hwndWinamp);
+    std::string payload;
+    {
+        std::lock_guard<std::mutex> lock(g_snapshotMutex);
+        payload = g_latestSnapshot;
+    }
+    if (payload.empty()) return;
     payload.push_back('\n');
 
     DWORD written = 0;
@@ -399,13 +381,11 @@ void SendSnapshot(HWND hwndWinamp)
         ClosePipe();
 }
 
-DWORD WINAPI WorkerThread(void* parameter)
+DWORD WINAPI WorkerThread(void*)
 {
-    const auto hwndWinamp = static_cast<HWND>(parameter);
-
     while (true)
     {
-        SendSnapshot(hwndWinamp);
+        SendSnapshot();
 
         if (WaitForSingleObject(
                 g_stopEvent,
@@ -478,6 +458,16 @@ int PluginInit()
     if (g_stopEvent == nullptr)
         return 1;
 
+    g_metadata = {};
+    CaptureSnapshot(g_plugin.hwndParent, 0, 0, 0);
+    g_timer = SetTimer(g_plugin.hwndParent, 0, PollIntervalMs, CaptureSnapshot);
+    if (g_timer == 0)
+    {
+        CloseHandle(g_stopEvent);
+        g_stopEvent = nullptr;
+        return 1;
+    }
+
     g_thread = CreateThread(
         nullptr,
         0,
@@ -488,6 +478,8 @@ int PluginInit()
 
     if (g_thread == nullptr)
     {
+        KillTimer(g_plugin.hwndParent, g_timer);
+        g_timer = 0;
         CloseHandle(g_stopEvent);
         g_stopEvent = nullptr;
         return 1;
@@ -509,6 +501,11 @@ void PluginConfig()
 
 void PluginQuit()
 {
+    if (g_timer != 0)
+    {
+        KillTimer(g_plugin.hwndParent, g_timer);
+        g_timer = 0;
+    }
     if (g_stopEvent != nullptr)
         SetEvent(g_stopEvent);
 

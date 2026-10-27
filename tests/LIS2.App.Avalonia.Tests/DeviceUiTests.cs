@@ -114,6 +114,39 @@ public sealed class DeviceUiTests
             browser.GetVisualDescendants().OfType<Button>().Single(control => control.Name == "VariableInsert1")
                 .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.Equal("Clock.Year", ui.Control<TextBox>("FormatVariable").Text);
+            ui.Window.RefreshMediaSource("Winamp", new Dictionary<string, object?>
+            {
+                ["Connected"] = true, ["Artist"] = "", ["StreamName"] = "RADIO BOB", ["Title"] = "Lacrimosa - Titel"
+            });
+            ui.Control<TextBox>("FormatVariable").Text = "Winamp.Artist";
+            ui.Control<ComboBox>("FormatKind").SelectedIndex = 0;
+            ui.Control<TextBox>("FormatPrefix").Text = "";
+            ui.Control<TextBox>("FormatSuffix").Text = "";
+            ui.Click("FormatFallbackBrowse");
+            browser = ui.Window.OwnedWindows.Single();
+            browser.GetVisualDescendants().OfType<TextBox>().Single(control => control.Name == "VariableSearch").Text = "Winamp.StreamName";
+            await Fixture.WaitUntilAsync(() => browser.GetVisualDescendants().OfType<ListBox>().Single(control => control.Name == "VariableResults").ItemCount == 1);
+            browser.GetVisualDescendants().OfType<Button>().Single(control => control.Name == "VariableInsert1")
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            const string fallbackTemplate = "{Winamp.Artist|fallbackvar:Winamp.StreamName|fallback:--}";
+            await Fixture.WaitUntilAsync(() => ui.Control<TextBox>("FormatTemplate").Text == fallbackTemplate);
+            Assert.Equal("RADIO BOB", ui.Control<TextBlock>("FormatResult").Text);
+            Assert.Equal(UiTranslations.Translate("The fallback variable is used.", language), ui.Control<TextBlock>("FormatStatus").Text);
+            ui.Control<TextBox>("PageLine1").Text = "";
+            ui.Click("FormatInsert1");
+            await ui.ClickAndWaitAsync("PageSave");
+            await Fixture.WaitUntilAsync(() => ui.Store.Load().Pages.Any(page => page.Line1Template == fallbackTemplate));
+            editor.BringIntoView();
+            await ui.CaptureAsync($"fallback-editor-top-{language}-{width}x{height}");
+            ui.Control<Button>("FormatInsert2").BringIntoView();
+            await ui.CaptureAsync($"fallback-editor-{language}-{width}x{height}");
+            ui.Control<TextBox>("FormatFallbackVariable").Text = "Bad|Key";
+            await Fixture.WaitUntilAsync(() => !ui.Control<Button>("FormatInsert1").IsEnabled);
+            ui.Control<TextBox>("FormatFallbackVariable").Text = "Winamp.StreamName";
+            ui.Window.RefreshMediaSource("Winamp", new Dictionary<string, object?> { ["Connected"] = true, ["Artist"] = "Björk", ["StreamName"] = "RADIO BOB" });
+            ui.Control<TextBox>("FormatVariable").Text = "Clock.Year";
+            ui.Control<TextBox>("FormatVariable").Text = "Winamp.Artist";
+            await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("FormatResult").Text == "Björk");
             var input = ui.Control<TextBox>("PageLine1");
             input.Focus();
             await global::Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { },
