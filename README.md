@@ -347,11 +347,13 @@ The Debian packages include the .NET runtime, an application menu entry and the 
 - [Windows Media Player Legacy setup](docs/wmp-legacy-integration.md)
 - [Home Assistant integration](docs/home-assistant-integration.md)
 - [Release process](docs/release.md)
-- [Roadmap and remaining work](TODO.md), including updates, an APT repository, template validation, data freshness, sensor/fan history, connection tests, virtual page testing and failure notifications
+- [Roadmap and remaining work](TODO.md), including updates, template validation, data freshness, sensor/fan history, connection tests, virtual page testing and failure notifications
 
 ## Scope decisions
 
 Several ideas have deliberately **not** been added:
+
+- no dedicated APT repository; Debian packages are provided as release downloads
 
 - no general full-settings import/export; legacy WPF settings migration and separate page/custom-glyph files are supported
 - no restore-defaults workflow

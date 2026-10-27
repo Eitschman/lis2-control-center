@@ -7,7 +7,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 ## Roadmap: Weiterentwicklung nach v0.1.3
 
-Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nicht implementiert. Die Reihenfolge priorisiert Update-Hinweise und Debian-Verteilung, danach die Unterstützung bei Seitenkonfiguration und Fehlersuche. Der automatische Windows-Dateiaustausch bleibt ein eigenes Arbeitspaket. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
+Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nicht implementiert. Die Reihenfolge priorisiert Update-Hinweise, danach die Unterstützung bei Seitenkonfiguration und Fehlersuche. Der automatische Windows-Dateiaustausch bleibt ein eigenes Arbeitspaket. Debian-Pakete werden weiterhin als Release-Downloads angeboten; ein eigenes APT-Repository ist nicht vorgesehen. Die bestehenden Paketnummern bleiben erhalten. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
 
 ### ROAD-01: Update-Hinweise
 
@@ -16,13 +16,6 @@ Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nich
 - [ ] Automatische Update-Prüfung abschaltbar machen; manuelle Prüfung anbieten.
 - [ ] Portable Linux-Pakete zunächst durch Hinweis und passenden Download unterstützen.
 - [ ] Vertrauensmodell und Verifikation für Updateinformationen und heruntergeladene Pakete festlegen und prüfen; fehlgeschlagene Prüfungen verhindern die Installation.
-
-### ROAD-02: APT-Repository für Debian-Pakete
-
-- [ ] Ein signiertes APT-Repository für amd64 und arm64 einrichten und den Veröffentlichungsworkflow anbinden.
-- [ ] Einrichtung, Signaturschlüssel und Aktualisierung über die Paketverwaltung dokumentieren.
-- [ ] Debian-Installationen über die Paketverwaltung aktualisieren; die Anwendung darf deren Dateien nicht selbst ersetzen.
-- [ ] Installation und Upgrade einschließlich Erhalt der Benutzerdaten auf beiden Architekturen prüfen.
 
 ### ROAD-03: Vorlagenprüfung im Seiteneditor
 
