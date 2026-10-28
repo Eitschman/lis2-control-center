@@ -6,6 +6,62 @@ namespace LIS2.Display.Tests;
 public sealed class TemplateRendererTests
 {
     [Theory]
+    [InlineData("21.5", "{HA.Room}", "21,5")]
+    [InlineData("-0.0500", "{HA.Room|prefix:Wert: |suffix: °C}", "Wert: -0,0500 °C")]
+    [InlineData("1.2300e+5", "{HA.Room|upper}", "1,2300E+5")]
+    [InlineData("1.2300E+5", "{HA.Room|lower}", "1,2300e+5")]
+    [InlineData("00123.4500", "{HA.Room}", "00123,4500")]
+    [InlineData("0", "{HA.Room}", "0")]
+    [InlineData("21.123456789012345678901234567890123456789", "{HA.Room}", "21,123456789012345678901234567890123456789")]
+    [InlineData("21.50", "{HA.Room|percent:1}", "21,5%")]
+    [InlineData("1536", "{HA.Room|bytes:1}", "1,5 KB")]
+    [InlineData("Room 21.5", "{HA.Room}", "Room 21.5")]
+    [InlineData("1.2.3", "{HA.Room}", "1.2.3")]
+    [InlineData(" ", "{HA.Room}", " ")]
+    [InlineData("unavailable", "{HA.Room|fallback:--}", "--")]
+    public void Render_PreservesHaPrecisionTextAndExplicitFormatting(string state, string template, string expected)
+    {
+        var original = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+            Assert.Equal(expected, new TemplateRenderer().Render(template,
+                new Dictionary<string, object?> { ["HA.Room"] = state, ["HA.Room.Unit"] = "" }));
+        }
+        finally { System.Globalization.CultureInfo.CurrentCulture = original; }
+    }
+
+    [Theory]
+    [InlineData("de-DE", "21,50 °C", "21,5 °C")]
+    [InlineData("en-US", "21.50 °C", "21.5 °C")]
+    [InlineData("fr-FR", "21,50 °C", "21,5 °C")]
+    public void Render_LocalizesNumericHomeAssistantStatesWithoutChangingSourceData(string culture, string expected, string formatted)
+    {
+        var original = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo(culture);
+            var values = new Dictionary<string, object?>
+            {
+                ["HA.sensor.room"] = "21.50", ["HA.sensor.room.Unit"] = "°C",
+                ["HA.Room"] = "21.50", ["HA.Room.Unit"] = "°C",
+                ["HA.sensor.room.attribute.version"] = "21.50", ["HA.sensor.room.FriendlyName"] = "Room 21.50",
+                ["HA.sensor.room.attribute.target"] = 21.5
+            };
+            var renderer = new TemplateRenderer();
+            Assert.Equal(expected, renderer.Render("{HA.sensor.room|suffix: °C}", values));
+            Assert.Equal(expected, renderer.Render("{Missing|fallbackvar:HA.Room|suffix: °C}", values));
+            Assert.Equal(formatted, renderer.Render("{HA.sensor.room|number:1|suffix: °C}", values));
+            Assert.Equal("21.50", renderer.Render("{HA.sensor.room.attribute.version}", values));
+            Assert.Equal("Room 21.50", renderer.Render("{HA.sensor.room.FriendlyName}", values));
+            Assert.Equal("21.50", renderer.Render("{Missing|fallback:21.50}", values));
+            Assert.Equal("21.50", values["HA.sensor.room"]);
+            Assert.Equal(21.5.ToString(System.Globalization.CultureInfo.CurrentCulture), renderer.Render("{HA.sensor.room.attribute.target}", values));
+        }
+        finally { System.Globalization.CultureInfo.CurrentCulture = original; }
+    }
+
+    [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("unknown")]

@@ -14,6 +14,7 @@ public sealed class HomeAssistantUiTests
     [InlineData("German", "de")]
     [InlineData("French", "fr")]
     [InlineData("Russian", "ru")]
+    [InlineData("English", "en")]
     public async Task BrowserCreatesWorkingAliasAndAttributePagesAndPersistsSettings(string language, string code)
     {
         await using var server = new HomeAssistantServer();
@@ -30,6 +31,7 @@ public sealed class HomeAssistantUiTests
         var sources = new PageSourceValues();
         await sources.StartAsync();
         var window = new MainWindow(workspace, tokenStore, false, _ => throw new InvalidOperationException(), sources);
+        var originalCulture = System.Globalization.CultureInfo.CurrentCulture;
         try
         {
             window.Show();
@@ -47,10 +49,19 @@ public sealed class HomeAssistantUiTests
             Click(window, "HaConnect");
             var socket = await server.AcceptAsync();
             await server.InitializeAsync(socket);
-            await HomeAssistantServer.WaitAsync(() => sources.HomeAssistant.Entities.Count == 1);
+            await server.SendAsync(socket, new { id = 2, type = "event", @event = new { event_type = "state_changed", data = new
+            {
+                entity_id = "sensor.room", new_state = new { entity_id = "sensor.room", state = "21.50",
+                    attributes = new { friendly_name = "Room", unit_of_measurement = "°C", battery = 87, target = 21.5, version = "1.25" } }
+            } } });
+            await HomeAssistantServer.WaitAsync(() => sources.HomeAssistant.Entities.SingleOrDefault()?.State == "21.50");
             // Der Suchfilter stößt dieselbe Aktualisierung wie der periodische UI-Lauf an.
             window.FindControl<TextBox>("HaEntityFilter")!.Text = "room";
             await HomeAssistantServer.WaitAsync(() => Equals("sensor.room", window.FindControl<ComboBox>("HaEntityPicker")!.SelectedItem));
+            Assert.Contains("21" + originalCulture.NumberFormat.NumberDecimalSeparator + "50", window.FindControl<TextBlock>("HaSelectedEntity")!.Text!);
+            var attributeRows = window.FindControl<ListBox>("HaAttributes")!.Items.Cast<object>().Select(row => row.ToString()!).ToArray();
+            Assert.Contains(attributeRows, row => row.Contains("Name = target") && row.Contains(21.5.ToString(originalCulture)));
+            Assert.Contains(attributeRows, row => row.Contains("Name = version") && row.Contains("1.25"));
             window.FindControl<TextBox>("HaAlias")!.Text = "Room Temp";
             window.FindControl<CheckBox>("HaFavorite")!.IsChecked = true;
             Click(window, "HaSaveEntity");
@@ -103,6 +114,7 @@ public sealed class HomeAssistantUiTests
         }
         finally
         {
+            System.Globalization.CultureInfo.CurrentCulture = originalCulture;
             await window.BeginShutdownAsync();
             window.Close();
             if (Directory.Exists(directory)) Directory.Delete(directory, true);

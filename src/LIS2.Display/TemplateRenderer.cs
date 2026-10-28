@@ -48,7 +48,10 @@ public sealed partial class TemplateRenderer
             if (!IsMissingValue(rawValue)) break;
             if (string.Equals(operation.Name, "fallbackvar", StringComparison.OrdinalIgnoreCase) &&
                 !string.IsNullOrWhiteSpace(operation.Argument))
-                values.TryGetValue(operation.Argument.Trim(), out rawValue);
+            {
+                name = operation.Argument.Trim();
+                values.TryGetValue(name, out rawValue);
+            }
         }
 
         var fallback = parts
@@ -65,6 +68,11 @@ public sealed partial class TemplateRenderer
             return fallback ?? string.Empty;
 
         object? current = rawValue;
+
+        // HA-Zustände sind Protokolltexte mit Dezimalpunkt. Nur ihre Darstellung
+        // lokalisieren; Rohdaten, Vergleiche, Textattribute und Präzision bleiben erhalten.
+        string DisplayText(object? value) =>
+            SourceValueFormatter.Format(value, ReferenceEquals(value, rawValue) ? name : null, values);
 
         foreach (var part in parts.Skip(1))
         {
@@ -89,28 +97,28 @@ public sealed partial class TemplateRenderer
                     break;
 
                 case "upper":
-                    current = Convert.ToString(current, CultureInfo.CurrentCulture)?
+                    current = DisplayText(current)
                         .ToUpper(CultureInfo.CurrentCulture);
                     break;
 
                 case "lower":
-                    current = Convert.ToString(current, CultureInfo.CurrentCulture)?
+                    current = DisplayText(current)
                         .ToLower(CultureInfo.CurrentCulture);
                     break;
 
                 case "prefix":
                     current = (operation.Argument ?? string.Empty) +
-                              (Convert.ToString(current, CultureInfo.CurrentCulture) ?? string.Empty);
+                              DisplayText(current);
                     break;
 
                 case "suffix":
-                    current = (Convert.ToString(current, CultureInfo.CurrentCulture) ?? string.Empty) +
+                    current = DisplayText(current) +
                               (operation.Argument ?? string.Empty);
                     break;
             }
         }
 
-        var result = Convert.ToString(current, CultureInfo.CurrentCulture) ?? string.Empty;
+        var result = DisplayText(current);
         return string.IsNullOrEmpty(result) ? fallback ?? string.Empty : result;
     }
 

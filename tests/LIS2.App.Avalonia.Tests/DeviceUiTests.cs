@@ -13,6 +13,50 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class DeviceUiTests
 {
+    [AvaloniaFact]
+    public async Task HomeAssistantStateUsesRegionalNumbersOnDashboardAndDisplayPreview()
+    {
+        var original = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+            var expected = "21" + original.NumberFormat.NumberDecimalSeparator + "50 °C";
+            var sources = new PageSourceValues();
+            // Den HA-Snapshot ohne Netzwerkverbindung über den allgemeinen Schlüsseladapter einspeisen.
+            sources.UpdateMedia("HA", new Dictionary<string, object?> { ["sensor.room"] = "21.50", ["sensor.room.Unit"] = "°C" });
+            var saved = new PortableWorkspace
+            {
+                Pages = [new() { Id = "ha-room", Name = "Wohnzimmer", Line1Template = "{HA.sensor.room|suffix: °C}", DurationSeconds = 600 }],
+                Dashboard = new DashboardSettings { Values = [new() { Label = "Wohnzimmer", Template = "{HA.sensor.room|suffix: °C}" }] }
+            };
+            var hardware = new Dictionary<string, object?> { ["Hardware.CPU.Temperature.Package"] = 42.5, ["Hardware.CPU.Temperature.Package.Unit"] = "°C" };
+            await using var ui = await Fixture.OpenAsync(saved, sources: sources,
+                sensors: new LIS2.Runtime.SnapshotFanSensors(() => hardware));
+            ui.Control<ComboBox>("LanguageModeComboBox").SelectedIndex = 2;
+            Assert.Equal("Drehzahl: —", ui.Control<TextBlock>("DashboardFan2Rpm").Text);
+            ui.Click("NavButton0");
+            await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("DashboardValueText1").Text == expected);
+            await Fixture.WaitUntilAsync(() => ui.Control<VfdLine>("PreviewLine1").Text!.StartsWith(expected));
+            Assert.Equal("21.50", sources.Snapshot(DateTimeOffset.Now)["HA.sensor.room"]);
+            await ui.CaptureAsync("dashboard-ha-regional-numbers");
+            ui.Click("DashboardValueSettings");
+            await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 1);
+            var editor = ui.Window.OwnedWindows.Single();
+            DialogControl<Button>(editor, "DashboardBrowse1").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 2);
+            var browser = ui.Window.OwnedWindows.Single(window => window != editor);
+            DialogControl<TextBox>(browser, "VariableSearch").Text = "HA.sensor.room";
+            await Fixture.WaitUntilAsync(() => browser.GetVisualDescendants().OfType<TextBlock>().Any(text => text.Text?.Contains(expected[..^3].TrimEnd()) == true));
+            await CaptureDashboardDialogAsync(browser, "variables-regional-numbers");
+            browser.Close(); editor.Close();
+            ui.Click("NavButton5");
+            typeof(MainWindow).GetMethod("RefreshHardwareSensors", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.Invoke(ui.Window, null);
+            var entry = ui.Control<ListBox>("HardwareSensorList").Items.OfType<HardwareSensorEntry>().Single();
+            Assert.Equal(42.5.ToString(original) + " °C", entry.DisplayValue);
+            await ui.CaptureAsync("hardware-regional-numbers");
+        }
+        finally { System.Globalization.CultureInfo.CurrentCulture = original; }
+    }
+
     [AvaloniaTheory]
     [InlineData(false)]
     [InlineData(true)]

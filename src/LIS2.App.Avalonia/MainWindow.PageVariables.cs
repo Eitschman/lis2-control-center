@@ -116,7 +116,7 @@ public partial class MainWindow
             var key = Selected();
             if (key is null) { details.Text = BrowserText("Select a variable to inspect its current value and exact template key."); return; }
             snapshot.TryGetValue(key, out var value);
-            details.Text = key + Environment.NewLine + BrowserText("Current value: ") + (value?.ToString() ?? BrowserText("(unavailable)")) +
+            details.Text = key + Environment.NewLine + BrowserText("Current value: ") + (value is null ? BrowserText("(unavailable)") : LIS2.Display.SourceValueFormatter.Format(value, key, snapshot)) +
                 Environment.NewLine + BrowserText("Template: {") + key + "}";
             favorite.Content = _favoritePageVariables.Contains(key)
                 ? BrowserText("★ Remove favorite")

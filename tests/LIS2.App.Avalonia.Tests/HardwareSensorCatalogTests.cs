@@ -3,6 +3,23 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class HardwareSensorCatalogTests
 {
     [Theory]
+    [InlineData("de-DE", "42,5 °C")]
+    [InlineData("en-US", "42.5 °C")]
+    public void SensorDisplayUsesOperatingSystemRegionalNumbers(string culture, string expected)
+    {
+        var original = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo(culture);
+            var entry = new HardwareSensorEntry("Hardware.CPU.Temperature.Package", 42.5, "CPU", false, true) { Unit = "°C" };
+            Assert.Equal(expected, entry.DisplayValue);
+            Assert.Contains(expected, entry.SelectionDetails);
+            Assert.Contains(expected, entry.ToString());
+        }
+        finally { System.Globalization.CultureInfo.CurrentCulture = original; }
+    }
+
+    [Theory]
     [InlineData(false, false, false, false, null)]
     [InlineData(true, true, false, false, null)]
     [InlineData(true, false, false, false, "install the official PawnIO")]
@@ -276,7 +293,7 @@ public sealed class HardwareSensorCatalogTests
         var entry = new HardwareSensorEntry("Hardware.cpu.Temperature.temp1", 42.5d, "CPU Package", true, true);
         Assert.Equal("CPU Package", entry.DisplayName);
         Assert.Equal("Temperature", entry.SensorType);
-        Assert.Equal("42.5", entry.DisplayValue);
+        Assert.Equal(42.5.ToString(System.Globalization.CultureInfo.CurrentCulture), entry.DisplayValue);
         Assert.Contains("★", entry.Markers);
         Assert.Equal("Unavailable", (entry with { IsAvailable = false }).DisplayValue);
         Assert.Equal("Other", HardwareSensorCatalog.GetSensorType("Hardware.cpu.Unknown.value"));

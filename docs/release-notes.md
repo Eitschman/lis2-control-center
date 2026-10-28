@@ -2,6 +2,10 @@
 
 ## Dashboard-Feinschliff
 
+Numerische Home-Assistant-Zustände werden in Dashboard- und Displayvorlagen auch ohne ausdrückliches Zahlenformat nach den Regionseinstellungen dargestellt, einschließlich Alias- und Ersatzvariablen. `21.50` wird bei deutschen Einstellungen zu `21,50`, ohne Rundung oder Präzisionsverlust. Rohzustände, Sichtbarkeitsbedingungen, Namen und Textattribute bleiben unverändert. Ausdrückliche Zahlenformate bestimmen weiterhin die Nachkommastellen; numerische JSON-Attribute folgen bereits den Regionseinstellungen.
+
+Der Quellenabgleich umfasst Windows-/Linux-Hardware, Uhr, Winamp, WMP Legacy, modernes WMP/GSMTC, Linux-MPRIS und Home Assistant. Hardwareliste, HA-Zustands-/Attributliste, Variablenbrowser und gelesene Lüftersensoren verwenden ebenfalls regionale Zahlenformate. Numerische Medienfelder bleiben Zahlen; Titel, Versionszeichenfolgen, Datums-/Laufzeitformate, Rohdaten und technische Eingabeformate werden nicht umgedeutet. Maßgeblich sind die Regionseinstellungen des Betriebssystems, unabhängig von der Oberflächensprache.
+
 Unbelegte Livewerte zeigen ein dezentes „—“. Konfigurierte Vorlagen ohne Ergebnis zeigen „Nicht verfügbar“ in kleinerer Schrift. Die Lüfterkarte ist niedriger und beschriftet Drehzahlwerte ausdrücklich; nicht zugeordnete Drehzahlsensoren zeigen „Drehzahl: —“. Beide Zahnradschaltflächen haben dieselbe Größe und sichtbare Hover- und Fokuszustände.
 
 Im Livewerte-Dialog passt „Zahlen kompakt“ ausdrückliche Zahlenformate auf höchstens eine Nachkommastelle an und ergänzt Abstände vor unterstützten Einheiten. Ganze Zahlen ohne Nachkommastellen bleiben ganzzahlig. Die Aktion verändert nur den Entwurf; Speichern übernimmt die Änderungen, Abbrechen verwirft sie. Bestehende Vorlagen werden nicht automatisch umgeschrieben. Hilfe und Bedienung sind in fünf Sprachen ergänzt.

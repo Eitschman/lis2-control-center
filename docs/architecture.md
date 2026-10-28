@@ -84,6 +84,19 @@ Es gibt keinen automatischen seriellen Wiederverbindungsablauf. Displayverbindun
 
 ## Datenquellen und Plattformen
 
+`SourceValueFormatter` verwendet für die Anzeige typisierter Zahlen die Regionseinstellungen des Betriebssystems, unabhängig von der Oberflächensprache. Numerische HA-Zustandstexte werden ohne Rundung lokalisiert; die mitgelieferte `.Unit`-Variable kennzeichnet Entitätszustände einschließlich Alias und leerer Einheit. Dashboard, Displayvorlagen, Hardwareliste, HA-Browser, Variablenbrowser und gelesene Lüftersensoren verwenden dieselbe Zahlenanzeige. Der Vorlagenrenderer wendet ausdrücklich gewählte Zahlenformate weiterhin auf die unveränderten Rohwerte an.
+
+| Quelle | Rohwerte und Anzeige |
+| --- | --- |
+| Windows-/Linux-Hardware | Sensorwerte bleiben typisierte Zahlen; sichtbare Zahlen folgen der Region |
+| Home Assistant | Zustand bleibt Protokolltext; numerischer Zustand wird bei der Anzeige lokalisiert. JSON-Zahlenattribute bleiben Zahlen, Textattribute unverändert |
+| Winamp und WMP Legacy | Track-, Audio- und Pegelwerte bleiben Zahlen; Titel und Metadaten bleiben Text, Laufzeiten behalten ihr Zeitformat |
+| Modernes WMP/GSMTC | Wiedergaberate und Trackdaten bleiben Zahlen; Titel und Laufzeiten werden nicht als Dezimalzahlen interpretiert |
+| Linux-MPRIS | Metadaten bleiben Text; Mikrosekunden werden als Dauer gelesen und als Zeit dargestellt |
+| Uhr | Numerische Zeitbestandteile bleiben Zahlen; Datum, Uhrzeit und Wochentag behalten die vorgesehenen Formate |
+
+Sichtbarkeitsausdrücke, technische Eingabeformate, Rohdaten und gespeicherte Vorlagen werden durch die Darstellung nicht geändert. Numerische Zeichenfolgen in Titeln, Versionsattributen oder anderen freien Textfeldern werden nicht automatisch umgedeutet.
+
 - `PageSourceValues` verwendet die gemeinsame Registry, Clock und HA sowie ergänzte Hardware-/Mediensnapshots. Die vorhandenen Template-Namensräume bleiben erhalten.
 - Windows-Hardwaresnapshots stammen aus `WindowsHardwareFanSensors` mit LibreHardwareMonitor; Linux nutzt `LinuxSystemSensors` und `LinuxHwmonFanSensors`.
 - Windows startet Winamp, WMP Legacy mit getrennten Metadaten-/Audiopipes und den per Reflection geladenen GSMTC-Anbieter. Die Legacy-Medienkarte und `WmpLegacy.*` berücksichtigen die unabhängigen Verbindungsfristen; Spektrumglyphen verwenden dessen feste Byte-Pegelskala.

@@ -45,6 +45,8 @@ The **Test connection** action authenticates a temporary WebSocket connection wi
 
 ## Display variables
 
+Numeric entity states use the operating system decimal separator in dashboard and display templates, including aliases and fallback variables, and in the entity and variable browsers. This preserves precision, for example `21.50` becomes `21,50` with German regional settings. An explicit `number`, `percent` or `bytes` operation still controls formatting. Raw source states, visibility expressions, names and text attributes remain unchanged. Numeric JSON attributes use regional formatting in templates and attribute lists.
+
 Every current Home Assistant entity is exposed as:
 
 ```text

@@ -5,6 +5,41 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class PageSourceValuesTests
 {
+    [Theory]
+    [InlineData("de-DE", "21,5", "1,25")]
+    [InlineData("en-US", "21.5", "1.25")]
+    [InlineData("fr-FR", "21,5", "1,25")]
+    public async Task AllSourceKindsUseRegionalNumbersAndPreserveMetadata(string culture, string number, string rate)
+    {
+        var original = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo(culture);
+            await using var sources = new PageSourceValues();
+            sources.UpdateHardware(new Dictionary<string, object?> { ["Hardware.Cpu.Temperature"] = 21.5 });
+            sources.UpdateMedia("HA", new Dictionary<string, object?> { ["sensor.room"] = "21.5", ["sensor.room.Unit"] = "°C",
+                ["sensor.room.attribute.target"] = 21.5, ["sensor.room.attribute.version"] = "1.25" });
+            sources.UpdateMedia("Winamp", LIS2.Winamp.WinampValues.FromSnapshot(new(
+                LIS2.Winamp.WinampPlaybackState.Playing, "1.25", "21.5", null, 2, 12,
+                TimeSpan.FromSeconds(65), TimeSpan.FromSeconds(125), 192, 44100, 20, 30, null)));
+            sources.UpdateMedia("WmpLegacy", LIS2.WmpLegacy.WmpLegacyValues.FromSnapshot(new(
+                LIS2.WmpLegacy.WmpLegacyPlaybackState.Playing, "1.25", "21.5", null, 2, 12,
+                TimeSpan.FromSeconds(65), TimeSpan.FromSeconds(125))));
+            sources.UpdateMedia("Media", LinuxMprisSource.Parse("<media><state>Playing</state><title>21.5</title><artist>1.25</artist><album>Album</album><elapsed>65000000</elapsed><duration>125000000</duration></media>"));
+            var values = sources.Snapshot(new DateTimeOffset(2026, 10, 28, 11, 15, 30, TimeSpan.Zero));
+            var renderer = new TemplateRenderer();
+            Assert.Equal(number + "/" + number + "/" + number,
+                renderer.Render("{Hardware.Cpu.Temperature}/{HA.sensor.room}/{HA.sensor.room.attribute.target}", values));
+            Assert.Equal("1.25", renderer.Render("{HA.sensor.room.attribute.version}", values));
+            foreach (var source in new[] { "Winamp", "WmpLegacy", "Media" })
+                Assert.Equal("21.5 / 1.25", renderer.Render("{" + source + ".Title} / {" + source + ".Artist}", values));
+            Assert.Equal("01:05 / 01:05 / 00:01:05", renderer.Render("{Winamp.Elapsed} / {WmpLegacy.Elapsed} / {Media.Elapsed}", values));
+            Assert.Equal("28.10.2026", renderer.Render("{Clock.Date}", values));
+            Assert.Equal(rate, renderer.Render("{Rate}", new Dictionary<string, object?> { ["Rate"] = 1.25 }));
+        }
+        finally { System.Globalization.CultureInfo.CurrentCulture = original; }
+    }
+
     [Fact]
     public async Task LegacySpectrumUsesByteLevelsAndDisconnectedMetadataDisappears()
     {

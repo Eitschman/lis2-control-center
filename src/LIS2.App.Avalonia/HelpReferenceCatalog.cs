@@ -27,6 +27,7 @@ internal static class HelpReferenceCatalog
         {
             case 0:
                 Add("Dashboard", "The Dashboard combines the compact 20x2 VFD preview, page controls, four fan channels and eight configurable live values. Connection status remains in the header.");
+                Add("Regional numbers", "All source numbers use the operating system regional settings, independently of the interface language. Hardware, Home Assistant and variable browsers use the same presentation. Numeric Home Assistant states retain their decimal places without an explicit format. Titles, text attributes, dates, timelines, source keys and technical input syntax remain unchanged. Use number, percent or bytes in a template to choose precision.");
                 Add("VFD preview", "The preview displays the normalized 20-character lines. Long text may scroll during page playback.");
                 Add("Fan outputs", "Manual output respects the minimum, maximum and AllowStop of all four channels. Each serial action needs fresh authorization. Authorized serial fan output sends 100% first; stop or orderly disconnect sends 100%. Manual serial output is blocked during automatic serial control.");
                 Add("Current page", "Choose an enabled, currently visible page or use Previous and Next while the sequence is running. Pause stops only automatic page rotation; live values, scrolling and event overlays continue. Resume continues rotation. These controls use the applied virtual or serial transport; they are disabled when playback is stopped.");
@@ -136,6 +137,7 @@ Add("Windows CPU temperatures", "Windows CPU temperatures require the official s
                 Add("Connection", "Enter the Home Assistant URL and a long-lived access token, then test and save the connection.");
                 Add("Token storage", "Windows uses DPAPI. Linux uses the desktop keyring through secret-tool. Local AES storage requires explicit selection; the key is stored beside the encrypted token. Keyring errors are displayed without switching storage automatically. Disabling Home Assistant stops the source and removes the token from the selected store. Switching back to the keyring migrates local files only after verifying the saved token.");
                 AddExample("Entity state", "{HA.sensor.living_room_temperature}");
+                Add("Home Assistant numbers", "Numeric entity states, including aliases and fallback variables, use the operating system decimal separator in templates without rounding. For example, 21.50 becomes 21,50 with German regional settings. Explicit number, percent and bytes formats control precision. Raw states, visibility expressions, text attributes and names remain unchanged; numeric JSON attributes already follow regional settings.");
                 AddExample("Unit and friendly name", "{HA.sensor.living_room_temperature.Unit}  {HA.sensor.living_room_temperature.FriendlyName}");
                 AddExample("Attributes", "{HA.media_player.living_room.attribute.media_title}");
                 AddExample("Aliases", "{HA.LivingRoomTemp}  {HA.LivingRoomTemp.Unit}  {HA.LivingRoomTemp.attribute.device_class}");

@@ -47,6 +47,8 @@ public partial class MainWindow
                 _ => "System"
             };
             ApplySettingsLocalization();
+            RefreshDashboardPlayback();
+            RefreshDashboardValues();
             this.FindControl<TextBlock>("SettingsAppearanceStatus")!.Text = string.Empty;
             _ = SavePortableWorkspaceAsync();
         };

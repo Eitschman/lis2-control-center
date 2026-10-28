@@ -15,6 +15,8 @@ Das freigegebene Dashboard-Mockup ergänzt eine niedrige VFD-Karte über die ges
 
 ## Arbeitsgrundlage und Nachweis
 
+Zahlen aller Datenquellen werden nach den Regionseinstellungen des Betriebssystems dargestellt, unabhängig von der Oberflächensprache. Das gilt für Dashboard, Displayvorlagen, Hardware-, HA- und Variablenbrowser. Numerische HA-Zustandstexte behalten ohne ausdrückliches Format ihre Präzision. Rohdaten, Sichtbarkeitsbedingungen, Titel, Textattribute, Quellschlüssel und technische Eingabeformate bleiben unverändert. Ausdrückliche Formatoperationen bestimmen weiterhin die Genauigkeit.
+
 Unbelegte Dashboard-Livewerte und nicht zugeordnete Drehzahlquellen zeigen „—“; konfigurierte Quellen ohne Daten bleiben als „Nicht verfügbar“ erkennbar. Die optionale Aktion „Zahlen kompakt“ verändert nur den Entwurf und benötigt Speichern. Eigene Vorlagen und ihre Präzision bleiben ohne diese Auswahl erhalten. Die Lüfterkarte nutzt kompakte Abstände; beide Zahnradschaltflächen haben einheitliche Hover- und Fokuszustände.
 
 - [Implementierungsstatus](linux-port-status.md): aktueller Codebefund und CI-Nachweis.

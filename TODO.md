@@ -14,6 +14,8 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] „Zahlen kompakt“ verändert nur den Dialogentwurf: höchstens eine Nachkommastelle und Abstand vor Einheiten. Bestehende Vorlagen bleiben ohne ausdrückliche Auswahl unverändert; Speichern und Abbrechen gelten wie bei anderen Änderungen.
 - [x] README und Hilfe in fünf Sprachen aktualisiert; Dashboard-Regressionen ergänzen Leerzustände und Entwurfsverhalten.
 - [ ] Release v0.1.16 mit CI- und Downloadprüfung.
+- [x] Numerische HA-Zustände in Dashboard und Display ohne ausdrückliches Format regional darstellen; Aliase, Ersatzvariablen und Präzision erhalten. Rohdaten, Sichtbarkeit und Textattribute bleiben unverändert.
+- [x] Quellenabgleich für Windows-/Linux-Hardware, Uhr, Winamp, WMP Legacy, GSMTC, MPRIS und HA. Zahlenanzeige auch in Hardwareliste, HA-Browser, Variablenbrowser und Sensoranzeige vereinheitlichen; Titel, Kennungen und technische Eingabeformate erhalten.
 
 ### Windows-CPU-Sensoren und acht Dashboard-Livewerte
 

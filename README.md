@@ -44,7 +44,7 @@ Windows Media Player Legacy plug-ins: [x86 / 32-bit](https://github.com/Eitschma
 
 ## Project status
 
-Release v0.1.16 refines dashboard spacing, empty states and settings buttons, and adds an optional compact number-format action. It also includes eight dashboard live values and a documented Windows CPU-temperature setup using PawnIO with explicit per-user device access.
+The application refines dashboard spacing, empty states and settings buttons, and adds an optional compact number-format action. It also includes eight dashboard live values and a documented Windows CPU-temperature setup using PawnIO with explicit per-user device access.
 
 As of October 27, 2026, PORT-08 includes verified archive launches on Windows x64, Linux x64 and native Linux ARM64, plus Debian packages for amd64/arm64. The shared application in `src/LIS2.App.Avalonia` provides ten main views, display/page/event runtime, custom glyphs, Windows/Linux sensors, fan control with explicit authorization for serial output, Home Assistant, media sources, workspace persistence, help and About. The modal variable browser is an accepted difference from WPF.
 
@@ -285,6 +285,10 @@ Data sources are source-agnostic from the display engine's point of view. Typica
 Aliases provide shorter stable names for hardware/Home Assistant values where configured.
 
 `Winamp.*` and `WindowsMedia.*` refer to the Windows integrations; `Media.*` refers to Linux MPRIS players. Available hardware keys depend on the operating system and detected sensors; use the variable browser to select actual keys.
+
+Number presentation follows the operating system regional settings for every source, independently of the selected interface language. Hardware and media numeric fields retain their numeric types; titles, version strings, technical keys and clock/timeline formats remain intact. Hardware, Home Assistant and variable browsers use the same regional number presentation.
+
+Numeric Home Assistant entity states also use the operating system decimal separator without an explicit format, including aliases and fallback variables. Their precision is preserved: `21.50` appears as `21,50` with German regional settings. Raw source states, visibility expressions, names and text attributes remain unchanged. Numeric JSON attributes already follow regional settings. Use an explicit number format to select decimal places.
 
 Template values can be formatted inline:
 

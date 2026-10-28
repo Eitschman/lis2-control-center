@@ -135,7 +135,7 @@ public partial class MainWindow
                 SetUiText("FanSensorStatus", values.Count == 0
                     ? "No readable temperature sensors found. Missing keys trigger fail-safe."
                     : string.Join(Environment.NewLine, values.OrderBy(x => x.Key).Select(x =>
-                        x.Key + " = " + Convert.ToString(x.Value, CultureInfo.InvariantCulture) + " C")));
+                        x.Key + " = " + LIS2.Display.SourceValueFormatter.FormatNumeric(x.Value) + " C")));
             }
             catch (Exception ex) { SetUiText("FanSensorStatus", $"Sensor read failed: {(UiMessage)ex.Message}"); }
         };

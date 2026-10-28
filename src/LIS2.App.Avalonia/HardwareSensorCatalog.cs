@@ -134,7 +134,7 @@ public sealed record HardwareSensorEntry(string Key, object? Value, string Alias
     internal string Language { get; init; } = "en";
     public string DisplaySensorType => UiTranslations.Translate(SensorType, Language);
     public string DisplayValue => IsAvailable
-        ? (Convert.ToString(Value, CultureInfo.InvariantCulture) ?? "") +
+        ? LIS2.Display.SourceValueFormatter.FormatNumeric(Value) +
           (string.IsNullOrWhiteSpace(Unit) ? "" : " " + Unit.Trim())
         : UiTranslations.Translate("Unavailable", Language);
 

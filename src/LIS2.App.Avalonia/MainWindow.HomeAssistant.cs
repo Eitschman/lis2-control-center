@@ -232,7 +232,7 @@ public partial class MainWindow
         {
             var entity = snapshot.First(e => string.Equals(e.EntityId, id, StringComparison.OrdinalIgnoreCase));
             var favorite = _haPreferences.Any(p => string.Equals(p.EntityId, id, StringComparison.OrdinalIgnoreCase) && p.IsFavorite);
-            return new HaEntityRow(id, entity.FriendlyName, entity.State + " " + entity.Unit,
+            return new HaEntityRow(id, entity.FriendlyName, LIS2.Display.SourceValueFormatter.FormatNumeric(entity.State) + " " + entity.Unit,
                 HaEntityKey(id), favorite ? "★" : "");
         }).ToArray();
         var entityList = this.FindControl<ListBox>("HaEntityList")!;
@@ -278,14 +278,14 @@ public partial class MainWindow
         var entity = _pageSources.HomeAssistant.Entities.FirstOrDefault(e => e.EntityId == id);
         var preference = _haPreferences.FirstOrDefault(p => string.Equals(p.EntityId, id, StringComparison.OrdinalIgnoreCase));
         SetUiText("HaSelectedEntity", entity is null
-            ? "Select an entity above." : (UiMessage)$"{entity.FriendlyName} ({entity.EntityId}) — {entity.State} {entity.Unit}");
+            ? "Select an entity above." : (UiMessage)$"{entity.FriendlyName} ({entity.EntityId}) — {LIS2.Display.SourceValueFormatter.FormatNumeric(entity.State)} {entity.Unit}");
         if (loadPreferences)
         {
             this.FindControl<TextBox>("HaAlias")!.Text = preference?.Alias ?? "";
             this.FindControl<CheckBox>("HaFavorite")!.IsChecked = preference?.IsFavorite == true;
         }
         var attributes = entity?.Attributes.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
-            .Select(pair => new HaAttributeRow(pair.Key, Convert.ToString(pair.Value, System.Globalization.CultureInfo.InvariantCulture) ?? "")).ToArray() ?? [];
+            .Select(pair => new HaAttributeRow(pair.Key, LIS2.Display.SourceValueFormatter.Format(pair.Value))).ToArray() ?? [];
         var list = this.FindControl<ListBox>("HaAttributes")!;
         var previous = SelectedHaAttribute();
         if (!attributes.SequenceEqual(list.ItemsSource as HaAttributeRow[] ?? []))
