@@ -2,7 +2,7 @@
 
 ## Kompaktes Dashboard mit konfigurierbaren Livewerten
 
-Die VFD-Karte nutzt die gesamte Breite mit unverändert kompakten 20×2 Zeichen links und Seitensteuerung rechts. Auswahl, vorherige/nächste Seite und Pause/Fortsetzen verwenden den aktiven Transport. Pause hält nur die automatische Rotation an; Werte, Laufschrift und Ereignisse bleiben aktiv. Schmale Fenster stapeln Vorschau und Bedienung.
+Die VFD-Karte nutzt die gesamte Breite mit unverändert kompakten 20×2 Zeichen links und Seitensteuerung rechts. Auswahl, vorherige/nächste Seite und Pause/Fortsetzen verwenden den aktiven Transport. Pause hält nur die automatische Rotation an; Werte, Laufschrift und Ereignisse bleiben aktiv. Vorschau und Bedienung passen auch bei Mindestbreite nebeneinander.
 
 Vier frei beschriftbare Livewerte verwenden die vorhandene Vorlagensyntax und den Variablenbrowser. Das Zahnrad öffnet die Konfiguration; Speichern sichert die Auswahl im Workspace, Abbrechen verwirft den Entwurf. Die Lüfterkarte ergänzt konfigurierten Modus, Regelsensor und ausdrücklich zugeordnete Drehzahlsensoren. Ohne passende Drehzahlquelle erscheint „Nicht verfügbar“; es werden keine Drehzahlen aus Prozentwerten abgeleitet. Die Sensorzuordnung erteilt keine Hardwarefreigabe. Schnellzugriff und Demo-Schaltfläche entfallen. Die Hilfe beschreibt die Bedienung in allen fünf Sprachen.
 

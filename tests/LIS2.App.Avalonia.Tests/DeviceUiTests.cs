@@ -576,9 +576,9 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         ui.Control<ComboBox>("DashboardPagePicker").SelectedIndex = 1;
         await Fixture.WaitUntilAsync(() => ui.Control<VfdLine>("PreviewLine1").Text!.StartsWith("CPU"));
         await ui.CaptureAsync($"dashboard-compact-{language}-{width}x{height}");
-        Assert.Equal(width < 1100 ? 1 : 3, ui.Control<Grid>("DashboardVfdLayout").ColumnDefinitions.Count);
+        Assert.Equal(3, ui.Control<Grid>("DashboardVfdLayout").ColumnDefinitions.Count);
         Assert.Equal(width < 1100 ? 2 : 4, ui.Control<Grid>("DashboardValuesLayout").ColumnDefinitions.Count);
-        if (width > 1100) Assert.InRange(ui.Control<Border>("DashboardVfdCard").Bounds.Height, 110, 200);
+        Assert.InRange(ui.Control<Border>("DashboardVfdCard").Bounds.Height, 110, 200);
         var scroll = ui.Control<ScrollViewer>("DashboardView");
         Assert.True(scroll.Extent.Width <= scroll.Viewport.Width + 1);
         for (var channel = 1; channel <= 4; channel++)

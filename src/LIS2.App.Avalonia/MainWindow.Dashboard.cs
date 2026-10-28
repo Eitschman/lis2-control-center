@@ -88,19 +88,12 @@ public partial class MainWindow
             AutomationProperties.SetName(this.FindControl<Button>(name)!, UiText(text));
     }
 
-    /// <summary>Schmale Fenster stapeln die Bedienung und zeigen Livewerte in zwei Spalten; das VFD bleibt unverändert.</summary>
+    /// <summary>Die kompakte VFD-Karte passt auch bei Mindestbreite; schmale Fenster zeigen Livewerte in zwei Spalten.</summary>
     private void UpdateDashboardLayout()
     {
         var layout = this.FindControl<Grid>("DashboardVfdLayout");
         if (layout is null) return;
         var stacked = Bounds.Width < 1100;
-        layout.ColumnDefinitions = new ColumnDefinitions(stacked ? "*" : "Auto,28,*");
-        layout.RowDefinitions = new RowDefinitions(stacked ? "Auto,Auto" : "Auto");
-        this.FindControl<Border>("DashboardVfdSeparator")!.IsVisible = !stacked;
-        var controls = this.FindControl<StackPanel>("DashboardPageControls")!;
-        Grid.SetColumn(controls, stacked ? 0 : 2);
-        Grid.SetRow(controls, stacked ? 1 : 0);
-        controls.Margin = new Thickness(0, stacked ? 12 : 0, 0, 0);
         var values = this.FindControl<Grid>("DashboardValuesLayout")!;
         values.ColumnDefinitions = new ColumnDefinitions(stacked ? "*,*" : "*,*,*,*");
         for (var index = 0; index < 4; index++)

@@ -201,7 +201,7 @@ The full-width VFD card keeps the preview at 20x2 characters. While page playbac
 
 The fan card shows each channel's configured mode and control sensor. Its gear button assigns an RPM source to each channel. RPM must come from an actual sensor; the LIS2 does not provide confirmed speed feedback. Missing or unassigned speed sources show **Unavailable**. Sensor selection does not authorize physical fan output.
 
-The **Live values** gear configures four labels and templates independently of the active display page. Use the variable browser to insert keys from your system and apply the same formatting as in page templates, for example `{Clock.Time}` or `{Hardware.Cpu.Temperature|number:1|suffix: °C}` with a matching hardware key. Empty results show **Unavailable**. Save stores the configuration in the workspace; Cancel discards edits. Narrow windows stack the VFD controls and arrange live values in two columns.
+The **Live values** gear configures four labels and templates independently of the active display page. Use the variable browser to insert keys from your system and apply the same formatting as in page templates, for example `{Clock.Time}` or `{Hardware.Cpu.Temperature|number:1|suffix: °C}` with a matching hardware key. Empty results show **Unavailable**. Save stores the configuration in the workspace; Cancel discards edits. The VFD preview and page controls stay side by side at the minimum window width; live values use two columns in narrow windows.
 
 ## Architecture
 

@@ -13,7 +13,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] Auswahl, vorherige/nächste Seite und Pause/Fortsetzen am angewendeten Transport. Pause erhält Livewerte, Laufschrift und Ereignis-Overlays.
 - [x] Vier persistente Livewerte mit eigener Beschriftung, Vorlagensyntax und Variablenbrowser; Speichern und Abbrechen im Konfigurationsdialog.
 - [x] Lüfterdetails mit konfiguriertem Modus, Regelsensor und ausdrücklich zugeordneten Drehzahlsensoren. Fehlende Drehzahlen bleiben als nicht verfügbar erkennbar; Hardwarefreigabe unverändert.
-- [x] Deutsche, englische, französische, türkische und russische Hilfe ergänzt. Schmale Fenster stapeln die VFD-Bedienung und ordnen Livewerte in zwei Spalten an.
+- [x] Deutsche, englische, französische, türkische und russische Hilfe ergänzt. Die VFD-Bedienung bleibt auch bei Mindestbreite neben der Vorschau; schmale Fenster ordnen Livewerte in zwei Spalten an.
 - [ ] Release v0.1.14: Main-/Release-CI und veröffentlichte Downloads nachweisen.
 
 ### Winamp-Aktualisierung und Dashboard
