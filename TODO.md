@@ -14,6 +14,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] Fehlende CPU-Messwerte trotz verfügbarer GPU-/Lastwerte sichtbar erklären; Hinweise und Hilfe in fünf Sprachen ergänzen.
 - [x] Installation, Benutzerfreigabe, Gegenproben und Rücknahme im [Windows-Sensorleitfaden](docs/windows-hardware-sensors.md) dokumentieren; PowerShell-Werkzeug mit Sicherung und Geräteprüfung.
 - [ ] Benutzerfreigabe nach Windows-Neustart und auf weiteren CPU-/Mainboardmodellen prüfen.
+- [ ] Release v0.1.15: Main-/Release-CI, Download-Prüfsummen und mitgelieferten Windows-Sensorleitfaden samt Berechtigungswerkzeug nachweisen.
 
 ### Dashboard nach freigegebenem Mockup
 

@@ -47,7 +47,7 @@ Die SID und den absoluten Sicherungspfad übernehmen. Das ist auch dann wichtig,
 
 ## 3. Gewählten Benutzer freigeben
 
-Eine PowerShell als Administrator im Repository-Verzeichnis öffnen. Das Werkzeug ist im Quellrepository unter `tools/windows/Set-PawnIoUserAccess.ps1` enthalten. SID, Sicherungspfad und Geräteinstanz aus den vorigen Schritten eintragen:
+Eine PowerShell als Administrator im entpackten Windows-Paket oder im Repository-Verzeichnis öffnen. Das Werkzeug liegt unter `tools/windows/Set-PawnIoUserAccess.ps1`. SID, Sicherungspfad und Geräteinstanz aus den vorigen Schritten eintragen:
 
 ```powershell
 $userSid = Read-Host 'SID des normalen Anwendungsbenutzers'
