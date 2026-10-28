@@ -7,6 +7,14 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 ## Roadmap: Weiterentwicklung nach v0.1.3
 
+### Dashboard-Feinschliff
+
+- [x] Unbelegte Livewerte als dezentes „—“; konfigurierte Quellen ohne Ergebnis als „Nicht verfügbar“. Null und Leerzeichen bleiben gültige Inhalte.
+- [x] Kompaktere Lüfterkarte, beschriftete Drehzahlen und einheitliche Zahnradschaltflächen mit Hover- und Tastaturfokus.
+- [x] „Zahlen kompakt“ verändert nur den Dialogentwurf: höchstens eine Nachkommastelle und Abstand vor Einheiten. Bestehende Vorlagen bleiben ohne ausdrückliche Auswahl unverändert; Speichern und Abbrechen gelten wie bei anderen Änderungen.
+- [x] README und Hilfe in fünf Sprachen aktualisiert; Dashboard-Regressionen ergänzen Leerzustände und Entwurfsverhalten.
+- [ ] Release v0.1.16 mit CI- und Downloadprüfung.
+
 ### Windows-CPU-Sensoren und acht Dashboard-Livewerte
 
 - [x] Acht Livewerte mit Übernahme vorhandener Vierer-Konfigurationen, vier Spalten bei breiten und zwei bei schmalen Fenstern; Bearbeiten und Speichern aller acht Werte.

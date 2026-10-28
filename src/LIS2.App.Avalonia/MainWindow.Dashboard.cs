@@ -117,7 +117,12 @@ public partial class MainWindow
             label.Text = setting.Label.Length == 0 ? UiText("Value") + " " + (index + 1) : setting.Label;
             var output = renderer.Render(setting.Template, values);
             var text = this.FindControl<TextBlock>($"DashboardValueText{index + 1}")!;
-            text.Text = output.Length == 0 ? UiText("Unavailable") : output;
+            var unconfigured = setting.Template.Length == 0;
+            text.Text = unconfigured ? "—" : output.Length == 0 ? UiText("Unavailable") : output;
+            text.FontSize = unconfigured || output.Length == 0 ? 16 : 23;
+            text.FontWeight = unconfigured || output.Length == 0 ? FontWeight.Normal : FontWeight.SemiBold;
+            text.Opacity = unconfigured || output.Length == 0 ? 0.65 : 1;
+            text.MinHeight = 30;
             ToolTip.SetTip(text, setting.Template);
         }
         for (var index = 0; index < 4; index++)
@@ -128,7 +133,9 @@ public partial class MainWindow
             this.FindControl<TextBlock>($"DashboardFan{index + 1}Mode")!.Text = UiText(channel.Mode);
             var speedKey = _dashboardSettings.FanSpeedKeys[index];
             var rpm = TryDashboardNumber(values.GetValueOrDefault(speedKey), out var speed) && speed >= 0
-                ? speed.ToString("N0", CultureInfo.CurrentCulture) + " RPM" : UiText("Unavailable");
+                ? speed.ToString("N0", CultureInfo.CurrentCulture) + " RPM"
+                : speedKey.Length == 0 ? "—" : UiText("Unavailable");
+            rpm = UiText("Speed") + ": " + rpm;
             this.FindControl<TextBlock>($"DashboardFan{index + 1}Rpm")!.Text = rpm;
             var sensor = this.FindControl<TextBlock>($"DashboardFan{index + 1}Sensor")!;
             sensor.Text = "";
@@ -224,6 +231,16 @@ public partial class MainWindow
             finally { save.IsEnabled = true; cancel.IsEnabled = true; }
         };
         var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = HorizontalAlignment.Right };
+        if (!fanSpeeds)
+        {
+            var compact = new Button { Name = "DashboardCompactNumbers", Content = UiText("Compact numbers") };
+            ToolTip.SetTip(compact, UiText("Use at most one decimal place and spaces before units. Changes apply only after Save."));
+            compact.Click += (_, _) =>
+            {
+                foreach (var input in inputs) input.Text = DashboardFormatting.CompactTemplate(input.Text ?? "");
+            };
+            actions.Children.Add(compact);
+        }
         actions.Children.Add(save); actions.Children.Add(cancel);
         var layout = new Grid { RowDefinitions = new RowDefinitions("*,Auto,Auto"), RowSpacing = 12, Margin = new Thickness(18) };
         layout.Children.Add(new ScrollViewer { Content = rows });

@@ -1,4 +1,10 @@
-# LIS2 Control Center 0.1.15
+# LIS2 Control Center 0.1.16
+
+## Dashboard-Feinschliff
+
+Unbelegte Livewerte zeigen ein dezentes „—“. Konfigurierte Vorlagen ohne Ergebnis zeigen „Nicht verfügbar“ in kleinerer Schrift. Die Lüfterkarte ist niedriger und beschriftet Drehzahlwerte ausdrücklich; nicht zugeordnete Drehzahlsensoren zeigen „Drehzahl: —“. Beide Zahnradschaltflächen haben dieselbe Größe und sichtbare Hover- und Fokuszustände.
+
+Im Livewerte-Dialog passt „Zahlen kompakt“ ausdrückliche Zahlenformate auf höchstens eine Nachkommastelle an und ergänzt Abstände vor unterstützten Einheiten. Ganze Zahlen ohne Nachkommastellen bleiben ganzzahlig. Die Aktion verändert nur den Entwurf; Speichern übernimmt die Änderungen, Abbrechen verwirft sie. Bestehende Vorlagen werden nicht automatisch umgeschrieben. Hilfe und Bedienung sind in fünf Sprachen ergänzt.
 
 ## Acht Livewerte und Windows-CPU-Temperaturen
 
@@ -12,7 +18,7 @@ Das Windows-Paket enthält `docs/windows-hardware-sensors.md` und `tools/windows
 
 Die VFD-Karte nutzt die gesamte Breite mit unverändert kompakten 20×2 Zeichen links und Seitensteuerung rechts. Auswahl, vorherige/nächste Seite und Pause/Fortsetzen verwenden den aktiven Transport. Pause hält nur die automatische Rotation an; Werte, Laufschrift und Ereignisse bleiben aktiv. Vorschau und Bedienung passen auch bei Mindestbreite nebeneinander.
 
-Acht frei beschriftbare Livewerte verwenden die vorhandene Vorlagensyntax und den Variablenbrowser. Das Zahnrad öffnet die Konfiguration; Speichern sichert die Auswahl im Workspace, Abbrechen verwirft den Entwurf. Die Lüfterkarte ergänzt konfigurierten Modus, Regelsensor und ausdrücklich zugeordnete Drehzahlsensoren. Ohne passende Drehzahlquelle erscheint „Nicht verfügbar“; es werden keine Drehzahlen aus Prozentwerten abgeleitet. Die Sensorzuordnung erteilt keine Hardwarefreigabe. Schnellzugriff und Demo-Schaltfläche entfallen. Die Hilfe beschreibt die Bedienung in allen fünf Sprachen.
+Acht frei beschriftbare Livewerte verwenden die vorhandene Vorlagensyntax und den Variablenbrowser. Das Zahnrad öffnet die Konfiguration; Speichern sichert die Auswahl im Workspace, Abbrechen verwirft den Entwurf. Die Lüfterkarte ergänzt konfigurierten Modus, Regelsensor und ausdrücklich zugeordnete Drehzahlsensoren. Konfigurierte Drehzahlquellen ohne Messwert zeigen „Nicht verfügbar“; es werden keine Drehzahlen aus Prozentwerten abgeleitet. Die Sensorzuordnung erteilt keine Hardwarefreigabe. Schnellzugriff und Demo-Schaltfläche entfallen. Die Hilfe beschreibt die Bedienung in allen fünf Sprachen.
 
 ## Flüssigere Winamp-Telemetrie
 
@@ -82,7 +88,7 @@ Beispiel: `{Value|number:2}` formatiert `50.1234567` mit deutschem Betriebssyste
 
 ## Windows Media Player Legacy
 
-Die Windows-App enthält die Legacy-Medienkarte, Metadaten über das Hintergrund-Plug-in und direkt erfasstes Prozess-Audio, `WmpLegacy.*`, drei Presets und fünfsprachige Hilfe. Die Pakete `LIS2-WMP-Legacy-0.1.15-win32.zip` und `LIS2-WMP-Legacy-0.1.15-win64.zip` enthalten jeweils beide nativen DLLs, Registrierungsanleitungen und die MIT-Lizenz. Die Architektur des Hintergrund-Plug-ins muss zum **Legacy-Playerprozess** passen. Registrierung mit dem passenden administrativen `regsvr32`, danach den Player neu starten. Die Visualisierungs-DLL bleibt ein optionales Diagnosewerkzeug. Einzelheiten und manuelle Prüfliste: [Legacy-Leitfaden](https://github.com/Eitschman/lis2-control-center/blob/v0.1.15/docs/wmp-legacy-integration.md). Kein Plug-in greift auf LIS2-Hardware zu.
+Die Windows-App enthält die Legacy-Medienkarte, Metadaten über das Hintergrund-Plug-in und direkt erfasstes Prozess-Audio, `WmpLegacy.*`, drei Presets und fünfsprachige Hilfe. Die Pakete `LIS2-WMP-Legacy-0.1.16-win32.zip` und `LIS2-WMP-Legacy-0.1.16-win64.zip` enthalten jeweils beide nativen DLLs, Registrierungsanleitungen und die MIT-Lizenz. Die Architektur des Hintergrund-Plug-ins muss zum **Legacy-Playerprozess** passen. Registrierung mit dem passenden administrativen `regsvr32`, danach den Player neu starten. Die Visualisierungs-DLL bleibt ein optionales Diagnosewerkzeug. Einzelheiten und manuelle Prüfliste: [Legacy-Leitfaden](https://github.com/Eitschman/lis2-control-center/blob/v0.1.16/docs/wmp-legacy-integration.md). Kein Plug-in greift auf LIS2-Hardware zu.
 
 Die Legacy-DLLs enthalten ihre C/C++-Laufzeit durch statisches Linken. Eine separate Visual-C++-Redistributable-Installation entfällt. Die CI kontrolliert die tatsächlichen DLL-Importe. Sicherheitsaktualisierungen der eingebundenen Laufzeit erfordern einen neuen Plug-in-Build.
 
@@ -94,7 +100,7 @@ App, Protokolltester und Headless-Tests verwenden **Avalonia 11.3.22**. Die DBus
 
 Enthalten sind portable Pakete für Windows x64, Linux x64 und Linux ARM64, Debian-Pakete für amd64/arm64, der Windows-Protokolltester, das native 32-Bit-Winamp-Plug-in `gen_lis2.dll` und beide Legacy-Plug-in-Pakete.
 
-Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.15_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
+Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.16_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
 
 Die Anwendungspakete liefern **.NET 10.0.13** mit; .NET muss nicht separat installiert werden. Lizenztexte, Fremdkomponentenhinweise und feste Quellverweise liegen unter `licenses/` und `THIRD-PARTY-NOTICES.txt` bei. Avalonia-Lizenztext und Inter-Schrift wurden gegen den tatsächlichen Paketstand geprüft.
 

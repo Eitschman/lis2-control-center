@@ -14,6 +14,50 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class DeviceUiTests
 {
     [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task DashboardEmptySlotsAndNumberDraftRespectSaveAndCancel(bool dark)
+    {
+        var saved = new PortableWorkspace { ThemeMode = dark ? "Dark" : "Light",
+            Dashboard = new DashboardSettings { Values = [new() { Template = "{CPU|number:2|suffix:°C}" },
+                new() { Template = "0" }, new() { Template = " " }] } };
+        await using var ui = await Fixture.OpenAsync(saved);
+        ui.Click("NavButton0");
+        await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("DashboardValueText4").Text == "—");
+        Assert.Equal("0", ui.Control<TextBlock>("DashboardValueText2").Text);
+        Assert.Equal(" ", ui.Control<TextBlock>("DashboardValueText3").Text);
+        Assert.Equal(23, ui.Control<TextBlock>("DashboardValueText2").FontSize);
+        Assert.Equal(16, ui.Control<TextBlock>("DashboardValueText4").FontSize);
+        foreach (var name in new[] { "DashboardValueSettings", "DashboardFanSettings" })
+        {
+            var button = ui.Control<Button>(name);
+            Assert.Equal(32, button.Width);
+            Assert.Equal(32, button.Height);
+            button.Focus(NavigationMethod.Tab);
+        }
+        var hover = ui.Control<Button>("DashboardValueSettings");
+        ui.Window.UpdateLayout();
+        ui.Window.MouseMove(hover.TranslatePoint(new Point(16, 16), ui.Window)!.Value, RawInputModifiers.None);
+        Assert.True(hover.IsPointerOver);
+        await ui.CaptureAsync("dashboard-refined-" + (dark ? "dark" : "light"));
+        ui.Click("DashboardValueSettings");
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 1);
+        var dialog = ui.Window.OwnedWindows.Single();
+        DialogControl<Button>(dialog, "DashboardCompactNumbers").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Assert.Equal("{CPU|number:1|suffix: °C}", DialogControl<TextBox>(dialog, "DashboardTemplate1").Text);
+        DialogControl<Button>(dialog, "DashboardSettingsCancel").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Assert.Equal("{CPU|number:2|suffix:°C}", ui.Store.Load().Dashboard.Values[0].Template);
+        ui.Click("DashboardValueSettings");
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 1);
+        dialog = ui.Window.OwnedWindows.Single();
+        DialogControl<Button>(dialog, "DashboardCompactNumbers").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await CaptureDashboardDialogAsync(dialog, "dashboard-compact-format-" + (dark ? "dark" : "light"));
+        DialogControl<Button>(dialog, "DashboardSettingsSave").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 0);
+        Assert.Equal("{CPU|number:1|suffix: °C}", ui.Store.Load().Dashboard.Values[0].Template);
+    }
+
+    [AvaloniaTheory]
     [InlineData(950, 600, 1, "en")]
     [InlineData(950, 600, 2, "de")]
     [InlineData(1305, 893, 2, "de")]
@@ -566,7 +610,7 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         typeof(MainWindow).GetMethod("RefreshHardwareSensors", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.Invoke(ui.Window, null);
         await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("DashboardFan1Rpm").Text?.Contains("RPM") == true);
         Assert.Contains("1", ui.Control<TextBlock>("DashboardFan1Rpm").Text!);
-        Assert.Equal(UiTranslations.Translate("Unavailable", language), ui.Control<TextBlock>("DashboardFan2Rpm").Text);
+        Assert.Equal(UiTranslations.Translate("Speed", language) + ": —", ui.Control<TextBlock>("DashboardFan2Rpm").Text);
         Assert.Equal(UiTranslations.Translate("Unavailable", language), ui.Control<TextBlock>("DashboardValueText4").Text);
         Assert.Equal(UiTranslations.Translate("Curve", language), ui.Control<TextBlock>("DashboardFan1Mode").Text);
         Assert.Contains("°C", ui.Control<TextBlock>("DashboardFan1Sensor").Text!);
@@ -630,7 +674,7 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
             new LIS2.Display.TemplateRenderer().Render("{Hardware.Cpu.Temperature.Core}", hardware));
         hardware.Remove("Hardware.Case.Fan.Front");
         typeof(MainWindow).GetMethod("RefreshHardwareSensors", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.Invoke(ui.Window, null);
-        await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("DashboardFan1Rpm").Text == UiTranslations.Translate("Unavailable", language));
+        await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("DashboardFan1Rpm").Text == UiTranslations.Translate("Speed", language) + ": " + UiTranslations.Translate("Unavailable", language));
         ui.Click("DashboardFanSettings");
         await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 1);
         dialog = ui.Window.OwnedWindows.Single();

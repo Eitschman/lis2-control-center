@@ -9,6 +9,23 @@
     <x:String x:Key="PageFormattingHint">Formatting: {Key|number:2}&#10;50.1234567 → 50,12 (German regional settings)&#10;fallback, fallbackvar, percent, bytes, prefix, suffix, upper, lower&#10;More examples: Pages help</x:String>
   </Window.Resources>
   <Window.Styles>
+    <Style Selector="Button.dashboardSettings">
+      <Setter Property="Width" Value="32" />
+      <Setter Property="Height" Value="32" />
+      <Setter Property="Padding" Value="7" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.dashboardSettings:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Lis2HeaderBrush}" />
+    </Style>
+    <Style Selector="Button.dashboardSettings:focus-visible /template/ ContentPresenter">
+      <Setter Property="BorderBrush" Value="{DynamicResource Lis2IconBrush}" />
+      <Setter Property="Background" Value="{DynamicResource Lis2HeaderBrush}" />
+    </Style>
     <Style Selector="Path.dashboardIcon">
       <Setter Property="Width" Value="16" />
       <Setter Property="Height" Value="16" />
@@ -101,9 +118,9 @@
             <StackPanel Spacing="12">
               <Grid ColumnDefinitions="*,Auto">
                 <TextBlock Text="Fan Outputs" FontWeight="SemiBold" FontSize="16" VerticalAlignment="Center" />
-                <Button Name="DashboardFanSettings" Grid.Column="1" ToolTip.Tip="Configure speed sensors" AutomationProperties.Name="Configure speed sensors"><Path Classes="dashboardIcon dashboardGear" /></Button>
+                <Button Classes="dashboardSettings" Name="DashboardFanSettings" Grid.Column="1" ToolTip.Tip="Configure speed sensors" AutomationProperties.Name="Configure speed sensors"><Path Classes="dashboardIcon dashboardGear" /></Button>
               </Grid>
-              <Grid ColumnDefinitions="*,18,*" RowDefinitions="Auto,Auto,18,Auto,Auto,14,Auto">
+              <Grid ColumnDefinitions="*,18,*" RowDefinitions="Auto,Auto,8,Auto,Auto,8,Auto">
                 <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="Auto,*,55">
                 <TextBlock Grid.Column="0" Text="Fan 1" VerticalAlignment="Center" />
                 <Slider Name="DashboardFan1Slider" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="6,0,10,0" IsEnabled="False" />
@@ -125,23 +142,23 @@
                 <TextBlock Name="DashboardFan4Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
               </Grid>
                 <WrapPanel Grid.Row="1" Grid.Column="0" Margin="0,4,0,0">
-                  <TextBlock Name="DashboardFan1Rpm" Margin="0,0,18,4" />
-                  <TextBlock Name="DashboardFan1Mode" Margin="0,0,18,4" />
+                  <TextBlock Opacity="0.7" Name="DashboardFan1Rpm" Margin="0,0,18,4" />
+                  <TextBlock Opacity="0.7" Name="DashboardFan1Mode" Margin="0,0,18,4" />
                   <TextBlock Name="DashboardFan1Sensor" Margin="0,0,0,4" />
                 </WrapPanel>
                 <WrapPanel Grid.Row="1" Grid.Column="2" Margin="0,4,0,0">
-                  <TextBlock Name="DashboardFan2Rpm" Margin="0,0,18,4" />
-                  <TextBlock Name="DashboardFan2Mode" Margin="0,0,18,4" />
+                  <TextBlock Opacity="0.7" Name="DashboardFan2Rpm" Margin="0,0,18,4" />
+                  <TextBlock Opacity="0.7" Name="DashboardFan2Mode" Margin="0,0,18,4" />
                   <TextBlock Name="DashboardFan2Sensor" Margin="0,0,0,4" />
                 </WrapPanel>
                 <WrapPanel Grid.Row="4" Grid.Column="0" Margin="0,4,0,0">
-                  <TextBlock Name="DashboardFan3Rpm" Margin="0,0,18,4" />
-                  <TextBlock Name="DashboardFan3Mode" Margin="0,0,18,4" />
+                  <TextBlock Opacity="0.7" Name="DashboardFan3Rpm" Margin="0,0,18,4" />
+                  <TextBlock Opacity="0.7" Name="DashboardFan3Mode" Margin="0,0,18,4" />
                   <TextBlock Name="DashboardFan3Sensor" Margin="0,0,0,4" />
                 </WrapPanel>
                 <WrapPanel Grid.Row="4" Grid.Column="2" Margin="0,4,0,0">
-                  <TextBlock Name="DashboardFan4Rpm" Margin="0,0,18,4" />
-                  <TextBlock Name="DashboardFan4Mode" Margin="0,0,18,4" />
+                  <TextBlock Opacity="0.7" Name="DashboardFan4Rpm" Margin="0,0,18,4" />
+                  <TextBlock Opacity="0.7" Name="DashboardFan4Mode" Margin="0,0,18,4" />
                   <TextBlock Name="DashboardFan4Sensor" Margin="0,0,0,4" />
                 </WrapPanel>
                 <WrapPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right">
@@ -155,7 +172,7 @@
             <StackPanel Spacing="16">
               <Grid ColumnDefinitions="*,Auto">
                 <TextBlock Text="Live values" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
-                <Button Name="DashboardValueSettings" Grid.Column="1" ToolTip.Tip="Configure live values" AutomationProperties.Name="Configure live values"><Path Classes="dashboardIcon dashboardGear" /></Button>
+                <Button Classes="dashboardSettings" Name="DashboardValueSettings" Grid.Column="1" ToolTip.Tip="Configure live values" AutomationProperties.Name="Configure live values"><Path Classes="dashboardIcon dashboardGear" /></Button>
               </Grid>
               <Grid Name="DashboardValuesLayout" ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="18" RowSpacing="16">
                 <StackPanel Name="DashboardValueSlot1" Spacing="8"><TextBlock Name="DashboardValueLabel1" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText1" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>

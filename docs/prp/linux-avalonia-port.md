@@ -15,6 +15,8 @@ Das freigegebene Dashboard-Mockup ergänzt eine niedrige VFD-Karte über die ges
 
 ## Arbeitsgrundlage und Nachweis
 
+Unbelegte Dashboard-Livewerte und nicht zugeordnete Drehzahlquellen zeigen „—“; konfigurierte Quellen ohne Daten bleiben als „Nicht verfügbar“ erkennbar. Die optionale Aktion „Zahlen kompakt“ verändert nur den Entwurf und benötigt Speichern. Eigene Vorlagen und ihre Präzision bleiben ohne diese Auswahl erhalten. Die Lüfterkarte nutzt kompakte Abstände; beide Zahnradschaltflächen haben einheitliche Hover- und Fokuszustände.
+
 - [Implementierungsstatus](linux-port-status.md): aktueller Codebefund und CI-Nachweis.
 - [Inventar](linux-port-inventory.md): Projekte, Zuständigkeiten, Plattformgrenzen und Tests.
 - [Paritätsaudit](wpf-avalonia-parity-audit.md): vorhandene Ansichten und offene Unterschiede.
