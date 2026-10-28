@@ -9,6 +9,16 @@
     <x:String x:Key="PageFormattingHint">Formatting: {Key|number:2}&#10;50.1234567 → 50,12 (German regional settings)&#10;fallback, fallbackvar, percent, bytes, prefix, suffix, upper, lower&#10;More examples: Pages help</x:String>
   </Window.Resources>
   <Window.Styles>
+    <Style Selector="Path.dashboardIcon">
+      <Setter Property="Width" Value="16" />
+      <Setter Property="Height" Value="16" />
+      <Setter Property="Stretch" Value="Uniform" />
+      <Setter Property="Stroke" Value="{DynamicResource Lis2IconBrush}" />
+      <Setter Property="StrokeThickness" Value="1.5" />
+    </Style>
+    <Style Selector="Path.dashboardGear">
+      <Setter Property="Data" Value="M6,1 L10,1 L11,4 L14,5 L14,11 L11,12 L10,15 L6,15 L5,12 L2,11 L2,5 L5,4 Z M10,8 A2,2 0 1 1 6,8 A2,2 0 1 1 10,8" />
+    </Style>
     <Style Selector="Border.vfdDisplay">
       <Setter Property="Background" Value="#123B8A" />
       <Setter Property="BorderBrush" Value="#5D8FE8" />
@@ -64,59 +74,94 @@
       </Grid>
       <ScrollViewer Name="DashboardView" Grid.Row="1">
         <StackPanel Spacing="14">
-          <Grid ColumnDefinitions="Auto,14,*">
-            <Border Background="{DynamicResource Lis2CardBrush}" Grid.Column="0" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16" VerticalAlignment="Top">
+            <Border Name="DashboardVfdCard" Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
               <StackPanel Spacing="12">
                 <TextBlock Text="VFD Preview" FontWeight="SemiBold" FontSize="16" />
-                <Border Classes="vfdDisplay">
+                <Grid Name="DashboardVfdLayout" ColumnDefinitions="Auto,28,*">
+                <Border Name="DashboardVfdSeparator" Grid.Column="1" Width="1" Background="{DynamicResource Lis2BorderBrush}" Margin="0,2" />
+                <Border Classes="vfdDisplay" VerticalAlignment="Center" HorizontalAlignment="Left">
                   <StackPanel HorizontalAlignment="Left" Spacing="0">
                     <local:VfdLine Name="PreviewLine1" Classes="vfdLine" Text="                    " />
                     <local:VfdLine Name="PreviewLine2" Classes="vfdLine" Text="                    " />
                   </StackPanel>
                 </Border>
-                <Button Name="VirtualDemo" Content="Send demo display" IsEnabled="False" HorizontalAlignment="Left" />
+                <StackPanel Name="DashboardPageControls" Grid.Column="2" Spacing="8" VerticalAlignment="Center">
+                  <TextBlock Text="Current page" />
+                  <ComboBox Name="DashboardPagePicker" MinWidth="180" MaxWidth="340" HorizontalAlignment="Left" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Name="DashboardPrevious" ToolTip.Tip="Previous page" AutomationProperties.Name="Previous page" Width="44" HorizontalContentAlignment="Center"><Path Classes="dashboardIcon" Data="M2,2 L2,14 M13,2 L4,8 L13,14 Z" /></Button>
+                    <Button Name="DashboardPause" ToolTip.Tip="Pause rotation" AutomationProperties.Name="Pause rotation" Width="44" HorizontalContentAlignment="Center"><Path Name="DashboardPauseIcon" Classes="dashboardIcon" Data="M5,2 L5,14 M11,2 L11,14" /></Button>
+                    <Button Name="DashboardNext" ToolTip.Tip="Next page" AutomationProperties.Name="Next page" Width="44" HorizontalContentAlignment="Center"><Path Classes="dashboardIcon" Data="M14,2 L14,14 M3,2 L12,8 L3,14 Z" /></Button>
+                  </StackPanel>
+                </StackPanel>
+                </Grid>
               </StackPanel>
             </Border>
-            <StackPanel Grid.Column="2" Spacing="14">
-              <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
-                <StackPanel Spacing="10">
-                  <TextBlock Text="Quick Links" FontSize="16" FontWeight="SemiBold" />
-                  <WrapPanel>
-                    <Button Name="OpenDisplayControls" Content="Open Display Controls" Margin="0,0,8,8" />
-                    <Button Name="OpenFanControl" Content="Open Fan Control" Margin="0,0,8,8" />
-                  </WrapPanel>
-                </StackPanel>
-              </Border>
-            </StackPanel>
-          </Grid>
           <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
-              <TextBlock Text="Fan Outputs" FontWeight="SemiBold" FontSize="16" />
-              <Grid ColumnDefinitions="*,18,*" RowDefinitions="Auto,12,Auto,14,Auto">
-                <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="70,*,55">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="Fan Outputs" FontWeight="SemiBold" FontSize="16" VerticalAlignment="Center" />
+                <Button Name="DashboardFanSettings" Grid.Column="1" ToolTip.Tip="Configure speed sensors" AutomationProperties.Name="Configure speed sensors"><Path Classes="dashboardIcon dashboardGear" /></Button>
+              </Grid>
+              <Grid ColumnDefinitions="*,18,*" RowDefinitions="Auto,Auto,18,Auto,Auto,14,Auto">
+                <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="Auto,*,55">
                 <TextBlock Grid.Column="0" Text="Fan 1" VerticalAlignment="Center" />
                 <Slider Name="DashboardFan1Slider" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="6,0,10,0" IsEnabled="False" />
                 <TextBlock Name="DashboardFan1Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
               </Grid>
-                <Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="70,*,55">
+                <Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="Auto,*,55">
                 <TextBlock Grid.Column="0" Text="Fan 2" VerticalAlignment="Center" />
                 <Slider Name="DashboardFan2Slider" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="6,0,10,0" IsEnabled="False" />
                 <TextBlock Name="DashboardFan2Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
               </Grid>
-                <Grid Grid.Row="2" Grid.Column="0" ColumnDefinitions="70,*,55">
+                <Grid Grid.Row="3" Grid.Column="0" ColumnDefinitions="Auto,*,55">
                 <TextBlock Grid.Column="0" Text="Fan 3" VerticalAlignment="Center" />
                 <Slider Name="DashboardFan3Slider" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="6,0,10,0" IsEnabled="False" />
                 <TextBlock Name="DashboardFan3Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
               </Grid>
-                <Grid Grid.Row="2" Grid.Column="2" ColumnDefinitions="70,*,55">
+                <Grid Grid.Row="3" Grid.Column="2" ColumnDefinitions="Auto,*,55">
                 <TextBlock Grid.Column="0" Text="Fan 4" VerticalAlignment="Center" />
                 <Slider Name="DashboardFan4Slider" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="6,0,10,0" IsEnabled="False" />
                 <TextBlock Name="DashboardFan4Value" Grid.Column="2" Text="100 %" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" />
               </Grid>
-                <WrapPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right">
+                <WrapPanel Grid.Row="1" Grid.Column="0" Margin="0,4,0,0">
+                  <TextBlock Name="DashboardFan1Rpm" Margin="0,0,18,4" />
+                  <TextBlock Name="DashboardFan1Mode" Margin="0,0,18,4" />
+                  <TextBlock Name="DashboardFan1Sensor" Margin="0,0,0,4" />
+                </WrapPanel>
+                <WrapPanel Grid.Row="1" Grid.Column="2" Margin="0,4,0,0">
+                  <TextBlock Name="DashboardFan2Rpm" Margin="0,0,18,4" />
+                  <TextBlock Name="DashboardFan2Mode" Margin="0,0,18,4" />
+                  <TextBlock Name="DashboardFan2Sensor" Margin="0,0,0,4" />
+                </WrapPanel>
+                <WrapPanel Grid.Row="4" Grid.Column="0" Margin="0,4,0,0">
+                  <TextBlock Name="DashboardFan3Rpm" Margin="0,0,18,4" />
+                  <TextBlock Name="DashboardFan3Mode" Margin="0,0,18,4" />
+                  <TextBlock Name="DashboardFan3Sensor" Margin="0,0,0,4" />
+                </WrapPanel>
+                <WrapPanel Grid.Row="4" Grid.Column="2" Margin="0,4,0,0">
+                  <TextBlock Name="DashboardFan4Rpm" Margin="0,0,18,4" />
+                  <TextBlock Name="DashboardFan4Mode" Margin="0,0,18,4" />
+                  <TextBlock Name="DashboardFan4Sensor" Margin="0,0,0,4" />
+                </WrapPanel>
+                <WrapPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right">
                   <CheckBox Name="DashboardFanConsent" Content="Authorize serial fan output" IsVisible="False" Margin="0,0,12,0"/>
                   <Button Name="DashboardFansApply" Content="Apply" MinWidth="110" IsEnabled="False"/>
                 </WrapPanel>
+              </Grid>
+            </StackPanel>
+          </Border>
+          <Border Name="DashboardValuesCard" Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
+            <StackPanel Spacing="16">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="Live values" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <Button Name="DashboardValueSettings" Grid.Column="1" ToolTip.Tip="Configure live values" AutomationProperties.Name="Configure live values"><Path Classes="dashboardIcon dashboardGear" /></Button>
+              </Grid>
+              <Grid Name="DashboardValuesLayout" ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="18" RowSpacing="16">
+                <StackPanel Name="DashboardValueSlot1" Spacing="8"><TextBlock Name="DashboardValueLabel1" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText1" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
+                <StackPanel Name="DashboardValueSlot2" Grid.Column="1" Spacing="8"><TextBlock Name="DashboardValueLabel2" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText2" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
+                <StackPanel Name="DashboardValueSlot3" Grid.Column="2" Spacing="8"><TextBlock Name="DashboardValueLabel3" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText3" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
+                <StackPanel Name="DashboardValueSlot4" Grid.Column="3" Spacing="8"><TextBlock Name="DashboardValueLabel4" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText4" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
               </Grid>
             </StackPanel>
           </Border>

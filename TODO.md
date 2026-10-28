@@ -7,6 +7,15 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 ## Roadmap: Weiterentwicklung nach v0.1.3
 
+### Dashboard nach freigegebenem Mockup
+
+- [x] Niedrige VFD-Karte über die gesamte Breite, kompakte 20×2-Vorschau und Seitensteuerung. Schnellzugriff und Demo-Schaltfläche entfallen.
+- [x] Auswahl, vorherige/nächste Seite und Pause/Fortsetzen am angewendeten Transport. Pause erhält Livewerte, Laufschrift und Ereignis-Overlays.
+- [x] Vier persistente Livewerte mit eigener Beschriftung, Vorlagensyntax und Variablenbrowser; Speichern und Abbrechen im Konfigurationsdialog.
+- [x] Lüfterdetails mit konfiguriertem Modus, Regelsensor und ausdrücklich zugeordneten Drehzahlsensoren. Fehlende Drehzahlen bleiben als nicht verfügbar erkennbar; Hardwarefreigabe unverändert.
+- [x] Deutsche, englische, französische, türkische und russische Hilfe ergänzt. Schmale Fenster stapeln die VFD-Bedienung und ordnen Livewerte in zwei Spalten an.
+- [ ] Release v0.1.14: Main-/Release-CI und veröffentlichte Downloads nachweisen.
+
 ### Winamp-Aktualisierung und Dashboard
 
 - [x] [Release-Workflow 40546184681](https://github.com/Eitschman/lis2-control-center/actions/runs/40546184681) für v0.1.13 geprüft: 14 erfolgreiche Jobs, Release veröffentlicht. Neun heruntergeladene Nutzdateien stimmen mit SHA256SUMS.txt überein; Paketinhalt und zehn README-Downloadlinks sind geprüft.
@@ -15,6 +24,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] Empfangene Winamp-Audiowerte und moderne WMP-Metadaten über den tatsächlichen UI-Timer prüfen.
 - [x] Redundanten Systemstatusbereich und Befehlszähler aus dem Dashboard entfernen; Verbindungsanzeige oben rechts erhalten.
 - [x] Neue Winamp-DLL unter Winamp 5.9.2.10042 im realen Radio-BOB-Stream prüfen: 155 sichtbare Pegel-/Spektrumänderungen nach Anlauf, Medianabstand 95 ms. Original-DLL gesichert, neue DLL installiert, Player anschließend wieder gestoppt.
+- [x] Benutzer bestätigt die flüssigere Winamp-Anzeige im Betrieb.
 - [ ] Weitere Winamp-Zielsysteme und lokale MP3-Wiedergabe mit der neuen DLL prüfen.
 
 ### Aktueller Fehlernachweis: WMP-Legacy-Audio nach Titelwechsel
@@ -100,7 +110,7 @@ Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nich
 - [x] Winamp, Windows GSMTC, HA-WebSocket-Quelle und Linux-Metadaten über `playerctl`.
 - [x] Workspace, Windows-Importlogik, Theme-/Sprachauswahl, Windows-Tray und Autostart.
 - [x] Hilfe mit zehn Themen, About-Dialog, virtuelle Diagnose und Textexport.
-- [x] Kompakte Dashboard-VFD-Fläche für 20 × 2 Zeichen bei unveränderter Schriftgröße; passende Kartenbreite, restlicher Platz für Status/Schnellzugriff und umbrechende Schnellzugriff-Schaltflächen. Layoutregressionen auf Deutsch/Englisch und Sichtprüfung bei 950 × 600 sowie 1305 × 893 Pixeln.
+- [x] Kompakte Dashboard-VFD-Fläche für 20 × 2 Zeichen bei unveränderter Schriftgröße in einer niedrigen, durchgehenden Karte mit Seitensteuerung. Layoutregressionen und Sichtprüfung bei 950 × 600 sowie 1305 × 893 Pixeln.
 - [x] Gemeinsame kompakte VFD-Darstellung in Übersicht und Seiteneditor, Schriftgröße 24 und Linux-Monospace-Auswahl. Gefüllte/leere Zeilen und aufgehobene Seitenauswahl behalten 20 × 2 Zeichenplätze; vier zusätzliche Layoutregressionen prüfen Deutsch/Englisch und beide Fenstergrößen. Weitere VFD-Vorschauen sind im Anwendungs- und Werkzeugcode nicht vorhanden.
 - [x] Windows-/Ubuntu-Builds und vier Testprojekte je OS; Pakete für `win-x64`, `linux-x64`, `linux-arm64` mit SHA-256.
 

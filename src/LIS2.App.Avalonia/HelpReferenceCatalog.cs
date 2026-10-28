@@ -26,10 +26,12 @@ internal static class HelpReferenceCatalog
         switch (ClampSection(index))
         {
             case 0:
-                Add("Dashboard", "The Dashboard shows the current 20x2 VFD preview, connection status, recent commands and direct fan outputs.");
+                Add("Dashboard", "The Dashboard combines the compact 20x2 VFD preview, page controls, four fan channels and four configurable live values. Connection status remains in the header.");
                 Add("VFD preview", "The preview displays the normalized 20-character lines. Long text may scroll during page playback.");
                 Add("Fan outputs", "Manual output respects the minimum, maximum and AllowStop of all four channels. Each serial action needs fresh authorization. Authorized serial fan output sends 100% first; stop or orderly disconnect sends 100%. Manual serial output is blocked during automatic serial control.");
-                Add("Quick links", "Open Display for manual output or Fan Control for regulation and sensor assignments.");
+                Add("Current page", "Choose an enabled, currently visible page or use Previous and Next while the sequence is running. Pause stops only automatic page rotation; live values, scrolling and event overlays continue. Resume continues rotation. These controls use the applied virtual or serial transport; they are disabled when playback is stopped.");
+                Add("Fan outputs", "Each channel shows its configured mode and control sensor. Use the gear beside Fan Outputs to assign a real RPM sensor to each channel. The LIS2 does not supply confirmed RPM feedback. Missing or unassigned speed sensors show Unavailable. Assigning a sensor never authorizes hardware output.");
+                Add("Live values", "Use the gear beside Live values to configure four labels and templates. Browse variables inserts a current source key; existing template formatting is supported, for example {Hardware.Cpu.Temperature|number:1|suffix: °C}. Choose actual keys from your system. Empty results show Unavailable. Save persists the selection; Cancel discards edits. These values are independent of the active display page.");
                 break;
             case 1:
                 Add("Display", "Use the Display section for direct physical or virtual LIS2 output. Manual commands interrupt page scheduling.");

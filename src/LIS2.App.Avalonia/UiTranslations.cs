@@ -5,6 +5,16 @@ internal static class UiTranslations
 {
     private static readonly IReadOnlyDictionary<string, string[]> Texts = new Dictionary<string, string[]>(StringComparer.Ordinal)
     {
+        ["Current page"] = ["Aktuelle Seite", "Page actuelle", "Geçerli sayfa", "Текущая страница"],
+        ["Previous page"] = ["Vorherige Seite", "Page précédente", "Önceki sayfa", "Предыдущая страница"],
+        ["Next page"] = ["Nächste Seite", "Page suivante", "Sonraki sayfa", "Следующая страница"],
+        ["Pause rotation"] = ["Seitenrotation pausieren", "Suspendre la rotation", "Sayfa dönüşünü duraklat", "Приостановить смену страниц"],
+        ["Resume rotation"] = ["Seitenrotation fortsetzen", "Reprendre la rotation", "Sayfa dönüşünü sürdür", "Возобновить смену страниц"],
+        ["Live values"] = ["Livewerte", "Valeurs en direct", "Canlı değerler", "Текущие значения"],
+        ["Configure live values"] = ["Livewerte konfigurieren", "Configurer les valeurs", "Canlı değerleri yapılandır", "Настроить текущие значения"],
+        ["Configure speed sensors"] = ["Drehzahlsensoren zuordnen", "Affecter les capteurs de vitesse", "Devir sensörlerini ata", "Назначить датчики оборотов"],
+        ["Speed sensor key"] = ["Drehzahlsensor-Schlüssel", "Clé du capteur de vitesse", "Devir sensörü anahtarı", "Ключ датчика оборотов"],
+        ["Save"] = ["Speichern", "Enregistrer", "Kaydet", "Сохранить"],
         ["Register the matching x86/x64 WMP Legacy background DLL with regsvr32. Direct audio capture requires no visualization DLL."] = ["Die zum Legacy-Player passende x86/x64-Hintergrund-DLL mit regsvr32 registrieren. Für die direkte Audioerfassung ist keine Visualisierungs-DLL nötig.", "Enregistrez la DLL d’arrière-plan x86/x64 correspondant au lecteur Legacy avec regsvr32. La capture audio directe ne nécessite aucune DLL de visualisation.", "Legacy oynatıcıya uygun x86/x64 arka plan DLL’sini regsvr32 ile kaydedin. Doğrudan ses yakalama için görselleştirme DLL’si gerekmez.", "Зарегистрируйте фоновую DLL x86/x64, соответствующую проигрывателю Legacy, с помощью regsvr32. Для прямого захвата звука DLL визуализации не нужна."],
         ["Direct player audio"] = ["Direktes Player-Audio", "Audio direct du lecteur", "Doğrudan oynatıcı sesi", "Звук непосредственно из проигрывателя"],
         ["Audio capture failed: {0}"] = ["Audioerfassung fehlgeschlagen: {0}", "Échec de la capture audio : {0}", "Ses yakalama başarısız: {0}", "Ошибка захвата звука: {0}"],

@@ -33,6 +33,7 @@ public sealed class PortableWorkspaceStore
             result.PageVariableFavorites ??= new List<string>();
             result.HomeAssistantUrl ??= string.Empty;
             result.Fans = PortableFanSettings.Normalize(result.Fans);
+            result.Dashboard = DashboardSettings.Normalize(result.Dashboard);
             return result;
         }
         catch (JsonException)
@@ -67,6 +68,7 @@ public sealed class PortableWorkspace
     public bool HomeAssistantLocalTokenStorage { get; set; }
     public List<PageDefinition> Pages { get; set; } = new();
     public PortableFanSettings Fans { get; set; } = new();
+    public DashboardSettings Dashboard { get; set; } = new();
     public string HomeAssistantUrl { get; set; } = string.Empty;
     public List<CustomGlyphSettings> CustomGlyphs { get; set; } = new();
     public List<PortableHaEntityPreference> HomeAssistantEntityPreferences { get; set; } = new();

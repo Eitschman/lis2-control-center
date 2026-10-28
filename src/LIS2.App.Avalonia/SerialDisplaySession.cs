@@ -19,6 +19,7 @@ public sealed class SerialDisplaySession : IDisplaySession
     private bool _manualFansActive;
     public bool FansRunning => _fanLoop is not null || _manualFansActive;
     public bool AutomaticFansRunning => _fanLoop is not null;
+    public IReadOnlyList<int>? FanOutputs => _fanRuntime?.LastApplied;
     public bool FansBusy => _fanTransition;
     public Exception? FanFault => _fanLoop?.LastFault ?? _lastFanFault;
     public event Action<Exception>? FanFaulted;

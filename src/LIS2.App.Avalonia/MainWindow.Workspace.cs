@@ -82,6 +82,8 @@ public partial class MainWindow
         LoadSettingsPreferences();
         FilterHardwareSensors();
         _fanSettings = PortableFanSettings.Normalize(saved.Fans);
+        _dashboardSettings = DashboardSettings.Normalize(saved.Dashboard);
+        RefreshDashboardValues();
         RefreshFanEditor();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked = saved.ProgramCustomGlyphsOnConnect;
         // Ohne Datei bleibt die Startseite erhalten; eine gespeicherte leere Liste ersetzt sie.
@@ -115,6 +117,7 @@ public partial class MainWindow
         LanguageMode = _preferredLanguage,
         LinuxMediaPlayer = _selectedMediaPlayer,
         Fans = PortableFanSettings.Normalize(_fanSettings),
+        Dashboard = DashboardSettings.Normalize(_dashboardSettings),
         ProgramCustomGlyphsOnConnect = this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true
     };
 

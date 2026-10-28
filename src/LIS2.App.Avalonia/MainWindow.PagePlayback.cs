@@ -123,6 +123,7 @@ public partial class MainWindow
         SetUiText("PagePlaybackStatus", running
             ? (UiMessage)$"Sequence running: {PagePlaybackName(sequence?.CurrentPageId)}"
             : "Sequence stopped");
+        RefreshDashboardPlayback();
     }
 
     private async Task TickPagePlaybackAsync()

@@ -16,6 +16,29 @@ public sealed class PagePlayback
     private readonly PingPongScroller _line2Scroller = new();
     private string _renderedLine1 = string.Empty;
     private string _renderedLine2 = string.Empty;
+    private string? _requestedPageId;
+    private int _requestedDirection;
+    private DateTimeOffset? _pausedAt;
+
+    public bool RotationPaused => _pausedAt.HasValue;
+
+    /// <summary>Nur die Rotation pausiert; Datenaktualisierung und Laufschrift laufen weiter.</summary>
+    public void SetRotationPaused(bool paused, DateTimeOffset now)
+    {
+        if (paused == RotationPaused) return;
+        if (paused) _pausedAt = now;
+        else
+        {
+            if (_current is not null) _nextSwitch += now - _pausedAt!.Value;
+            _pausedAt = null;
+        }
+    }
+
+    public void RequestPage(string? pageId, int direction = 0)
+    {
+        _requestedPageId = pageId;
+        _requestedDirection = direction;
+    }
 
     public string? CurrentPageId => _current?.Id;
     public TimeSpan NextDelay { get; private set; } = TimeSpan.FromMilliseconds(250);
@@ -32,6 +55,8 @@ public sealed class PagePlayback
             TimeSpan.FromMilliseconds(p.ScrollEdgePauseMilliseconds),
             TimeSpan.FromMilliseconds(p.RefreshIntervalMilliseconds))));
         _current = null;
+        _requestedPageId = null;
+        _requestedDirection = 0;
         _nextSwitch = default;
         _nextRefresh = default;
         _lastFrame = null;
@@ -46,7 +71,20 @@ public sealed class PagePlayback
     {
         ArgumentNullException.ThrowIfNull(values);
         var previous = _current;
-        if (_current is null || now >= _nextSwitch ||
+        var requested = _requestedPageId is not null
+            ? _scheduler.Select(_requestedPageId, page => _visibility.IsVisible(page.VisibilityExpression, values))
+            : _requestedDirection != 0
+                ? _scheduler.Move(_requestedDirection, page => _visibility.IsVisible(page.VisibilityExpression, values)) : null;
+        _requestedPageId = null;
+        _requestedDirection = 0;
+        if (requested is not null)
+        {
+            _current = requested;
+            _nextSwitch = now + _current.Duration;
+            if (RotationPaused) _pausedAt = now;
+            _nextRefresh = default;
+        }
+        else if (_current is null || !RotationPaused && now >= _nextSwitch ||
             !_visibility.IsVisible(_current.VisibilityExpression, values))
         {
             _current = _scheduler.Next(p => _visibility.IsVisible(p.VisibilityExpression, values));
@@ -57,6 +95,7 @@ public sealed class PagePlayback
                 return null;
             }
             _nextSwitch = now + _current.Duration;
+            if (RotationPaused) _pausedAt = now;
             if (!ReferenceEquals(previous, _current))
                 _nextRefresh = default;
         }
@@ -85,7 +124,7 @@ public sealed class PagePlayback
         var refresh = _nextRefresh - now;
         var rotate = _nextSwitch - now;
         if (refresh < next) next = refresh;
-        if (rotate < next) next = rotate;
+        if (!RotationPaused && rotate < next) next = rotate;
         var first = _line1Scroller.TimeUntilNextChange(now, _current.Line1OverflowMode);
         var second = _line2Scroller.TimeUntilNextChange(now, _current.Line2OverflowMode);
         if (first != Timeout.InfiniteTimeSpan && first < next) next = first;

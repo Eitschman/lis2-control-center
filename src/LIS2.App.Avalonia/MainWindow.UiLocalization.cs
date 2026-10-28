@@ -288,7 +288,7 @@ public partial class MainWindow
         foreach (var label in LocalizableControls<TextBlock>())
         {
             if (_uiTextBindings.ContainsKey(label)) continue;
-            if (DataTextFields.Contains(label.Name ?? "") || label.DataContext is not null && label.DataContext != DataContext) continue;
+            if (DataTextFields.Contains(label.Name ?? "") || (label.Name?.StartsWith("DashboardValue", StringComparison.Ordinal) == true || label.Name?.StartsWith("DashboardFan", StringComparison.Ordinal) == true) || label.DataContext is not null && label.DataContext != DataContext) continue;
             if (!_originalPageLabels.TryGetValue(label, out var original))
             {
                 original = UiTranslations.FindEnglishSource(label.Text ?? string.Empty);

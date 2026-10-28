@@ -37,7 +37,7 @@ public partial class MainWindow : Window
             OperatingSystem.IsWindows() ? new WindowsHardwareFanSensors() :
             new SnapshotFanSensors(() => new Dictionary<string, object?>()));
         InitializeComponent();
-        SizeChanged += (_, _) => UpdatePageEditorLayout();
+        SizeChanged += (_, _) => { UpdatePageEditorLayout(); UpdateDashboardLayout(); };
 
         for (var i = 0; i < SectionNames.Length; i++)
         {
@@ -56,13 +56,9 @@ public partial class MainWindow : Window
 
         this.FindControl<Button>("VirtualConnect")!.Click += async (_, _) =>
             await RunVirtualActionAsync(ConnectWithGlyphsAsync);
-        this.FindControl<Button>("VirtualDemo")!.Click += async (_, _) =>
-            await RunSelectedDisplayActionAsync(session => session.RenderBothAsync("LIS2 Control Center", "Windows / Linux"));
         this.FindControl<Button>("VirtualDisconnect")!.Click += async (_, _) =>
             await RunVirtualActionAsync(async () => { StopPagePlayback(); await _virtualDevice.DisconnectAsync(); });
 
-        this.FindControl<Button>("OpenDisplayControls")!.Click += (_, _) => NavigateTo(1);
-        this.FindControl<Button>("OpenFanControl")!.Click += (_, _) => NavigateTo(6);
 
         this.FindControl<Button>("SendLine1")!.Click += async (_, _) =>
             await RunSelectedDisplayActionAsync(session => session.WriteLineAsync(1, this.FindControl<TextBox>("Line1TextBox")!.Text ?? ""));
@@ -107,6 +103,7 @@ public partial class MainWindow : Window
         InitializeMedia();
         InitializeSettings();
         InitializeEvents();
+        InitializeDashboard();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
         Closing += OnWindowClosing;
         // The virtual transport is hardware-free: make the WPF-style preview
@@ -162,6 +159,7 @@ public partial class MainWindow : Window
     private async Task ShutdownRuntimeAsync()
     {
         _editorPreviewTimer.Stop();
+        _dashboardTimer.Stop();
         StopPagePlayback();
         StopSerialPlayback();
         _eventTimer.Stop();
@@ -287,7 +285,6 @@ public partial class MainWindow : Window
         var connected = SelectedDisplay?.IsConnected == true;
         var playbackBusy = (SerialSelected ? _serialSequence : _virtualSequence)?.IsBusy == true;
         this.FindControl<Button>("VirtualConnect")!.IsEnabled = !_busy && !playbackBusy && !_virtualDevice.IsConnected;
-        this.FindControl<Button>("VirtualDemo")!.IsEnabled = !_busy && !_serialBusy && !_settingsTransportBusy && !playbackBusy && connected;
         this.FindControl<Button>("VirtualDisconnect")!.IsEnabled = !_busy && !playbackBusy && _virtualDevice.IsConnected;
         foreach (var name in new[] { "SendLine1", "SendLine2", "RenderBoth", "ClearDisplay",
                                     "Brightness100", "Brightness75", "Brightness50", "Brightness25",

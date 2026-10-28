@@ -9,7 +9,9 @@ Eine gemeinsame Avalonia-Anwendung ersetzt die WPF-Anwendung auf Windows x64 und
 
 Die zehn Hauptansichten bleiben Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics und Home Assistant. Windows unterstützt Winamp, GSMTC und Windows Media Player Legacy; Linux erhält die passenden Sensor- und Medienanbieter. Home Assistant bleibt lesend. Eigene OctoPrint-, Plex- oder Docker-Datenquellen sind für bereits über HA verfügbare Werte nicht vorgesehen.
 
-Die genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anstelle der großen WPF-ComboBox. Lüfterfreigabe und Sicherheitsgrenzen bleiben unabhängig von einer äußerlich gleichen Oberfläche verbindlich. Weitere Abweichungen werden im [Paritätsaudit](wpf-avalonia-parity-audit.md) erfasst, ohne sie dadurch zu genehmigen.
+Eine genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anstelle der großen WPF-ComboBox. Das unten beschriebene Dashboard-Mockup ist ebenfalls vom Benutzer freigegeben. Lüfterfreigabe und Sicherheitsgrenzen bleiben unabhängig von der Oberfläche verbindlich. Weitere Abweichungen werden im [Paritätsaudit](wpf-avalonia-parity-audit.md) erfasst, ohne sie dadurch zu genehmigen.
+
+Das freigegebene Dashboard-Mockup ergänzt eine niedrige VFD-Karte über die gesamte Breite, Seitenwahl und Rotation-Pause bei unverändert kompakter Vorschau, erweiterte Lüfterdetails und vier konfigurierbare Livewerte. Schnellzugriff und Demo-Schaltfläche entfallen. Drehzahlangaben benötigen ausdrücklich zugeordnete Sensoren; die Oberfläche leitet keine Messwerte aus Stellprozenten ab. Livewerte verwenden den vorhandenen Variablenbrowser und Vorlagenrenderer. Die Auswahl wird im Workspace gespeichert. Hardwarefreigaben und Sicherheitsgrenzen bleiben erhalten.
 
 ## Arbeitsgrundlage und Nachweis
 

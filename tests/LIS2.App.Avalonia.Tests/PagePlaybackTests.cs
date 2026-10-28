@@ -5,6 +5,39 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class PagePlaybackTests
 {
     [Fact]
+    public void RotationPauseKeepsRefreshingAndNavigationSkipsHiddenAndDisabledPages()
+    {
+        var playback = new PagePlayback();
+        playback.Reload([
+            new PageDefinition { Id = "a", Line1Template = "{Value}", DurationSeconds = 2, RefreshIntervalMilliseconds = 100 },
+            new PageDefinition { Id = "hidden", VisibilityExpression = "Show=true" },
+            new PageDefinition { Id = "disabled", Enabled = false },
+            new PageDefinition { Id = "b", Line1Template = "Second", DurationSeconds = 2 }
+        ]);
+        var now = DateTimeOffset.UnixEpoch;
+        var values = new Dictionary<string, object?> { ["Value"] = "Before" };
+        playback.Tick(now, values);
+        playback.SetRotationPaused(true, now.AddSeconds(1));
+        values["Value"] = "After";
+        Assert.StartsWith("After", playback.Tick(now.AddSeconds(20), values)!.Line1);
+        Assert.Equal("a", playback.CurrentPageId);
+        Assert.InRange(playback.NextDelay.TotalMilliseconds, 1, 1000);
+        playback.RequestPage(null, 1);
+        Assert.StartsWith("Second", playback.Tick(now.AddSeconds(21), values)!.Line1);
+        playback.RequestPage("hidden");
+        playback.Tick(now.AddSeconds(22), values);
+        Assert.Equal("b", playback.CurrentPageId);
+        playback.RequestPage(null, -1);
+        playback.Tick(now.AddSeconds(23), values);
+        Assert.Equal("a", playback.CurrentPageId);
+        playback.SetRotationPaused(false, now.AddSeconds(24));
+        playback.Tick(now.AddSeconds(25), values);
+        Assert.Equal("a", playback.CurrentPageId);
+        playback.Tick(now.AddSeconds(26), values);
+        Assert.Equal("b", playback.CurrentPageId);
+    }
+
+    [Fact]
     public void RotatesByDurationAndSkipsDisabledPages()
     {
         var playback = new PagePlayback();

@@ -28,6 +28,7 @@ public sealed class PageSequenceController
     public bool IsRunning { get; private set; }
     public bool IsBusy { get; private set; }
     public string? CurrentPageId => _playback.CurrentPageId;
+    public bool RotationPaused => _playback.RotationPaused;
     public TimeSpan NextDelay { get; private set; } = TimeSpan.FromMilliseconds(250);
     public EventQueue Events => _events;
 
@@ -36,6 +37,7 @@ public sealed class PageSequenceController
         ArgumentNullException.ThrowIfNull(pages);
         if (IsRunning || IsBusy) return false;
         _playback.Reload(pages);
+        _playback.SetRotationPaused(false, DateTimeOffset.UtcNow);
         _dispatcher = new PageFrameDispatcher(_write, _clear);
         NextDelay = TimeSpan.FromMilliseconds(1);
         IsRunning = true;
@@ -43,6 +45,20 @@ public sealed class PageSequenceController
     }
 
     public void Stop() => IsRunning = false;
+
+    /// <summary>Dashboard-Aktionen werden zwischen Frames angewendet und lassen Ereignis-Overlays bestehen.</summary>
+    public async Task ControlAsync(string? pageId = null, int direction = 0, bool? rotationPaused = null)
+    {
+        await _tickGate.WaitAsync();
+        try
+        {
+            if (!IsRunning) return;
+            if (rotationPaused.HasValue) _playback.SetRotationPaused(rotationPaused.Value, DateTimeOffset.UtcNow);
+            if (pageId is not null || direction != 0) _playback.RequestPage(pageId, direction);
+            NextDelay = TimeSpan.FromMilliseconds(1);
+        }
+        finally { _tickGate.Release(); }
+    }
 
     /// <summary>Replace the running page schedule without dropping the device connection.
     /// An active display write must finish before the new schedule is installed.</summary>

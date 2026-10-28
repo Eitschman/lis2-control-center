@@ -305,10 +305,10 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
             horizontalInset - 1, horizontalInset + 1);
         Assert.InRange(display.Bounds.Height - first.DesiredSize.Height - second.DesiredSize.Height,
             verticalInset - 1, verticalInset + 1);
-        var card = Assert.IsType<Border>(Assert.IsType<StackPanel>(display.Parent).Parent);
-        var cardInset = card.Padding.Left + card.Padding.Right +
-            card.BorderThickness.Left + card.BorderThickness.Right;
-        Assert.InRange(card.Bounds.Width - display.Bounds.Width, cardInset - 1, cardInset + 1);
+        var card = ui.Control<Border>("DashboardVfdCard");
+        Assert.True(card.Bounds.Width > display.Bounds.Width + 100);
+        Assert.Null(ui.Window.FindControl<Button>("VirtualDemo"));
+        Assert.Null(ui.Window.FindControl<Button>("OpenDisplayControls"));
     }
 
     [AvaloniaFact]
@@ -381,7 +381,8 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         ports.ItemsSource = new[] { "SERIAL-TEST" };
         ports.SelectedIndex = 0;
         ui.Click("NavButton0");
-        await ui.ClickAndWaitAsync("VirtualDemo");
+        ui.Click("NavButton1");
+        await ui.ClickAndWaitAsync("RenderBoth");
         Assert.Empty(ui.SerialTransports);
         Assert.Equal("Virtual", ui.Store.Load().TransportMode);
         ui.Click("NavButton7");
@@ -489,7 +490,8 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         await using var ui = await Fixture.OpenAsync(new PortableWorkspace { LanguageMode = "German" });
         ui.Window.Width = width;
         ui.Window.Height = height;
-        await ui.ClickAndWaitAsync("VirtualDemo");
+        ui.Click("NavButton1");
+        await ui.ClickAndWaitAsync("RenderBoth");
         foreach (var section in new[] { 0, 1, 7 })
         {
             ui.Click("NavButton" + section);
@@ -521,6 +523,200 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         Assert.Empty(ui.SerialTransports);
     }
 
+    [AvaloniaTheory]
+    [InlineData(1305, 893, 2, "de")]
+    [InlineData(950, 600, 2, "de")]
+    [InlineData(950, 600, 5, "ru")]
+    [InlineData(1305, 893, 1, "en")]
+    [InlineData(950, 600, 3, "fr")]
+    [InlineData(950, 600, 4, "tr")]
+    public async Task DashboardControlsPersistValuesAndShowRealSensors(int width, int height, int languageIndex, string language)
+    {
+        var hardware = new Dictionary<string, object?>
+        {
+            ["Hardware.Cpu.Temperature.Core"] = 52.4, ["Hardware.Cpu.Temperature.Core.Unit"] = "°C",
+            ["Hardware.Gpu.Temperature.Core"] = 46.2, ["Hardware.Gpu.Temperature.Core.Unit"] = "°C",
+            ["Hardware.Case.Fan.Front"] = 1240, ["Hardware.Case.Fan.Front.Unit"] = "RPM",
+            ["Hardware.Memory.Load.Used"] = 26.3
+        };
+        var saved = new PortableWorkspace
+        {
+            Pages = [new PageDefinition { Id = "one", Name = "Clock", Line1Template = "{Clock.Time}", DurationSeconds = 600 },
+                new PageDefinition { Id = "two", Name = "Hardware", Line1Template = "CPU {Hardware.Cpu.Temperature.Core|number:1}", DurationSeconds = 600 },
+                new PageDefinition { Id = "hidden", Name = "Hidden", VisibilityExpression = "Missing=1" }],
+            Dashboard = new DashboardSettings
+            {
+                Values = [new() { Label = "CPU", Template = "{Hardware.Cpu.Temperature.Core|number:1|suffix: °C}" },
+                    new() { Label = "GPU", Template = "{Hardware.Gpu.Temperature.Core|number:1|suffix: °C}" },
+                    new() { Label = "RAM", Template = "{Hardware.Memory.Load.Used|percent:1}" },
+                    new() { Label = "Home Assistant", Template = "{HA.sensor.missing}" }],
+                FanSpeedKeys = ["Hardware.Case.Fan.Front"]
+            }
+        };
+        saved.Fans.Channels[0].Mode = "Curve";
+        saved.Fans.Channels[0].SensorKey = "Hardware.Cpu.Temperature.Core";
+        await using var ui = await Fixture.OpenAsync(saved, sensors: new LIS2.Runtime.SnapshotFanSensors(() => hardware));
+        ui.Window.Width = width; ui.Window.Height = height;
+        ui.Control<ComboBox>("LanguageModeComboBox").SelectedIndex = languageIndex;
+        ui.Click("NavButton0");
+        typeof(MainWindow).GetMethod("RefreshHardwareSensors", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.Invoke(ui.Window, null);
+        await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("DashboardFan1Rpm").Text?.Contains("RPM") == true);
+        Assert.Contains("1", ui.Control<TextBlock>("DashboardFan1Rpm").Text!);
+        Assert.Equal(UiTranslations.Translate("Unavailable", language), ui.Control<TextBlock>("DashboardFan2Rpm").Text);
+        Assert.Equal(UiTranslations.Translate("Unavailable", language), ui.Control<TextBlock>("DashboardValueText4").Text);
+        Assert.Equal(UiTranslations.Translate("Curve", language), ui.Control<TextBlock>("DashboardFan1Mode").Text);
+        Assert.Contains("°C", ui.Control<TextBlock>("DashboardFan1Sensor").Text!);
+        Assert.Equal(2, ui.Control<ComboBox>("DashboardPagePicker").ItemCount);
+        await ui.ClickAndWaitAsync("DashboardNext");
+        await Fixture.WaitUntilAsync(() => ui.Control<VfdLine>("PreviewLine1").Text!.StartsWith("CPU"));
+        await ui.ClickAndWaitAsync("DashboardPause");
+        Assert.Equal(UiTranslations.Translate("Resume rotation", language), ToolTip.GetTip(ui.Control<Button>("DashboardPause")));
+        await ui.ClickAndWaitAsync("DashboardPrevious");
+        Assert.Equal(UiTranslations.Translate("Resume rotation", language), ToolTip.GetTip(ui.Control<Button>("DashboardPause")));
+        ui.Control<ComboBox>("DashboardPagePicker").SelectedIndex = 1;
+        await Fixture.WaitUntilAsync(() => ui.Control<VfdLine>("PreviewLine1").Text!.StartsWith("CPU"));
+        await ui.CaptureAsync($"dashboard-compact-{language}-{width}x{height}");
+        Assert.Equal(width < 1100 ? 1 : 3, ui.Control<Grid>("DashboardVfdLayout").ColumnDefinitions.Count);
+        Assert.Equal(width < 1100 ? 2 : 4, ui.Control<Grid>("DashboardValuesLayout").ColumnDefinitions.Count);
+        if (width > 1100) Assert.InRange(ui.Control<Border>("DashboardVfdCard").Bounds.Height, 110, 200);
+        var scroll = ui.Control<ScrollViewer>("DashboardView");
+        Assert.True(scroll.Extent.Width <= scroll.Viewport.Width + 1);
+        for (var channel = 1; channel <= 4; channel++)
+        {
+            var grid = Assert.IsType<Grid>(ui.Control<Slider>($"DashboardFan{channel}Slider").Parent);
+            var label = Assert.IsType<TextBlock>(grid.Children[0]);
+            var natural = new TextBlock { Text = label.Text, FontSize = label.FontSize, FontFamily = label.FontFamily };
+            natural.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            Assert.True(label.Bounds.Width + 1 >= natural.DesiredSize.Width, "Fan label is clipped: " + label.Text);
+        }
+        scroll.Offset = new Vector(0, scroll.Extent.Height);
+        await ui.CaptureAsync($"dashboard-compact-bottom-{language}-{width}x{height}");
+        scroll.Offset = default;
+
+        ui.Click("DashboardValueSettings");
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 1);
+        var dialog = ui.Window.OwnedWindows.Single();
+        await CaptureDashboardDialogAsync(dialog, "dashboard-values-editor-" + language);
+        DialogControl<TextBox>(dialog, "DashboardLabel1").Text = "Custom CPU";
+        DialogControl<TextBox>(dialog, "DashboardTemplate1").Text = "";
+        DialogControl<Button>(dialog, "DashboardBrowse1").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 2);
+        var browser = ui.Window.OwnedWindows.Single(window => window != dialog);
+        DialogControl<TextBox>(browser, "VariableSearch").Text = "Hardware.Cpu.Temperature.Core";
+        await Fixture.WaitUntilAsync(() => DialogControl<ListBox>(browser, "VariableResults").SelectedItem?.ToString()?.EndsWith("[Hardware.Cpu.Temperature.Core]") == true);
+        DialogControl<Button>(browser, "VariableInsert1").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 1);
+        Assert.Equal("{Hardware.Cpu.Temperature.Core}", DialogControl<TextBox>(dialog, "DashboardTemplate1").Text);
+        DialogControl<Button>(dialog, "DashboardSettingsSave").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 0);
+        Assert.Equal("Custom CPU", ui.Store.Load().Dashboard.Values[0].Label);
+        Assert.Equal("Custom CPU", ui.Control<TextBlock>("DashboardValueLabel1").Text);
+        hardware["Hardware.Cpu.Temperature.Core"] = 61.5;
+        typeof(MainWindow).GetMethod("RefreshHardwareSensors", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.Invoke(ui.Window, null);
+        await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("DashboardValueText1").Text ==
+            new LIS2.Display.TemplateRenderer().Render("{Hardware.Cpu.Temperature.Core}", hardware));
+        hardware.Remove("Hardware.Case.Fan.Front");
+        typeof(MainWindow).GetMethod("RefreshHardwareSensors", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.Invoke(ui.Window, null);
+        await Fixture.WaitUntilAsync(() => ui.Control<TextBlock>("DashboardFan1Rpm").Text == UiTranslations.Translate("Unavailable", language));
+        ui.Click("DashboardFanSettings");
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 1);
+        dialog = ui.Window.OwnedWindows.Single();
+        DialogControl<TextBox>(dialog, "DashboardTemplate2").Text = "Hardware.Case.Fan.Front";
+        await CaptureDashboardDialogAsync(dialog, "dashboard-speed-editor-" + language);
+        DialogControl<Button>(dialog, "DashboardSettingsSave").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 0);
+        Assert.Equal("Hardware.Case.Fan.Front", ui.Store.Load().Dashboard.FanSpeedKeys[1]);
+        ui.Click("DashboardValueSettings");
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 1);
+        dialog = ui.Window.OwnedWindows.Single();
+        DialogControl<TextBox>(dialog, "DashboardLabel1").Text = "Discard";
+        DialogControl<Button>(dialog, "DashboardSettingsCancel").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Assert.Equal("Custom CPU", ui.Store.Load().Dashboard.Values[0].Label);
+        Assert.Empty(ui.SerialTransports);
+    }
+
+    [AvaloniaFact]
+    public async Task DashboardPageControlsUseAppliedSerialTransportWithoutFanAuthorization()
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace
+        {
+            Pages = [new PageDefinition { Id = "a", Name = "First", Line1Template = "First", DurationSeconds = 600 },
+                new PageDefinition { Id = "b", Name = "Second", Line1Template = "Second", DurationSeconds = 600 }]
+        });
+        ui.Click("NavButton7");
+        ui.Control<ComboBox>("TransportModeComboBox").SelectedIndex = 1;
+        var ports = ui.Control<ComboBox>("SettingsPortComboBox");
+        ports.ItemsSource = new[] { "SERIAL-TEST" }; ports.SelectedIndex = 0;
+        await ui.ClickAndWaitAsync("SettingsApplyTransport");
+        ui.Click("NavButton0");
+        await Fixture.WaitUntilAsync(() => ui.Control<Button>("DashboardNext").IsEnabled);
+        await ui.ClickAndWaitAsync("DashboardNext");
+        await Fixture.WaitUntilAsync(() => ui.Control<VfdLine>("PreviewLine1").Text!.StartsWith("Second"));
+        await ui.ClickAndWaitAsync("DashboardPause");
+        Assert.Equal("Resume rotation", ToolTip.GetTip(ui.Control<Button>("DashboardPause")));
+        Assert.DoesNotContain(Assert.Single(ui.SerialTransports).Writes, bytes => bytes.Length > 0 && bytes[0] == 0xAE);
+        ui.Click("PagePlaybackStop");
+        Assert.False(ui.Control<Button>("DashboardNext").IsEnabled);
+        Assert.False(ui.Control<Button>("DashboardPause").IsEnabled);
+    }
+
+    [AvaloniaFact]
+    public async Task DashboardSaveFailureKeepsDraftAndCanBeRetried()
+    {
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace());
+        ui.Click("DashboardValueSettings");
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 1);
+        var dialog = ui.Window.OwnedWindows.Single();
+        DialogControl<TextBox>(dialog, "DashboardLabel1").Text = "Retained draft";
+        DialogControl<TextBox>(dialog, "DashboardTemplate1").Text = "{Clock.Time}";
+        var original = await File.ReadAllBytesAsync(ui.StorePath);
+        // Eine Datei durch ein Verzeichnis zu ersetzen simuliert einen echten Schreibfehler auf beiden Betriebssystemen.
+        File.Delete(ui.StorePath);
+        Directory.CreateDirectory(ui.StorePath);
+        try
+        {
+            DialogControl<Button>(dialog, "DashboardSettingsSave").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            await Fixture.WaitUntilAsync(() => !string.IsNullOrEmpty(DialogControl<TextBlock>(dialog, "DashboardSettingsError").Text));
+            Assert.Equal("Retained draft", DialogControl<TextBox>(dialog, "DashboardLabel1").Text);
+            Assert.True(DialogControl<Button>(dialog, "DashboardSettingsSave").IsEnabled);
+            Assert.NotEqual("Retained draft", ui.Control<TextBlock>("DashboardValueLabel1").Text);
+        }
+        finally
+        {
+            Directory.Delete(ui.StorePath);
+            await File.WriteAllBytesAsync(ui.StorePath, original);
+        }
+        DialogControl<Button>(dialog, "DashboardSettingsSave").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 0);
+        Assert.Equal("Retained draft", ui.Store.Load().Dashboard.Values[0].Label);
+    }
+
+    private static T DialogControl<T>(Window dialog, string name) where T : Control =>
+        dialog.GetVisualDescendants().OfType<T>().Single(control => control.Name == name);
+
+    private static async Task CaptureDashboardDialogAsync(Window dialog, string name)
+    {
+        await Task.Delay(40);
+        dialog.UpdateLayout();
+        using var frame = dialog.CaptureRenderedFrame();
+        Assert.NotNull(frame);
+        var directory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../TestResults/screenshots"));
+        Directory.CreateDirectory(directory);
+        frame.Save(Path.Combine(directory, name + ".png"));
+        var scroll = dialog.GetVisualDescendants().OfType<ScrollViewer>().First();
+        Assert.True(scroll.Extent.Width <= scroll.Viewport.Width + 1);
+        if (scroll.Extent.Height > scroll.Viewport.Height)
+        {
+            scroll.Offset = new Vector(0, scroll.Extent.Height);
+            await Task.Delay(40);
+            dialog.UpdateLayout();
+            using var bottom = dialog.CaptureRenderedFrame();
+            Assert.NotNull(bottom);
+            bottom.Save(Path.Combine(directory, name + "-bottom.png"));
+            scroll.Offset = default;
+        }
+    }
+
     private sealed class Fixture : IAsyncDisposable
     {
         private readonly string _directory = Path.Combine(Path.GetTempPath(), "lis2-ui-" + Guid.NewGuid().ToString("N"));
@@ -542,7 +738,8 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
             });
         }
 
-        public static async Task<Fixture> OpenAsync(PortableWorkspace saved, bool token = false)
+        public static async Task<Fixture> OpenAsync(PortableWorkspace saved, bool token = false,
+            PageSourceValues? sources = null, LIS2.Runtime.IFanSensorSource? sensors = null)
         {
             // Erst nach Erstellen der isolierten Datei darf das Fenster seinen Workspace laden.
             var ui = new Fixture();
@@ -554,7 +751,7 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
                 var transport = new VirtualLis2Transport();
                 ui.SerialTransports.Add(transport);
                 return new SerialDisplaySession(transport);
-            });
+            }, sources, sensors);
             ui.Window.Show();
             await WaitUntilAsync(() => ui.Control<TextBlock>("ConnectionText").Text?.StartsWith("Connected") == true &&
                 ui.Control<Button>("SettingsApplyTransport").IsEnabled);
