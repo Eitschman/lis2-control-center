@@ -13,7 +13,8 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] Kompaktere Lüfterkarte, beschriftete Drehzahlen und einheitliche Zahnradschaltflächen mit Hover- und Tastaturfokus.
 - [x] „Zahlen kompakt“ verändert nur den Dialogentwurf: höchstens eine Nachkommastelle und Abstand vor Einheiten. Bestehende Vorlagen bleiben ohne ausdrückliche Auswahl unverändert; Speichern und Abbrechen gelten wie bei anderen Änderungen.
 - [x] README und Hilfe in fünf Sprachen aktualisiert; Dashboard-Regressionen ergänzen Leerzustände und Entwurfsverhalten.
-- [ ] Release v0.1.16 mit CI- und Downloadprüfung.
+- [x] Release v0.1.16: Main-CI 40675924112 mit zwölf und Release-CI 40676894895 mit 14 erfolgreichen Jobs. Neun Prüfsummen und zehn README-Downloadlinks geprüft.
+- [x] Hilfe: erklärende Absätze verwenden auch mit eingebetteten Vorlagen die normale Schrift; ausdrücklich gekennzeichnete Codebeispiele behalten Festbreitenschrift. Alle zehn Bereiche in fünf Sprachen werden geprüft. Diese Korrektur ist nach v0.1.16 im Quellstand enthalten.
 - [x] Numerische HA-Zustände in Dashboard und Display ohne ausdrückliches Format regional darstellen; Aliase, Ersatzvariablen und Präzision erhalten. Rohdaten, Sichtbarkeit und Textattribute bleiben unverändert.
 - [x] Quellenabgleich für Windows-/Linux-Hardware, Uhr, Winamp, WMP Legacy, GSMTC, MPRIS und HA. Zahlenanzeige auch in Hardwareliste, HA-Browser, Variablenbrowser und Sensoranzeige vereinheitlichen; Titel, Kennungen und technische Eingabeformate erhalten.
 

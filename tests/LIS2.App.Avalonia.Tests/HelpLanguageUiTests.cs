@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using LIS2.App.Avalonia;
 
@@ -40,6 +41,46 @@ public sealed class HelpLanguageUiTests
                 text.Text == explanation);
             Assert.Contains(help.GetVisualDescendants().OfType<TextBlock>(), text =>
                 text.Text == "{HA.media_player.living_room.attribute.media_title}");
+            var helpSections = help.GetVisualDescendants().OfType<ListBox>().Single();
+            for (var section = 0; section < 10; section++)
+            {
+                helpSections.SelectedIndex = section;
+                var paragraphs = help.GetVisualDescendants().OfType<TextBlock>().ToArray();
+                var entries = HelpReferenceCatalog.GetSection(section, [], [], preference switch
+                {
+                    "German" or "System" => "de", "French" => "fr", "Turkish" => "tr", "Russian" => "ru", _ => "en"
+                });
+                foreach (var entry in entries)
+                {
+                    if (entry.Body == HelpReferenceLocalization.Translate("No runtime variables currently available.", preference switch
+                        {
+                            "German" or "System" => "de", "French" => "fr", "Turkish" => "tr", "Russian" => "ru", _ => "en"
+                        })) continue;
+                    var paragraph = paragraphs.FirstOrDefault(text => text.Text == entry.Body);
+                    Assert.NotNull(paragraph);
+                    Assert.Equal(entry.IsExample
+                        ? new FontFamily("Consolas,DejaVu Sans Mono,Liberation Mono")
+                        : FontFamily.Default, paragraph.FontFamily);
+                }
+            }
+            helpSections.SelectedIndex = 0;
+            help.UpdateLayout();
+            var liveValues = help.GetVisualDescendants().OfType<TextBlock>()
+                .Single(text => text.Text?.Contains("{Hardware.Cpu.Temperature|number:1|suffix: °C}") == true);
+            Assert.Equal(FontFamily.Default, liveValues.FontFamily);
+            liveValues.BringIntoView();
+            var helpScroll = liveValues.GetVisualAncestors().OfType<ScrollViewer>().First();
+            helpScroll.Offset = new global::Avalonia.Vector(0, helpScroll.Extent.Height);
+            await Task.Delay(50);
+            help.UpdateLayout();
+            var typographyScreenshots = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../TestResults/screenshots"));
+            Directory.CreateDirectory(typographyScreenshots);
+            using (var frame = help.CaptureRenderedFrame())
+            {
+                Assert.NotNull(frame);
+                frame.Save(Path.Combine(typographyScreenshots, "help-typography-" + preference + ".png"));
+            }
+            helpSections.SelectedIndex = 9;
             help.Width = 840;
             help.Height = 600;
             await Task.Delay(50);

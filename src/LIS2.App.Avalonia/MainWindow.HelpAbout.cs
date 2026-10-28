@@ -56,7 +56,7 @@ public partial class MainWindow
                 FontSize = 24, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap
             };
             content.Children.Add(sectionTitle);
-            foreach (var (sectionHeading, text) in HelpReferenceCatalog.GetSection(index,
+            foreach (var (sectionHeading, text, isExample) in HelpReferenceCatalog.GetSection(index,
                          PagePreviewValues().Keys, _glyphs.Glyphs.Select(g => g.Name), CurrentUiLanguage()))
             {
                 if (sectionHeading != sectionTitle.Text)
@@ -68,7 +68,8 @@ public partial class MainWindow
                 content.Children.Add(new TextBlock
                 {
                     Text = text, TextWrapping = TextWrapping.Wrap,
-                    FontFamily = text.Contains('{') ? new FontFamily("Consolas") : FontFamily.Default
+                    // Eingebettete Vorlagen ändern nicht die Schrift des erklärenden Absatzes.
+                    FontFamily = isExample ? new FontFamily("Consolas,DejaVu Sans Mono,Liberation Mono") : FontFamily.Default
                 });
             }
             scroll.Offset = new Vector(0, 0);

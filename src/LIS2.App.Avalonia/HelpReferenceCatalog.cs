@@ -15,14 +15,14 @@ internal static class HelpReferenceCatalog
 
     internal static int ClampSection(int index) => Math.Clamp(index, 0, Sections.Length - 1);
 
-    internal static IReadOnlyList<(string Heading, string Body)> GetSection(
+    internal static IReadOnlyList<(string Heading, string Body, bool IsExample)> GetSection(
         int index, IEnumerable<string> variableKeys, IEnumerable<string> glyphNames, string language = "en")
     {
-        var content = new List<(string, string)>();
+        var content = new List<(string, string, bool)>();
         void Add(string heading, string body) => content.Add((
-            HelpReferenceLocalization.Translate(heading, language), HelpReferenceLocalization.Translate(body, language)));
+            HelpReferenceLocalization.Translate(heading, language), HelpReferenceLocalization.Translate(body, language), false));
         // Beispiele und dynamische Schlüssel sind ausführbare Vorlagensyntax, keine übersetzbaren Texte.
-        void AddExample(string heading, string body) => content.Add((HelpReferenceLocalization.Translate(heading, language), body));
+        void AddExample(string heading, string body) => content.Add((HelpReferenceLocalization.Translate(heading, language), body, true));
         switch (ClampSection(index))
         {
             case 0:
@@ -68,7 +68,7 @@ internal static class HelpReferenceCatalog
                 Add("Visibility", "The condition fields follow the raw expression and selected page. Browse variables selects a current key for the condition. Invalid raw expressions remain editable. Save feedback appears beside the editor; a failed save keeps the draft.");
                 Add("Formatting details", "number and percent accept 0 to 6 decimal places. percent appends % without multiplying by 100; bytes uses powers of 1024. Numbers follow the operating system culture. Missing values return fallback directly, without further formatting. Visibility uses one condition without braces; numeric comparisons use a decimal point. Missing keys hide the page.");
                 AddExample("Clock", "{Clock.Time}  {Clock.Date}  {Clock.Day}");
-                content.AddRange(HelpVariableCatalog.Get("Clock.", language));
+                content.AddRange(HelpVariableCatalog.Get("Clock.", language).Select(entry => (entry.Heading, entry.Body, false)));
                 var keys = variableKeys.Where(k => !k.StartsWith("HA.", StringComparison.OrdinalIgnoreCase))
                     .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(k => k, StringComparer.OrdinalIgnoreCase).Take(200).ToArray();
                 if (keys.Length == 0) Add("Available runtime variables", "No runtime variables currently available.");
@@ -93,14 +93,14 @@ internal static class HelpReferenceCatalog
                 Add("Linux and Windows", "Linux uses MPRIS through playerctl, which must be installed. Select an automatic or specific player; the selection is saved. An unavailable selected player stays disconnected. Media.* provides Player, State, Title, Artist, Album, Elapsed, Duration and Connected, but no VU or spectrum. Values are refreshed every second. Windows uses WindowsMedia.* for GSMTC and Winamp.* for the Winamp plug-in. Create a page from the relevant media card. No plug-in is needed for GSMTC.");
                 AddExample("Media", "{Media.Player}  {Media.State}  {Media.Title}  {Media.Artist}  {Media.Album}  {Media.Elapsed}  {Media.Duration}  {Media.Connected}");
                 AddExample("Example", "{Winamp.Artist|fallback:Nothing playing} / {Winamp.Title|fallback:--}");
-                content.AddRange(HelpVariableCatalog.Get("Media.", language));
-                content.AddRange(HelpVariableCatalog.Get("Winamp.", language));
-                content.AddRange(HelpVariableCatalog.Get("WindowsMedia.", language));
-                content.AddRange(HelpVariableCatalog.Get("WmpLegacy.", language));
+                content.AddRange(HelpVariableCatalog.Get("Media.", language).Select(entry => (entry.Heading, entry.Body, false)));
+                content.AddRange(HelpVariableCatalog.Get("Winamp.", language).Select(entry => (entry.Heading, entry.Body, false)));
+                content.AddRange(HelpVariableCatalog.Get("WindowsMedia.", language).Select(entry => (entry.Heading, entry.Body, false)));
+                content.AddRange(HelpVariableCatalog.Get("WmpLegacy.", language).Select(entry => (entry.Heading, entry.Body, false)));
                 content.Add((UiTranslations.Translate("Windows Media Player Legacy", language),
-                    UiTranslations.Translate("Register the matching x86/x64 WMP Legacy background DLL with regsvr32. Direct audio capture requires no visualization DLL.", language)));
+                    UiTranslations.Translate("Register the matching x86/x64 WMP Legacy background DLL with regsvr32. Direct audio capture requires no visualization DLL.", language), false));
                 content.Add((UiTranslations.Translate("Audio", language), HelpLocalization.Translate(
-                    "VU and spectrum are captured directly from the Legacy player process through WASAPI. No visualization needs to be selected or visible; the player may be minimized. Windows build 20348 or later is required. Metadata and playback state still come from the background plug-in.", language)));
+                    "VU and spectrum are captured directly from the Legacy player process through WASAPI. No visualization needs to be selected or visible; the player may be minimized. Windows build 20348 or later is required. Metadata and playback state still come from the background plug-in.", language), false));
                 break;
             case 4:
                 Add("Events", "Timed events temporarily override ordinary page output on connected displays.");
