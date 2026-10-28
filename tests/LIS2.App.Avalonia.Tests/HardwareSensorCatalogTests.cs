@@ -2,6 +2,23 @@ using LIS2.App.Avalonia;
 namespace LIS2.App.Avalonia.Tests;
 public sealed class HardwareSensorCatalogTests
 {
+    [Theory]
+    [InlineData(false, false, false, false, null)]
+    [InlineData(true, true, false, false, null)]
+    [InlineData(true, false, false, false, "install the official PawnIO")]
+    [InlineData(true, false, false, true, "install the official PawnIO")]
+    [InlineData(true, false, true, false, "configure PawnIO access")]
+    [InlineData(true, false, true, true, "check PawnIO driver access")]
+    public void CpuTemperatureWarningDistinguishesMissingDriverPermissionsAndUnreadableSensors(
+        bool detected, bool available, bool installed, bool administrator, string? expected)
+    {
+        var warning = WindowsHardwareFanSensors.CpuTemperatureWarning(detected, available, installed, administrator);
+        if (expected is null) { Assert.Null(warning); return; }
+        Assert.Contains(expected, warning!);
+        foreach (var language in new[] { "de", "fr", "tr", "ru" })
+            Assert.NotEqual(warning, UiTranslations.Translate(warning!, language));
+    }
+
     [Fact]
     public void FormattedPageTemplatesTrackOriginalOfflineSensorKeys()
     {

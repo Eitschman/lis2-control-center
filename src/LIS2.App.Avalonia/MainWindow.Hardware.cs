@@ -143,8 +143,8 @@ public partial class MainWindow
             _pageSources.UpdateHardware(_hardwareSensors);
             RefreshFanSensorChoices();
             RefreshPageVariables();
-            _hardwareSourceError = snapshot.Count == 0 && _liveFanSensors is WindowsHardwareFanSensors windows
-                ? windows.Diagnostic
+            _hardwareSourceError = _liveFanSensors is WindowsHardwareFanSensors windows
+                ? windows.AvailabilityWarning ?? (snapshot.Count == 0 ? windows.Diagnostic : null)
                 : null;
             if (_hardwareListLiveUpdates || _selectedSection == 5) FilterHardwareSensors();
         }
@@ -206,7 +206,7 @@ public partial class MainWindow
         var total = _hardwareSensors.Count(pair => HardwareSensorCatalog.IsSensorKey(pair.Key));
         var unavailable = options.Count(entry => !entry.IsAvailable);
         SetUiText("HardwareSensorStatus", !string.IsNullOrWhiteSpace(_hardwareSourceError)
-            ? (UiMessage)$"Hardware source error: {_hardwareSourceError}"
+            ? (UiMessage)$"Hardware source error: {(UiMessage)_hardwareSourceError}"
             : unavailable > 0
                 ? (UiMessage)$"{options.Length} visible sensor(s) / {total} total values · {unavailable} unavailable configured sensor(s)"
                 : (UiMessage)$"{options.Length} visible sensor(s) / {total} total values");

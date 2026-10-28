@@ -549,7 +549,11 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
                 Values = [new() { Label = "CPU", Template = "{Hardware.Cpu.Temperature.Core|number:1|suffix: °C}" },
                     new() { Label = "GPU", Template = "{Hardware.Gpu.Temperature.Core|number:1|suffix: °C}" },
                     new() { Label = "RAM", Template = "{Hardware.Memory.Load.Used|percent:1}" },
-                    new() { Label = "Home Assistant", Template = "{HA.sensor.missing}" }],
+                    new() { Label = "Home Assistant", Template = "{HA.sensor.missing}" },
+                    new() { Label = "CPU load", Template = "52 %" },
+                    new() { Label = "Fan speed", Template = "{Hardware.Case.Fan.Front|number:0|suffix: RPM}" },
+                    new() { Label = "Long custom label for another live value", Template = "{Clock.Time}" },
+                    new() { Label = "Eighth value", Template = "{Hardware.Gpu.Temperature.Core|number:1|suffix: °C}" }],
                 FanSpeedKeys = ["Hardware.Case.Fan.Front"]
             }
         };
@@ -578,6 +582,9 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         await ui.CaptureAsync($"dashboard-compact-{language}-{width}x{height}");
         Assert.Equal(3, ui.Control<Grid>("DashboardVfdLayout").ColumnDefinitions.Count);
         Assert.Equal(width < 1100 ? 2 : 4, ui.Control<Grid>("DashboardValuesLayout").ColumnDefinitions.Count);
+        Assert.Equal(width < 1100 ? 4 : 2, ui.Control<Grid>("DashboardValuesLayout").RowDefinitions.Count);
+        Assert.Equal(8, ui.Control<Grid>("DashboardValuesLayout").Children.Count);
+        Assert.Contains("46", ui.Control<TextBlock>("DashboardValueText8").Text!);
         Assert.InRange(ui.Control<Border>("DashboardVfdCard").Bounds.Height, 110, 200);
         var scroll = ui.Control<ScrollViewer>("DashboardView");
         Assert.True(scroll.Extent.Width <= scroll.Viewport.Width + 1);
@@ -598,6 +605,8 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         var dialog = ui.Window.OwnedWindows.Single();
         await CaptureDashboardDialogAsync(dialog, "dashboard-values-editor-" + language);
         DialogControl<TextBox>(dialog, "DashboardLabel1").Text = "Custom CPU";
+        DialogControl<TextBox>(dialog, "DashboardLabel8").Text = "Saved eighth value";
+        DialogControl<TextBox>(dialog, "DashboardTemplate8").Text = "{Hardware.Memory.Load.Used|percent:1}";
         DialogControl<TextBox>(dialog, "DashboardTemplate1").Text = "";
         DialogControl<Button>(dialog, "DashboardBrowse1").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 2);
@@ -610,6 +619,10 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         DialogControl<Button>(dialog, "DashboardSettingsSave").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 0);
         Assert.Equal("Custom CPU", ui.Store.Load().Dashboard.Values[0].Label);
+        Assert.Equal(8, ui.Store.Load().Dashboard.Values.Count);
+        Assert.Equal("Saved eighth value", ui.Store.Load().Dashboard.Values[7].Label);
+        Assert.Equal("{Hardware.Memory.Load.Used|percent:1}", ui.Store.Load().Dashboard.Values[7].Template);
+        Assert.Equal("Saved eighth value", ui.Control<TextBlock>("DashboardValueLabel8").Text);
         Assert.Equal("Custom CPU", ui.Control<TextBlock>("DashboardValueLabel1").Text);
         hardware["Hardware.Cpu.Temperature.Core"] = 61.5;
         typeof(MainWindow).GetMethod("RefreshHardwareSensors", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.Invoke(ui.Window, null);
@@ -689,6 +702,33 @@ var dashboardFirst = ui.Control<VfdLine>("PreviewLine1");
         DialogControl<Button>(dialog, "DashboardSettingsSave").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         await Fixture.WaitUntilAsync(() => ui.Window.OwnedWindows.Count == 0);
         Assert.Equal("Retained draft", ui.Store.Load().Dashboard.Values[0].Label);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(1, "en")]
+    [InlineData(2, "de")]
+    [InlineData(3, "fr")]
+    [InlineData(4, "tr")]
+    [InlineData(5, "ru")]
+    public async Task MissingCpuDriverWarningRemainsVisibleWithOtherSensors(int languageIndex, string language)
+    {
+        var hardware = new Dictionary<string, object?> { ["Hardware.Gpu.Temperature.Core"] = 55d,
+            ["Hardware.Gpu.Temperature.Core.Unit"] = "°C", ["Hardware.Cpu.Load.Total"] = 12d };
+        await using var ui = await Fixture.OpenAsync(new PortableWorkspace(),
+            sensors: new LIS2.Runtime.SnapshotFanSensors(() => hardware));
+        ui.Window.Width = 950; ui.Window.Height = 600;
+        ui.Control<ComboBox>("LanguageModeComboBox").SelectedIndex = languageIndex;
+        ui.Click("NavButton5");
+        var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        typeof(MainWindow).GetMethod("RefreshHardwareSensors", flags)!.Invoke(ui.Window, null);
+        var warning = WindowsHardwareFanSensors.CpuTemperatureWarning(true, false, false, false)!;
+        typeof(MainWindow).GetField("_hardwareSourceError", flags)!.SetValue(ui.Window, warning);
+        typeof(MainWindow).GetMethod("FilterHardwareSensors", flags)!.Invoke(ui.Window, null);
+        var status = ui.Control<TextBlock>("HardwareSensorStatus");
+        Assert.Contains(UiTranslations.Translate(warning, language), status.Text!);
+        Assert.Contains("PawnIO", status.Text!);
+        Assert.NotEmpty(ui.Control<ListBox>("HardwareSensorList").Items);
+        await ui.CaptureAsync("hardware-cpu-driver-warning-" + language);
     }
 
     private static T DialogControl<T>(Window dialog, string name) where T : Control =>

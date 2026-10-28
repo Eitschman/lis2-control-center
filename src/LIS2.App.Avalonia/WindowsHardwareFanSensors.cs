@@ -1,5 +1,6 @@
 using LibreHardwareMonitor.Hardware;
 using LIS2.Runtime;
+using System.Security.Principal;
 
 namespace LIS2.App.Avalonia;
 
@@ -14,6 +15,7 @@ public sealed class WindowsHardwareFanSensors : IFanSensorSource, IDisposable
     private bool _disposed;
     private int _emptySnapshots;
     public string Diagnostic { get; private set; } = "Not sampled";
+    public string? AvailabilityWarning { get; private set; }
 
     public WindowsHardwareFanSensors()
     {
@@ -53,7 +55,27 @@ public sealed class WindowsHardwareFanSensors : IFanSensorSource, IDisposable
             Diagnostic += " No hardware discovered; check Windows permissions and LibreHardwareMonitor support.";
         else if (values.Count == 0)
             Diagnostic += " Hardware detected but no readable sensor values.";
+        var cpus = _computer.Hardware.Where(hardware => hardware.HardwareType == HardwareType.Cpu).ToArray();
+        var administrator = false;
+        if (OperatingSystem.IsWindows())
+        {
+            using var identity = WindowsIdentity.GetCurrent();
+            administrator = new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
+        }
+        AvailabilityWarning = CpuTemperatureWarning(cpus.Length > 0,
+            cpus.Any(cpu => cpu.Sensors.Any(sensor => sensor.SensorType == SensorType.Temperature && sensor.Value is float value && float.IsFinite(value))),
+            LibreHardwareMonitor.PawnIo.PawnIo.IsInstalled,
+            administrator);
         return values;
+    }
+
+    /// <summary>Fehlende CPU-Messwerte bleiben auch bei verfügbaren GPU- oder Lastwerten sichtbar erklärt.</summary>
+    internal static string? CpuTemperatureWarning(bool cpuDetected, bool temperatureAvailable, bool pawnIoInstalled, bool administrator)
+    {
+        if (!cpuDetected || temperatureAvailable) return null;
+        if (!pawnIoInstalled) return "CPU temperatures unavailable: install the official PawnIO driver and configure access. See Hardware help.";
+        if (!administrator) return "CPU temperatures unavailable: configure PawnIO access for your Windows account. See Hardware help.";
+        return "CPU temperatures unavailable: check PawnIO driver access and LibreHardwareMonitor support for this CPU.";
     }
 
     private static void Read(IHardware hardware, Dictionary<string, object?> values)

@@ -7,11 +7,19 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 ## Roadmap: Weiterentwicklung nach v0.1.3
 
+### Windows-CPU-Sensoren und acht Dashboard-Livewerte
+
+- [x] Acht Livewerte mit Übernahme vorhandener Vierer-Konfigurationen, vier Spalten bei breiten und zwei bei schmalen Fenstern; Bearbeiten und Speichern aller acht Werte.
+- [x] CPU-Temperaturen mit der tatsächlichen Windows-Hardwarequelle prüfen: signiertes PawnIO 2.2.0 installiert; ausdrücklich gewählte Freigabe nur für das Benutzerkonto geprüft, anschließend Messwerte ohne Administratorrechte und ohne eigenen LIS2-Dienst.
+- [x] Fehlende CPU-Messwerte trotz verfügbarer GPU-/Lastwerte sichtbar erklären; Hinweise und Hilfe in fünf Sprachen ergänzen.
+- [x] Installation, Benutzerfreigabe, Gegenproben und Rücknahme im [Windows-Sensorleitfaden](docs/windows-hardware-sensors.md) dokumentieren; PowerShell-Werkzeug mit Sicherung und Geräteprüfung.
+- [ ] Benutzerfreigabe nach Windows-Neustart und auf weiteren CPU-/Mainboardmodellen prüfen.
+
 ### Dashboard nach freigegebenem Mockup
 
 - [x] Niedrige VFD-Karte über die gesamte Breite, kompakte 20×2-Vorschau und Seitensteuerung. Schnellzugriff und Demo-Schaltfläche entfallen.
 - [x] Auswahl, vorherige/nächste Seite und Pause/Fortsetzen am angewendeten Transport. Pause erhält Livewerte, Laufschrift und Ereignis-Overlays.
-- [x] Vier persistente Livewerte mit eigener Beschriftung, Vorlagensyntax und Variablenbrowser; Speichern und Abbrechen im Konfigurationsdialog.
+- [x] Acht persistente Livewerte mit eigener Beschriftung, Vorlagensyntax und Variablenbrowser; Speichern und Abbrechen im Konfigurationsdialog.
 - [x] Lüfterdetails mit konfiguriertem Modus, Regelsensor und ausdrücklich zugeordneten Drehzahlsensoren. Fehlende Drehzahlen bleiben als nicht verfügbar erkennbar; Hardwarefreigabe unverändert.
 - [x] Deutsche, englische, französische, türkische und russische Hilfe ergänzt. Die VFD-Bedienung bleibt auch bei Mindestbreite neben der Vorschau; schmale Fenster ordnen Livewerte in zwei Spalten an.
 - [x] Release v0.1.14: [Main-CI 40660877824](https://github.com/Eitschman/lis2-control-center/actions/runs/40660877824) mit zwölf und [Release-CI 40661702506](https://github.com/Eitschman/lis2-control-center/actions/runs/40661702506) mit 14 erfolgreichen Jobs. Neun Nutzdateien anhand SHA256SUMS.txt geprüft; Paketinhalt, Lizenzbeilagen und zehn README-Downloadlinks geprüft.

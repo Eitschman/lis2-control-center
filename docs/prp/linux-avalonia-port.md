@@ -11,7 +11,7 @@ Die zehn Hauptansichten bleiben Dashboard, Display, Pages, Media, Events, Hardwa
 
 Eine genehmigte UI-Abweichung ist der modale, durchsuchbare Variablenbrowser anstelle der großen WPF-ComboBox. Das unten beschriebene Dashboard-Mockup ist ebenfalls vom Benutzer freigegeben. Lüfterfreigabe und Sicherheitsgrenzen bleiben unabhängig von der Oberfläche verbindlich. Weitere Abweichungen werden im [Paritätsaudit](wpf-avalonia-parity-audit.md) erfasst, ohne sie dadurch zu genehmigen.
 
-Das freigegebene Dashboard-Mockup ergänzt eine niedrige VFD-Karte über die gesamte Breite, Seitenwahl und Rotation-Pause bei unverändert kompakter Vorschau, erweiterte Lüfterdetails und vier konfigurierbare Livewerte. Schnellzugriff und Demo-Schaltfläche entfallen. Drehzahlangaben benötigen ausdrücklich zugeordnete Sensoren; die Oberfläche leitet keine Messwerte aus Stellprozenten ab. Livewerte verwenden den vorhandenen Variablenbrowser und Vorlagenrenderer. Die Auswahl wird im Workspace gespeichert. Hardwarefreigaben und Sicherheitsgrenzen bleiben erhalten.
+Das freigegebene Dashboard-Mockup ergänzt eine niedrige VFD-Karte über die gesamte Breite, Seitenwahl und Rotation-Pause bei unverändert kompakter Vorschau, erweiterte Lüfterdetails und acht konfigurierbare Livewerte. Schnellzugriff und Demo-Schaltfläche entfallen. Drehzahlangaben benötigen ausdrücklich zugeordnete Sensoren; die Oberfläche leitet keine Messwerte aus Stellprozenten ab. Livewerte verwenden den vorhandenen Variablenbrowser und Vorlagenrenderer. Die Auswahl wird im Workspace gespeichert. Hardwarefreigaben und Sicherheitsgrenzen bleiben erhalten.
 
 ## Arbeitsgrundlage und Nachweis
 

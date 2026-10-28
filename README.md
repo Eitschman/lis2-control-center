@@ -44,6 +44,8 @@ Windows Media Player Legacy plug-ins: [x86 / 32-bit](https://github.com/Eitschma
 
 ## Project status
 
+Current development changes include eight dashboard live values and a documented Windows CPU-temperature setup using PawnIO with explicit per-user device access. These changes are not included in the v0.1.14 downloads above.
+
 As of October 27, 2026, PORT-08 includes verified archive launches on Windows x64, Linux x64 and native Linux ARM64, plus Debian packages for amd64/arm64. The shared application in `src/LIS2.App.Avalonia` provides ten main views, display/page/event runtime, custom glyphs, Windows/Linux sensors, fan control with explicit authorization for serial output, Home Assistant, media sources, workspace persistence, help and About. The modal variable browser is an accepted difference from WPF.
 
 The linked status report records current Windows/Linux test counts and CI evidence; the Linux keyring test is skipped on Windows. Tests include eight Protocol Tester UI regressions. Device controls, settings and all ten main views are tested using actual Avalonia controls and Skia rendering. Static text and dynamic messages follow the selected language; metadata and technical keys remain unchanged. Help supports German, English, French, Turkish, Russian or the system language, including changes while the dialog is open. Native Windows/Linux smoke tests cover the main application and Protocol Tester. See the [status report](docs/prp/linux-port-status.md) for CI evidence and visual checks. Extracted packages and native ARM64 execution pass in CI; physical LIS2 validation and further manual desktop checks remain open. The user has confirmed Debian package operation on a Raspberry Pi 5 with Debian 13, KDE Plasma 6.3.6 and a Wayland session, including release v0.1.0 with .NET 10.
@@ -93,6 +95,8 @@ The following features belong to the Avalonia application. The porting status re
 - minimum/maximum/fail-safe output
 - missing/invalid sensor fail-safe handling
 - fan-curve editor/preview, live input/output display and optional hysteresis
+
+Windows CPU temperatures require the official signed PawnIO driver used by LibreHardwareMonitor. An explicit, one-time device permission for your Windows account allows LIS2 Control Center to run without administrator rights or an additional LIS2 service. Installation and permission changes require elevation; the permission also allows other programs under that account to access PawnIO. See the [Windows sensor setup, verification and rollback guide](docs/windows-hardware-sensors.md). The release archives do not include the PawnIO installer.
 
 ### Winamp
 
@@ -179,7 +183,7 @@ See [docs/home-assistant-integration.md](docs/home-assistant-integration.md).
 
 ### Desktop application
 
-- dashboard with compact 20x2 preview, page selection and rotation pause/resume, four configurable template-based live values and fan mode/control-sensor details; RPM values require explicitly assigned speed sensors
+- dashboard with compact 20x2 preview, page selection and rotation pause/resume, eight configurable template-based live values and fan mode/control-sensor details; RPM values require explicitly assigned speed sensors
 - tray support, subject to the tray integration available on the Linux desktop
 - autostart through the Windows user registry or a Linux XDG autostart entry
 - Light, Dark and system themes
@@ -201,7 +205,7 @@ The full-width VFD card keeps the preview at 20x2 characters. While page playbac
 
 The fan card shows each channel's configured mode and control sensor. Its gear button assigns an RPM source to each channel. RPM must come from an actual sensor; the LIS2 does not provide confirmed speed feedback. Missing or unassigned speed sources show **Unavailable**. Sensor selection does not authorize physical fan output.
 
-The **Live values** gear configures four labels and templates independently of the active display page. Use the variable browser to insert keys from your system and apply the same formatting as in page templates, for example `{Clock.Time}` or `{Hardware.Cpu.Temperature|number:1|suffix: °C}` with a matching hardware key. Empty results show **Unavailable**. Save stores the configuration in the workspace; Cancel discards edits. The VFD preview and page controls stay side by side at the minimum window width; live values use two columns in narrow windows.
+The **Live values** gear configures eight labels and templates independently of the active display page. Use the variable browser to insert keys from your system and apply the same formatting as in page templates, for example `{Clock.Time}` or `{Hardware.Cpu.Temperature|number:1|suffix: °C}` with a matching hardware key. Empty results show **Unavailable**. Save stores the configuration in the workspace; Cancel discards edits. The VFD preview and page controls stay side by side at the minimum window width; live values use two columns in narrow windows.
 
 ## Architecture
 

@@ -162,6 +162,10 @@
                 <StackPanel Name="DashboardValueSlot2" Grid.Column="1" Spacing="8"><TextBlock Name="DashboardValueLabel2" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText2" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
                 <StackPanel Name="DashboardValueSlot3" Grid.Column="2" Spacing="8"><TextBlock Name="DashboardValueLabel3" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText3" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
                 <StackPanel Name="DashboardValueSlot4" Grid.Column="3" Spacing="8"><TextBlock Name="DashboardValueLabel4" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText4" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
+                <StackPanel Name="DashboardValueSlot5" Grid.Row="1" Spacing="8"><TextBlock Name="DashboardValueLabel5" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText5" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
+                <StackPanel Name="DashboardValueSlot6" Grid.Row="1" Grid.Column="1" Spacing="8"><TextBlock Name="DashboardValueLabel6" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText6" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
+                <StackPanel Name="DashboardValueSlot7" Grid.Row="1" Grid.Column="2" Spacing="8"><TextBlock Name="DashboardValueLabel7" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText7" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
+                <StackPanel Name="DashboardValueSlot8" Grid.Row="1" Grid.Column="3" Spacing="8"><TextBlock Name="DashboardValueLabel8" TextWrapping="Wrap"/><TextBlock Name="DashboardValueText8" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
               </Grid>
             </StackPanel>
           </Border>
@@ -746,6 +750,7 @@
         <StackPanel Spacing="12">
           <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16"><StackPanel Spacing="12">
           <TextBlock Text="Hardware monitoring" FontSize="18" FontWeight="SemiBold" />
+          <TextBlock Name="HardwareSensorStatus" Text="Refresh to discover available sensors." TextWrapping="Wrap" />
           <WrapPanel>
             <Button Margin="0,0,8,8" Name="HardwareRefresh" Content="Refresh sensors" />
             <Button Margin="0,0,8,8" Name="HardwareAutoRefresh" Content="Start live updates" />
@@ -798,7 +803,6 @@
             <CheckBox Margin="0,0,8,8" Name="HardwareFavorite" Content="Favorite" VerticalAlignment="Center" />
             <Button Margin="0,0,8,8" Name="HardwareSavePreference" Content="Save sensor preference" />
           </WrapPanel>
-          <TextBlock Name="HardwareSensorStatus" Text="Refresh to discover available sensors." TextWrapping="Wrap" />
           <TextBlock Name="HardwareSaveStatus" TextWrapping="Wrap" />
           <WrapPanel>
             <Button Margin="0,0,8,8" Name="HardwareUseForFan" Content="Use for Fan 1" IsEnabled="False" />

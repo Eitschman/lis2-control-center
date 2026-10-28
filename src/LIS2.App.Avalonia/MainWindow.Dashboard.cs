@@ -96,11 +96,13 @@ public partial class MainWindow
         var stacked = Bounds.Width < 1100;
         var values = this.FindControl<Grid>("DashboardValuesLayout")!;
         values.ColumnDefinitions = new ColumnDefinitions(stacked ? "*,*" : "*,*,*,*");
-        for (var index = 0; index < 4; index++)
+        values.RowDefinitions = new RowDefinitions(stacked ? "Auto,Auto,Auto,Auto" : "Auto,Auto");
+        var columns = stacked ? 2 : 4;
+        for (var index = 0; index < DashboardSettings.ValueCount; index++)
         {
             var slot = this.FindControl<StackPanel>($"DashboardValueSlot{index + 1}")!;
-            Grid.SetColumn(slot, stacked ? index % 2 : index);
-            Grid.SetRow(slot, stacked ? index / 2 : 0);
+            Grid.SetColumn(slot, index % columns);
+            Grid.SetRow(slot, index / columns);
         }
     }
 
@@ -108,7 +110,7 @@ public partial class MainWindow
     {
         var values = PagePreviewValues();
         var renderer = new TemplateRenderer();
-        for (var index = 0; index < 4; index++)
+        for (var index = 0; index < DashboardSettings.ValueCount; index++)
         {
             var setting = _dashboardSettings.Values[index];
             var label = this.FindControl<TextBlock>($"DashboardValueLabel{index + 1}")!;
@@ -117,6 +119,9 @@ public partial class MainWindow
             var text = this.FindControl<TextBlock>($"DashboardValueText{index + 1}")!;
             text.Text = output.Length == 0 ? UiText("Unavailable") : output;
             ToolTip.SetTip(text, setting.Template);
+        }
+        for (var index = 0; index < 4; index++)
+        {
             var channel = _fanSettings.Channels[index];
             if (SerialSelected && _serialDisplay?.AutomaticFansRunning == true && _serialDisplay.FanOutputs is { Count: 4 } outputs)
                 this.FindControl<Slider>($"DashboardFan{index + 1}Slider")!.Value = outputs[index];
@@ -160,7 +165,8 @@ public partial class MainWindow
         var rows = new StackPanel { Spacing = 18 };
         var labels = new List<TextBox>();
         var inputs = new List<TextBox>();
-        for (var index = 0; index < 4; index++)
+        var count = fanSpeeds ? 4 : DashboardSettings.ValueCount;
+        for (var index = 0; index < count; index++)
         {
             var number = index;
             var section = new StackPanel { Spacing = 6 };
@@ -196,7 +202,7 @@ public partial class MainWindow
         cancel.Click += (_, _) => dialog.Close();
         save.Click += async (_, _) =>
         {
-            for (var index = 0; index < 4; index++)
+            for (var index = 0; index < count; index++)
             {
                 if (fanSpeeds) draft.FanSpeedKeys[index] = inputs[index].Text?.Trim() ?? "";
                 else draft.Values[index] = new DashboardValueSetting { Label = labels[index].Text?.Trim() ?? "", Template = inputs[index].Text ?? "" };

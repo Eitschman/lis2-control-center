@@ -5,6 +5,29 @@ namespace LIS2.App.Avalonia.Tests;
 public sealed class PortableWorkspaceStoreTests
 {
     [Fact]
+    public void DashboardExpandsFourSavedValuesWithoutChangingExistingTemplates()
+    {
+        var original = new DashboardSettings
+        {
+            Values = Enumerable.Range(1, 4).Select(index => new DashboardValueSetting
+                { Label = "Original " + index, Template = " {Value" + index + "} " }).ToList(),
+            FanSpeedKeys = ["Hardware.Front.Fan.Speed"]
+        };
+        var normalized = DashboardSettings.Normalize(original);
+        Assert.Equal(8, normalized.Values.Count);
+        Assert.Equal(4, normalized.FanSpeedKeys.Count);
+        Assert.Equal("Hardware.Front.Fan.Speed", normalized.FanSpeedKeys[0]);
+        for (var index = 0; index < 4; index++)
+        {
+            Assert.Equal(original.Values[index].Label, normalized.Values[index].Label);
+            Assert.Equal(original.Values[index].Template, normalized.Values[index].Template);
+            Assert.NotSame(original.Values[index], normalized.Values[index]);
+        }
+        Assert.All(normalized.Values.Skip(4), value => { Assert.Empty(value.Label); Assert.Empty(value.Template); });
+        Assert.Equal(4, original.Values.Count);
+    }
+
+    [Fact]
     public async Task RoundTripsPagesAndUrlWithoutAnyToken()
     {
         var path = Path.Combine(Path.GetTempPath(), "lis2-portable-" + Guid.NewGuid().ToString("N") + ".json");
