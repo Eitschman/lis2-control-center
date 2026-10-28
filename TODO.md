@@ -14,7 +14,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] Vier persistente Livewerte mit eigener Beschriftung, Vorlagensyntax und Variablenbrowser; Speichern und Abbrechen im Konfigurationsdialog.
 - [x] Lüfterdetails mit konfiguriertem Modus, Regelsensor und ausdrücklich zugeordneten Drehzahlsensoren. Fehlende Drehzahlen bleiben als nicht verfügbar erkennbar; Hardwarefreigabe unverändert.
 - [x] Deutsche, englische, französische, türkische und russische Hilfe ergänzt. Die VFD-Bedienung bleibt auch bei Mindestbreite neben der Vorschau; schmale Fenster ordnen Livewerte in zwei Spalten an.
-- [ ] Release v0.1.14: Main-/Release-CI und veröffentlichte Downloads nachweisen.
+- [x] Release v0.1.14: [Main-CI 40660877824](https://github.com/Eitschman/lis2-control-center/actions/runs/40660877824) mit zwölf und [Release-CI 40661702506](https://github.com/Eitschman/lis2-control-center/actions/runs/40661702506) mit 14 erfolgreichen Jobs. Neun Nutzdateien anhand SHA256SUMS.txt geprüft; Paketinhalt, Lizenzbeilagen und zehn README-Downloadlinks geprüft.
 
 ### Winamp-Aktualisierung und Dashboard
 
