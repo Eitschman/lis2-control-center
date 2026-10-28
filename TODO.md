@@ -14,7 +14,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] Fehlende CPU-Messwerte trotz verfügbarer GPU-/Lastwerte sichtbar erklären; Hinweise und Hilfe in fünf Sprachen ergänzen.
 - [x] Installation, Benutzerfreigabe, Gegenproben und Rücknahme im [Windows-Sensorleitfaden](docs/windows-hardware-sensors.md) dokumentieren; PowerShell-Werkzeug mit Sicherung und Geräteprüfung.
 - [ ] Benutzerfreigabe nach Windows-Neustart und auf weiteren CPU-/Mainboardmodellen prüfen.
-- [ ] Release v0.1.15: Main-/Release-CI, Download-Prüfsummen und mitgelieferten Windows-Sensorleitfaden samt Berechtigungswerkzeug nachweisen.
+- [x] Release v0.1.15: [Main-CI 40667479253](https://github.com/Eitschman/lis2-control-center/actions/runs/40667479253) mit zwölf und [Release-CI 40668381783](https://github.com/Eitschman/lis2-control-center/actions/runs/40668381783) mit 14 erfolgreichen Jobs. Neun Nutzdateien anhand SHA256SUMS.txt und zehn README-Links geprüft. Windows-Sensorleitfaden und Berechtigungswerkzeug sind im veröffentlichten ZIP enthalten und geprüft.
 
 ### Dashboard nach freigegebenem Mockup
 
