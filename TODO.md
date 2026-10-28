@@ -15,7 +15,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] README und Hilfe in fünf Sprachen aktualisiert; Dashboard-Regressionen ergänzen Leerzustände und Entwurfsverhalten.
 - [x] Release v0.1.16: Main-CI 40675924112 mit zwölf und Release-CI 40676894895 mit 14 erfolgreichen Jobs. Neun Prüfsummen und zehn README-Downloadlinks geprüft.
 - [x] Hilfe: erklärende Absätze verwenden auch mit eingebetteten Vorlagen die normale Schrift; ausdrücklich gekennzeichnete Codebeispiele behalten Festbreitenschrift. Alle zehn Bereiche in fünf Sprachen werden geprüft.
-- [ ] Release v0.1.17 mit korrigiertem Hilfe-Schriftbild, CI- und Downloadprüfung.
+- [x] Release v0.1.17 mit korrigiertem Hilfe-Schriftbild: [Main-CI 40679279936](https://github.com/Eitschman/lis2-control-center/actions/runs/40679279936) besteht zwölf Jobs, [Release-CI 40679310939](https://github.com/Eitschman/lis2-control-center/actions/runs/40679310939) alle 14. Windows 540 Tests erfolgreich und ein Linux-Schlüsselbundtest übersprungen, Linux 541 erfolgreich. Neun SHA-256-Prüfsummen, Paketversionen, Lizenzbeilagen, beide Legacy-Architekturen und zehn README-Downloadlinks geprüft.
 - [x] Numerische HA-Zustände in Dashboard und Display ohne ausdrückliches Format regional darstellen; Aliase, Ersatzvariablen und Präzision erhalten. Rohdaten, Sichtbarkeit und Textattribute bleiben unverändert.
 - [x] Quellenabgleich für Windows-/Linux-Hardware, Uhr, Winamp, WMP Legacy, GSMTC, MPRIS und HA. Zahlenanzeige auch in Hardwareliste, HA-Browser, Variablenbrowser und Sensoranzeige vereinheitlichen; Titel, Kennungen und technische Eingabeformate erhalten.
 
