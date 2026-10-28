@@ -1,6 +1,6 @@
 # TODO: Projektroadmap und Restarbeiten
 
-Stand: 27.10.2026. Hauptbranch: `main`.
+Stand: 28.10.2026. Hauptbranch: `main`.
 Implementierungsstand: PORT-08 mit Avalonia 11.3.22 und .NET 10. Windows Media Player Legacy liefert Metadaten über sein Hintergrund-Plug-in; Pegel und Spektrum kommen direkt aus der WASAPI-Prozess-Audioerfassung. Aktuelle Prüfergebnisse und offene Zielsystemnachweise stehen im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
@@ -9,7 +9,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 ### Winamp-Aktualisierung und Dashboard
 
-- [ ] Als Nächstes: Ergebnis von [Release-Workflow 40546184681](https://github.com/Eitschman/lis2-control-center/actions/runs/40546184681) für v0.1.13 prüfen; danach veröffentlichte Pakete, neun SHA-256-Prüfsummen und zehn README-Downloadlinks prüfen und den Release-Nachweis aktualisieren. Der Workflow läuft auf Benutzerwunsch über Nacht unverändert weiter.
+- [x] [Release-Workflow 40546184681](https://github.com/Eitschman/lis2-control-center/actions/runs/40546184681) für v0.1.13 geprüft: 14 erfolgreiche Jobs, Release veröffentlicht. Neun heruntergeladene Nutzdateien stimmen mit SHA256SUMS.txt überein; Paketinhalt und zehn README-Downloadlinks sind geprüft.
 
 - [x] Winamp-Audioerfassung auf 100 ms stellen und neue Snapshots sofort an den Pipe-Worker melden.
 - [x] Empfangene Winamp-Audiowerte und moderne WMP-Metadaten über den tatsächlichen UI-Timer prüfen.
