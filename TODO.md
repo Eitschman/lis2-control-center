@@ -7,6 +7,11 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 ## Roadmap: Weiterentwicklung nach v0.1.3
 
+### Plattformgerechte Seitenvorlagen
+
+- [x] Linux zeigt nur MPRIS-Medienvorlagen, Windows nur Winamp-/Windows-Media-/WMP-Legacy-Vorlagen; gemeinsame Uhr-/Hardwarevorlagen bleiben auf beiden Plattformen erhalten. Fremde Vorlagen sind aus der Auswahlliste entfernt.
+- [x] Stabile Vorlagenkennungen erhalten die Zuordnung nach dem Entfernen von Einträgen und nach Sprachwechseln. Plattformfilter und tatsächliche Seitenerzeugung werden mit Avalonia-Controls geprüft.
+
 ### Dashboard-Feinschliff
 
 - [x] Unbelegte Livewerte als dezentes „—“; konfigurierte Quellen ohne Ergebnis als „Nicht verfügbar“. Null und Leerzeichen bleiben gültige Inhalte.

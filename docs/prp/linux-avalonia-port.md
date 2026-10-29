@@ -5,6 +5,8 @@ Implementierungsstand: PORT-08 und Windows Media Player Legacy; genaue Prüfnach
 
 ## Ziel und verbindlicher Umfang
 
+Die Seitenvorlagenauswahl enthält nur die Medienquellen des jeweiligen Betriebssystems: Winamp und beide Windows-Media-Integrationen auf Windows, MPRIS auf Linux. Nicht unterstützte Medienvorlagen werden aus der Liste entfernt; gemeinsame Uhr-/Hardwarevorlagen bleiben erhalten. Die Erzeugung verwendet stabile Vorlagenkennungen unabhängig von Listenposition und Oberflächensprache.
+
 Eine gemeinsame Avalonia-Anwendung ersetzt die WPF-Anwendung auf Windows x64 und unterstützt Linux x64 sowie Linux ARM64. Die WPF-Funktionsreferenz für Funktionen, Anordnung, Interaktionen, Einstellungen und Vorlagen liegt im Git-Commit `922ca1b`. Der Benutzer beauftragt die Entfernung der WPF-Projekte und anschließend die Übernahme nach `main`. App und Protokolltester verwenden ausschließlich Avalonia; offene manuelle Desktop- und Hardwareprüfungen bleiben separat dokumentiert.
 
 Die zehn Hauptansichten bleiben Dashboard, Display, Pages, Media, Events, Hardware, Fan Control, Settings, Diagnostics und Home Assistant. Windows unterstützt Winamp, GSMTC und Windows Media Player Legacy; Linux erhält die passenden Sensor- und Medienanbieter. Home Assistant bleibt lesend. Eigene OctoPrint-, Plex- oder Docker-Datenquellen sind für bereits über HA verfügbare Werte nicht vorgesehen.

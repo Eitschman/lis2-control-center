@@ -21,11 +21,7 @@ public partial class MainWindow
     private void InitializePagesEditor()
     {
         var presetPicker = this.FindControl<ComboBox>("PagePresetPicker")!;
-        for (var index = 7; index <= 14; index++)
-        {
-            var item = (ComboBoxItem)presetPicker.Items[index]!;
-            item.IsVisible = item.IsEnabled = index == 11 ? OperatingSystem.IsLinux() : OperatingSystem.IsWindows();
-        }
+        FilterPagePresets(presetPicker, OperatingSystem.IsWindows(), OperatingSystem.IsLinux());
         _editorPreviewTimer.Tick += (_, _) => TickEditorPreview();
         Closed += (_, _) => _editorPreviewTimer.Stop();
         this.FindControl<ListBox>("PagesList")!.SelectionChanged += async (_, _) => await HandlePageSelectionAsync();
@@ -33,7 +29,7 @@ public partial class MainWindow
         {
             try
             {
-                var choice = this.FindControl<ComboBox>("PagePresetPicker")!.SelectedIndex;
+                if (presetPicker.SelectedItem is not ComboBoxItem { Tag: int choice }) return;
                 var preset = CreateWpfPagePreset(choice);
                 if (choice is 9 or 14 && !await EnsureSpectrumGlyphsAsync()) return;
                 if (!CommitPendingPageEditor()) return;
@@ -174,6 +170,19 @@ public partial class MainWindow
         if (SelectedDisplay?.IsConnected == true)
             await RunSelectedDisplayActionAsync(session => session.ProgramAllGlyphsAsync(_glyphs.Glyphs), preservePlayback: true);
         return true;
+    }
+
+    /// <summary>Entfernt plattformfremde Vorlagen und erhält ihre Kennung unabhängig von der Listenposition.</summary>
+    internal static void FilterPagePresets(ComboBox picker, bool isWindows, bool isLinux)
+    {
+        for (var index = picker.Items.Count - 1; index >= 0; index--)
+        {
+            var item = (ComboBoxItem)picker.Items[index]!;
+            item.Tag = index;
+            if (index >= 7 && !(index == 11 ? isLinux : isWindows))
+                picker.Items.RemoveAt(index);
+        }
+        picker.SelectedIndex = 0;
     }
 
     private PagePresetSpec CreateWpfPagePreset(int choice)

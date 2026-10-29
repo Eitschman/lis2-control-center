@@ -1,9 +1,32 @@
 using LIS2.App.Avalonia;
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
 
 namespace LIS2.App.Avalonia.Tests;
 
 public sealed class PagePresetCatalogTests
 {
+    [AvaloniaTheory]
+    [InlineData(true, false, new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14 })]
+    [InlineData(false, true, new[] { 0, 1, 2, 3, 4, 5, 6, 11 })]
+    public void PlatformPickerContainsOnlySupportedPresetsWithStableIds(bool isWindows, bool isLinux, int[] expected)
+    {
+        var picker = new ComboBox();
+        for (var index = 0; index < 15; index++)
+            picker.Items.Add(new ComboBoxItem { Content = "Preset " + index });
+        MainWindow.FilterPagePresets(picker, isWindows, isLinux);
+        Assert.Equal(expected, picker.Items.OfType<ComboBoxItem>().Select(item => (int)item.Tag!));
+        Assert.All(picker.Items.OfType<ComboBoxItem>(), item =>
+        {
+            Assert.True(item.IsVisible);
+            Assert.True(item.IsEnabled);
+        });
+        Assert.Equal(0, picker.SelectedIndex);
+        var last = picker.Items.OfType<ComboBoxItem>().Last();
+        picker.SelectedItem = last;
+        Assert.Equal(expected.Last(), last.Tag);
+    }
+
     [Theory]
     [InlineData(0, "Clock", "{Clock.Time}", "{Clock.Date}", 5, "", "Truncate", "Truncate")]
     [InlineData(1, "LIS2 Status", "LIS2 Control Center", "Ready", 5, "", "Truncate", "Truncate")]

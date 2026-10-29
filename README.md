@@ -82,6 +82,7 @@ The following features belong to the Avalonia application. The porting status re
 - scheduler-driven rotation independent from scrolling animation
 - event/overlay queue with priority and lifetime plus UI/test generation
 - ready-made presets for Clock, Status, CPU, GPU, Memory, Temperatures, Fans, Winamp Now Playing/VU/Spectrum, Windows Media Player Now Playing and WMP Legacy Now Playing/VU/Spectrum
+- platform-specific preset selection: Windows lists Winamp and Windows Media players; Linux lists MPRIS players. Unsupported player presets are absent from the selection.
 
 ### PC hardware and fan control
 

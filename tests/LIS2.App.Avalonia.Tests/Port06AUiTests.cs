@@ -42,8 +42,8 @@ public sealed class Port06AUiTests
             Click(window, "HardwareRefresh");
             Click(window, "NavButton2");
             var picker = window.FindControl<ComboBox>("PagePresetPicker")!;
-            Assert.Equal(OperatingSystem.IsLinux(), ((ComboBoxItem)picker.Items[11]!).IsEnabled);
-            Assert.Equal(OperatingSystem.IsWindows(), ((ComboBoxItem)picker.Items[7]!).IsEnabled);
+            Assert.Equal(OperatingSystem.IsLinux(), picker.Items.OfType<ComboBoxItem>().Any(item => Equals(item.Tag, 11)));
+            Assert.Equal(OperatingSystem.IsWindows(), picker.Items.OfType<ComboBoxItem>().Any(item => Equals(item.Tag, 7)));
             picker.SelectedIndex = choice;
             Click(window, "PageCreatePreset");
             await Wait(() => store.Load().Pages.Count == 1);

@@ -13,6 +13,57 @@ namespace LIS2.App.Avalonia.Tests;
 
 public sealed class MediaUiTests
 {
+    [AvaloniaFact]
+    public async Task PlatformPresetMenuOmitsForeignPlayersAndKeepsCreationAfterLanguageChange()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "lis2-platform-presets-" + Guid.NewGuid().ToString("N"));
+        var store = new PortableWorkspaceStore(Path.Combine(directory, "workspace.json"));
+        await store.SaveAsync(new PortableWorkspace { LanguageMode = "English" });
+        var window = new MainWindow(store, new PortableHaTokenStore(directory, "no-keyring"), false,
+            _ => throw new InvalidOperationException("No serial hardware in preset tests."));
+        try
+        {
+            window.Show();
+            Click(window, "NavButton2");
+            var picker = window.FindControl<ComboBox>("PagePresetPicker")!;
+            var choices = picker.Items.OfType<ComboBoxItem>().ToArray();
+            Assert.Equal(OperatingSystem.IsWindows() ? 14 : 8, choices.Length);
+            Assert.Equal(OperatingSystem.IsLinux(), choices.Any(item => Equals(item.Tag, 11)));
+            Assert.Equal(OperatingSystem.IsWindows(), choices.Any(item => Equals(item.Tag, 14)));
+            Assert.All(choices, item => Assert.True(item.IsVisible && item.IsEnabled));
+            window.FindControl<ComboBox>("LanguageModeComboBox")!.SelectedIndex = 2;
+            window.Width = 950;
+            window.Height = 600;
+            picker.IsDropDownOpen = true;
+            await Task.Delay(50);
+            window.UpdateLayout();
+            var screenshots = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../TestResults/screenshots"));
+            Directory.CreateDirectory(screenshots);
+            using (var frame = window.CaptureRenderedFrame())
+            {
+                Assert.NotNull(frame);
+                frame.Save(Path.Combine(screenshots, "pages-platform-presets.png"));
+            }
+            picker.IsDropDownOpen = false;
+            foreach (var choice in OperatingSystem.IsWindows() ? new[] { 10, 12 } : new[] { 11 })
+            {
+                picker.SelectedItem = choices.Single(item => Equals(item.Tag, choice));
+                var count = store.Load().Pages.Count;
+                Click(window, "PageCreatePreset");
+                await WaitAsync(() => store.Load().Pages.Count == count + 1);
+                var page = store.Load().Pages.Last();
+                Assert.Equal(choice == 11 ? "{Media.Title}" : PagePresetCatalog.Get(choice).Line1, page.Line1Template);
+                Assert.Equal(choice == 11 ? "{Media.Artist}" : PagePresetCatalog.Get(choice).Line2, page.Line2Template);
+            }
+        }
+        finally
+        {
+            await window.BeginShutdownAsync();
+            window.Close();
+            if (Directory.Exists(directory)) Directory.Delete(directory, true);
+        }
+    }
+
     public sealed class TestMediaProvider
     {
         public IReadOnlyDictionary<string, object?> Values { get; set; } = new Dictionary<string, object?>();
@@ -137,9 +188,14 @@ public sealed class MediaUiTests
             window.Show();
             Click(window, "NavButton2");
             var picker = window.FindControl<ComboBox>("PagePresetPicker")!;
-            Assert.Equal(OperatingSystem.IsWindows(), ((ComboBoxItem)picker.Items[14]!).IsEnabled);
-            ((ComboBoxItem)picker.Items[14]!).IsEnabled = true;
-            picker.SelectedIndex = 14;
+            var spectrum = picker.Items.OfType<ComboBoxItem>().SingleOrDefault(item => Equals(item.Tag, 14));
+            if (!OperatingSystem.IsWindows())
+            {
+                Assert.Null(spectrum);
+                return;
+            }
+            Assert.NotNull(spectrum);
+            picker.SelectedItem = spectrum;
             Click(window, "PageCreatePreset");
             await WaitAsync(() => window.OwnedWindows.Any());
             var dialog = window.OwnedWindows.Single();
