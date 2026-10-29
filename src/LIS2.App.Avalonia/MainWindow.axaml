@@ -295,6 +295,8 @@
                 <ComboBoxItem Content="WMP Legacy Now Playing"/>
                 <ComboBoxItem Content="WMP Legacy VU"/>
                 <ComboBoxItem Content="WMP Legacy Spectrum"/>
+                <ComboBoxItem Content="Linux MPRIS VU"/>
+                <ComboBoxItem Content="Linux MPRIS Spectrum"/>
               </ComboBox>
               <Button Name="PageCreatePreset" Content="Create from preset" HorizontalAlignment="Stretch"/>
               <ListBox Name="PagesList" MinHeight="250" MaxHeight="420">
@@ -477,6 +479,21 @@
             <TextBlock Name="LinuxMediaAlbum" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
             <TextBlock Name="LinuxMediaPlayback"/>
             <TextBlock Name="LinuxMediaDuration"/>
+            <Separator Margin="0,8"/>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="VU / Spectrum" FontWeight="SemiBold"/>
+              <TextBlock Name="LinuxAudioStatus" Grid.Column="1" Text="Waiting for playback" TextWrapping="Wrap" MaxWidth="420"/>
+            </Grid>
+            <Grid ColumnDefinitions="25,*,40" RowDefinitions="Auto,Auto" RowSpacing="6">
+              <TextBlock Text="L"/>
+              <ProgressBar Name="LinuxVuLeft" Grid.Column="1" Maximum="255" Height="14"/>
+              <TextBlock Name="LinuxVuLeftValue" Grid.Column="2" Text="—" HorizontalAlignment="Right"/>
+              <TextBlock Grid.Row="1" Text="R"/>
+              <ProgressBar Name="LinuxVuRight" Grid.Row="1" Grid.Column="1" Maximum="255" Height="14"/>
+              <TextBlock Name="LinuxVuRightValue" Grid.Row="1" Grid.Column="2" Text="—" HorizontalAlignment="Right"/>
+            </Grid>
+            <Grid Name="LinuxSpectrumBars" ColumnSpacing="3" Height="70"/>
+            <TextBlock Name="LinuxAudioTarget" TextWrapping="Wrap" Opacity="0.7"/>
             <Button Name="LinuxMediaPage" Content="Create playback page"/>
           </StackPanel>
         </Border>

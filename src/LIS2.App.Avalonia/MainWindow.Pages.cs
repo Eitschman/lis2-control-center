@@ -31,7 +31,7 @@ public partial class MainWindow
             {
                 if (presetPicker.SelectedItem is not ComboBoxItem { Tag: int choice }) return;
                 var preset = CreateWpfPagePreset(choice);
-                if (choice is 9 or 14 && !await EnsureSpectrumGlyphsAsync()) return;
+                if (choice is 9 or 14 or 16 && !await EnsureSpectrumGlyphsAsync()) return;
                 if (!CommitPendingPageEditor()) return;
                 _pages.Add();
                 var index = _pages.Pages.Count - 1;
@@ -179,7 +179,7 @@ public partial class MainWindow
         {
             var item = (ComboBoxItem)picker.Items[index]!;
             item.Tag = index;
-            if (index >= 7 && !(index == 11 ? isLinux : isWindows))
+            if (index >= 7 && !(index is 11 or 15 or 16 ? isLinux : isWindows))
                 picker.Items.RemoveAt(index);
         }
         picker.SelectedIndex = 0;
@@ -196,9 +196,7 @@ public partial class MainWindow
             4 => CreateHardwarePagePreset("Memory"),
             5 => CreateHardwarePagePreset("Temperatures"),
             6 => CreateHardwarePagePreset("Fans"),
-            7 or 8 or 9 or 10 or 12 or 13 or 14 => PagePresetCatalog.Get(choice),
-            11 => new PagePresetSpec("Linux media", "{Media.Title}", "{Media.Artist}", 7,
-                "Media.State=Playing", "PingPong", "PingPong"),
+            7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 => PagePresetCatalog.Get(choice),
             _ => throw new ArgumentOutOfRangeException(nameof(choice), "Unknown page preset.")
         };
     }

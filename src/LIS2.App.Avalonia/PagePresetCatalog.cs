@@ -1,6 +1,6 @@
 namespace LIS2.App.Avalonia;
 
-/// <summary>Exact non-hardware page preset definitions from WPF MainWindow.CreatePagePresetDefinition.</summary>
+/// <summary>Gemeinsame und plattformabhängige Medienvorlagen; die Windows-Grundlagen folgen der WPF-Referenz.</summary>
 public sealed record PagePresetSpec(
     string Name, string Line1, string Line2, int Duration = 5,
     string Visibility = "", string Overflow1 = "Truncate",
@@ -21,6 +21,12 @@ public static class PagePresetCatalog
         10 => new("Windows Media Now Playing", "{WindowsMedia.Artist|fallback:--}",
             "{WindowsMedia.Title|fallback:--}", 7,
             "WindowsMedia.State=Playing", "PingPong", "PingPong"),
+        11 => new("Linux media", "{Media.Title}", "{Media.Artist}", 7,
+            "Media.State=Playing", "PingPong", "PingPong"),
+        15 => new("Linux MPRIS VU", "{Media.Title}", "{Media.Vu}", 7,
+            "Media.AudioConnected=True", "PingPong", "Truncate"),
+        16 => new("Linux MPRIS Spectrum", "{Media.Artist}", "{Media.SpectrumGlyphs}", 7,
+            "Media.AudioConnected=True", "PingPong", "Truncate"),
         12 => new("WMP Legacy Now Playing", "{WmpLegacy.Artist}", "{WmpLegacy.Title}", 7,
             "WmpLegacy.State=Playing", "PingPong", "PingPong"),
         13 => new("WMP Legacy VU", "{WmpLegacy.Title}", "{WmpLegacy.Vu}", 7,

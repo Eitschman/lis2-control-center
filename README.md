@@ -146,12 +146,17 @@ Release **v0.1.17** includes Legacy support and both plug-in architectures. Sele
 
 ### Linux media players
 
+The current development build also captures the selected player's audio through PipeWire for stereo VU and a 20-band spectrum. This requires a running PipeWire desktop session, `pipewire-bin` and `dbus-bin`, in addition to `playerctl`. Only the selected MPRIS process or its child processes are matched; microphone and whole-system audio are never substituted. Missing or ambiguous streams have a separate audio status while metadata remains available. See the [Linux audio setup and test guide](docs/linux-media-audio.md). This addition is available in development artifacts; the release downloads above remain v0.1.17.
+
 - MPRIS-compatible desktop players queried through `playerctl`
 - automatic player selection or a saved selection of a specific player
 - title, artist, album, playback state and elapsed/duration values when supplied by the player
 - artist and title remain unchanged: Tuner may already supply the station name as artist; combined stream titles are never split automatically
 - `Media.*` display variables and direct page creation from the Media view
 - a selected player remains disconnected while unavailable instead of switching to another player
+- stereo VU and 20-band spectrum updated approximately every 100 ms, independently of the one-second metadata refresh
+- Linux MPRIS Now Playing, VU and Spectrum presets; Windows-only presets are omitted on Linux and Linux-only presets are omitted on Windows
+- `Media.AudioConnected`, `Media.VuLeft`, `Media.VuRight`, `Media.Vu`, `Media.Spectrum`, `Media.SpectrumRaw`, `Media.SpectrumPeak` and `Media.SpectrumGlyphs`; diagnostic fields identify the selected PipeWire node and process
 
 Install `playerctl` for this integration, for example with `sudo apt install playerctl` on Debian/Ubuntu. It is a recommended dependency of the Debian package. Winamp VU/spectrum telemetry and the Windows GSMTC provider are separate Windows integrations.
 

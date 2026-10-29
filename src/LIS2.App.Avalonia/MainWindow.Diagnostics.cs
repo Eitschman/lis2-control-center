@@ -81,6 +81,13 @@ public partial class MainWindow
         details.Add("Winamp.Connected: " + winamp.GetValueOrDefault("Connected"));
         details.Add("Winamp.IsStream: " + winamp.GetValueOrDefault("IsStream"));
         details.Add("Winamp.TitleSource: " + winamp.GetValueOrDefault("TitleSource"));
+        if (OperatingSystem.IsLinux())
+        {
+            details.Add("Media.Player: " + _mprisValues.GetValueOrDefault("Player"));
+            var audio = _linuxAudio.Values;
+            foreach (var key in new[] { "AudioConnected", "AudioStatus", "AudioTarget", "AudioProcessId", "AudioNodeSerial" })
+                details.Add("Media." + key + ": " + audio.GetValueOrDefault(key));
+        }
         foreach (var channel in _fanSettings.Channels)
             details.Add($"{channel.Name}: {channel.Mode}, sensor={channel.SensorKey ?? "-"}, fixed={channel.FixedPercent}%, " +
                 $"min={channel.MinimumPercent}%, max={channel.MaximumPercent}%, fail-safe={channel.FailSafePercent}%");

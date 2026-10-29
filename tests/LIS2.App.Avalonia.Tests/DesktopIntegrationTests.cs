@@ -106,6 +106,10 @@ public sealed class DesktopIntegrationTests
         var mediaHelp = HelpVariableCatalog.Get("Winamp.", language).ToDictionary(entry => entry.Heading, entry => entry.Body);
         foreach (var key in LIS2.Winamp.WinampValues.FromSnapshot(snapshot).Keys)
             Assert.False(string.IsNullOrWhiteSpace(mediaHelp["{Winamp." + key + "}"]));
-        Assert.Equal(8, HelpVariableCatalog.Get("Media.", language).Count());
+        var linuxHelp = HelpVariableCatalog.Get("Media.", language).ToDictionary(entry => entry.Heading, entry => entry.Body);
+        var linuxAudio = LinuxPlayerAudio.Map(new(4410, 128, 64, new int[20]), new("104", 42, "radio"));
+        foreach (var key in LinuxMprisSource.Parse(LinuxMprisSourceTests.Metadata).Keys
+                     .Concat(linuxAudio.Keys).Concat(new[] { "Player", "SpectrumGlyphs" }).Distinct())
+            Assert.False(string.IsNullOrWhiteSpace(linuxHelp["{Media." + key + "}"]));
     }
 }

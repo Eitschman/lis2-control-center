@@ -93,12 +93,12 @@ public sealed class PageSourceValues : IAsyncDisposable
         }
         foreach (var pair in _hardware) values[pair.Key] = pair.Value;
         foreach (var pair in _media) values[pair.Key] = pair.Value;
-        foreach (var source in new[] { "Winamp", "WmpLegacy" })
+        foreach (var source in new[] { "Winamp", "WmpLegacy", "Media" })
         {
-            // Legacy liefert immer 0..255, auch bei einem leisen Audiosignal.
+            // Legacy und Linux liefern immer 0..255, auch bei einem leisen Audiosignal.
             values[source + ".SpectrumGlyphs"] = _spectrumSet &&
                 values.TryGetValue(source + ".SpectrumRaw", out var raw) && raw is IReadOnlyList<int> spectrum
-                ? LIS2.Display.GlyphRendering.Spectrum(spectrum, source == "WmpLegacy" ? 255 : null)
+                ? LIS2.Display.GlyphRendering.Spectrum(spectrum, source is "WmpLegacy" or "Media" ? 255 : null)
                 : values.GetValueOrDefault(source + ".Spectrum") ?? string.Empty;
         }
         foreach (var pair in PageClockValues.Create(now))

@@ -12,6 +12,9 @@ public partial class MainWindow
     private readonly WmpLegacyDataSource _mediaLegacy = new(enableProcessAudio: true);
     private DispatcherTimer? _mediaTimer;
     private readonly LinuxMprisSource _mpris = new();
+    private readonly LinuxPlayerAudio _linuxAudio = new();
+    private IReadOnlyDictionary<string, object?> _mprisValues = LinuxMprisSource.Map("", "", "");
+    private DateTimeOffset _nextMprisRefresh;
     private readonly WindowsMediaBridge _windowsMedia = new();
     private bool _mprisRefreshing;
     private bool _mediaStopping;
@@ -23,11 +26,13 @@ public partial class MainWindow
     private bool _updatingMediaPlayers;
     private readonly ProgressBar[] _winampSpectrumBars = new ProgressBar[20];
     private readonly ProgressBar[] _legacySpectrumBars = new ProgressBar[20];
+    private readonly ProgressBar[] _linuxSpectrumBars = new ProgressBar[20];
 
     private void InitializeMedia()
     {
         InitializeSpectrumBars("WinampSpectrumBars", _winampSpectrumBars);
         InitializeSpectrumBars("WmpLegacySpectrumBars", _legacySpectrumBars);
+        InitializeSpectrumBars("LinuxSpectrumBars", _linuxSpectrumBars);
         this.FindControl<Border>("WmpLegacyMediaCard")!.IsVisible = OperatingSystem.IsWindows();
         InitializeMediaProviders();
     }
@@ -52,10 +57,8 @@ public partial class MainWindow
         this.FindControl<Border>("LinuxMediaCard")!.IsVisible = OperatingSystem.IsLinux();
         this.FindControl<Border>("WinampMediaCard")!.IsVisible = OperatingSystem.IsWindows();
         this.FindControl<Border>("WindowsMediaCard")!.IsVisible = OperatingSystem.IsWindows();
-        // Windows liest bereits empfangene Telemetrie; Pegel und Spektrum benötigen deren 100-ms-Takt.
-        // Linux startet externe playerctl-Abfragen und behält seinen bisherigen Abfragetakt.
-        _mediaTimer = new DispatcherTimer { Interval = OperatingSystem.IsWindows()
-            ? TimeSpan.FromMilliseconds(100) : TimeSpan.FromSeconds(1) };
+        // Audiowerte laufen auf beiden Plattformen mit 100 ms; externe MPRIS-Abfragen bleiben bei einer Sekunde.
+        _mediaTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
         _mediaTimer.Tick += (_, _) => RefreshMedia();
         if (_startBackgroundSources) _mediaTimer.Start();
         this.FindControl<Button>("WindowsMediaPage")!.Click += async (_, _) => await CreateMediaPageAsync("WindowsMedia", "Windows Media Player");
@@ -69,9 +72,13 @@ public partial class MainWindow
             if (_updatingMediaPlayers) return;
             var picker = this.FindControl<ComboBox>("LinuxMediaPlayer")!;
             _selectedMediaPlayer = picker.SelectedIndex <= 0 ? null : picker.SelectedItem as string;
+            _linuxAudio.SelectPlayer(null, false);
+            _mprisValues = LinuxMprisSource.Map("", "", "");
+            _nextMprisRefresh = default;
             // Laufende Antworten der vorherigen Auswahl dürfen keine neuen Werte überschreiben.
             _pageSources.UpdateMedia("Media", new Dictionary<string, object?>());
             ApplyMprisValues(LinuxMprisSource.Map("", "", ""));
+            RefreshLinuxAudio();
             await SavePortableWorkspaceAsync();
         };
         if (_startBackgroundSources) _ = _mediaLifetime.StartAsync(StartMediaAsync);
@@ -82,6 +89,7 @@ public partial class MainWindow
         // Native Player-Plug-ins verwenden Windows-Pipes; Linux verwendet MPRIS.
         if (!OperatingSystem.IsWindows())
         {
+            if (OperatingSystem.IsLinux()) _linuxAudio.Start();
             RefreshMedia();
             return;
         }
@@ -132,7 +140,12 @@ public partial class MainWindow
         if (!OperatingSystem.IsWindows())
         {
             // Ohne Hintergrundquellen darf auch der UI-Timer keine echten Playerabfragen starten.
-            if (_startBackgroundSources && _mediaRefresh.IsCompleted) _mediaRefresh = RefreshMprisAsync();
+            if (_startBackgroundSources && _mediaRefresh.IsCompleted && DateTimeOffset.UtcNow >= _nextMprisRefresh)
+            {
+                _nextMprisRefresh = DateTimeOffset.UtcNow.AddSeconds(1);
+                _mediaRefresh = RefreshMprisAsync();
+            }
+            RefreshLinuxAudio();
             return;
         }
         RefreshMediaProvider("WindowsMedia", RefreshWindowsMedia);
@@ -198,6 +211,8 @@ public partial class MainWindow
             _applicationJournal.Record("Media", "MPRIS refresh failed (" + ex.GetBaseException().GetType().Name + ")");
             System.Diagnostics.Trace.TraceError("Linux MPRIS refresh failed: {0}", ex);
             _pageSources.UpdateMedia("Media", new Dictionary<string, object?>());
+            _mprisValues = LinuxMprisSource.Map("", "", "");
+            _linuxAudio.SelectPlayer(null, false);
             ApplyMprisValues(LinuxMprisSource.Map("", "", ""));
             var status = this.FindControl<TextBlock>("LinuxMediaStatus");
             if (status is not null)
@@ -227,8 +242,37 @@ public partial class MainWindow
     internal void ApplyMprisSnapshot(MprisSnapshot snapshot)
     {
         UpdateMediaPlayerPicker(snapshot.Players);
-        _pageSources.UpdateMedia("Media", snapshot.Values);
+        _mprisValues = snapshot.Values;
+        _linuxAudio.SelectPlayer(snapshot.Values.GetValueOrDefault("Player") as string,
+            snapshot.Values.GetValueOrDefault("Connected") is true && Equals(snapshot.Values.GetValueOrDefault("State"), "Playing"));
         ApplyMprisValues(snapshot.Values);
+        RefreshLinuxAudio();
+    }
+
+    private void RefreshLinuxAudio()
+    {
+        var audio = _linuxAudio.Values;
+        var values = new Dictionary<string, object?>(_mprisValues);
+        foreach (var pair in audio) values[pair.Key] = pair.Value;
+        _pageSources.UpdateMedia("Media", values);
+        ApplyLinuxAudioValues(audio);
+    }
+
+    /// <summary>Metadaten und Audiozustand bleiben unabhängig; fehlendes Audio leert nur die Pegel.</summary>
+    internal void ApplyLinuxAudioValues(IReadOnlyDictionary<string, object?> values)
+    {
+        var connected = values.GetValueOrDefault("AudioConnected") is true;
+        SetUiText("LinuxAudioStatus", (string?)values.GetValueOrDefault("AudioStatus") ?? "Disconnected");
+        this.FindControl<TextBlock>("LinuxAudioTarget")!.Text = connected
+            ? $"PipeWire: {values.GetValueOrDefault("AudioTarget")} · PID {values.GetValueOrDefault("AudioProcessId")} · #{values.GetValueOrDefault("AudioNodeSerial")}" : "";
+        int Level(string key) => connected && values.GetValueOrDefault(key) is int level ? Math.Clamp(level, 0, 255) : 0;
+        this.FindControl<ProgressBar>("LinuxVuLeft")!.Value = Level("VuLeft");
+        this.FindControl<ProgressBar>("LinuxVuRight")!.Value = Level("VuRight");
+        this.FindControl<TextBlock>("LinuxVuLeftValue")!.Text = connected ? Level("VuLeft").ToString() : "—";
+        this.FindControl<TextBlock>("LinuxVuRightValue")!.Text = connected ? Level("VuRight").ToString() : "—";
+        var spectrum = connected && values.GetValueOrDefault("SpectrumRaw") is IReadOnlyList<int> bands ? bands : [];
+        for (var index = 0; index < _linuxSpectrumBars.Length; index++)
+            _linuxSpectrumBars[index].Value = index < spectrum.Count ? Math.Clamp(spectrum[index], 0, 255) : 0;
     }
 
     internal void ApplyMprisValues(IReadOnlyDictionary<string, object?> values)
@@ -331,6 +375,7 @@ public partial class MainWindow
         _mediaCancellation.Cancel();
         await _mediaLifetime.StopAsync(() => RuntimeShutdown.RunAsync(
             () => _mediaRefresh,
+            () => _linuxAudio.DisposeAsync().AsTask(),
             () => _windowsMedia.DisposeAsync().AsTask(),
             () => _mediaWinamp.StopAsync(),
             () => _mediaWinamp.DisposeAsync().AsTask(),

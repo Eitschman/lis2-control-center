@@ -20,7 +20,7 @@ Beide Legacy-Plug-ins verwenden unter MSVC eine statisch eingebundene C/C++-Lauf
 | WMP Legacy plug-ins win32/win64 | CMake/MSVC baut Hintergrund- und Visualisierungs-DLL; Defender-Prüfung, gemeinsames ZIP mit beiden Anleitungen und MIT-Lizenz, SHA-256 |
 | Winamp plugin x86 | CMake/MSVC mit Win32 und Release; CTest prüft Unicode, Datei-/Streamwechsel, Titelherkunft, Cache, konsistente und einmalig übertragene Snapshots sowie Lebenszyklus; Artefakt gen_lis2.dll |
 
-Für `win-x64` wird `LIS2.WindowsMedia` separat publiziert; Provider-DLL, WinRT.Runtime.dll, Microsoft.Windows.SDK.NET.dll und weitere DLL-Abhängigkeiten werden in das App-Paket übernommen. Der Paketjob startet den echten GSMTC-Anbieter, liest den Verbindungsstatus, beendet ihn und prüft die fehlende Anbieter-DLL. Linux-Medien und Tokenstore benötigen zusätzlich playerctl-/secret-tool- und Sitzungsdienste.
+Für `win-x64` wird `LIS2.WindowsMedia` separat publiziert; Provider-DLL, WinRT.Runtime.dll, Microsoft.Windows.SDK.NET.dll und weitere DLL-Abhängigkeiten werden in das App-Paket übernommen. Der Paketjob startet den echten GSMTC-Anbieter, liest den Verbindungsstatus, beendet ihn und prüft die fehlende Anbieter-DLL. Linux-Metadaten benötigen playerctl, VU/Spektrum zusätzlich pipewire-bin, dbus-bin und eine PipeWire-Desktopsitzung. Der Tokenstore benötigt secret-tool und einen Schlüsselbunddienst.
 
 Artefakte mit 14 Tagen Aufbewahrung:
 
@@ -80,7 +80,7 @@ lis2-control-center
 
 Für ARM64 den Dateinamen mit `_arm64.deb` verwenden. Ein neueres Paket wird mit demselben `apt install`-Befehl installiert. Die Anwendung erscheint im Anwendungsmenü. Die Dateien liegen unter `/usr/lib/lis2-control-center`, der Startbefehl unter `/usr/bin`.
 
-Die Bibliotheksabhängigkeiten berücksichtigen Debian 12 und 13 sowie die ICU-/OpenSSL-Paketnamen von Ubuntu 24.04. Grundlage sind die offiziellen [Avalonia-11-Paketierungsangaben](https://v11.docs.avaloniaui.net/docs/deployment/debian-ubuntu/) und [.NET-10-Installation für Debian](https://learn.microsoft.com/en-us/dotnet/core/install/linux-debian#dependencies). `libsecret-tools` und `playerctl` werden empfohlen und von `apt` standardmäßig mitinstalliert. Für sichere Tokenspeicherung muss zusätzlich ein Schlüsselbunddienst in der Desktop-Sitzung laufen. Das Paket richtet weder serielle Gruppenrechte noch Autostart automatisch ein.
+Die Bibliotheksabhängigkeiten berücksichtigen Debian 12 und 13 sowie die ICU-/OpenSSL-Paketnamen von Ubuntu 24.04. Grundlage sind die offiziellen [Avalonia-11-Paketierungsangaben](https://v11.docs.avaloniaui.net/docs/deployment/debian-ubuntu/) und [.NET-10-Installation für Debian](https://learn.microsoft.com/en-us/dotnet/core/install/linux-debian#dependencies). `libsecret-tools`, `playerctl`, `pipewire-bin` und `dbus-bin` werden empfohlen und von `apt` standardmäßig mitinstalliert. Für sichere Tokenspeicherung muss zusätzlich ein Schlüsselbunddienst in der Desktop-Sitzung laufen; für Linux-Spieleraudio eine PipeWire-Sitzung mit Sitzungsmanager. Das Paket richtet weder serielle Gruppenrechte noch Autostart automatisch ein.
 
 Deinstallation: `sudo apt remove lis2-control-center`. Persönliche Einstellungen und Tokens bleiben erhalten. Einen in der App aktivierten Autostart vor der Deinstallation in den Einstellungen deaktivieren.
 

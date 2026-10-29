@@ -20,5 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="TestData/mpris_service.py" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="TestData/linux_audio_service.py" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

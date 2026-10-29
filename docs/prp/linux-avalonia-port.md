@@ -72,6 +72,7 @@ Die normale serielle Verbindung startet als reine Displayverbindung. Sie schreib
 - [x] Windows-/Linux-Sensoranbieter und getestete Sensorkataloge vorhanden.
 - [x] Bestehende `Clock.*`, `Hardware.*`, `Winamp.*`, `WindowsMedia.*` und `HA.*`-Schlüssel werden weiterverwendet.
 - [x] Linux-Medien liefern `Media.Connected`, `Media.State`, `Media.Title`, `Media.Artist`, `Media.Album`, `Media.Elapsed`, `Media.Duration` und `Media.Player` über `playerctl`.
+- [x] Linux-Spieleraudio über PipeWire: ausgewählter MPRIS-Prozess einschließlich Kindprozessen, Stereo-VU, zwanzig Spektrumbänder, unabhängiger Audiostatus und 100-ms-Anzeige; Linux-VU-/Spektrumvorlagen und Hilfe in fünf Sprachen. Keine Mikrofon-/Systemaudio-Ersatzquelle. [Installation und offene Pi-Prüfung](../linux-media-audio.md).
 - [x] Gespeicherte Linux-Playerauswahl, Position, Trennen/Wiederfinden und Abbruch/Timeout implementiert und getestet. Der Anbieter fragt sekündlich ab; eine eigene D-Bus-Subscription bleibt offen.
 - [ ] VLC und Plexamp einzeln auf dem Zielsystem prüfen. Wine/Winamp bleibt optional.
 - [x] Workspace und validierende Windows-Importlogik einschließlich Seiten, Glyphen und Lüfterkonfiguration vorhanden.

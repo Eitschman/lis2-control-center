@@ -1,6 +1,6 @@
 # TODO: Projektroadmap und Restarbeiten
 
-Stand: 28.10.2026. Hauptbranch: `main`.
+Stand: 29.10.2026. Hauptbranch: `main`.
 Implementierungsstand: PORT-08 mit Avalonia 11.3.22 und .NET 10. Windows Media Player Legacy liefert Metadaten über sein Hintergrund-Plug-in; Pegel und Spektrum kommen direkt aus der WASAPI-Prozess-Audioerfassung. Aktuelle Prüfergebnisse und offene Zielsystemnachweise stehen im [Status](docs/prp/linux-port-status.md).
 
 Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-avalonia-port.md), [Status](docs/prp/linux-port-status.md) und [Paritätsaudit](docs/prp/wpf-avalonia-parity-audit.md) unterscheiden vorhandenen Code, automatische Tests und offene Desktop-/Hardwareprüfung.
@@ -11,6 +11,13 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 - [x] Linux zeigt nur MPRIS-Medienvorlagen, Windows nur Winamp-/Windows-Media-/WMP-Legacy-Vorlagen; gemeinsame Uhr-/Hardwarevorlagen bleiben auf beiden Plattformen erhalten. Fremde Vorlagen sind aus der Auswahlliste entfernt.
 - [x] Stabile Vorlagenkennungen erhalten die Zuordnung nach dem Entfernen von Einträgen und nach Sprachwechseln. Plattformfilter und tatsächliche Seitenerzeugung werden mit Avalonia-Controls geprüft.
+
+### Linux-Spieleraudio über PipeWire
+
+- [x] Gewählten MPRIS-Prozess und Kindprozesse einem eindeutigen PipeWire-Wiedergabestream zuordnen; keine Mikrofon- oder Systemaudio-Ersatzquelle.
+- [x] Stereo-VU und zwanzig Spektrumbänder mit etwa 100 ms Aktualisierung, getrenntem Audiostatus, Medienkarte, Displayvariablen und Linux-VU-/Spektrumvorlagen.
+- [x] Hilfe in fünf Sprachen, Debian-Empfehlungen und [Installations-/Prüfleitfaden](docs/linux-media-audio.md) ergänzen.
+- [ ] GitHub-Testbuild auf Raspberry Pi 5 mit Tuner prüfen: Titelwechsel, Pause, Minimieren, Streamneustart, Medienkarte und VFD-Ausgabe. Danach Fehler korrigieren und gesondert über ein Release entscheiden.
 
 ### Dashboard-Feinschliff
 

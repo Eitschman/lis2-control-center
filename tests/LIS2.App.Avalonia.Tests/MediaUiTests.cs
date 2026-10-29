@@ -27,7 +27,7 @@ public sealed class MediaUiTests
             Click(window, "NavButton2");
             var picker = window.FindControl<ComboBox>("PagePresetPicker")!;
             var choices = picker.Items.OfType<ComboBoxItem>().ToArray();
-            Assert.Equal(OperatingSystem.IsWindows() ? 14 : 8, choices.Length);
+            Assert.Equal(OperatingSystem.IsWindows() ? 14 : 10, choices.Length);
             Assert.Equal(OperatingSystem.IsLinux(), choices.Any(item => Equals(item.Tag, 11)));
             Assert.Equal(OperatingSystem.IsWindows(), choices.Any(item => Equals(item.Tag, 14)));
             Assert.All(choices, item => Assert.True(item.IsVisible && item.IsEnabled));
@@ -45,7 +45,7 @@ public sealed class MediaUiTests
                 frame.Save(Path.Combine(screenshots, "pages-platform-presets.png"));
             }
             picker.IsDropDownOpen = false;
-            foreach (var choice in OperatingSystem.IsWindows() ? new[] { 10, 12 } : new[] { 11 })
+            foreach (var choice in OperatingSystem.IsWindows() ? new[] { 10, 12 } : new[] { 11, 15 })
             {
                 picker.SelectedItem = choices.Single(item => Equals(item.Tag, choice));
                 var count = store.Load().Pages.Count;
@@ -176,7 +176,7 @@ public sealed class MediaUiTests
     }
 
     [AvaloniaFact]
-    public async Task LegacySpectrumPresetRequiresGlyphReplacementAndHonorsCancel()
+    public async Task PlatformSpectrumPresetRequiresGlyphReplacementAndHonorsCancel()
     {
         var directory = Path.Combine(Path.GetTempPath(), "lis2-legacy-preset-" + Guid.NewGuid().ToString("N"));
         var store = new PortableWorkspaceStore(Path.Combine(directory, "workspace.json"));
@@ -188,12 +188,9 @@ public sealed class MediaUiTests
             window.Show();
             Click(window, "NavButton2");
             var picker = window.FindControl<ComboBox>("PagePresetPicker")!;
-            var spectrum = picker.Items.OfType<ComboBoxItem>().SingleOrDefault(item => Equals(item.Tag, 14));
-            if (!OperatingSystem.IsWindows())
-            {
-                Assert.Null(spectrum);
-                return;
-            }
+            var source = OperatingSystem.IsWindows() ? "WmpLegacy" : "Media";
+            var presetId = OperatingSystem.IsWindows() ? 14 : 16;
+            var spectrum = picker.Items.OfType<ComboBoxItem>().SingleOrDefault(item => Equals(item.Tag, presetId));
             Assert.NotNull(spectrum);
             picker.SelectedItem = spectrum;
             Click(window, "PageCreatePreset");
@@ -209,7 +206,7 @@ public sealed class MediaUiTests
             dialog.GetVisualDescendants().OfType<Button>().Single(button => Equals(button.Content, "Replace glyphs"))
                 .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             await WaitAsync(() => store.Load().Pages.Count == 1);
-            Assert.Equal("{WmpLegacy.SpectrumGlyphs}", store.Load().Pages.Single().Line2Template);
+            Assert.Equal("{" + source + ".SpectrumGlyphs}", store.Load().Pages.Single().Line2Template);
             Click(window, "PageCreatePreset");
             await WaitAsync(() => store.Load().Pages.Count == 2);
             Assert.Empty(window.OwnedWindows);
@@ -327,10 +324,28 @@ public sealed class MediaUiTests
             Assert.Equal("A | B & <C>\nTitel", window.FindControl<TextBlock>("LinuxMediaTitle")!.Text);
             Assert.Equal("Connected", window.FindControl<TextBlock>("LinuxMediaArtist")!.Text);
             Assert.Equal("00:01:05 / 25:01:01", window.FindControl<TextBlock>("LinuxMediaDuration")!.Text);
+            var audio = LinuxPlayerAudio.Map(new(4410, 128, 64,
+                Enumerable.Range(0, 20).Select(index => index * 12).ToArray()), new("104", 42, "Test player"));
+            window.ApplyLinuxAudioValues(audio);
+            Assert.Equal(128, window.FindControl<ProgressBar>("LinuxVuLeft")!.Value);
+            Assert.Equal(64, window.FindControl<ProgressBar>("LinuxVuRight")!.Value);
+            Assert.Equal(UiTranslations.Translate("Connected", language), window.FindControl<TextBlock>("LinuxAudioStatus")!.Text);
+            Assert.Equal(20, window.FindControl<Grid>("LinuxSpectrumBars")!.Children.Count);
             await Capture(window, "port04-media-" + language + "-wide");
             window.Width = 950;
             window.Height = 600;
             await Capture(window, "port04-media-" + language + "-small");
+            window.FindControl<Grid>("LinuxSpectrumBars")!.BringIntoView();
+            await Capture(window, "linux-audio-" + language + "-small");
+            window.ApplyLinuxAudioValues(new Dictionary<string, object?>(audio)
+            {
+                ["AudioConnected"] = false, ["AudioStatus"] = "No audio stream for the selected player"
+            });
+            Assert.Equal(0, window.FindControl<ProgressBar>("LinuxVuLeft")!.Value);
+            Assert.Equal("A | B & <C>\nTitel", window.FindControl<TextBlock>("LinuxMediaTitle")!.Text);
+            Assert.Equal(UiTranslations.Translate("No audio stream for the selected player", language),
+                window.FindControl<TextBlock>("LinuxAudioStatus")!.Text);
+            await Capture(window, "linux-audio-" + language + "-error");
             picker.SelectedItem = "vlc";
             await WaitAsync(() => store.Load().LinuxMediaPlayer == "vlc");
             Assert.Equal(UiTranslations.Translate("Nothing playing", language), window.FindControl<TextBlock>("LinuxMediaTitle")!.Text);

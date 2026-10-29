@@ -88,7 +88,7 @@ def build_package(publish, rid, version, output):
             "Depends: libc6 (>= 2.36), libgcc-s1, libstdc++6, libgssapi-krb5-2, "
             "libicu76 | libicu74 | libicu72, libssl3t64 | libssl3, ca-certificates, tzdata, "
             "libx11-6, libice6, libsm6, libfontconfig1\n"
-            "Recommends: libsecret-tools, playerctl\n"
+            "Recommends: libsecret-tools, playerctl, pipewire-bin, dbus-bin\n"
             "Homepage: https://github.com/Eitschman/lis2-control-center\n"
             "Description: LIS2 hardware and display control center\n"
             " Avalonia desktop application for the VL System L.I.S. 2 display and fans.\n",

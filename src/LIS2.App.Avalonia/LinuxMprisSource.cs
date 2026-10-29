@@ -68,7 +68,7 @@ public sealed class LinuxMprisSource(string executable = "playerctl",
     }
 
     internal static async Task<PlayerctlResult> ExecuteAsync(string executable, IReadOnlyList<string> arguments,
-        CancellationToken cancellationToken, TimeSpan requestTimeout)
+        CancellationToken cancellationToken, TimeSpan requestTimeout, IReadOnlyDictionary<string, string>? environment = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using var process = new Process();
@@ -81,6 +81,8 @@ public sealed class LinuxMprisSource(string executable = "playerctl",
             process.StartInfo.UseShellExecute = false;
             // Fehlertexte für die Unterscheidung zwischen fehlenden Playern und Providerfehlern stabil halten.
             process.StartInfo.Environment["LC_ALL"] = "C";
+            if (environment is not null)
+                foreach (var pair in environment) process.StartInfo.Environment[pair.Key] = pair.Value;
             if (!process.Start()) throw new InvalidOperationException("Could not start playerctl.");
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             timeout.CancelAfter(requestTimeout);
