@@ -84,6 +84,7 @@ public partial class MainWindow
         if (OperatingSystem.IsLinux())
         {
             details.Add("Media.Player: " + _mprisValues.GetValueOrDefault("Player"));
+            details.Add("Media.AudioIdentity: " + _linuxAudio.IdentityDetails);
             var audio = _linuxAudio.Values;
             foreach (var key in new[] { "AudioConnected", "AudioStatus", "AudioTarget", "AudioProcessId", "AudioNodeSerial" })
                 details.Add("Media." + key + ": " + audio.GetValueOrDefault(key));

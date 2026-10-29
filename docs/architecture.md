@@ -84,6 +84,8 @@ Es gibt keinen automatischen seriellen Wiederverbindungsablauf. Displayverbindun
 
 ## Datenquellen und Plattformen
 
+Die Linux-Audiozuordnung verwendet bei nativen Prozessen Host-Prozesskennungen. `LinuxSandboxSelection` erkennt Flatpak-D-Bus-Proxys über deren `.flatpak-info` und ordnet interne Prozesskennungen mittels `/proc/*/status` der passenden Anwendungsinstanz zu. PipeWire-Clientidentität und Sandbox müssen übereinstimmen. Mehrdeutige Instanzen werden nicht anhand des sichtbaren Playernamens oder Systemtons ersetzt. Direkte PipeWire- und Pulse-Verbindungen sowie ein echter D-Bus-Proxy mit getrenntem PID-Namensraum werden in privaten Integrationstests geprüft.
+
 `SourceValueFormatter` verwendet für die Anzeige typisierter Zahlen die Regionseinstellungen des Betriebssystems, unabhängig von der Oberflächensprache. Numerische HA-Zustandstexte werden ohne Rundung lokalisiert; die mitgelieferte `.Unit`-Variable kennzeichnet Entitätszustände einschließlich Alias und leerer Einheit. Dashboard, Displayvorlagen, Hardwareliste, HA-Browser, Variablenbrowser und gelesene Lüftersensoren verwenden dieselbe Zahlenanzeige. Der Vorlagenrenderer wendet ausdrücklich gewählte Zahlenformate weiterhin auf die unveränderten Rohwerte an.
 
 | Quelle | Rohwerte und Anzeige |

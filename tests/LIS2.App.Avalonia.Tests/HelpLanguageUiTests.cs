@@ -160,6 +160,17 @@ public sealed class HelpLanguageUiTests
                 Assert.NotNull(frame);
                 frame.Save(Path.Combine(screenshots, "help-wmp-stream-" + preference + ".png"));
             }
+            var sandboxHelp = help.GetVisualDescendants().OfType<TextBlock>().Single(text =>
+                text.Text?.Contains("Flatpak", StringComparison.Ordinal) == true && text.Text != "Flatpak");
+            Assert.Equal(global::Avalonia.Media.TextWrapping.Wrap, sandboxHelp.TextWrapping);
+            sandboxHelp.BringIntoView();
+            await Task.Delay(50);
+            help.UpdateLayout();
+            using (var frame = help.CaptureRenderedFrame())
+            {
+                Assert.NotNull(frame);
+                frame.Save(Path.Combine(screenshots, "help-linux-audio-" + preference + ".png"));
+            }
             help.Close();
         }
         finally

@@ -154,6 +154,7 @@ The current development build also captures the selected player's audio through 
 - artist and title remain unchanged: Tuner may already supply the station name as artist; combined stream titles are never split automatically
 - `Media.*` display variables and direct page creation from the Media view
 - a selected player remains disconnected while unavailable instead of switching to another player
+- automatic process identification for native players and Flatpak sandboxes, including namespace PID translation and D-Bus proxies; no installation-type setting or external `flatpak` command is needed
 - stereo VU and 20-band spectrum updated approximately every 100 ms, independently of the one-second metadata refresh
 - Linux MPRIS Now Playing, VU and Spectrum presets; Windows-only presets are omitted on Linux and Linux-only presets are omitted on Windows
 - `Media.AudioConnected`, `Media.VuLeft`, `Media.VuRight`, `Media.Vu`, `Media.Spectrum`, `Media.SpectrumRaw`, `Media.SpectrumPeak` and `Media.SpectrumGlyphs`; diagnostic fields identify the selected PipeWire node and process

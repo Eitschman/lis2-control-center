@@ -22,8 +22,12 @@ internal sealed class LinuxPlayerAudio(IReadOnlyDictionary<string, string>? envi
     private IReadOnlyDictionary<string, object?> _values = Empty("Waiting for playback");
     private DateTimeOffset? _lastFrame;
     private bool? _explicitRaw;
+    private string _identityDetails = "";
 
-    internal void Start() => _worker = RunAsync(_lifetime.Token);
+    internal string IdentityDetails { get { lock (_sync) return _identityDetails; } }
+
+    // Prozessbestand und FFT bleiben außerhalb des UI-Threads, auch bei einem Start aus Avalonia.
+    internal void Start() => _worker = Task.Run(() => RunAsync(_lifetime.Token));
 
     /// <summary>Ein Quellenwechsel leert Pegel sofort und entwertet verspätete Prozessantworten.</summary>
     internal void SelectPlayer(string? player, bool playing)
@@ -37,6 +41,7 @@ internal sealed class LinuxPlayerAudio(IReadOnlyDictionary<string, string>? envi
             _generation++;
             _captureCancellation?.Cancel();
             _lastFrame = null;
+            _identityDetails = "";
             _values = Empty(player is null ? "Waiting for playback" : "Resolving player audio");
         }
     }
@@ -73,7 +78,15 @@ internal sealed class LinuxPlayerAudio(IReadOnlyDictionary<string, string>? envi
                             "string:org.mpris.MediaPlayer2." + player], cancellation);
                         var processId = ParseProcessId(owner);
                         var graph = await CommandAsync("pw-dump", [], cancellation);
-                        var target = FindTarget(graph, processId, IsProcessOrChild);
+                        var sandbox = LinuxSandboxSelection.Read(processId);
+                        lock (_sync)
+                        {
+                            if (selection == _selection)
+                                _identityDetails = "D-Bus PID: " + processId.ToString(CultureInfo.InvariantCulture) +
+                                    (sandbox is null ? "; host process" : "; Flatpak: " + sandbox.Identity.ApplicationId +
+                                    "; instance: " + sandbox.Identity.InstanceId + "; mapped processes: " + sandbox.Processes.Count);
+                        }
+                        var target = FindTarget(graph, processId, IsProcessOrChild, sandbox);
                         // Ältere pw-record-Versionen geben auf stdout direkt PCM aus; neuere verlangen --raw.
                         _explicitRaw ??= (await CommandAsync("pw-record", ["--help"], cancellation)).Contains("--raw", StringComparison.Ordinal);
                         bool changed;
@@ -132,16 +145,16 @@ internal sealed class LinuxPlayerAudio(IReadOnlyDictionary<string, string>? envi
     }
 
     /// <summary>Nur Wiedergabeknoten mit bestätigter Prozesszuordnung sind zulässig, niemals Geräte oder Mikrofone.</summary>
-    internal static LinuxAudioTarget FindTarget(string json, int playerProcessId, Func<int, int, bool>? belongsToPlayer = null)
+    internal static LinuxAudioTarget FindTarget(string json, int playerProcessId, Func<int, int, bool>? belongsToPlayer = null,
+        LinuxSandboxSelection? sandbox = null)
     {
         using var document = JsonDocument.Parse(json);
-        var clients = new Dictionary<int, int>();
+        var clients = new Dictionary<int, JsonElement>();
         foreach (var item in document.RootElement.EnumerateArray())
         {
             if (item.GetProperty("type").GetString() != "PipeWire:Interface:Client" ||
                 !item.TryGetProperty("info", out var info) || !info.TryGetProperty("props", out var props)) continue;
-            if (ReadInt(props, "pipewire.sec.pid") is { } clientPid)
-                clients[item.GetProperty("id").GetInt32()] = clientPid;
+            clients[item.GetProperty("id").GetInt32()] = props;
         }
         var targets = new List<(LinuxAudioTarget Target, bool Running)>();
         foreach (var item in document.RootElement.EnumerateArray())
@@ -150,9 +163,18 @@ internal sealed class LinuxPlayerAudio(IReadOnlyDictionary<string, string>? envi
                 !item.TryGetProperty("info", out var info) || !info.TryGetProperty("props", out var props) ||
                 ReadText(props, "media.class") != "Stream/Output/Audio") continue;
             var processId = ReadInt(props, "application.process.id");
-            if (processId is null && ReadInt(props, "client.id") is { } clientId && clients.TryGetValue(clientId, out var ownerPid))
-                processId = ownerPid;
-            if (processId is null || !(belongsToPlayer?.Invoke(processId.Value, playerProcessId) ?? processId == playerProcessId)) continue;
+            var client = ReadInt(props, "client.id") is { } clientId && clients.TryGetValue(clientId, out var clientProps)
+                ? clientProps : default;
+            processId ??= ReadInt(client, "application.process.id");
+            if (sandbox is not null)
+                processId = sandbox.Resolve(processId, ReadInt(client, "pipewire.sec.pid"),
+                    ReadText(client, "pipewire.access.portal.app_id"), ReadText(client, "pipewire.access.portal.instance_id"));
+            else
+            {
+                processId ??= ReadInt(client, "pipewire.sec.pid");
+                if (processId is not null && !(belongsToPlayer?.Invoke(processId.Value, playerProcessId) ?? processId == playerProcessId)) continue;
+            }
+            if (processId is null) continue;
             var serial = ReadText(props, "object.serial");
             if (!ulong.TryParse(serial, NumberStyles.None, CultureInfo.InvariantCulture, out _)) continue;
             targets.Add((new(serial, processId.Value, ReadText(props, "node.name")),
@@ -168,7 +190,8 @@ internal sealed class LinuxPlayerAudio(IReadOnlyDictionary<string, string>? envi
         };
     }
 
-    private static string ReadText(JsonElement props, string key) => props.TryGetProperty(key, out var value) ? value.ToString() : "";
+    private static string ReadText(JsonElement props, string key) => props.ValueKind == JsonValueKind.Object &&
+        props.TryGetProperty(key, out var value) ? value.ToString() : "";
     private static int? ReadInt(JsonElement props, string key) => int.TryParse(ReadText(props, key), NumberStyles.None,
         CultureInfo.InvariantCulture, out var number) && number > 0 ? number : null;
 

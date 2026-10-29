@@ -14,6 +14,9 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 
 ### Linux-Spieleraudio über PipeWire
 
+- [x] Automatische Zuordnung unabhängig von einer Installationsart-Auswahl: native Hostprozesse, Pulse-Clients und Flatpak mit D-Bus-Proxy, Instanzkennung und Übersetzung interner Prozessnummern. Andere Anwendungen und nicht unterscheidbare Instanzen werden abgelehnt.
+- [x] Reale Gegenprobe mit privatem D-Bus-Proxy und PID-Namensraum: Ohne Sandbox-Zuordnung tritt „Kein Audiostream für den gewählten Player“ auf; direkte PipeWire- und Pulse-Varianten bleiben erfolgreich. Hilfe und Diagnose beschreiben die Sandboxzuordnung.
+
 - [x] Gewählten MPRIS-Prozess und Kindprozesse einem eindeutigen PipeWire-Wiedergabestream zuordnen; keine Mikrofon- oder Systemaudio-Ersatzquelle.
 - [x] Stereo-VU und zwanzig Spektrumbänder mit etwa 100 ms Aktualisierung, getrenntem Audiostatus, Medienkarte, Displayvariablen und Linux-VU-/Spektrumvorlagen.
 - [x] Hilfe in fünf Sprachen, Debian-Empfehlungen und [Installations-/Prüfleitfaden](docs/linux-media-audio.md) ergänzen.

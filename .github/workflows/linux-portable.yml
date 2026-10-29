@@ -257,10 +257,10 @@ jobs:
       - name: Test Avalonia runtime and device UI
         if: runner.os == 'Windows'
         run: dotnet test tests/LIS2.App.Avalonia.Tests/LIS2.App.Avalonia.Tests.csproj --configuration Release
-      - name: Install Linux credential test dependencies
+      - name: Install Linux credential and audio test dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libsecret-tools gnome-keyring dbus playerctl python3-dbus python3-gi pipewire-bin wireplumber
-      - name: Test Avalonia with isolated Linux Secret Service
+        run: sudo apt-get update && sudo apt-get install -y libsecret-tools gnome-keyring dbus playerctl python3-dbus python3-gi pipewire-bin wireplumber pipewire-pulse pulseaudio-utils bubblewrap xdg-dbus-proxy
+      - name: Test Avalonia with isolated Linux credential and audio services
         if: runner.os == 'Linux'
         shell: bash
         run: |

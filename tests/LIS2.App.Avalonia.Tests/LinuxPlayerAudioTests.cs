@@ -18,6 +18,42 @@ public sealed class LinuxPlayerAudioTests
         """;
 
     [Fact]
+    public void SandboxProcessNumbersUseTheSelectedInstanceAndRejectOtherApplications()
+    {
+        var identity = new LinuxSandboxIdentity("org.example.Player", "123");
+        var selection = new LinuxSandboxSelection(identity,
+            [new(500, 2, identity), new(501, 3, identity), new(600, 2, new("org.example.Other", "456"))]);
+        var graph = """
+            [
+              {"id":3,"type":"PipeWire:Interface:Client","info":{"props":{"application.process.id":3,"pipewire.sec.pid":999,"pipewire.access.portal.app_id":"org.example.Player"}}},
+              {"id":4,"type":"PipeWire:Interface:Node","info":{"state":"running","props":{"object.serial":104,"client.id":3,"node.name":"radio","media.class":"Stream/Output/Audio"}}},
+              {"id":5,"type":"PipeWire:Interface:Client","info":{"props":{"application.process.id":2,"pipewire.sec.pid":999,"pipewire.access.portal.app_id":"org.example.Other"}}},
+              {"id":6,"type":"PipeWire:Interface:Node","info":{"state":"running","props":{"object.serial":106,"client.id":5,"node.name":"other","media.class":"Stream/Output/Audio"}}}
+            ]
+            """;
+        Assert.Throws<InvalidOperationException>(() => LinuxPlayerAudio.FindTarget(graph, 900));
+        Assert.Equal(new LinuxAudioTarget("104", 501, "radio"), LinuxPlayerAudio.FindTarget(graph, 900, sandbox: selection));
+        Assert.Equal(500, selection.Resolve(2, 500, "", ""));
+        Assert.Null(selection.Resolve(2, 600, identity.ApplicationId, ""));
+        Assert.Null(selection.Resolve(2, 999, "org.example.Other", ""));
+        Assert.Null(selection.Resolve(2, 999, identity.ApplicationId, "wrong-instance"));
+        Assert.Null(selection.Resolve(999, 999, identity.ApplicationId, ""));
+        var ambiguous = new LinuxSandboxSelection(identity,
+            [.. selection.Processes, new(700, 2, new(identity.ApplicationId, "789"))]);
+        Assert.Throws<InvalidOperationException>(() => ambiguous.Resolve(2, 999, identity.ApplicationId, ""));
+        Assert.Equal(500, ambiguous.Resolve(2, 999, identity.ApplicationId, identity.InstanceId));
+        Assert.Equal(identity, LinuxSandboxSelection.ParseIdentity("[Application]\nname=org.example.Player\n[Instance]\ninstance-id=123\n"));
+        Assert.Null(LinuxSandboxSelection.ParseIdentity("[Application]\nname=org.example.Player\n"));
+    }
+
+    [Fact]
+    public void NativeClientProcessMetadataIsUsedBeforeThePulseServerProcess()
+    {
+        var graph = Graph.Replace("\"pipewire.sec.pid\":42", "\"application.process.id\":42,\"pipewire.sec.pid\":999");
+        Assert.Equal("104", LinuxPlayerAudio.FindTarget(graph, 42).Serial);
+    }
+
+    [Fact]
     public void OnlySelectedPlaybackProcessIsCapturedAndDefaultRoutingIsForbidden()
     {
         Assert.Equal(new LinuxAudioTarget("104", 42, "radio"), LinuxPlayerAudio.FindTarget(Graph, 42));
@@ -77,8 +113,11 @@ public sealed class LinuxPlayerAudioTests
         Assert.Equal("", audio.Values["Vu"]);
     }
 
-    [Fact]
-    public async Task RealPipeWireCaptureSurvivesStreamReplacementAndPauseWithoutUsingSystemAudio()
+    [Theory]
+    [InlineData("native")]
+    [InlineData("pulse")]
+    [InlineData("sandbox")]
+    public async Task RealPipeWireCaptureSurvivesStreamReplacementAndPauseWithoutUsingSystemAudio(string mode)
     {
         if (!OperatingSystem.IsLinux()) return;
         var start = new ProcessStartInfo("dbus-run-session")
@@ -88,6 +127,7 @@ public sealed class LinuxPlayerAudioTests
         start.ArgumentList.Add("--");
         start.ArgumentList.Add("/usr/bin/python3");
         start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "TestData", "linux_audio_service.py"));
+        start.ArgumentList.Add(mode);
         using var fixture = Process.Start(start)!;
         var errors = fixture.StandardError.ReadToEndAsync();
         try
@@ -106,6 +146,8 @@ public sealed class LinuxPlayerAudioTests
             audio.Start();
             await WaitAudio(audio, values => values.GetValueOrDefault("AudioConnected") is true);
             var first = audio.Values;
+            Assert.Contains(mode == "sandbox" ? "; Flatpak: org.example.Lis2Audio" : "; host process", audio.IdentityDetails);
+            Assert.True(Directory.Exists("/proc/" + first["AudioProcessId"]));
             Assert.InRange((int)first["VuLeft"]!, 115, 135);
             Assert.InRange((int)first["VuRight"]!, 50, 75);
             var firstSpectrum = Assert.IsType<int[]>(first["SpectrumRaw"]);
