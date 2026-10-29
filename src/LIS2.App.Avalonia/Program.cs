@@ -7,11 +7,14 @@ internal static class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        if (args is ["--apply-update", var planPath])
+            return UpdateInstallation.RunWindowsHelperAsync(Path.GetFullPath(planPath)).GetAwaiter().GetResult();
         AppDomain.CurrentDomain.UnhandledException += (_, failure) =>
         {
             if (failure.ExceptionObject is Exception exception) FailureLog.Write("Unhandled", exception);
         };
         TaskScheduler.UnobservedTaskException += (_, failure) => FailureLog.Write("Unobserved task", failure.Exception);
+        UpdateStartup.Configure(args);
         if (args is ["--media-provider-smoke", var directory])
             return WindowsMediaSmoke.RunAsync(Path.GetFullPath(directory)).GetAwaiter().GetResult();
         if (args is ["--instance-activation-smoke", var profileDirectory])

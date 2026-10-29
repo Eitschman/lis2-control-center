@@ -5,6 +5,8 @@ Implementierungsstand: PORT-08 und Windows Media Player Legacy; genaue Prüfnach
 
 ## Ziel und verbindlicher Umfang
 
+ROAD-01 und ROAD-05 bilden ein gemeinsames Updatepaket. Stabile GitHub-Releases werden mit Versionshinweisen und plattformgerechten Paketen angeboten; Downloads benötigen eine gültige SHA-256-Prüfung. Windows verwendet einen separaten Austauschprozess mit geordnetem Runtime-Shutdown, Sicherung, Startbestätigung und Wiederherstellung. Linux übergibt Debian-Pakete an die konfigurierte System-Paketinstallation; portable Archive werden zum manuellen Entpacken heruntergeladen. Automatische Prüfung und automatische Windows-Installation sind getrennte ausdrückliche Auswahlen. Ein eigenes APT-Repository bleibt ausgeschlossen. [Bedienung und Vertrauensmodell](../application-updates.md).
+
 Die Seitenvorlagenauswahl enthält nur die Medienquellen des jeweiligen Betriebssystems: Winamp und beide Windows-Media-Integrationen auf Windows, MPRIS auf Linux. Nicht unterstützte Medienvorlagen werden aus der Liste entfernt; gemeinsame Uhr-/Hardwarevorlagen bleiben erhalten. Die Erzeugung verwendet stabile Vorlagenkennungen unabhängig von Listenposition und Oberflächensprache.
 
 Eine gemeinsame Avalonia-Anwendung ersetzt die WPF-Anwendung auf Windows x64 und unterstützt Linux x64 sowie Linux ARM64. Die WPF-Funktionsreferenz für Funktionen, Anordnung, Interaktionen, Einstellungen und Vorlagen liegt im Git-Commit `922ca1b`. Der Benutzer beauftragt die Entfernung der WPF-Projekte und anschließend die Übernahme nach `main`. App und Protokolltester verwenden ausschließlich Avalonia; offene manuelle Desktop- und Hardwareprüfungen bleiben separat dokumentiert.

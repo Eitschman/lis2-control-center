@@ -41,7 +41,7 @@ class DebianPackageTests(unittest.TestCase):
                 package = build_package(self.publish, rid, "0.0~ci1.1", self.output)
                 fields = subprocess.check_output(["dpkg-deb", "--field", str(package)], text=True)
                 self.assertIn(f"Architecture: {architecture}\n", fields)
-                self.assertIn("Recommends: libsecret-tools, playerctl, pipewire-bin, dbus-bin", fields)
+                self.assertIn("Recommends: libsecret-tools, playerctl, pipewire-bin, dbus-bin, xdg-utils", fields)
                 self.assertIn("libicu76 | libicu74 | libicu72", fields)
                 listing = subprocess.check_output(["dpkg-deb", "--contents", str(package)], text=True)
                 self.assertIn("root/root", listing)

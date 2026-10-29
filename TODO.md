@@ -74,15 +74,19 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] Quellenabgrenzung mit pausiertem Legacy-Player und gleichzeitigem Testton eines anderen Prozesses: Pegel und Spektrum bleiben null; Fortsetzen liefert wieder Audio.
 - [ ] Direkte Audioerfassung auf weiteren Windows-Systemen und mit der anderen Playerarchitektur prüfen.
 
-Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nicht implementiert. Die Reihenfolge priorisiert Update-Hinweise, danach die Unterstützung bei Seitenkonfiguration und Fehlersuche. Der automatische Windows-Dateiaustausch bleibt ein eigenes Arbeitspaket. Debian-Pakete werden weiterhin als Release-Downloads angeboten; ein eigenes APT-Repository ist nicht vorgesehen. Die bestehenden Paketnummern bleiben erhalten. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
+Die Update-Hinweise und der automatische Windows-Dateiaustausch bilden das gemeinsame Paket ROAD-01/ROAD-05. Linux ergänzt geprüfte Debian-Downloads mit Übergabe an die System-Paketinstallation sowie portable Archivdownloads. Ein eigenes APT-Repository bleibt ausgeschlossen. Anschließend folgen Vorlagenprüfung und Datenaktualität. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
 
-### ROAD-01: Update-Hinweise
+### ROAD-01 / ROAD-05: Update-Hinweise und Installation
 
-- [ ] Neue Versionen erkennen und die installierte Version mit der verfügbaren Version anzeigen.
-- [ ] Versionshinweise und den zur Plattform beziehungsweise Installationsart passenden Download anbieten.
-- [ ] Automatische Update-Prüfung abschaltbar machen; manuelle Prüfung anbieten.
-- [ ] Portable Linux-Pakete zunächst durch Hinweis und passenden Download unterstützen.
-- [ ] Vertrauensmodell und Verifikation für Updateinformationen und heruntergeladene Pakete festlegen und prüfen; fehlgeschlagene Prüfungen verhindern die Installation.
+- [x] Stabile GitHub-Releases erkennen, installierte und verfügbare Version sowie Versionshinweise anzeigen; Plattform und Architektur bestimmen das Paket.
+- [x] Manuelle Suche sowie getrennte, zunächst ausgeschaltete Einstellungen für tägliche automatische Prüfung und automatische Windows-Installation. Einstellungen im Workspace speichern.
+- [x] Downloads mit SHA256SUMS.txt desselben Releases prüfen und vor Übergabe erneut verifizieren. Offizielle Asset-URLs und Größenlimits erzwingen; Fehler verhindern die Installation. Vertrauensmodell im [Updateleitfaden](docs/application-updates.md).
+- [x] Portable Windows-Anwendung durch einen separaten Prozess aktualisieren: Workspace speichern, Display-/Audio-/Lüfterlaufzeit geordnet beenden, Installationsordner sichern, austauschen und neu starten. Fehlgeschlagener Austausch oder Neustart stellt die vorherige Version wieder her.
+- [x] Echte Windows-Prozessprüfung mit Erfolg und absichtlich fehlender neuer Programmdatei: Austausch beziehungsweise Wiederherstellung, erneuter Desktopstart und geordneter Shutdown nachgewiesen. Dateisperre und fehlende Stagingdateien sind durch Regressionen abgedeckt.
+- [x] Debian-/Ubuntu-Pakete für amd64/arm64 herunterladen und an die System-Paketinstallation übergeben; fehlende Zuordnung sichtbar melden. Portable Linux-Archive herunterladen und im Downloadordner bereitstellen. `xdg-utils` als Debian-Empfehlung aufnehmen.
+- [x] Bedienung und Hilfe in fünf Sprachen, deutsche/russische Sichtprüfung bei 1305×893 und 950×600; Update- und Fehlergegenproben in bestehende Suiten integrieren.
+- [ ] Tatsächliche Debian-Paketübergabe und Installation auf dem Pi/KDE mit dessen Dateizuordnung prüfen. Die isolierte Prozessprüfung belegt keine Installation durch Discover oder GNOME Software.
+- [ ] Update zwischen zwei veröffentlichten Produktversionen auf Windows und Linux am Zielsystem prüfen. Der erste Stand mit Updater muss noch regulär installiert werden; v0.1.18 enthält ihn nicht.
 
 ### ROAD-03: Vorlagenprüfung im Seiteneditor
 
@@ -95,14 +99,6 @@ Die folgenden Erweiterungen sind für die weitere Planung aufgenommen, noch nich
 - [ ] Bei Sensoren, Home Assistant und Medien den Zeitpunkt beziehungsweise das Alter der letzten gültigen Daten anzeigen.
 - [ ] Veraltete Daten, Verbindungsverlust und Wiederverbindung erkennbar darstellen.
 - [ ] Zeitablauf und Wiederherstellung für die unterschiedlichen Quelltypen prüfen.
-
-### ROAD-05: Automatische Windows-Updates
-
-- [ ] Das portable Windows-Paket über einen separaten Updateprozess aktualisieren: verifiziert herunterladen, Anwendung geordnet beenden, Dateien austauschen und neu starten.
-- [ ] Laufende Display- und Lüfterausgaben vor dem Austausch geordnet beenden; geltende Regeln zur seriellen Freigabe beim Neustart erhalten.
-- [ ] Wiederherstellung der vorherigen Version bei fehlgeschlagenem Update vorsehen und mit gezielt unterbrochenen Updates prüfen.
-- [ ] Dateisperren, fehlende Schreibrechte und fehlgeschlagenen Neustart prüfen; Fehler sichtbar melden.
-- [ ] Automatische Installation als eigene Einstellung behandeln; eine aktivierte Versionsprüfung allein erlaubt noch keine Installation.
 
 ### ROAD-06: Sensor- und Lüfterverlauf
 

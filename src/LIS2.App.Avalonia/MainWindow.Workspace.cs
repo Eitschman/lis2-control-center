@@ -78,6 +78,9 @@ public partial class MainWindow
         _preferredTheme = saved.ThemeMode;
         _preferredLanguage = saved.LanguageMode;
         _selectedMediaPlayer = saved.LinuxMediaPlayer;
+        _checkUpdatesAutomatically = saved.CheckUpdatesAutomatically;
+        _installUpdatesAutomatically = saved.CheckUpdatesAutomatically && saved.InstallUpdatesAutomatically;
+        _debianUpdates = saved.DebianUpdates;
         UpdateMediaPlayerPicker([]);
         LoadSettingsPreferences();
         FilterHardwareSensors();
@@ -116,6 +119,9 @@ public partial class MainWindow
         ThemeMode = _preferredTheme,
         LanguageMode = _preferredLanguage,
         LinuxMediaPlayer = _selectedMediaPlayer,
+        CheckUpdatesAutomatically = _checkUpdatesAutomatically,
+        InstallUpdatesAutomatically = _installUpdatesAutomatically,
+        DebianUpdates = _debianUpdates,
         Fans = PortableFanSettings.Normalize(_fanSettings),
         Dashboard = DashboardSettings.Normalize(_dashboardSettings),
         ProgramCustomGlyphsOnConnect = this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsChecked == true

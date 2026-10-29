@@ -370,13 +370,14 @@ internal static class UiTranslations
         ["Virtual LIS2 protocol integration (no physical hardware)"] = ["Virtuelle LIS2-Protokollanbindung (ohne physische Hardware)", "Intégration du protocole LIS2 virtuel (sans matériel physique)", "Sanal LIS2 protokol entegrasyonu (fiziksel donanım yok)", "Интеграция виртуального протокола LIS2 (без физического оборудования)"],
     };
 
-    internal static bool HasTranslation(string source, string language) => Texts.ContainsKey(source) ||
+    internal static bool HasTranslation(string source, string language) => UpdateText.Contains(source) || Texts.ContainsKey(source) ||
         PageVariableBrowserLocalization.HasTranslation(source) || UiTranslationCatalog.HasTranslation(source, language);
 
-    internal static IEnumerable<string> Sources => Texts.Keys;
+    internal static IEnumerable<string> Sources => Texts.Keys.Concat(UpdateText.Sources).Distinct();
 
     internal static string Translate(string source, string language)
     {
+        if (UpdateText.Contains(source)) return UpdateText.Get(source, language);
         var index = language switch { "de" => 0, "fr" => 1, "tr" => 2, "ru" => 3, _ => -1 };
         if (index < 0) return source;
         if (Texts.TryGetValue(source, out var translations)) return translations[index];

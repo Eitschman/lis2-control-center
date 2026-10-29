@@ -453,6 +453,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Portable archive regression failed" }
           python tools/packaging/smoke_portable.py --archive LIS2-Avalonia-win-x64.zip --checksum LIS2-Avalonia-win-x64.sha256 --rid win-x64 --output portable-smoke/win-x64
           if ($LASTEXITCODE -ne 0) { throw "Extracted Windows package smoke failed" }
+      - name: Smoke Windows update and rollback with real desktop restart
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./tools/packaging/smoke_windows_update.ps1 -AppDirectory publish/win-x64 -OutputDirectory portable-smoke/win-x64/updater
       - name: Upload extracted package smoke evidence
         if: always()
         uses: actions/upload-artifact@v4

@@ -79,6 +79,9 @@ public sealed class PortableWorkspace
     public string ThemeMode { get; set; } = "System";
     public string LanguageMode { get; set; } = "System";
     public string? LinuxMediaPlayer { get; set; }
+    public bool CheckUpdatesAutomatically { get; set; }
+    public bool InstallUpdatesAutomatically { get; set; }
+    public bool DebianUpdates { get; set; } = true;
 }
 
 public sealed class PortableHardwareSensorPreference

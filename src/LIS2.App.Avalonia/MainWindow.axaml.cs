@@ -25,8 +25,9 @@ public partial class MainWindow : Window
     /// <summary>Erlaubt isolierte UI-Prüfungen mit eigenem Workspace und simuliertem Transport.</summary>
     internal MainWindow(PortableWorkspaceStore workspaceStore, PortableHaTokenStore tokenStore,
         bool startBackgroundSources, Func<string, SerialDisplaySession> serialSessionFactory,
-        PageSourceValues? pageSources = null, IFanSensorSource? fanSensors = null)
+        PageSourceValues? pageSources = null, IFanSensorSource? fanSensors = null, HttpClient? updateClient = null)
     {
+        _updateClient = updateClient ?? ApplicationUpdates.CreateClient();
         _runtime = new DisplayRuntimeHost(pageSources);
         _workspaceStore = workspaceStore;
         _haTokenStore = tokenStore;
@@ -102,6 +103,7 @@ public partial class MainWindow : Window
         InitializePageFormatting();
         InitializeMedia();
         InitializeSettings();
+        InitializeUpdates();
         InitializeEvents();
         InitializeDashboard();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
@@ -121,6 +123,7 @@ public partial class MainWindow : Window
             // WPF starts page rendering automatically after transport connection.
             _transportStartup = ApplySettingsTransportAsync();
             await _transportStartup;
+            UpdateStartup.NotifyReady();
         };
         UpdateSection();
         UpdateVirtualControls();
@@ -158,6 +161,9 @@ public partial class MainWindow : Window
 
     private async Task ShutdownRuntimeAsync()
     {
+        _updateCheckTimer.Stop();
+        _updateLifetime.Cancel();
+        _updateClient.Dispose();
         _editorPreviewTimer.Stop();
         _dashboardTimer.Stop();
         StopPagePlayback();

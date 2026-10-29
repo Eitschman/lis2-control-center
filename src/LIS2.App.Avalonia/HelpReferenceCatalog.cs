@@ -122,6 +122,7 @@ Add("Windows CPU temperatures", "Windows CPU temperatures require the official s
                 Add("Fail-safe", "Missing or invalid sensors in Curve and Follow use the configured fail-safe value within the channel limits. Preview and simulation do not control physical fans. Physical output requires explicit authorization for the current serial connection. Start sends 100% first; stop and orderly disconnect send 100%. A broken physical connection cannot guarantee delivery of a safety frame.");
                 break;
             case 7:
+                Add("Updates", UpdateText.Help);
                 Add("Settings", "Select Virtual LIS2 or a serial port. Configure language, appearance and device startup preferences.");
                 Add("Transport", "Applying saves the transport and port, disconnects the current device and connects the selected transport. A missing saved port remains selected and is never replaced automatically. Serial display control does not enable fans.");
                 Add("Windows import", "Import in Settings reads settings.json without changing the source file. It imports transport, port, brightness, glyphs, pages, fans and sensor preferences, including Home Assistant activation and URL. The token stays separate. Reconnect Home Assistant afterward if required.");

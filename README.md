@@ -190,6 +190,8 @@ See [docs/home-assistant-integration.md](docs/home-assistant-integration.md).
 
 ### Desktop application
 
+The development build also adds update checks, verified downloads, a Windows updater with rollback and Debian package handoff to the system installer. Automatic checks and automatic Windows installation are separate, initially disabled preferences. Portable Linux archives can be downloaded for manual installation. These additions are not part of release v0.1.18 yet. See the [update guide](docs/application-updates.md) for setup, trust model and recovery.
+
 - dashboard with compact 20x2 preview, page selection and rotation pause/resume, eight configurable template-based live values and fan mode/control-sensor details; RPM values require explicitly assigned speed sensors
 - tray support, subject to the tray integration available on the Linux desktop
 - autostart through the Windows user registry or a Linux XDG autostart entry

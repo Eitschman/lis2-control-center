@@ -82,8 +82,9 @@
       </Grid>
     </Border>
     <Grid Grid.Column="1" Margin="20" RowDefinitions="Auto,*,Auto">
-      <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,18">
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,18">
         <TextBlock Grid.Column="0" Name="SectionTitle" Text="Dashboard" FontSize="28" FontWeight="SemiBold" TextWrapping="Wrap" />
+        <Button Grid.Row="1" Grid.ColumnSpan="3" Name="UpdateNotice" IsVisible="False" Content="Update available" HorizontalAlignment="Left" Margin="0,6,0,0" />
         <Button Grid.Column="1" Name="OpenHelp" Content="Help &amp; reference" Margin="12,0" VerticalAlignment="Top" />
         <Border Grid.Column="2" Background="{DynamicResource Lis2StatusBrush}" CornerRadius="14" Padding="14,9" VerticalAlignment="Top">
           <TextBlock Name="ConnectionText" Text="Disconnected" FontWeight="SemiBold" Foreground="{DynamicResource Lis2StatusTextBrush}" />
@@ -941,6 +942,31 @@
         </StackPanel>
       </ScrollViewer>
       <ScrollViewer Name="SettingsView" Grid.Row="1" IsVisible="False"><StackPanel Spacing="14">
+          <Border Name="UpdateCard" Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
+            <StackPanel Spacing="10">
+              <TextBlock Name="UpdateHeading" Text="Updates" FontWeight="SemiBold" FontSize="18"/>
+              <TextBlock Name="UpdateVersions" TextWrapping="Wrap"/>
+              <CheckBox Name="UpdateAutomaticCheck" Content="Check automatically"/>
+              <CheckBox Name="UpdateAutomaticInstall" Content="Install automatically (Windows; restarts the application)">
+                <CheckBox.ContentTemplate><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap"/></DataTemplate></CheckBox.ContentTemplate>
+              </CheckBox>
+              <ComboBox Name="UpdatePackageKind" HorizontalAlignment="Left" MinWidth="210">
+                <ComboBoxItem Content="Debian package"/><ComboBoxItem Content="Portable archive"/>
+              </ComboBox>
+              <WrapPanel>
+                <Button Name="UpdateCheck" Content="Check for updates" Margin="0,0,8,6"/>
+                <Button Name="UpdateDownload" Content="Download update" Margin="0,0,8,6"/>
+                <Button Name="UpdateInstall" Content="Install and restart" Margin="0,0,8,6"/>
+                <Button Name="UpdateFolder" Content="Open download folder" Margin="0,0,8,6"/>
+                <Button Name="UpdateCancel" Content="Cancel" Margin="0,0,8,6"/>
+              </WrapPanel>
+              <ProgressBar Name="UpdateProgress" IsIndeterminate="True" Height="5"/>
+              <TextBlock Name="UpdateStatus" TextWrapping="Wrap"/>
+              <Expander Name="UpdateNotesExpander" Header="Release notes" HorizontalAlignment="Stretch">
+                <TextBox Name="UpdateNotes" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="220" AcceptsReturn="True"/>
+              </Expander>
+            </StackPanel>
+          </Border>
           <Border BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
             <StackPanel Spacing="12">
               <TextBlock Name="SettingsDeviceHeading" Text="Device / Transport" FontWeight="SemiBold" FontSize="18"/>

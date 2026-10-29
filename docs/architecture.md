@@ -3,6 +3,10 @@
 Stand: 20.10.2026. Geltungsbereich: `feature/linux-avalonia`, Arbeitspaket PORT-02.
 Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md).
 
+## Anwendungsupdates
+
+`ApplicationUpdates` liest stabile GitHub-Releases und prüft plattformgerechte Downloads anhand SHA-256. `MainWindow.Updates` verwaltet Bedienung, gespeicherte Freigaben und die tägliche Prüfung. `UpdateInstallation` übergibt Debian-Pakete an den Desktop und tauscht portable Windows-Installationen außerhalb des laufenden Anwendungsordners aus. Die Anwendungskopie startet über `--apply-update` vor Avalonia und vor der normalen Instanzsperre. `UpdateStartup` bestätigt den neuen Desktop; ein fehlgeschlagener Start löst die Wiederherstellung aus. Der Austausch wird erst nach erfolgreichem Runtime-Shutdown freigegeben. Details und Grenzen stehen im [Updateleitfaden](application-updates.md).
+
 ## Projekte und Abhängigkeiten
 
 `LIS2.App.Avalonia` ist die gemeinsame Desktopanwendung für Windows und Linux. Auch `tools/LIS2.ProtocolTester` verwendet Avalonia. Der Quellbaum und die Solution enthalten keine WPF-Projekte. Die WPF-Funktionsreferenz ist über Git-Commit `922ca1b` zugänglich.
