@@ -22,7 +22,7 @@ Windows bereitet das portable x64-Paket vor, speichert den Workspace und beendet
 
 Linux lädt das amd64-/ARM64-Debian-Paket und öffnet es mit der eingerichteten System-Paketinstallation. Installation und Rechteabfrage erfolgen dort; anschließend LIS2 neu starten. Dafür werden xdg-utils und eine passende Dateizuordnung benötigt. Portable Linux-Archive werden zum manuellen Entpacken angeboten. GitHub und das Repository sind die Vertrauensquelle; die Prüfsumme aus demselben Release ist keine unabhängige digitale Signatur. [Bedienung, Grenzen und Wiederherstellung](application-updates.md).
 
-Die tatsächliche Pi-Paketinstallation durch den Systeminstaller bleibt ein Zielsystemtest; v0.1.19 ist dort nach Benutzerbestätigung installiert. Der echte Windows-Prozesswechsel und die Wiederherstellung nach absichtlich fehlendem Startprogramm sind mit isolierten Anwendungskopien geprüft. Hilfe und Bedienung sind in fünf Sprachen ergänzt.
+Der Benutzer bestätigt den Pi-Updateversuch von v0.1.19 auf v0.1.21 als erfolgreich. Der echte Windows-Prozesswechsel und die Wiederherstellung nach absichtlich fehlendem Startprogramm sind mit isolierten Anwendungskopien geprüft. Hilfe und Bedienung sind in fünf Sprachen ergänzt.
 
 ## Linux-VU, Spektrum und plattformgerechte Vorlagen
 
@@ -32,7 +32,7 @@ Linux zeigt ausschließlich die passenden MPRIS-Medienvorlagen einschließlich V
 
 Benötigt werden eine laufende PipeWire-Desktopsitzung mit Sitzungsmanager sowie `playerctl`, `pipewire-bin` und `dbus-bin`. Die Debian-Pakete empfehlen diese Werkzeuge. Einzelheiten stehen in [Linux-Spieleraudio](linux-media-audio.md).
 
-Der Benutzer bestätigt den erfolgreichen Betrieb mit Tuner als Flatpak auf Raspberry Pi 5. Build 40858349727 besteht zwölf Jobs einschließlich nativer, Pulse- und Sandbox-Audiotests sowie ARM64-Paketprüfungen. Linux besteht 557 Anwendungstests, Windows 556 mit einem übersprungenen Linux-Schlüsselbundtest. Weitere konkrete Zielsystem-Gegenproben sind im Leitfaden aufgeführt.
+Der Benutzer bestätigt den erfolgreichen Betrieb mit Tuner als Flatpak auf Raspberry Pi 5. Die Release-CI prüft native, Pulse- und Sandbox-Audiofälle sowie ARM64-Pakete. Weitere konkrete Zielsystem-Gegenproben sind im Leitfaden aufgeführt.
 
 ## Einheitliches Schriftbild der Hilfe
 
@@ -142,11 +142,13 @@ App, Protokolltester und Headless-Tests verwenden **Avalonia 11.3.22**. Die DBus
 
 Enthalten sind portable Pakete für Windows x64, Linux x64 und Linux ARM64, Debian-Pakete für amd64/arm64, der Windows-Protokolltester, das native 32-Bit-Winamp-Plug-in `gen_lis2.dll` und beide Legacy-Plug-in-Pakete.
 
-Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.19_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
+Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.22_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
 
 Die Anwendungspakete liefern **.NET 10.0.13** mit; .NET muss nicht separat installiert werden. Lizenztexte, Fremdkomponentenhinweise und feste Quellverweise liegen unter `licenses/` und `THIRD-PARTY-NOTICES.txt` bei. Avalonia-Lizenztext und Inter-Schrift wurden gegen den tatsächlichen Paketstand geprüft.
 
 ## Prüfumfang und offene Praxisprüfungen
+
+[Main-CI 40905698394](https://github.com/Eitschman/lis2-control-center/actions/runs/40905698394) besteht zwölf Jobs, [Release-CI 40905698970](https://github.com/Eitschman/lis2-control-center/actions/runs/40905698970) alle 14. Linux besteht 635 Anwendungstests, Windows 634 mit einem übersprungenen Linux-Schlüsselbundtest. 32 Paketprüfungen bestehen. Alle neun heruntergeladenen Nutzdateien stimmen mit SHA256SUMS.txt überein. Produktversion 0.1.22, Runtime 10.0.13, Paketarchitekturen, Lizenzbeilagen, Debian-Empfehlungen und zehn README-Downloadlinks sind geprüft. Beide Legacy-Pakete bestehen Architektur- und statische Laufzeitprüfung; die Winamp-DLL besteht x86-PE- und Importprüfung. Der Windows-Paket-Smoke bestätigt Austausch und Wiederherstellung mit erneutem Desktopstart.
 
 Die Release-Pipeline prüft Bibliotheken, Avalonia-Controls, native Windows-/Linux-Oberflächen, GSMTC-Anbieterstart, extrahierte Archive und Debian-Installation auf x64 und nativem ARM64. Die nativen Legacy-Plug-ins werden für beide Architekturen gebaut und mit Microsoft Defender geprüft. Die Desktop-Smokes prüfen unter anderem zehn Ansichten, Hilfe/About, Aktivierung aus einem zweiten Prozess und Shutdown. Screenshots dienen der Sichtprüfung.
 

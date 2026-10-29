@@ -110,6 +110,8 @@ ROAD-01/ROAD-05 bieten Update-Hinweise und Windows-Dateiaustausch sowie geprüft
 - [x] Verlauf in der Lüftersteuerung zusammen mit der Kurvenkonfiguration verfügbar; Messlücken und nicht zugeordnete Drehzahlsensoren kenntlich machen. Sollwert ist keine Bestätigung physischer Ausgabe.
 - [x] Benutzerentscheidung: 60 Minuten ausschließlich im Arbeitsspeicher, maximal 1801 Punkte je Kanal, keine Persistenz. Konfigurationswechsel leeren den betroffenen Verlauf. [Bedienung und Grenzen](docs/fan-history.md).
 
+- [x] Release v0.1.22 veröffentlicht. [Main-CI 40905698394](https://github.com/Eitschman/lis2-control-center/actions/runs/40905698394) besteht zwölf Jobs, [Release-CI 40905698970](https://github.com/Eitschman/lis2-control-center/actions/runs/40905698970) alle 14. Linux besteht 635 Anwendungstests, Windows 634 mit einem übersprungenen Linux-Schlüsselbundtest. 32 Paketprüfungen bestehen. Alle neun heruntergeladenen Nutzdateien stimmen mit SHA256SUMS.txt überein. Produktversion 0.1.22, Runtime 10.0.13, Paketarchitekturen, Lizenzbeilagen, Debian-Empfehlungen und zehn README-Downloadlinks sind geprüft. Beide Legacy-Pakete bestehen Architektur- und statische Laufzeitprüfung; die Winamp-DLL besteht x86-PE- und Importprüfung. Der Windows-Paket-Smoke bestätigt Austausch und Wiederherstellung mit erneutem Desktopstart. Verlauf und Hilfe sind in fünf Sprachen, zwei Fenstergrößen sowie hellem und dunklem Theme gerendert und geprüft.
+
 ### ROAD-07: Gezielter Verbindungstest
 
 - [ ] Für die ausgewählte Quelle die Verbindungsschritte einzeln prüfen und den fehlgeschlagenen Schritt benennen, etwa HA-Anmeldung, Medien-Pipe oder serieller Port.
