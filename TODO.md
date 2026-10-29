@@ -101,6 +101,7 @@ ROAD-01/ROAD-05 bieten Update-Hinweise und Windows-Dateiaustausch sowie geprüft
 - [x] Hardware gesamt, ausgewählter Sensor, Home Assistant und Medien zeigen Zeitpunkt und Alter; HA kennzeichnet den Quell-Datenempfang ausdrücklich.
 - [x] Veraltete Daten, fehlende Messungen und Trennung unterscheiden; bei Wiederkehr nur gültige Erfassungen übernehmen. Ereignisquellen nicht allein wegen unveränderter Daten als fehlerhaft einstufen.
 - [x] Zeitablauf, fehlende Werte, Wiederkehr und HA-Neukonfiguration prüfen; Hilfe und Übersetzungen in fünf Sprachen ergänzen. [Fristen und Quellunterschiede](docs/template-validation-and-freshness.md).
+- [x] Release v0.1.21 veröffentlicht: [Main-CI 40898217880](https://github.com/Eitschman/lis2-control-center/actions/runs/40898217880) besteht zwölf Jobs, [Release-CI 40898218003](https://github.com/Eitschman/lis2-control-center/actions/runs/40898218003) alle 14. Linux 628 Anwendungstests erfolgreich, Windows 627 und ein Linux-Schlüsselbundtest übersprungen. Playerwechsel übernimmt keine fremden Empfangszeitpunkte; fünf negative Gegenproben erkennen den Fehler, die korrigierten Quellen-/Oberflächenprüfungen bestehen auf beiden Plattformen. Alle neun SHA-256-Prüfsummen, Paketversionen, Architekturen, Lizenzbeilagen und zehn README-Downloadlinks geprüft. Windows-Dateiaustausch und Wiederherstellung bestehen im Paket-Smoke. Reales Update von v0.1.19 bleibt der nächste Zielsystemtest.
 
 ### ROAD-06: Sensor- und Lüfterverlauf
 
