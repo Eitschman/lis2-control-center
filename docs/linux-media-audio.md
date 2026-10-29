@@ -34,6 +34,17 @@ Fehlende Werkzeuge, ein nicht erreichbarer PipeWire-Server und fehlende oder meh
 
 ## Prüfung auf dem Raspberry Pi
 
+Teststand: [Build 40853093985](https://github.com/Eitschman/lis2-control-center/actions/runs/40853093985), Code `a29e12f`, Paketversion `0.0~ci603.1`. Das [ARM64-Debian-Artefakt](https://github.com/Eitschman/lis2-control-center/actions/runs/40853093985/artifacts/12888402125) enthält `.deb` und SHA-256-Datei. Die GitHub-Anmeldung kann für den Download erforderlich sein; Entwicklungsartefakte werden 14 Tage aufbewahrt. Es handelt sich um einen Testbuild, kein neues Release.
+
+Nach dem Entpacken auf dem Pi:
+
+```sh
+sha256sum -c lis2-control-center_0.0~ci603.1_arm64.deb.sha256
+sudo apt install ./lis2-control-center_0.0~ci603.1_arm64.deb
+```
+
+APT kann dies wegen der niedrigeren Entwicklungsversionsnummer als Downgrade gegenüber `0.1.17` anzeigen. Die Einstellungen werden weiter aus dem vorhandenen Benutzerprofil gelesen.
+
 1. ARM64-Debian-Artefakt des GitHub-Builds herunterladen, ZIP entpacken und das enthaltene `.deb` mit `sudo apt install ./<Paketname>.deb` installieren.
 2. Tuner mit derselben Radio-URL starten und auf der Medienseite ausdrücklich auswählen. Titel, Laufzeit und beide Audiobalken prüfen.
 3. Linux-VU- und Spektrumvorlage anlegen; auf Dashboard und Seitenansicht prüfen. Spektrum-Glyphen nur nach Zustimmung ersetzen.

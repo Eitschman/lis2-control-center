@@ -17,6 +17,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] Gewählten MPRIS-Prozess und Kindprozesse einem eindeutigen PipeWire-Wiedergabestream zuordnen; keine Mikrofon- oder Systemaudio-Ersatzquelle.
 - [x] Stereo-VU und zwanzig Spektrumbänder mit etwa 100 ms Aktualisierung, getrenntem Audiostatus, Medienkarte, Displayvariablen und Linux-VU-/Spektrumvorlagen.
 - [x] Hilfe in fünf Sprachen, Debian-Empfehlungen und [Installations-/Prüfleitfaden](docs/linux-media-audio.md) ergänzen.
+- [x] [GitHub-Build 40853093985](https://github.com/Eitschman/lis2-control-center/actions/runs/40853093985): zwölf Jobs erfolgreich, einschließlich Windows-/Linux-Tests und ARM64-Debian-Installation. Testpaket `0.0~ci603.1`, SHA-256 und Paketmetadaten geprüft.
 - [ ] GitHub-Testbuild auf Raspberry Pi 5 mit Tuner prüfen: Titelwechsel, Pause, Minimieren, Streamneustart, Medienkarte und VFD-Ausgabe. Danach Fehler korrigieren und gesondert über ein Release entscheiden.
 
 ### Dashboard-Feinschliff
