@@ -2,10 +2,11 @@ using System.Diagnostics;
 using System.Text.Json;
 using LIS2.App.Avalonia;
 using LIS2.WmpLegacy.Audio;
+using Xunit.Abstractions;
 
 namespace LIS2.App.Avalonia.Tests;
 
-public sealed class LinuxPlayerAudioTests
+public sealed class LinuxPlayerAudioTests(ITestOutputHelper output)
 {
     private const string Graph = """
         [
@@ -196,7 +197,7 @@ public sealed class LinuxPlayerAudioTests
                 try { await fixture.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10)); }
                 catch (TimeoutException) { fixture.Kill(entireProcessTree: true); await fixture.WaitForExitAsync(); }
             }
-            await errors;
+            output.WriteLine(await errors);
         }
     }
 
@@ -204,6 +205,7 @@ public sealed class LinuxPlayerAudioTests
     {
         var watch = Stopwatch.StartNew();
         while (!condition(source.Values) && watch.Elapsed < TimeSpan.FromSeconds(15)) await Task.Delay(50);
-        Assert.True(condition(source.Values), "Audio did not reach expected state: " + source.Values.GetValueOrDefault("AudioStatus"));
+        Assert.True(condition(source.Values), "Audio did not reach expected state: " + source.Values.GetValueOrDefault("AudioStatus") +
+            "; " + source.IdentityDetails);
     }
 }

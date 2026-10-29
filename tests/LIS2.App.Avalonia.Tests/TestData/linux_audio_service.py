@@ -110,6 +110,7 @@ with tempfile.TemporaryDirectory(prefix="lis2-private-audio-") as directory:
     runtime = pathlib.Path(directory)
     os.environ["XDG_RUNTIME_DIR"] = str(runtime)
     os.environ["PIPEWIRE_RUNTIME_DIR"] = str(runtime)
+    os.environ["PULSE_RUNTIME_PATH"] = str(runtime / "pulse")
     processes = []
     mode = sys.argv[1] if len(sys.argv) > 1 else "native"
     log_path = runtime / "server.log"
@@ -168,6 +169,7 @@ with tempfile.TemporaryDirectory(prefix="lis2-private-audio-") as directory:
             else:
                 run_player(directory, pulse=mode == "pulse")
         finally:
+            print(log_path.read_text(), file=sys.stderr, flush=True)
             for process in reversed(processes):
                 if process.poll() is None:
                     process.terminate()

@@ -259,11 +259,14 @@ jobs:
         run: dotnet test tests/LIS2.App.Avalonia.Tests/LIS2.App.Avalonia.Tests.csproj --configuration Release
       - name: Install Linux credential and audio test dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libsecret-tools gnome-keyring dbus playerctl python3-dbus python3-gi pipewire-bin wireplumber pipewire-pulse pulseaudio-utils bubblewrap xdg-dbus-proxy
+        run: sudo apt-get update && sudo apt-get install -y libsecret-tools gnome-keyring dbus playerctl python3-dbus python3-gi pipewire-bin wireplumber pipewire-pulse pulseaudio-utils bubblewrap xdg-dbus-proxy apparmor
       - name: Test Avalonia with isolated Linux credential and audio services
         if: runner.os == 'Linux'
         shell: bash
         run: |
+          sudo apparmor_parser --replace --skip-cache tests/LIS2.App.Avalonia.Tests/TestData/lis2-bwrap.apparmor
+          trap 'sudo apparmor_parser --remove tests/LIS2.App.Avalonia.Tests/TestData/lis2-bwrap.apparmor' EXIT
+          bwrap --unshare-pid --ro-bind / / --proc /proc -- /usr/bin/true
           export XDG_DATA_HOME="$RUNNER_TEMP/lis2-keyring-data"
           export XDG_RUNTIME_DIR="$RUNNER_TEMP/lis2-keyring-runtime"
           install -d -m 700 "$XDG_DATA_HOME" "$XDG_RUNTIME_DIR"

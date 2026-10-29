@@ -132,7 +132,9 @@ internal sealed class LinuxPlayerAudio(IReadOnlyDictionary<string, string>? envi
 
     private async Task<string> CommandAsync(string executable, IReadOnlyList<string> arguments, CancellationToken cancellation)
     {
-        var result = await LinuxMprisSource.ExecuteAsync(executable, arguments, cancellation, TimeSpan.FromSeconds(3), environment);
+        PlayerctlResult result;
+        try { result = await LinuxMprisSource.ExecuteAsync(executable, arguments, cancellation, TimeSpan.FromSeconds(3), environment); }
+        catch (TimeoutException exception) { throw new TimeoutException(executable + ": " + exception.Message, exception); }
         if (result.ExitCode != 0) throw new InvalidOperationException(executable + ": " + result.Error.Trim());
         return result.Output;
     }

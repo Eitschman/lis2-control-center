@@ -1,0 +1,7 @@
+# Ausschließlich für den kurzlebigen GitHub-Testjob, nicht für die installierte Anwendung.
+abi <abi/4.0>,
+include <tunables/global>
+
+profile lis2-audio-test-bwrap /usr/bin/bwrap flags=(unconfined) {
+    userns,
+}
