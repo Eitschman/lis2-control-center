@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
-using LIS2.Display;
 
 namespace LIS2.App.Avalonia;
 

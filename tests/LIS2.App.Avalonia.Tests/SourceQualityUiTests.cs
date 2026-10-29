@@ -79,6 +79,11 @@ public sealed class SourceQualityUiTests
             window.ObserveHardwareQuality(new Dictionary<string, object?> { ["Hardware.Cpu.Temperature"] = 43 }, now);
             Assert.Contains(SourceQualityText.Get("Current", code), window.FindControl<TextBlock>("HardwareFreshness")!.Text);
             Click(window, "HardwareRefresh");
+            var sensors = window.FindControl<ListBox>("HardwareSensorList")!;
+            sensors.SelectedItem = sensors.Items.OfType<HardwareSensorEntry>().Single();
+            Assert.True(window.FindControl<TextBlock>("HardwareSelectedFreshness")!.IsVisible);
+            Assert.Contains(SourceQualityText.Get("Current", code), window.FindControl<TextBlock>("HardwareSelectedFreshness")!.Text);
+            window.FindControl<TextBlock>("HardwareSelectedFreshness")!.BringIntoView();
             await CaptureAsync(window, "quality-hardware-current-" + code);
 
             Click(window, "NavButton3");
