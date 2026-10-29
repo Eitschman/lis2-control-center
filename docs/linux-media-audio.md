@@ -38,13 +38,13 @@ Fehlende Werkzeuge, ein nicht erreichbarer PipeWire-Server und fehlende oder meh
 
 ## Prüfung auf dem Raspberry Pi
 
-Teststand: [Build 40853093985](https://github.com/Eitschman/lis2-control-center/actions/runs/40853093985), Code `a29e12f`, Paketversion `0.0~ci603.1`. Das [ARM64-Debian-Artefakt](https://github.com/Eitschman/lis2-control-center/actions/runs/40853093985/artifacts/12888402125) enthält `.deb` und SHA-256-Datei. Die GitHub-Anmeldung kann für den Download erforderlich sein; Entwicklungsartefakte werden 14 Tage aufbewahrt. Es handelt sich um einen Testbuild, kein neues Release.
+Teststand: [Build 40858349727](https://github.com/Eitschman/lis2-control-center/actions/runs/40858349727), Code `238eab9`, Paketversion `0.0~ci607.1`, einschließlich automatischer Flatpak-Zuordnung. Das [ARM64-Debian-Artefakt](https://github.com/Eitschman/lis2-control-center/actions/runs/40858349727/artifacts/12890916352) enthält `.deb` und SHA-256-Datei. Alle zwölf CI-Jobs bestehen. Die GitHub-Anmeldung kann für den Download erforderlich sein; Entwicklungsartefakte werden 14 Tage aufbewahrt. Es handelt sich um einen Testbuild, kein neues Release.
 
 Nach dem Entpacken auf dem Pi:
 
 ```sh
-sha256sum -c lis2-control-center_0.0~ci603.1_arm64.deb.sha256
-sudo apt install ./lis2-control-center_0.0~ci603.1_arm64.deb
+sha256sum -c lis2-control-center_0.0~ci607.1_arm64.deb.sha256
+sudo apt install ./lis2-control-center_0.0~ci607.1_arm64.deb
 ```
 
 APT kann dies wegen der niedrigeren Entwicklungsversionsnummer als Downgrade gegenüber `0.1.17` anzeigen. Die Einstellungen werden weiter aus dem vorhandenen Benutzerprofil gelesen.
