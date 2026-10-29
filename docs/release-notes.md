@@ -1,4 +1,14 @@
-# LIS2 Control Center 0.1.17
+# LIS2 Control Center 0.1.18
+
+## Linux-VU, Spektrum und plattformgerechte Vorlagen
+
+Der gewählte MPRIS-Player liefert Stereo-VU und zwanzig Spektrumbänder über PipeWire, mit ungefähr 100 ms Aktualisierung in Medienkarte und Displayvariablen. Die Zuordnung berücksichtigt native Programme, Pulse-Clients und Flatpak mit D-Bus-Proxy und getrennten Prozessnummern. Mikrofon und Systemton werden nicht als Ersatzquelle verwendet. Fehlende oder mehrdeutige Streams haben einen eigenen Audiostatus; Metadaten bleiben unabhängig verfügbar.
+
+Linux zeigt ausschließlich die passenden MPRIS-Medienvorlagen einschließlich VU und Spectrum. Windows zeigt stattdessen Winamp, Windows Media Player und Legacy. Gemeinsame Uhr-/Hardwarevorlagen bleiben erhalten. Die Hilfe beschreibt Einrichtung und Variablen in fünf Sprachen.
+
+Benötigt werden eine laufende PipeWire-Desktopsitzung mit Sitzungsmanager sowie `playerctl`, `pipewire-bin` und `dbus-bin`. Die Debian-Pakete empfehlen diese Werkzeuge. Einzelheiten stehen in [Linux-Spieleraudio](linux-media-audio.md).
+
+Der Benutzer bestätigt den erfolgreichen Betrieb mit Tuner als Flatpak auf Raspberry Pi 5. Build 40858349727 besteht zwölf Jobs einschließlich nativer, Pulse- und Sandbox-Audiotests sowie ARM64-Paketprüfungen. Linux besteht 557 Anwendungstests, Windows 556 mit einem übersprungenen Linux-Schlüsselbundtest. Weitere konkrete Zielsystem-Gegenproben sind im Leitfaden aufgeführt.
 
 ## Einheitliches Schriftbild der Hilfe
 
@@ -108,7 +118,7 @@ App, Protokolltester und Headless-Tests verwenden **Avalonia 11.3.22**. Die DBus
 
 Enthalten sind portable Pakete für Windows x64, Linux x64 und Linux ARM64, Debian-Pakete für amd64/arm64, der Windows-Protokolltester, das native 32-Bit-Winamp-Plug-in `gen_lis2.dll` und beide Legacy-Plug-in-Pakete.
 
-Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.17_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
+Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.18_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
 
 Die Anwendungspakete liefern **.NET 10.0.13** mit; .NET muss nicht separat installiert werden. Lizenztexte, Fremdkomponentenhinweise und feste Quellverweise liegen unter `licenses/` und `THIRD-PARTY-NOTICES.txt` bei. Avalonia-Lizenztext und Inter-Schrift wurden gegen den tatsächlichen Paketstand geprüft.
 

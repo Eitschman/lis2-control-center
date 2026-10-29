@@ -1,6 +1,6 @@
 # Linux-Spieleraudio
 
-Die Linux-Anwendung liest Metadaten über MPRIS und `playerctl`. Pegel und Spektrum erfasst sie zusätzlich aus dem PipeWire-Wiedergabestream des gewählten Players. Ein eigenes Plug-in und ein sichtbares Playerfenster sind dafür nicht erforderlich. Die Zielsystemprüfung mit Tuner auf dem Raspberry Pi steht aus; dieser Stand wird zunächst als GitHub-Entwicklungsartefakt ausgeliefert.
+Die Linux-Anwendung liest Metadaten über MPRIS und `playerctl`. Pegel und Spektrum erfasst sie zusätzlich aus dem PipeWire-Wiedergabestream des gewählten Players. Ein eigenes Plug-in und ein sichtbares Playerfenster sind dafür nicht erforderlich. Der Benutzer bestätigt den erfolgreichen Betrieb mit Tuner als Flatpak auf Raspberry Pi 5. Die Funktion gehört zu Release v0.1.18.
 
 ## Installation und Bedienung
 
@@ -34,22 +34,22 @@ Bei Flatpak verwendet die Anwendung die Anwendungs- und Instanzkennung des D-Bus
 
 Gibt es mehrere laufende passende Streams, wird die Erfassung mit einer Fehlermeldung angehalten. Ohne laufende Kandidaten wird nur ein einzelner passender Knoten akzeptiert. Es gibt keine automatische Aufnahme des Standardgeräts, Mikrofons oder gesamten Systemtons. Der Diagnosebericht enthält die D-Bus-Hostkennung und gegebenenfalls die erkannte Flatpak-Identität.
 
-Fehlende Werkzeuge, ein nicht erreichbarer PipeWire-Server und fehlende oder mehrdeutige Streams bleiben als Audiostatus sichtbar. Gesperrte Prozessinformationen oder fehlende Sandbox-Identitäten verhindern eine bestätigte Zuordnung und führen ebenfalls zum Audiofehler. Tuner als Flatpak auf dem Pi ist weiterhin am Zielsystem zu prüfen. Bei Pause, Quellenwechsel und veralteten Audiodaten werden Pegel und Spektrum geleert. Neue Wiedergabeknoten werden sekündlich gesucht, etwa nach einem Titelwechsel. Die Audiodaten bleiben im Arbeitsspeicher und werden nicht gespeichert.
+Fehlende Werkzeuge, ein nicht erreichbarer PipeWire-Server und fehlende oder mehrdeutige Streams bleiben als Audiostatus sichtbar. Gesperrte Prozessinformationen oder fehlende Sandbox-Identitäten verhindern eine bestätigte Zuordnung und führen ebenfalls zum Audiofehler. Tuner als Flatpak auf dem Pi wurde vom Benutzer erfolgreich geprüft. Bei Pause, Quellenwechsel und veralteten Audiodaten werden Pegel und Spektrum geleert. Neue Wiedergabeknoten werden sekündlich gesucht, etwa nach einem Titelwechsel. Die Audiodaten bleiben im Arbeitsspeicher und werden nicht gespeichert.
 
 ## Prüfung auf dem Raspberry Pi
 
-Teststand: [Build 40858349727](https://github.com/Eitschman/lis2-control-center/actions/runs/40858349727), Code `238eab9`, Paketversion `0.0~ci607.1`, einschließlich automatischer Flatpak-Zuordnung. Das [ARM64-Debian-Artefakt](https://github.com/Eitschman/lis2-control-center/actions/runs/40858349727/artifacts/12890916352) enthält `.deb` und SHA-256-Datei. Alle zwölf CI-Jobs bestehen. Die GitHub-Anmeldung kann für den Download erforderlich sein; Entwicklungsartefakte werden 14 Tage aufbewahrt. Es handelt sich um einen Testbuild, kein neues Release.
+Der Benutzer bestätigt den erfolgreichen Betrieb mit dem geprüften ARM64-Testpaket `0.0~ci607.1` aus [Build 40858349727](https://github.com/Eitschman/lis2-control-center/actions/runs/40858349727), einschließlich automatischer Flatpak-Zuordnung. Die folgenden einzelnen Gegenproben dienen weiteren Zielsystemprüfungen; die Rückmeldung spezifiziert diese nicht einzeln.
 
-Nach dem Entpacken auf dem Pi:
+Für die Installation [ARM64-Debian-Paket v0.1.18](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/lis2-control-center_0.1.18_arm64.deb) und [SHA256SUMS.txt](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/SHA256SUMS.txt) aus demselben Release herunterladen:
 
 ```sh
-sha256sum -c lis2-control-center_0.0~ci607.1_arm64.deb.sha256
-sudo apt install ./lis2-control-center_0.0~ci607.1_arm64.deb
+sha256sum --ignore-missing -c SHA256SUMS.txt
+sudo apt install ./lis2-control-center_0.1.18_arm64.deb
 ```
 
-APT kann dies wegen der niedrigeren Entwicklungsversionsnummer als Downgrade gegenüber `0.1.17` anzeigen. Die Einstellungen werden weiter aus dem vorhandenen Benutzerprofil gelesen.
+Die Einstellungen werden weiter aus dem vorhandenen Benutzerprofil gelesen.
 
-1. ARM64-Debian-Artefakt des GitHub-Builds herunterladen, ZIP entpacken und das enthaltene `.deb` mit `sudo apt install ./<Paketname>.deb` installieren.
+1. ARM64-Debian-Paket des Releases wie oben installieren.
 2. Tuner mit derselben Radio-URL starten und auf der Medienseite ausdrücklich auswählen. Titel, Laufzeit und beide Audiobalken prüfen.
 3. Linux-VU- und Spektrumvorlage anlegen; auf Dashboard und Seitenansicht prüfen. Spektrum-Glyphen nur nach Zustimmung ersetzen.
 4. Automatischen Titelwechsel, Pause/Fortsetzen, Player minimieren, Stream stoppen/starten und Player neu starten prüfen. Bei fehlendem Stream müssen Balken verschwinden, anschließend wieder erscheinen.
