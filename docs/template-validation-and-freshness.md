@@ -35,6 +35,8 @@ Hardware-, Medien- und Home-Assistant-Ansichten zeigen Zustand, lokalen Zeitpunk
 
 Die Hardwareliste und die ausgewählte Sensordiagnose nutzen tatsächliche Erfassungen. UI-Timer und Ansichtswechsel erzeugen keine Messzeitpunkte. Noch nie empfangene Daten zeigen keinen erfundenen Zeitpunkt. Verbindungsverlust und Wiederverbindung werden unabhängig vom Datenalter dargestellt. Eine neue gültige Messung setzt den Zeitpunkt fort; fehlende Werte verjüngen ihn nicht.
 
+Ein Wechsel des ausgewählten Linux-Players setzt dessen Empfangszeitpunkt zurück. Ein neu gewählter, noch nicht erreichbarer Player übernimmt keine Datenzeit des vorherigen Players. Auch beim automatischen Wechsel beginnt die neue Playeridentität mit ihrer eigenen Erfassung.
+
 Home Assistant zeigt keinen individuellen Messzeitpunkt je Entität. Ein Sensor kann unverändert bleiben, während andere Entitäten Ereignisse senden. Die Anzeige nennt daher ausdrücklich den Datenempfang. Der letzte Empfang bleibt beim Verbindungsverlust erhalten und wird beim Neukonfigurieren der Quelle zurückgesetzt. Audiostatus und Metadaten bleiben unabhängig; diese Aktualitätszeilen beschreiben die Metadaten, die vorhandenen Audioanzeigen weiterhin den Audiokanal.
 
 ## Prüfungen

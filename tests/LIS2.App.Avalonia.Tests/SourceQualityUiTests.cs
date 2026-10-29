@@ -96,6 +96,12 @@ public sealed class SourceQualityUiTests
             window.RefreshDataFreshness();
             Assert.Contains(SourceQualityText.Get("Stale", code), window.FindControl<TextBlock>("WinampMediaFreshness")!.Text);
             await CaptureAsync(window, "quality-media-" + code);
+            var playerPicker = window.FindControl<ComboBox>("LinuxMediaPlayer")!;
+            window.UpdateMediaPlayerPicker(["fixture-player", "offline-player"]);
+            playerPicker.SelectedIndex = 2;
+            window.RefreshDataFreshness();
+            Assert.Equal(SourceQualityText.Get("No data received", code), window.FindControl<TextBlock>("LinuxMediaFreshness")!.Text);
+            await Task.Delay(100);
             Click(window, "NavButton9");
             window.RefreshDataFreshness();
             Assert.Equal(SourceQualityText.Get("No data received", code), window.FindControl<TextBlock>("HaFreshness")!.Text);

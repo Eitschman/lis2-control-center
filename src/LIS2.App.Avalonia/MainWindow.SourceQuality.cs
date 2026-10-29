@@ -15,6 +15,14 @@ public partial class MainWindow
     private readonly DispatcherTimer _freshnessTimer = new() { Interval = TimeSpan.FromSeconds(1) };
     private DateTimeOffset? _mprisReceivedAt;
 
+    /// <summary>Ein anderer Player darf keinen Empfangszeitpunkt seines Vorgängers übernehmen.</summary>
+    internal void ResetLinuxMediaQuality()
+    {
+        _mprisReceivedAt = null;
+        _dataFreshness.Reset("Media");
+        _qualityConnections["Media"] = false;
+    }
+
     /// <summary>Alter unabhängig von Ansichtswechseln aktualisieren; keine zusätzlichen Quellenabfragen starten.</summary>
     private void InitializeSourceQuality()
     {

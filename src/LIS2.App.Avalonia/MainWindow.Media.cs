@@ -72,6 +72,7 @@ public partial class MainWindow
             if (_updatingMediaPlayers) return;
             var picker = this.FindControl<ComboBox>("LinuxMediaPlayer")!;
             _selectedMediaPlayer = picker.SelectedIndex <= 0 ? null : picker.SelectedItem as string;
+            ResetLinuxMediaQuality();
             _linuxAudio.SelectPlayer(null, false);
             _mprisValues = LinuxMprisSource.Map("", "", "");
             _nextMprisRefresh = default;
@@ -244,6 +245,9 @@ public partial class MainWindow
 
     internal void ApplyMprisSnapshot(MprisSnapshot snapshot)
     {
+        if (snapshot.Values.GetValueOrDefault("Connected") is true &&
+            !Equals(snapshot.Values.GetValueOrDefault("Player"), _mprisValues.GetValueOrDefault("Player")))
+            ResetLinuxMediaQuality();
         if (snapshot.Values.GetValueOrDefault("Connected") is true) _mprisReceivedAt = DateTimeOffset.UtcNow;
         UpdateMediaPlayerPicker(snapshot.Players);
         _mprisValues = snapshot.Values;

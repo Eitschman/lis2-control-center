@@ -1,4 +1,4 @@
-# LIS2 Control Center 0.1.20
+# LIS2 Control Center 0.1.21
 
 ## Vorlagenprüfung und Datenaktualität
 
@@ -6,7 +6,7 @@ ROAD-03 ergänzt anklickbare Hinweise direkt unter den beiden Vorlagenzeilen. Fe
 
 ROAD-04 ergänzt Zustand, lokalen Zeitpunkt und Datenalter bei Hardware, ausgewähltem Sensor, Home Assistant und Medien. Fehlgeschlagene oder fehlende Erfassungen verjüngen den Zeitpunkt nicht. Periodische Hardware und Medien haben Zeitgrenzen; ereignisgesteuerter Windows Media Player und Home Assistant werden wegen unveränderter Werte allein nicht als veraltet eingestuft. HA nennt ausdrücklich den letzten Quell-Datenempfang. Bedienung und Hilfe sind in fünf Sprachen ergänzt. [Details und Grenzen](template-validation-and-freshness.md).
 
-**Mit einer installierten v0.1.19 lässt sich dieses Release erstmals über Einstellungen → Updates beziehen.** Auf dem Pi das ARM64-Debian-Paket herunterladen, an die eingerichtete System-Paketinstallation übergeben und dort installieren. Anschließend LIS2 neu starten und Version 0.1.20 kontrollieren. Diese reale Zielsystemprüfung übernimmt der Benutzer.
+**Mit einer installierten v0.1.19 lässt sich dieses Release erstmals über Einstellungen → Updates beziehen.** Auf dem Pi das ARM64-Debian-Paket herunterladen, an die eingerichtete System-Paketinstallation übergeben und dort installieren. Anschließend LIS2 neu starten und Version 0.1.21 kontrollieren. Diese reale Zielsystemprüfung übernimmt der Benutzer.
 
 ## Updates für Windows und Linux
 
