@@ -118,6 +118,7 @@ ROAD-01/ROAD-05 bieten Update-Hinweise und Windows-Dateiaustausch sowie geprüft
 - [x] Ergebnis, Fehlerschritt und passende Handlungsmöglichkeit anzeigen; Abbruch, Wiederholung, Quellennavigation und Export mit Zeitpunkt. Zugangsdaten, URLs und fremde Servertexte bleiben aus den Testergebnissen ausgeschlossen.
 - [x] Serielle Prüfung bleibt lesend: angewendete Auswahl, Betriebssystemerkennung und bereits geöffnete Verbindung. Kein Portöffnen, kein Identifikations- oder Protokollbefehl, keine Lüfterfreigabe.
 - [x] Erfolg, fehlende Voraussetzungen, Metadaten-/Audiofehler, Zeitüberschreitung, Abbruch und Shutdown in bestehenden Suiten prüfen; lokale HA-WebSocket-Fixtures und fünfsprachige Oberfläche/Hilfe. [Bedienung und Aussagegrenzen](docs/connection-tests.md).
+- [x] Release v0.1.23 veröffentlicht: [Main-CI 40911389643](https://github.com/Eitschman/lis2-control-center/actions/runs/40911389643) besteht zwölf Jobs, [Release-CI 40911390945](https://github.com/Eitschman/lis2-control-center/actions/runs/40911390945) alle 14. Linux 658 Anwendungstests erfolgreich, Windows 657 und ein Linux-Schlüsselbundtest übersprungen. 32 Paketprüfungen, neun SHA-256-Prüfsummen, Versionen, Architekturen, Lizenzbeilagen und zehn README-Downloadlinks geprüft. Diagnose und Hilfe in fünf Sprachen gerendert; schmale Ansichten sowie helles und dunkles Theme geprüft. Reale Geräteverbindungen bleiben gesonderte Praxisprüfungen.
 
 ### ROAD-08: Virtueller Testlauf für Seiten
 
