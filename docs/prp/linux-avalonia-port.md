@@ -1,7 +1,9 @@
 # PRP: LIS2 Control Center mit Avalonia
 
 Stand: 29.10.2026. Hauptbranch: `main`.
-Implementierungsstand: PORT-08, Windows Media Player Legacy und gemeinsames Updatepaket ROAD-01/ROAD-05; genaue Prüfnachweise im [Status](linux-port-status.md).
+Implementierungsstand: PORT-08, Windows Media Player Legacy, gemeinsames Updatepaket ROAD-01/ROAD-05 sowie ROAD-03/ROAD-04; genaue Prüfnachweise im [Status](linux-port-status.md).
+
+ROAD-03 und ROAD-04 ergänzen anklickbare Vorlagenhinweise und Quellaktualität. Statische Fehler sind von nicht entdeckten dynamischen Schlüsseln und derzeit fehlenden Werten zu unterscheiden. Hardware- und Medienzeitpunkte stammen aus Erfassungen, nicht UI-Abfragen. Ereignisgesteuerte Quellen werden nicht allein wegen unveränderter Werte als veraltet eingestuft. HA nennt den letzten Quell-Datenempfang ausdrücklich. [Bedienung und Grenzen](../template-validation-and-freshness.md).
 
 ## Ziel und verbindlicher Umfang
 

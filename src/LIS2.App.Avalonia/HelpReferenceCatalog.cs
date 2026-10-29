@@ -51,6 +51,7 @@ internal static class HelpReferenceCatalog
                 Add("Custom glyphs", "Save glyphs in the workspace and send them to the connected device. Programming on connect restores them after reconnecting. Templates accept numeric slots and saved names, for example {Glyph.1} and {Glyph.Play}. Spaces and punctuation become underscores; duplicate names use the last slot. Numeric names do not replace numeric slots.");
                 break;
             case 2:
+                Add("Template validation", SourceQualityText.ValidationHelp);
                 Add("Pages", "Each enabled page contains a name, two templates, duration, refresh interval, overflow modes and optional visibility condition.");
                 Add("Timing", "Duration is in seconds; refresh and scrolling use milliseconds. Overflow can truncate, marquee or ping-pong.");
                 AddExample("Template syntax", "{Variable}  {Variable|fallback:--}  {Variable|number:1}  {Variable|percent:0}  {Variable|bytes:1}");
@@ -77,6 +78,7 @@ internal static class HelpReferenceCatalog
                 Add("Home Assistant variables", "Use the Home Assistant browser for the full live entity and attribute catalogue rather than listing thousands of entries here.");
                 break;
             case 3:
+                Add("Data freshness", SourceQualityText.FreshnessHelp);
                 Add("Media", "Connected players supply read-only playback status, track metadata, elapsed time, duration and audio telemetry where supported.");
                 AddExample("Winamp", "{Winamp.State}  {Winamp.Artist}  {Winamp.Title}  {Winamp.Album}  {Winamp.Elapsed}  {Winamp.Duration}");
                 Add("Stream metadata", "Local files use their tags. Streams expose StreamName, StreamTitle, StreamGenre, StreamUrl and IsStream. Title prefers the current StreamTitle, then title metadata, then the playlist display text. Artist is never replaced automatically or split from StreamTitle. Missing decoder fields remain empty. Unicode is preserved. Diagnostics includes TitleSource. Install the matching new gen_lis2.dll; older plug-ins do not supply these fields.");
@@ -110,6 +112,7 @@ internal static class HelpReferenceCatalog
                 Add("Lifetime", "An event expires automatically. Cancel or clear it in the Events view; ordinary page playback resumes afterward.");
                 break;
             case 5:
+                Add("Data freshness", SourceQualityText.FreshnessHelp);
                 Add("Hardware", "The hardware browser exposes read-only sensors from the current operating system.");
 Add("Windows CPU temperatures", "Windows CPU temperatures require the official signed PawnIO driver used by LibreHardwareMonitor. To run without administrator rights, explicitly grant PawnIO access to your Windows account once using tools/windows/Set-PawnIoUserAccess.ps1; installation and permission changes require elevation. This grants driver access to all programs under that account, not only LIS2 or temperature reads. Restart the application normally afterwards. Setup, verification and rollback: https://github.com/Eitschman/lis2-control-center/blob/main/docs/windows-hardware-sensors.md. Missing access can leave CPU temperatures unavailable while GPU readings still work; ACPI thermal zones are not CPU sensors.");
                 Add("Sensor variables", "Use the exact Hardware.* key from the sensor browser in a page template.");
@@ -136,6 +139,7 @@ Add("Windows CPU temperatures", "Windows CPU temperatures require the official s
                 Add("Virtual LIS2", "The virtual device permits protocol tests without physical hardware.");
                 break;
             case 9:
+                Add("Data freshness", SourceQualityText.FreshnessHelp);
                 Add("Home Assistant", "The read-only WebSocket integration loads states and receives live state_changed updates.");
                 Add("Connection", "Enter the Home Assistant URL and a long-lived access token, then test and save the connection.");
                 Add("Token storage", "Windows uses DPAPI. Linux uses the desktop keyring through secret-tool. Local AES storage requires explicit selection; the key is stored beside the encrypted token. Keyring errors are displayed without switching storage automatically. Disabling Home Assistant stops the source and removes the token from the selected store. Switching back to the keyring migrates local files only after verifying the saved token.");

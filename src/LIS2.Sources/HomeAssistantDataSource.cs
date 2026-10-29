@@ -40,10 +40,14 @@ public sealed class HomeAssistantDataSource : IDataSource
 
     public DateTimeOffset? LastUpdateAt { get; private set; }
 
+    /// <summary>Letzten Datenempfang bei Verbindungsverlust für die Diagnose behalten.</summary>
+    public DateTimeOffset? LastReceivedAt { get; private set; }
+
     public event EventHandler? Changed;
 
     public void Configure(string? baseUrl, string? accessToken)
     {
+        LastReceivedAt = null;
         _baseUrl = (baseUrl ?? string.Empty).Trim().TrimEnd('/');
         _accessToken = accessToken?.Trim() ?? string.Empty;
     }
@@ -341,6 +345,7 @@ public sealed class HomeAssistantDataSource : IDataSource
         Volatile.Write(ref _values, values);
         Volatile.Write(ref _entities, entities);
         LastUpdateAt = DateTimeOffset.UtcNow;
+        LastReceivedAt = LastUpdateAt;
         LastError = null;
         IsConnected = true;
         Changed?.Invoke(this, EventArgs.Empty);

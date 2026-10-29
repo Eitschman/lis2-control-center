@@ -1,4 +1,12 @@
-# LIS2 Control Center 0.1.19
+# LIS2 Control Center 0.1.20
+
+## Vorlagenprüfung und Datenaktualität
+
+ROAD-03 ergänzt anklickbare Hinweise direkt unter den beiden Vorlagenzeilen. Fehlerhafte Operationen, Nachkommastellen, Klammern, unbekannte statische Variablen und fehlende Glyphen werden von derzeit fehlenden Werten und nicht entdeckten dynamischen Schlüsseln unterschieden. Anklicken markiert die betroffene Stelle; Korrekturen aktualisieren die Vorschau. Speichern bleibt möglich.
+
+ROAD-04 ergänzt Zustand, lokalen Zeitpunkt und Datenalter bei Hardware, ausgewähltem Sensor, Home Assistant und Medien. Fehlgeschlagene oder fehlende Erfassungen verjüngen den Zeitpunkt nicht. Periodische Hardware und Medien haben Zeitgrenzen; ereignisgesteuerter Windows Media Player und Home Assistant werden wegen unveränderter Werte allein nicht als veraltet eingestuft. HA nennt ausdrücklich den letzten Quell-Datenempfang. Bedienung und Hilfe sind in fünf Sprachen ergänzt. [Details und Grenzen](template-validation-and-freshness.md).
+
+**Mit einer installierten v0.1.19 lässt sich dieses Release erstmals über Einstellungen → Updates beziehen.** Auf dem Pi das ARM64-Debian-Paket herunterladen, an die eingerichtete System-Paketinstallation übergeben und dort installieren. Anschließend LIS2 neu starten und Version 0.1.20 kontrollieren. Diese reale Zielsystemprüfung übernimmt der Benutzer.
 
 ## Updates für Windows und Linux
 
@@ -8,7 +16,7 @@ Windows bereitet das portable x64-Paket vor, speichert den Workspace und beendet
 
 Linux lädt das amd64-/ARM64-Debian-Paket und öffnet es mit der eingerichteten System-Paketinstallation. Installation und Rechteabfrage erfolgen dort; anschließend LIS2 neu starten. Dafür werden xdg-utils und eine passende Dateizuordnung benötigt. Portable Linux-Archive werden zum manuellen Entpacken angeboten. GitHub und das Repository sind die Vertrauensquelle; die Prüfsumme aus demselben Release ist keine unabhängige digitale Signatur. [Bedienung, Grenzen und Wiederherstellung](application-updates.md).
 
-**v0.1.19 regulär installieren. Den Updateweg zwischen veröffentlichten Versionen prüfen wir mit dem darauffolgenden Release.** Der echte Windows-Prozesswechsel und die Wiederherstellung nach absichtlich fehlendem Startprogramm sind mit isolierten Anwendungskopien geprüft. Die tatsächliche Pi-Paketinstallation durch den Systeminstaller bleibt ein Zielsystemtest. Hilfe und Bedienung sind in fünf Sprachen ergänzt.
+Die tatsächliche Pi-Paketinstallation durch den Systeminstaller bleibt ein Zielsystemtest; v0.1.19 ist dort nach Benutzerbestätigung installiert. Der echte Windows-Prozesswechsel und die Wiederherstellung nach absichtlich fehlendem Startprogramm sind mit isolierten Anwendungskopien geprüft. Hilfe und Bedienung sind in fünf Sprachen ergänzt.
 
 ## Linux-VU, Spektrum und plattformgerechte Vorlagen
 

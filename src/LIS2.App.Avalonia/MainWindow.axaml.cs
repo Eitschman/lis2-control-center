@@ -106,6 +106,7 @@ public partial class MainWindow : Window
         InitializeUpdates();
         InitializeEvents();
         InitializeDashboard();
+        InitializeSourceQuality();
         this.FindControl<CheckBox>("ProgramGlyphsOnConnect")!.IsCheckedChanged += (_, _) => _ = SavePortableWorkspaceAsync();
         Closing += OnWindowClosing;
         // The virtual transport is hardware-free: make the WPF-style preview

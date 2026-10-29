@@ -17,10 +17,14 @@ public sealed class HomeAssistantConnectionTests
         Assert.Equal(87L, source.Values["sensor.room.attribute.battery"]);
         await server.SendAsync(first, new { id = 2, type = "event", @event = new { event_type = "state_changed", data = new { entity_id = "sensor.room", new_state = HomeAssistantServer.State("24") } } });
         await HomeAssistantServer.WaitAsync(() => Equals(source.Values.GetValueOrDefault("sensor.room"), "24"));
+        var received = source.LastReceivedAt;
+        Assert.NotNull(received);
+        Assert.Equal(source.LastUpdateAt, received);
         first.Abort();
         await HomeAssistantServer.WaitAsync(() => !source.IsConnected);
         Assert.Empty(source.Values);
         Assert.Empty(source.Entities);
+        Assert.Equal(received, source.LastReceivedAt);
         var second = await server.AcceptAsync();
         await server.InitializeAsync(second);
         await HomeAssistantServer.WaitAsync(() => source.Values.ContainsKey("sensor.room"));
@@ -31,6 +35,7 @@ public sealed class HomeAssistantConnectionTests
         Assert.Null(source.HomeAssistantVersion);
         Assert.Null(source.LastUpdateAt);
         source.Configure(null, null);
+        Assert.Null(source.LastReceivedAt);
         await source.StartAsync();
         Assert.False(source.IsConfigured);
     }

@@ -1,6 +1,6 @@
 # Architektur
 
-Stand: 29.10.2026. Geltungsbereich: `main`, gemeinsame Windows-/Linux-Anwendung einschließlich PORT-08 und ROAD-01/ROAD-05.
+Stand: 29.10.2026. Geltungsbereich: `main`, gemeinsame Windows-/Linux-Anwendung einschließlich PORT-08, ROAD-01/ROAD-05 und ROAD-03/ROAD-04.
 Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md).
 
 ## Anwendungsupdates
@@ -8,6 +8,8 @@ Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md
 `ApplicationUpdates` liest stabile GitHub-Releases und prüft plattformgerechte Downloads anhand SHA-256. `MainWindow.Updates` verwaltet Bedienung, gespeicherte Freigaben und die tägliche Prüfung. `UpdateInstallation` übergibt Debian-Pakete an den Desktop und tauscht portable Windows-Installationen außerhalb des laufenden Anwendungsordners aus. Die Anwendungskopie startet über `--apply-update` vor Avalonia und vor der normalen Instanzsperre. `UpdateStartup` bestätigt den neuen Desktop; ein fehlgeschlagener Start löst die Wiederherstellung aus. Der Austausch wird erst nach erfolgreichem Runtime-Shutdown freigegeben. Details und Grenzen stehen im [Updateleitfaden](application-updates.md).
 
 ## Projekte und Abhängigkeiten
+
+`TemplateValidation` prüft Ausdrücke unabhängig von der Ausgabe des Renderers. `MainWindow.SourceQuality` verbindet markierbare Zeilenhinweise mit dem aktuellen Variablenkatalog und zeigt die Datenaktualität in den Quellansichten. `DataFreshness` behält gültige Empfangszeitpunkte über fehlgeschlagene Erfassungen hinweg; UI-Abfragen erzeugen keine neuen Messungen. `HomeAssistantDataSource.LastReceivedAt` bleibt bei Trennung erhalten und wird bei Neukonfiguration zurückgesetzt. Zeitgrenzen und Unterschiede zwischen periodischen und ereignisgesteuerten Quellen stehen im [Leitfaden](template-validation-and-freshness.md).
 
 `LIS2.App.Avalonia` ist die gemeinsame Desktopanwendung für Windows und Linux. Auch `tools/LIS2.ProtocolTester` verwendet Avalonia. Der Quellbaum und die Solution enthalten keine WPF-Projekte. Die WPF-Funktionsreferenz ist über Git-Commit `922ca1b` zugänglich.
 

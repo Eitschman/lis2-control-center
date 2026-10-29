@@ -113,6 +113,7 @@ public partial class MainWindow
             System.Diagnostics.Trace.TraceError("Media startup {0} failed: {1}: {2}", provider, ex.GetBaseException().GetType().Name, ex.GetBaseException().Message);
             if (_mediaStopping) return;
             _pageSources.UpdateMedia(provider, new Dictionary<string, object?>());
+            ObserveMediaQuality(provider, new Dictionary<string, object?>(), DateTimeOffset.UtcNow);
             var controlName = provider switch
             {
                 "WindowsMedia" => "WindowsMediaStatus",
@@ -173,6 +174,7 @@ public partial class MainWindow
                 _ => throw new ArgumentException("Unknown media provider.", nameof(provider))
             };
             _pageSources.UpdateMedia(provider, new Dictionary<string, object?>());
+            ObserveMediaQuality(provider, new Dictionary<string, object?>(), DateTimeOffset.UtcNow);
             var statusControl = this.FindControl<TextBlock>(status);
             if (statusControl is not null)
                 SetUiText(statusControl, $"Provider error: {message}");
@@ -182,6 +184,7 @@ public partial class MainWindow
     private void RefreshWindowsMedia()
     {
         var values = _windowsMedia.Values;
+        ObserveMediaQuality("WindowsMedia", values, DateTimeOffset.UtcNow);
         _pageSources.UpdateMedia("WindowsMedia", values);
         var connected = values.GetValueOrDefault("Connected") is true;
         string Read(string key) => (connected || key == "Connected") && values.TryGetValue(key, out var value) ? Convert.ToString(value) ?? "" : "";
@@ -241,6 +244,7 @@ public partial class MainWindow
 
     internal void ApplyMprisSnapshot(MprisSnapshot snapshot)
     {
+        if (snapshot.Values.GetValueOrDefault("Connected") is true) _mprisReceivedAt = DateTimeOffset.UtcNow;
         UpdateMediaPlayerPicker(snapshot.Players);
         _mprisValues = snapshot.Values;
         _linuxAudio.SelectPlayer(snapshot.Values.GetValueOrDefault("Player") as string,
@@ -255,6 +259,7 @@ public partial class MainWindow
         var values = new Dictionary<string, object?>(_mprisValues);
         foreach (var pair in audio) values[pair.Key] = pair.Value;
         _pageSources.UpdateMedia("Media", values);
+        ObserveMediaQuality("Media", values, DateTimeOffset.UtcNow);
         ApplyLinuxAudioValues(audio);
     }
 
@@ -299,6 +304,7 @@ public partial class MainWindow
 
     internal void RefreshMediaSource(string id, IReadOnlyDictionary<string, object?> values)
     {
+        ObserveMediaQuality(id, values, DateTimeOffset.UtcNow);
         _pageSources.UpdateMedia(id, values);
         var prefix = id + "Media";
         var connected = values.GetValueOrDefault("Connected") is true;

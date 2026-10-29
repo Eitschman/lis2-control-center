@@ -332,9 +332,15 @@
                 <TextBlock Grid.Row="0" Text="Name" />
                 <TextBox Name="PageName" Grid.Row="0" Grid.Column="1" />
                 <TextBlock Grid.Row="1" Text="Line 1" />
-                <TextBox Name="PageLine1" Grid.Row="1" Grid.Column="1" ToolTip.Tip="{StaticResource PageFormattingHint}" ToolTip.Placement="Bottom" />
+                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="4">
+                  <TextBox Name="PageLine1" ToolTip.Tip="{StaticResource PageFormattingHint}" ToolTip.Placement="Bottom" />
+                  <StackPanel Name="PageLine1Issues" Spacing="3" IsVisible="False" />
+                </StackPanel>
                 <TextBlock Grid.Row="2" Text="Line 2" />
-                <TextBox Name="PageLine2" Grid.Row="2" Grid.Column="1" ToolTip.Tip="{StaticResource PageFormattingHint}" ToolTip.Placement="Bottom" />
+                <StackPanel Grid.Row="2" Grid.Column="1" Spacing="4">
+                  <TextBox Name="PageLine2" ToolTip.Tip="{StaticResource PageFormattingHint}" ToolTip.Placement="Bottom" />
+                  <StackPanel Name="PageLine2Issues" Spacing="3" IsVisible="False" />
+                </StackPanel>
                 <TextBlock Grid.Row="3" Text="Duration (s)" />
                 <WrapPanel Grid.Row="3" Grid.Column="1">
                   <TextBox Margin="0,0,8,8" Name="PageDuration" Width="90" />
@@ -463,6 +469,7 @@
             <TextBlock Name="WindowsMediaAlbum" TextTrimming="CharacterEllipsis" Opacity="0.7"/>
             <TextBlock Name="WindowsMediaPlayback" FontWeight="SemiBold"/>
             <TextBlock Name="WindowsMediaSource" TextWrapping="Wrap"/>
+            <TextBlock Name="WindowsMediaFreshness" TextWrapping="Wrap" Opacity="0.75"/>
             <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
               <TextBlock Name="WindowsMediaTime" FontFamily="Consolas" FontSize="16" Opacity="0.7" VerticalAlignment="Center"/>
               <Button Grid.Column="1" Name="WindowsMediaPage" Content="Create playback page"/>
@@ -480,6 +487,7 @@
             <TextBlock Name="LinuxMediaAlbum" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
             <TextBlock Name="LinuxMediaPlayback"/>
             <TextBlock Name="LinuxMediaDuration"/>
+            <TextBlock Name="LinuxMediaFreshness" TextWrapping="Wrap" Opacity="0.75"/>
             <Separator Margin="0,8"/>
             <Grid ColumnDefinitions="*,Auto">
               <TextBlock Text="VU / Spectrum" FontWeight="SemiBold"/>
@@ -537,6 +545,7 @@
             <Grid Name="WinampSpectrumBars" Height="70" ColumnSpacing="3"/>
             <TextBlock Name="WinampMediaTelemetry" FontFamily="Consolas" TextWrapping="Wrap"/>
             <TextBlock Name="WinampMediaConnection" TextWrapping="Wrap"/>
+            <TextBlock Name="WinampMediaFreshness" TextWrapping="Wrap" Opacity="0.75"/>
             <Button Name="WinampMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
         </Border>
@@ -579,6 +588,7 @@
             <Grid Name="WmpLegacySpectrumBars" Height="70" ColumnSpacing="3"/>
             <TextBlock Name="WmpLegacyMediaTelemetry" FontFamily="Consolas" TextWrapping="Wrap"/>
             <TextBlock Name="WmpLegacyMediaConnection" TextWrapping="Wrap"/>
+            <TextBlock Name="WmpLegacyMediaFreshness" TextWrapping="Wrap" Opacity="0.75"/>
             <TextBlock Name="WmpLegacyVisualizationConnection" TextWrapping="Wrap"/>
             <Button Name="WmpLegacyMediaPage" Content="Create playback page" HorizontalAlignment="Left"/>
           </StackPanel>
@@ -618,6 +628,7 @@
               <ComboBox Margin="0,0,8,8" Name="HaDomainFilter" Width="220" />
             </WrapPanel>
             <TextBlock Name="HaStatus" Text="Not configured" TextWrapping="Wrap" />
+            <TextBlock Name="HaFreshness" TextWrapping="Wrap" Opacity="0.75" />
             <Grid ColumnDefinitions="34,2.4*,1.4*,1*,1.7*" Margin="8,4,8,0">
               <TextBlock Grid.Column="0" Text="★" FontWeight="SemiBold"/>
               <TextBlock Grid.Column="1" Text="Entity" FontWeight="SemiBold"/>
@@ -786,6 +797,7 @@
           <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16"><StackPanel Spacing="12">
           <TextBlock Text="Hardware monitoring" FontSize="18" FontWeight="SemiBold" />
           <TextBlock Name="HardwareSensorStatus" Text="Refresh to discover available sensors." TextWrapping="Wrap" />
+          <TextBlock Name="HardwareFreshness" TextWrapping="Wrap" Opacity="0.75" />
           <WrapPanel>
             <Button Margin="0,0,8,8" Name="HardwareRefresh" Content="Refresh sensors" />
             <Button Margin="0,0,8,8" Name="HardwareAutoRefresh" Content="Start live updates" />
@@ -833,6 +845,7 @@
           <StackPanel Spacing="10">
             <TextBlock Text="Selected sensor / fan assignment" FontSize="18" FontWeight="SemiBold"/>
           <TextBlock Name="HardwareSelectedSensor" Text="Select a sensor above." TextWrapping="Wrap" />
+          <TextBlock Name="HardwareSelectedFreshness" TextWrapping="Wrap" Opacity="0.75" />
           <WrapPanel>
             <TextBox Margin="0,0,8,8" Name="HardwareAlias" Width="260" Watermark="Alias for selected sensor" />
             <CheckBox Margin="0,0,8,8" Name="HardwareFavorite" Content="Favorite" VerticalAlignment="Center" />

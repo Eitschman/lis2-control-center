@@ -91,15 +91,15 @@ Die Update-Hinweise und der automatische Windows-Dateiaustausch bilden das gemei
 
 ### ROAD-03: Vorlagenprüfung im Seiteneditor
 
-- [ ] Unbekannte Variablen, ungültige Formatierungen und fehlende Glyphen direkt am betroffenen Ausdruck markieren.
-- [ ] Fehlerhafte Ausdrücke von gültigen, aber aktuell nicht verfügbaren Quellen unterscheiden.
-- [ ] Korrektur und anschließende Vorschau mit gültigen, fehlerhaften und vorübergehend fehlenden Quelldaten prüfen.
+- [x] Unbekannte statische Variablen, ungültige Formatierungen und fehlende Glyphen unter der betroffenen Zeile melden; anklickbare Hinweise markieren den Ausdruck.
+- [x] Fehler von bekannten fehlenden Werten und noch nicht entdeckten dynamischen Hardware-/HA-Schlüsseln unterscheiden; aktuelle Glyphensätze berücksichtigen.
+- [x] Gültige, fehlerhafte und fehlende Werte sowie Korrektur, Markierung, Vorschau und fünfsprachige Oberfläche in bestehenden Suiten prüfen. [Bedienung und Grenzen](docs/template-validation-and-freshness.md).
 
 ### ROAD-04: Datenaktualität anzeigen
 
-- [ ] Bei Sensoren, Home Assistant und Medien den Zeitpunkt beziehungsweise das Alter der letzten gültigen Daten anzeigen.
-- [ ] Veraltete Daten, Verbindungsverlust und Wiederverbindung erkennbar darstellen.
-- [ ] Zeitablauf und Wiederherstellung für die unterschiedlichen Quelltypen prüfen.
+- [x] Hardware gesamt, ausgewählter Sensor, Home Assistant und Medien zeigen Zeitpunkt und Alter; HA kennzeichnet den Quell-Datenempfang ausdrücklich.
+- [x] Veraltete Daten, fehlende Messungen und Trennung unterscheiden; bei Wiederkehr nur gültige Erfassungen übernehmen. Ereignisquellen nicht allein wegen unveränderter Daten als fehlerhaft einstufen.
+- [x] Zeitablauf, fehlende Werte, Wiederkehr und HA-Neukonfiguration prüfen; Hilfe und Übersetzungen in fünf Sprachen ergänzen. [Fristen und Quellunterschiede](docs/template-validation-and-freshness.md).
 
 ### ROAD-06: Sensor- und Lüfterverlauf
 

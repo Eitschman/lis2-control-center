@@ -438,6 +438,7 @@ public partial class MainWindow
             return;
         }
         var frame = _editorPreview.Tick(DateTimeOffset.UtcNow, PagePreviewValues());
+        RefreshTemplateValidation();
         RefreshPageFormatting();
         UpdateConditionStatus();
         this.FindControl<VfdLine>("PagePreview1")!.Text = LIS2.Display.GlyphRendering.Preview(frame.Line1, _glyphs.IsSpectrumSet);

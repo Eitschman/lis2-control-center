@@ -70,6 +70,7 @@ public partial class MainWindow
             }
             var selected = this.FindControl<ListBox>("HardwareSensorList")!.SelectedItem as HardwareSensorEntry;
             _selectedHardwareSensorKey = selected?.Key;
+            RefreshDataFreshness();
             SetHardwareFanAssignmentEnabled(selected?.IsAvailable == true);
             this.FindControl<Button>("HardwareSavePreference")!.IsEnabled = selected is not null;
             var preference = _hardwarePreferences.FirstOrDefault(p => string.Equals(p.Key, selected?.Key, StringComparison.OrdinalIgnoreCase));
@@ -138,6 +139,7 @@ public partial class MainWindow
         try
         {
             var snapshot = _liveFanSensors.Snapshot();
+            ObserveHardwareQuality(snapshot, DateTimeOffset.UtcNow);
             _hardwareSensors.Clear();
             foreach (var item in snapshot) _hardwareSensors[item.Key] = item.Value;
             _pageSources.UpdateHardware(_hardwareSensors);
@@ -151,6 +153,7 @@ public partial class MainWindow
         catch (Exception ex)
         {
             _hardwareSensors.Clear();
+            ObserveHardwareQuality(_hardwareSensors, DateTimeOffset.UtcNow);
             _pageSources.UpdateHardware(_hardwareSensors);
             RefreshFanSensorChoices();
             RefreshPageVariables();
