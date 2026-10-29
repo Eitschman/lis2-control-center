@@ -121,6 +121,7 @@ Add("Windows CPU temperatures", "Windows CPU temperatures require the official s
             case 6:
                 Add("Regulation", "Choose an available sensor directly or type a key, including a missing sensor. Curve points and raw text share decimal temperatures without rounding. Test tools contains simulations and preview controls. Physical authorization stays separate and is never saved.");
                 Add("Fan Control", "Configure four channels, each with sensor assignment, mode and safe minimum/maximum output.");
+                Add("Sensor and fan history", FanHistoryText.Help);
                 Add("Regulation", "Fixed uses the configured percentage. Curve interpolates temperature=percent points and applies hysteresis. Follow rounds the sensor value to a percentage. External uses the fail-safe value because this application supplies no external control percentage. Off outputs zero only with AllowStop; otherwise it uses the minimum. Minimum and maximum limit normal outputs.");
                 Add("Fail-safe", "Missing or invalid sensors in Curve and Follow use the configured fail-safe value within the channel limits. Preview and simulation do not control physical fans. Physical output requires explicit authorization for the current serial connection. Start sends 100% first; stop and orderly disconnect send 100%. A broken physical connection cannot guarantee delivery of a safety frame.");
                 break;

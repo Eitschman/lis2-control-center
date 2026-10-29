@@ -1,4 +1,10 @@
-# LIS2 Control Center 0.1.21
+# LIS2 Control Center 0.1.22
+
+## Sensor- und Lüfterverlauf
+
+ROAD-06 ergänzt die Verlaufssicht in der Lüftersteuerung. Regelsensor, berechneter Sollwert und gemessene Drehzahl verwenden dieselbe Zeitachse mit getrennten Skalen. 5, 15 oder 60 Minuten sind auswählbar. Fehlende Messungen und nicht zugeordnete Drehzahlsensoren bleiben erkennbar. Der Sollwert verwendet gespeicherte Einstellungen einschließlich Fail-safe und bestätigt keine physische Ausgabe.
+
+Die letzten 60 Minuten bleiben ausschließlich im Arbeitsspeicher, höchstens 1801 Punkte je Kanal. Neustart oder eine geänderte Kanalkonfiguration beginnen einen neuen Verlauf. Hardwarefreigaben werden nicht erweitert. Bedienung und Hilfe sind in fünf Sprachen ergänzt. [Bedienung und Grenzen](fan-history.md).
 
 ## Vorlagenprüfung und Datenaktualität
 
@@ -6,7 +12,7 @@ ROAD-03 ergänzt anklickbare Hinweise direkt unter den beiden Vorlagenzeilen. Fe
 
 ROAD-04 ergänzt Zustand, lokalen Zeitpunkt und Datenalter bei Hardware, ausgewähltem Sensor, Home Assistant und Medien. Fehlgeschlagene oder fehlende Erfassungen verjüngen den Zeitpunkt nicht. Periodische Hardware und Medien haben Zeitgrenzen; ereignisgesteuerter Windows Media Player und Home Assistant werden wegen unveränderter Werte allein nicht als veraltet eingestuft. HA nennt ausdrücklich den letzten Quell-Datenempfang. Bedienung und Hilfe sind in fünf Sprachen ergänzt. [Details und Grenzen](template-validation-and-freshness.md).
 
-**Mit einer installierten v0.1.19 lässt sich dieses Release erstmals über Einstellungen → Updates beziehen.** Auf dem Pi das ARM64-Debian-Paket herunterladen, an die eingerichtete System-Paketinstallation übergeben und dort installieren. Anschließend LIS2 neu starten und Version 0.1.21 kontrollieren. Diese reale Zielsystemprüfung übernimmt der Benutzer.
+Das Release lässt sich über Einstellungen → Updates beziehen. Der Benutzer bestätigt den Pi-Updateversuch von v0.1.19 auf v0.1.21 als erfolgreich. Der reale Versionswechsel auf einem Windows-Zielsystem bleibt offen; der Paket-Smoke prüft Austausch und Wiederherstellung automatisiert.
 
 ## Updates für Windows und Linux
 

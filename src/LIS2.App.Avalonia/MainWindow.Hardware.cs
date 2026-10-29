@@ -143,6 +143,7 @@ public partial class MainWindow
             _hardwareSensors.Clear();
             foreach (var item in snapshot) _hardwareSensors[item.Key] = item.Value;
             _pageSources.UpdateHardware(_hardwareSensors);
+            RecordFanHistory(_hardwareSensors, DateTimeOffset.UtcNow);
             RefreshFanSensorChoices();
             RefreshPageVariables();
             _hardwareSourceError = _liveFanSensors is WindowsHardwareFanSensors windows
@@ -154,6 +155,7 @@ public partial class MainWindow
         {
             _hardwareSensors.Clear();
             ObserveHardwareQuality(_hardwareSensors, DateTimeOffset.UtcNow);
+            RecordFanHistory(_hardwareSensors, DateTimeOffset.UtcNow);
             _pageSources.UpdateHardware(_hardwareSensors);
             RefreshFanSensorChoices();
             RefreshPageVariables();

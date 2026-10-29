@@ -71,6 +71,7 @@ public partial class MainWindow
 
     private void InitializeFanEditor()
     {
+        InitializeFanHistory();
         InitializeCurvePoints();
         SetUiText("FanSensorSource", OperatingSystem.IsLinux() ? "Linux system sensors" : "Windows hardware sensors");
         this.FindControl<ComboBox>("FanSensorChoices")!.SelectionChanged += (_, _) =>

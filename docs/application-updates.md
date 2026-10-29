@@ -2,7 +2,7 @@
 
 ## Bedienung
 
-Release v0.1.19 ist der erste Stand mit Updater und wird regulär installiert. Den Updateweg zwischen veröffentlichten Produktversionen prüfen wir mit dem darauffolgenden Release.
+Der Benutzer bestätigt den Pi-Updateversuch von der installierten v0.1.19 auf v0.1.21 als erfolgreich. Der reale Versionswechsel auf einem Windows-Zielsystem bleibt offen; Austausch und Wiederherstellung werden im Paket-Smoke automatisiert geprüft.
 
 Unter Einstellungen zeigt „Updates“ die installierte Version und bietet eine manuelle Suche. Gefunden werden stabile Releases des öffentlichen Repositorys `Eitschman/lis2-control-center`. Vorabversionen und Entwürfe werden nicht angeboten. Versionsvergleich, Versionshinweise, Downloadfortschritt und Fehlerstatus stehen in derselben Karte. Ein verfügbarer neuer Stand erscheint zusätzlich als Schaltfläche unter der Kopfzeile.
 
@@ -42,7 +42,7 @@ API-Vertrag: [GitHub Releases](https://docs.github.com/en/rest/releases/releases
 
 ## Prüfnachweise
 
-[Release-CI 40898218003](https://github.com/Eitschman/lis2-control-center/actions/runs/40898218003) für v0.1.21 besteht alle 14 Jobs. Linux besteht 628 Anwendungstests, Windows 627 mit einem übersprungenen Linux-Schlüsselbundtest. Die 40 Updatefälle und drei Update-Oberflächenfälle sind enthalten. Die veröffentlichten Pakete und alle neun Prüfsummen sind geprüft. Der echte Windows-Austausch und die Wiederherstellung bestehen im Paket-Smoke. Auf dem Pi ist nach Benutzerbestätigung v0.1.19 installiert; der echte Übergang auf v0.1.21 über die System-Paketinstallation bleibt der anschließende manuelle Test.
+[Release-CI 40898218003](https://github.com/Eitschman/lis2-control-center/actions/runs/40898218003) für v0.1.21 besteht alle 14 Jobs. Linux besteht 628 Anwendungstests, Windows 627 mit einem übersprungenen Linux-Schlüsselbundtest. Die 40 Updatefälle und drei Update-Oberflächenfälle sind enthalten. Die veröffentlichten Pakete und alle neun Prüfsummen sind geprüft. Der echte Windows-Austausch und die Wiederherstellung bestehen im Paket-Smoke. Der Benutzer bestätigt den anschließenden Pi-Updateversuch von v0.1.19 auf v0.1.21 als erfolgreich.
 
 Die Anwendungstests prüfen Versionsvergleich, Plattformpakete, stabile Metadaten und offizielle URLs, Prüfsummen samt beschädigter Datei nach dem Download, HTTP-Fehler, Abbruch, ZIP-Pfade, Paketversion, Austausch, unterbrochenen Austausch und Wiederherstellung bei gescheitertem Neustart. Linux prüft die wörtliche Pfadübergabe an einen isolierten Desktopaufruf sowie dessen Fehlerstatus. Die tatsächliche Installation durch Discover oder GNOME Software ist eine eigene Desktopprüfung.
 

@@ -1,7 +1,11 @@
 # Architektur
 
-Stand: 29.10.2026. Geltungsbereich: `main`, gemeinsame Windows-/Linux-Anwendung einschließlich PORT-08, ROAD-01/ROAD-05 und ROAD-03/ROAD-04.
+Stand: 29.10.2026. Geltungsbereich: `main`, gemeinsame Windows-/Linux-Anwendung einschließlich PORT-08, ROAD-01/ROAD-05, ROAD-03/ROAD-04 und ROAD-06.
 Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md).
+
+## Sensor- und Lüfterverlauf
+
+`MainWindow.FanHistory` übernimmt ausschließlich vorhandene Hardware-Snapshots aus der Zwei-Sekunden-Abfrage. `FanController` berechnet den ausdrücklich als berechnet gekennzeichneten Sollwert aus gespeicherten Einstellungen. Der Drehzahlpfad verwendet die Dashboard-Sensorzuordnung; eine Berechnung oder LIS2-Rückmeldung ersetzt keine Messung. `FanHistory` begrenzt jede der vier Reihen auf 60 Minuten und 1801 Punkte, trennt Konfigurationswechsel und erhält Messlücken. `FanHistoryPlot` zeichnet drei Skalen mit gemeinsamer Zeitachse und verbindet keine Abstände über fünf Sekunden. Es gibt keine Persistenz und keine zusätzliche Ausgabefreigabe. [Bedienung und Grenzen](fan-history.md).
 
 ## Anwendungsupdates
 

@@ -401,6 +401,7 @@ internal static class HelpReferenceLocalization
 
     internal static string Translate(string source, string language)
     {
+        if (FanHistoryText.Contains(source)) return FanHistoryText.Get(source, language);
         if (SourceQualityText.Contains(source)) return SourceQualityText.Get(source, language);
         if (UpdateText.Contains(source)) return UpdateText.Get(source, language);
         var index = language switch { "de" => 0, "fr" => 1, "tr" => 2, "ru" => 3, _ => -1 };

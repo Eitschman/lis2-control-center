@@ -692,6 +692,23 @@
         <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
           <StackPanel Spacing="10">
             <TextBlock Text="Fan channel configuration" FontSize="17" FontWeight="SemiBold" />
+            <Expander Header="Sensor and fan history" IsExpanded="True" HorizontalAlignment="Stretch">
+              <StackPanel Spacing="8">
+                <WrapPanel>
+                  <ComboBox Name="HistoryChannel" SelectedIndex="0" Width="150" Margin="0,0,12,8">
+                    <ComboBoxItem Content="Fan 1"/><ComboBoxItem Content="Fan 2"/><ComboBoxItem Content="Fan 3"/><ComboBoxItem Content="Fan 4"/>
+                  </ComboBox>
+                  <ComboBox Name="HistoryWindow" Width="150" Margin="0,0,12,8"/>
+                </WrapPanel>
+                <Grid ColumnDefinitions="150,*" RowDefinitions="80,80,80">
+                  <StackPanel Spacing="5"><TextBlock Text="Control sensor" TextWrapping="Wrap" FontWeight="SemiBold"/><TextBlock Name="HistorySensor" TextWrapping="Wrap"/></StackPanel>
+                  <StackPanel Grid.Row="1" Spacing="5"><TextBlock Text="Calculated target" TextWrapping="Wrap" FontWeight="SemiBold"/><TextBlock Name="HistoryTarget" TextWrapping="Wrap"/></StackPanel>
+                  <StackPanel Grid.Row="2" Spacing="5"><TextBlock Text="Measured speed" TextWrapping="Wrap" FontWeight="SemiBold"/><TextBlock Name="HistoryRpm" TextWrapping="Wrap"/></StackPanel>
+                  <local:FanHistoryPlot Name="HistoryPlot" Grid.Column="1" Grid.RowSpan="3" Height="240" ClipToBounds="True" AxisBrush="{DynamicResource Lis2SidebarTextBrush}"/>
+                </Grid>
+                <TextBlock Name="HistoryStatus" Text="Waiting for measurements" Opacity="0.7" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Expander>
             <TextBlock Text="Physical fan outputs require explicit authorization. Configuration and previews do not send hardware commands." TextWrapping="Wrap" />
             <WrapPanel>
               <TextBlock Margin="0,0,8,8" Text="Channel" VerticalAlignment="Center" />

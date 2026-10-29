@@ -88,7 +88,8 @@ ROAD-01/ROAD-05 bieten Update-Hinweise und Windows-Dateiaustausch sowie geprüft
 - [x] Release v0.1.19 veröffentlicht: [Main-CI 40890216515](https://github.com/Eitschman/lis2-control-center/actions/runs/40890216515) mit zwölf und [Release-CI 40890232699](https://github.com/Eitschman/lis2-control-center/actions/runs/40890232699) mit 14 erfolgreichen Jobs. Linux 600 erfolgreiche Anwendungstests; Windows 599 erfolgreich und ein Linux-Schlüsselbundtest übersprungen. Neun Prüfsummen, Paketversionen, Lizenzbeilagen, Debian-Empfehlungen und zehn README-Downloadlinks geprüft. Echter Windows-Austausch und Wiederherstellung bestehen auch im veröffentlichten Paket.
 - [ ] Tatsächliche Debian-Paketübergabe und Installation auf dem Pi/KDE mit dessen Dateizuordnung prüfen. Die isolierte Prozessprüfung belegt keine Installation durch Discover oder GNOME Software.
 - [x] Benutzer bestätigt v0.1.19 auf dem Pi installiert; Ausgangsstand für den Updateversuch vorhanden.
-- [ ] Update zwischen zwei veröffentlichten Produktversionen auf Windows und Linux am Zielsystem prüfen. v0.1.19 als ersten Stand mit Updater regulär installieren; den Updateweg anschließend mit dem darauffolgenden Release prüfen.
+- [x] Benutzer bestätigt den Updateversuch auf dem Pi von der installierten v0.1.19 auf v0.1.21 als erfolgreich.
+- [ ] Update zwischen veröffentlichten Produktversionen auf einem Windows-Zielsystem prüfen; der Paket-Smoke prüft Austausch und Wiederherstellung automatisiert.
 
 ### ROAD-03: Vorlagenprüfung im Seiteneditor
 
@@ -101,13 +102,13 @@ ROAD-01/ROAD-05 bieten Update-Hinweise und Windows-Dateiaustausch sowie geprüft
 - [x] Hardware gesamt, ausgewählter Sensor, Home Assistant und Medien zeigen Zeitpunkt und Alter; HA kennzeichnet den Quell-Datenempfang ausdrücklich.
 - [x] Veraltete Daten, fehlende Messungen und Trennung unterscheiden; bei Wiederkehr nur gültige Erfassungen übernehmen. Ereignisquellen nicht allein wegen unveränderter Daten als fehlerhaft einstufen.
 - [x] Zeitablauf, fehlende Werte, Wiederkehr und HA-Neukonfiguration prüfen; Hilfe und Übersetzungen in fünf Sprachen ergänzen. [Fristen und Quellunterschiede](docs/template-validation-and-freshness.md).
-- [x] Release v0.1.21 veröffentlicht: [Main-CI 40898217880](https://github.com/Eitschman/lis2-control-center/actions/runs/40898217880) besteht zwölf Jobs, [Release-CI 40898218003](https://github.com/Eitschman/lis2-control-center/actions/runs/40898218003) alle 14. Linux 628 Anwendungstests erfolgreich, Windows 627 und ein Linux-Schlüsselbundtest übersprungen. Playerwechsel übernimmt keine fremden Empfangszeitpunkte; fünf negative Gegenproben erkennen den Fehler, die korrigierten Quellen-/Oberflächenprüfungen bestehen auf beiden Plattformen. Alle neun SHA-256-Prüfsummen, Paketversionen, Architekturen, Lizenzbeilagen und zehn README-Downloadlinks geprüft. Windows-Dateiaustausch und Wiederherstellung bestehen im Paket-Smoke. Reales Update von v0.1.19 bleibt der nächste Zielsystemtest.
+- [x] Release v0.1.21 veröffentlicht: [Main-CI 40898217880](https://github.com/Eitschman/lis2-control-center/actions/runs/40898217880) besteht zwölf Jobs, [Release-CI 40898218003](https://github.com/Eitschman/lis2-control-center/actions/runs/40898218003) alle 14. Linux 628 Anwendungstests erfolgreich, Windows 627 und ein Linux-Schlüsselbundtest übersprungen. Playerwechsel übernimmt keine fremden Empfangszeitpunkte; fünf negative Gegenproben erkennen den Fehler, die korrigierten Quellen-/Oberflächenprüfungen bestehen auf beiden Plattformen. Alle neun SHA-256-Prüfsummen, Paketversionen, Architekturen, Lizenzbeilagen und zehn README-Downloadlinks geprüft. Windows-Dateiaustausch und Wiederherstellung bestehen im Paket-Smoke. Der Benutzer bestätigt den Pi-Updateversuch als erfolgreich.
 
 ### ROAD-06: Sensor- und Lüfterverlauf
 
-- [ ] Temperatur, Sollwert und tatsächliche Lüfterdrehzahl über einen gemeinsamen Zeitraum darstellen.
-- [ ] Die Verlaufssicht zur Einstellung von Lüfterkurven nutzbar machen; Messlücken und nicht verfügbare Drehzahlsensoren kenntlich machen.
-- [ ] Aufbewahrung und Speicherbedarf begrenzen; konkrete Dauer und Persistenz vor der Umsetzung festlegen.
+- [x] Regelsensor, berechneten Sollwert und tatsächlich gemessene Drehzahl auf einer gemeinsamen Zeitachse mit getrennten Skalen darstellen; 5, 15 und 60 Minuten auswählbar.
+- [x] Verlauf in der Lüftersteuerung zusammen mit der Kurvenkonfiguration verfügbar; Messlücken und nicht zugeordnete Drehzahlsensoren kenntlich machen. Sollwert ist keine Bestätigung physischer Ausgabe.
+- [x] Benutzerentscheidung: 60 Minuten ausschließlich im Arbeitsspeicher, maximal 1801 Punkte je Kanal, keine Persistenz. Konfigurationswechsel leeren den betroffenen Verlauf. [Bedienung und Grenzen](docs/fan-history.md).
 
 ### ROAD-07: Gezielter Verbindungstest
 
