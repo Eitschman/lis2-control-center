@@ -86,7 +86,7 @@ Die Update-Hinweise und der automatische Windows-Dateiaustausch bilden das gemei
 - [x] Debian-/Ubuntu-Pakete für amd64/arm64 herunterladen und an die System-Paketinstallation übergeben; fehlende Zuordnung sichtbar melden. Portable Linux-Archive herunterladen und im Downloadordner bereitstellen. `xdg-utils` als Debian-Empfehlung aufnehmen.
 - [x] Bedienung und Hilfe in fünf Sprachen, deutsche/russische Sichtprüfung bei 1305×893 und 950×600; Update- und Fehlergegenproben in bestehende Suiten integrieren.
 - [ ] Tatsächliche Debian-Paketübergabe und Installation auf dem Pi/KDE mit dessen Dateizuordnung prüfen. Die isolierte Prozessprüfung belegt keine Installation durch Discover oder GNOME Software.
-- [ ] Update zwischen zwei veröffentlichten Produktversionen auf Windows und Linux am Zielsystem prüfen. Der erste Stand mit Updater muss noch regulär installiert werden; v0.1.18 enthält ihn nicht.
+- [ ] Update zwischen zwei veröffentlichten Produktversionen auf Windows und Linux am Zielsystem prüfen. v0.1.19 als ersten Stand mit Updater regulär installieren; den Updateweg anschließend mit dem darauffolgenden Release prüfen.
 
 ### ROAD-03: Vorlagenprüfung im Seiteneditor
 

@@ -1,6 +1,6 @@
 # Linux-Spieleraudio
 
-Die Linux-Anwendung liest Metadaten über MPRIS und `playerctl`. Pegel und Spektrum erfasst sie zusätzlich aus dem PipeWire-Wiedergabestream des gewählten Players. Ein eigenes Plug-in und ein sichtbares Playerfenster sind dafür nicht erforderlich. Der Benutzer bestätigt den erfolgreichen Betrieb mit Tuner als Flatpak auf Raspberry Pi 5. Die Funktion gehört zu Release v0.1.18.
+Die Linux-Anwendung liest Metadaten über MPRIS und `playerctl`. Pegel und Spektrum erfasst sie zusätzlich aus dem PipeWire-Wiedergabestream des gewählten Players. Ein eigenes Plug-in und ein sichtbares Playerfenster sind dafür nicht erforderlich. Der Benutzer bestätigt den erfolgreichen Betrieb mit Tuner als Flatpak auf Raspberry Pi 5. Die Funktion gehört zu Release v0.1.19.
 
 ## Installation und Bedienung
 
@@ -40,11 +40,11 @@ Fehlende Werkzeuge, ein nicht erreichbarer PipeWire-Server und fehlende oder meh
 
 Der Benutzer bestätigt den erfolgreichen Betrieb mit dem geprüften ARM64-Testpaket `0.0~ci607.1` aus [Build 40858349727](https://github.com/Eitschman/lis2-control-center/actions/runs/40858349727), einschließlich automatischer Flatpak-Zuordnung. Die folgenden einzelnen Gegenproben dienen weiteren Zielsystemprüfungen; die Rückmeldung spezifiziert diese nicht einzeln.
 
-Für die Installation [ARM64-Debian-Paket v0.1.18](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/lis2-control-center_0.1.18_arm64.deb) und [SHA256SUMS.txt](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/SHA256SUMS.txt) aus demselben Release herunterladen:
+Für die Installation [ARM64-Debian-Paket v0.1.19](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/lis2-control-center_0.1.19_arm64.deb) und [SHA256SUMS.txt](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/SHA256SUMS.txt) aus demselben Release herunterladen:
 
 ```sh
 sha256sum --ignore-missing -c SHA256SUMS.txt
-sudo apt install ./lis2-control-center_0.1.18_arm64.deb
+sudo apt install ./lis2-control-center_0.1.19_arm64.deb
 ```
 
 Die Einstellungen werden weiter aus dem vorhandenen Benutzerprofil gelesen.

@@ -13,44 +13,44 @@ LIS2 Control Center is an independent replacement for the obsolete VL System Mul
 
 ## Download and installation
 
-[Release v0.1.18](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.18) includes the following packages:
+[Release v0.1.19](https://github.com/Eitschman/lis2-control-center/releases/tag/v0.1.19) includes the following packages:
 
 | System | Download |
 | --- | --- |
-| Windows x64 | [Portable ZIP](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/LIS2-Control-Center-0.1.18-win-x64.zip) |
-| Debian/Ubuntu x64 | [Debian package for amd64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/lis2-control-center_0.1.18_amd64.deb) |
-| Debian/Ubuntu ARM64, Raspberry Pi 5 | [Debian package for arm64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/lis2-control-center_0.1.18_arm64.deb) |
-| Linux x64 | [Portable archive](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/LIS2-Control-Center-0.1.18-linux-x64.tar.gz) |
-| Linux ARM64 | [Portable archive](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/LIS2-Control-Center-0.1.18-linux-arm64.tar.gz) |
+| Windows x64 | [Portable ZIP](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/LIS2-Control-Center-0.1.19-win-x64.zip) |
+| Debian/Ubuntu x64 | [Debian package for amd64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/lis2-control-center_0.1.19_amd64.deb) |
+| Debian/Ubuntu ARM64, Raspberry Pi 5 | [Debian package for arm64](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/lis2-control-center_0.1.19_arm64.deb) |
+| Linux x64 | [Portable archive](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/LIS2-Control-Center-0.1.19-linux-x64.tar.gz) |
+| Linux ARM64 | [Portable archive](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/LIS2-Control-Center-0.1.19-linux-arm64.tar.gz) |
 
 On Windows, extract the ZIP and run `LIS2.App.Avalonia.exe`. For portable Linux packages, extract the archive and run `./LIS2.App.Avalonia`. The .NET 10 runtime is included; no separate .NET installation is required.
 
 On Debian/Ubuntu, run these commands from the download directory:
 
 ```sh
-sudo apt install ./lis2-control-center_0.1.18_amd64.deb
+sudo apt install ./lis2-control-center_0.1.19_amd64.deb
 lis2-control-center
 ```
 
-On ARM64, use `lis2-control-center_0.1.18_arm64.deb` instead. The application also appears in the application menu. Configure serial port permissions when using physical LIS2 hardware.
+On ARM64, use `lis2-control-center_0.1.19_arm64.deb` instead. The application also appears in the application menu. Configure serial port permissions when using physical LIS2 hardware.
 
 Linux Home Assistant token storage normally uses `secret-tool` and an unlocked desktop keyring; local AES storage is available only after explicitly selecting it in the application. A keyring is not required for features that do not use Home Assistant.
 
 Linux media metadata requires `playerctl`; VU and spectrum additionally require a running PipeWire desktop session, `pipewire-bin` and `dbus-bin`. The Debian packages recommend these tools and `libsecret-tools`; see the [packaging guide](docs/release.md#debian-pakete).
 
-Also available: the [Windows Protocol Tester](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/LIS2-ProtocolTester-0.1.18-win-x64.zip), [Winamp plug-in gen_lis2.dll](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/gen_lis2.dll) and [SHA-256 checksums](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/SHA256SUMS.txt). Close Winamp, replace `gen_lis2.dll` in the `Plugins` directory of the actual 32-bit Winamp installation, then restart the player. Compare the installed DLL with `SHA256SUMS.txt` to verify the replacement. The [release notes](docs/release-notes.md) describe the release scope and outstanding manual checks. Application and Protocol Tester packages include license texts, third-party notices and source references.
+Also available: the [Windows Protocol Tester](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/LIS2-ProtocolTester-0.1.19-win-x64.zip), [Winamp plug-in gen_lis2.dll](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/gen_lis2.dll) and [SHA-256 checksums](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/SHA256SUMS.txt). Close Winamp, replace `gen_lis2.dll` in the `Plugins` directory of the actual 32-bit Winamp installation, then restart the player. Compare the installed DLL with `SHA256SUMS.txt` to verify the replacement. The [release notes](docs/release-notes.md) describe the release scope and outstanding manual checks. Application and Protocol Tester packages include license texts, third-party notices and source references.
 
-Windows Media Player Legacy plug-ins: [x86 / 32-bit](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/LIS2-WMP-Legacy-0.1.18-win32.zip) or [x64 / 64-bit](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.18/LIS2-WMP-Legacy-0.1.18-win64.zip). Each ZIP contains the background and visualization DLLs, registration instructions and the MIT license.
+Windows Media Player Legacy plug-ins: [x86 / 32-bit](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/LIS2-WMP-Legacy-0.1.19-win32.zip) or [x64 / 64-bit](https://github.com/Eitschman/lis2-control-center/releases/download/v0.1.19/LIS2-WMP-Legacy-0.1.19-win64.zip). Each ZIP contains the background and visualization DLLs, registration instructions and the MIT license.
 
 ## Project status
 
-Release v0.1.18 adds Linux stereo VU and a 20-band spectrum through PipeWire, automatic Flatpak player matching and platform-specific media page presets. It also includes eight dashboard live values and a documented Windows CPU-temperature setup using PawnIO with explicit per-user device access.
+Release v0.1.19 adds update checks, a Windows updater with rollback and verified Linux package downloads with system-installer handoff. Linux stereo VU and a 20-band spectrum through PipeWire, automatic Flatpak player matching and platform-specific media presets are included. It also includes eight dashboard live values and a documented Windows CPU-temperature setup using PawnIO with explicit per-user device access.
 
 As of October 27, 2026, PORT-08 includes verified archive launches on Windows x64, Linux x64 and native Linux ARM64, plus Debian packages for amd64/arm64. The shared application in `src/LIS2.App.Avalonia` provides ten main views, display/page/event runtime, custom glyphs, Windows/Linux sensors, fan control with explicit authorization for serial output, Home Assistant, media sources, workspace persistence, help and About. The modal variable browser is an accepted difference from WPF.
 
 The linked status report records current Windows/Linux test counts and CI evidence; the Linux keyring test is skipped on Windows. Tests include eight Protocol Tester UI regressions. Device controls, settings and all ten main views are tested using actual Avalonia controls and Skia rendering. Static text and dynamic messages follow the selected language; metadata and technical keys remain unchanged. Help supports German, English, French, Turkish, Russian or the system language, including changes while the dialog is open. Native Windows/Linux smoke tests cover the main application and Protocol Tester. See the [status report](docs/prp/linux-port-status.md) for CI evidence and visual checks. Extracted packages and native ARM64 execution pass in CI; physical LIS2 validation and further manual desktop checks remain open. The user has confirmed Debian package operation on a Raspberry Pi 5 with Debian 13, KDE Plasma 6.3.6 and a Wayland session, including release v0.1.0 with .NET 10.
 
-The [Avalonia PRP](docs/prp/linux-avalonia-port.md) defines the requirements, the [status report](docs/prp/linux-port-status.md) records the verified implementation, and the [parity audit](docs/prp/wpf-avalonia-parity-audit.md) describes differences from WPF. [TODO.md](TODO.md) lists the remaining priorities. Transport, port, Home Assistant enablement, Linux token storage selection and brightness are persisted. Shared display actions use the applied transport. Windows settings import is available; manual fan output respects channel limits and requires authorization for each serial operation. Live Home Assistant and media player checks on target systems remain open. PORT-06A adds the spectrum variable, visible glyph previews, an integrated condition browser, direct sensor selection, consistent presets, save feedback and diagnostic fields. The pixel grid and precise curve points are editable. Release v0.1.18 uses .NET 10 LTS and includes license notices. Further manual desktop checks remain on the list.
+The [Avalonia PRP](docs/prp/linux-avalonia-port.md) defines the requirements, the [status report](docs/prp/linux-port-status.md) records the verified implementation, and the [parity audit](docs/prp/wpf-avalonia-parity-audit.md) describes differences from WPF. [TODO.md](TODO.md) lists the remaining priorities. Transport, port, Home Assistant enablement, Linux token storage selection and brightness are persisted. Shared display actions use the applied transport. Windows settings import is available; manual fan output respects channel limits and requires authorization for each serial operation. Live Home Assistant and media player checks on target systems remain open. PORT-06A adds the spectrum variable, visible glyph previews, an integrated condition browser, direct sensor selection, consistent presets, save feedback and diagnostic fields. The pixel grid and precise curve points are editable. Release v0.1.19 uses .NET 10 LTS and includes license notices. Further manual desktop checks remain on the list.
 
 ## Features
 
@@ -142,7 +142,7 @@ Use the plug-in package matching the **player process architecture**, independen
 
 Both Legacy plug-in DLLs embed their C/C++ runtime. No separate Visual C++ Redistributable installation is required for these plug-ins. Runtime security updates require rebuilding them with an updated toolchain. See the native package READMEs for Microsoft runtime redistribution terms.
 
-Release **v0.1.18** includes Legacy support and both plug-in architectures. Select the package matching the player process, then follow the registration instructions above.
+Release **v0.1.19** includes Legacy support and both plug-in architectures. Select the package matching the player process, then follow the registration instructions above.
 
 ### Linux media players
 
@@ -190,7 +190,7 @@ See [docs/home-assistant-integration.md](docs/home-assistant-integration.md).
 
 ### Desktop application
 
-The development build also adds update checks, verified downloads, a Windows updater with rollback and Debian package handoff to the system installer. Automatic checks and automatic Windows installation are separate, initially disabled preferences. Portable Linux archives can be downloaded for manual installation. These additions are not part of release v0.1.18 yet. See the [update guide](docs/application-updates.md) for setup, trust model and recovery.
+The application checks stable GitHub releases and offers verified downloads, a Windows updater with rollback and Debian package handoff to the system installer. Automatic checks and automatic Windows installation are separate, initially disabled preferences in Settings. Portable Linux archives can be downloaded for manual installation. Install v0.1.19 normally to obtain the updater; the following release can then be used to test the update path. See the [update guide](docs/application-updates.md) for setup, trust model and recovery.
 
 - dashboard with compact 20x2 preview, page selection and rotation pause/resume, eight configurable template-based live values and fan mode/control-sensor details; RPM values require explicitly assigned speed sensors
 - tray support, subject to the tray integration available on the Linux desktop

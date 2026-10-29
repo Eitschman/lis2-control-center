@@ -2,6 +2,8 @@
 
 ## Bedienung
 
+Release v0.1.19 ist der erste Stand mit Updater und wird regulär installiert. Den Updateweg zwischen veröffentlichten Produktversionen prüfen wir mit dem darauffolgenden Release.
+
 Unter Einstellungen zeigt „Updates“ die installierte Version und bietet eine manuelle Suche. Gefunden werden stabile Releases des öffentlichen Repositorys `Eitschman/lis2-control-center`. Vorabversionen und Entwürfe werden nicht angeboten. Versionsvergleich, Versionshinweise, Downloadfortschritt und Fehlerstatus stehen in derselben Karte. Ein verfügbarer neuer Stand erscheint zusätzlich als Schaltfläche unter der Kopfzeile.
 
 „Automatisch nach Updates suchen“ prüft beim nächsten Start und anschließend täglich während der Laufzeit. Die Auswahl wird im Workspace gespeichert und ist zunächst ausgeschaltet. Eine fehlgeschlagene Netzwerkanfrage wird angezeigt und löst keine Installation aus. Die manuelle Suche ist unabhängig davon möglich.

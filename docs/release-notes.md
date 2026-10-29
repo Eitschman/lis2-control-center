@@ -1,4 +1,14 @@
-# LIS2 Control Center 0.1.18
+# LIS2 Control Center 0.1.19
+
+## Updates für Windows und Linux
+
+Die Einstellungen bieten manuelle und optionale tägliche Suche nach stabilen GitHub-Releases, Versionsvergleich, Versionshinweise und plattformgerechte Downloads. SHA-256-Prüfung und offizielle Asset-URLs sind Voraussetzung für die Übergabe. Automatische Prüfung und automatische Windows-Installation sind getrennte, zunächst ausgeschaltete Auswahlen.
+
+Windows bereitet das portable x64-Paket vor, speichert den Workspace und beendet Display-, Audio- und Lüfterlaufzeit geordnet. Ein separater Prozess sichert den bisherigen Installationsordner, tauscht ihn aus und startet die Anwendung neu. Ohne Startbestätigung wird die vorherige Installation wiederhergestellt. Der übergeordnete Ordner muss beschreibbar sein; Player-Plug-ins in anderen Installationsordnern werden nicht ausgetauscht.
+
+Linux lädt das amd64-/ARM64-Debian-Paket und öffnet es mit der eingerichteten System-Paketinstallation. Installation und Rechteabfrage erfolgen dort; anschließend LIS2 neu starten. Dafür werden xdg-utils und eine passende Dateizuordnung benötigt. Portable Linux-Archive werden zum manuellen Entpacken angeboten. GitHub und das Repository sind die Vertrauensquelle; die Prüfsumme aus demselben Release ist keine unabhängige digitale Signatur. [Bedienung, Grenzen und Wiederherstellung](application-updates.md).
+
+**v0.1.19 regulär installieren. Den Updateweg zwischen veröffentlichten Versionen prüfen wir mit dem darauffolgenden Release.** Der echte Windows-Prozesswechsel und die Wiederherstellung nach absichtlich fehlendem Startprogramm sind mit isolierten Anwendungskopien geprüft. Die tatsächliche Pi-Paketinstallation durch den Systeminstaller bleibt ein Zielsystemtest. Hilfe und Bedienung sind in fünf Sprachen ergänzt.
 
 ## Linux-VU, Spektrum und plattformgerechte Vorlagen
 
@@ -118,7 +128,7 @@ App, Protokolltester und Headless-Tests verwenden **Avalonia 11.3.22**. Die DBus
 
 Enthalten sind portable Pakete für Windows x64, Linux x64 und Linux ARM64, Debian-Pakete für amd64/arm64, der Windows-Protokolltester, das native 32-Bit-Winamp-Plug-in `gen_lis2.dll` und beide Legacy-Plug-in-Pakete.
 
-Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.18_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
+Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.19_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
 
 Die Anwendungspakete liefern **.NET 10.0.13** mit; .NET muss nicht separat installiert werden. Lizenztexte, Fremdkomponentenhinweise und feste Quellverweise liegen unter `licenses/` und `THIRD-PARTY-NOTICES.txt` bei. Avalonia-Lizenztext und Inter-Schrift wurden gegen den tatsächlichen Paketstand geprüft.
 
