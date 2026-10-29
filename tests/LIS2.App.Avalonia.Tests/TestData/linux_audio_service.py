@@ -146,6 +146,8 @@ with tempfile.TemporaryDirectory(prefix="lis2-private-audio-") as directory:
                 sandbox = ["bwrap", "--die-with-parent", "--ro-bind", "/usr", "/usr", "--ro-bind", "/lib", "/lib",
                     "--ro-bind-try", "/lib64", "/lib64", "--ro-bind", "/etc", "/etc", "--bind", "/tmp", "/tmp",
                     "--ro-bind", str(marker), "/.flatpak-info", "--proc", "/proc", "--dev-bind", "/dev", "/dev"]
+                source = pathlib.Path(__file__).resolve()
+                sandbox += ["--ro-bind", str(source.parent), str(source.parent)]
                 proxy = runtime / "session-bus"
                 launch(sandbox + ["--", "xdg-dbus-proxy", os.environ["DBUS_SESSION_BUS_ADDRESS"], str(proxy),
                     "--filter", "--own=org.mpris.MediaPlayer2.lis2audio"])
@@ -154,7 +156,7 @@ with tempfile.TemporaryDirectory(prefix="lis2-private-audio-") as directory:
                     time.sleep(0.05)
                 else: raise RuntimeError("Private D-Bus proxy startup failed: " + log_path.read_text())
                 os.environ["DBUS_SESSION_BUS_ADDRESS"] = "unix:path=" + str(proxy)
-                actor = subprocess.Popen(sandbox + ["--unshare-pid", "--", "/usr/bin/python3", __file__,
+                actor = subprocess.Popen(sandbox + ["--unshare-pid", "--", "/usr/bin/python3", str(source),
                     "sandbox-player", directory], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=log, text=True)
                 processes.append(actor)
                 ready = json.loads(actor.stdout.readline())
