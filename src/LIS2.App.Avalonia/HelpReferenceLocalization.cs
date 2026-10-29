@@ -401,6 +401,7 @@ internal static class HelpReferenceLocalization
 
     internal static string Translate(string source, string language)
     {
+        if (ConnectionTestText.Contains(source)) return ConnectionTestText.Get(source, language);
         if (FanHistoryText.Contains(source)) return FanHistoryText.Get(source, language);
         if (SourceQualityText.Contains(source)) return SourceQualityText.Get(source, language);
         if (UpdateText.Contains(source)) return UpdateText.Get(source, language);

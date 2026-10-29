@@ -1,7 +1,9 @@
 # PRP: LIS2 Control Center mit Avalonia
 
 Stand: 29.10.2026. Hauptbranch: `main`.
-Implementierungsstand: PORT-08, Windows Media Player Legacy, gemeinsames Updatepaket ROAD-01/ROAD-05, ROAD-03/ROAD-04 und ROAD-06; genaue Prüfnachweise im [Status](linux-port-status.md).
+Implementierungsstand: PORT-08, Windows Media Player Legacy, gemeinsames Updatepaket ROAD-01/ROAD-05, ROAD-03/ROAD-04, ROAD-06 und ROAD-07; genaue Prüfnachweise im [Status](linux-port-status.md).
+
+ROAD-07 ergänzt eine plattformgerechte Verbindungstest-Auswahl in der Diagnose. Home Assistant verwendet eine getrennte Anmeldung, andere Quellen bestehende Zustände und Aktualitätsdaten. Serielle Tests öffnen keinen Port und senden keine Befehle. Testergebnisse bleiben frei von Zugangsdaten, URLs und fremden Fehlertexten; Abbruch und Shutdown warten die Bereinigung ab. Hilfe und Bedienung sind fünfsprachig. [Bedienung und Grenzen](../connection-tests.md).
 
 ROAD-06 stellt Regelsensor, berechneten Sollwert und zugeordnete gemessene Drehzahl in der Lüftersteuerung auf einer gemeinsamen Zeitachse mit getrennten Skalen dar. Messlücken bleiben sichtbar. Nach Benutzerentscheidung gelten 60 Minuten ausschließlich im Arbeitsspeicher, höchstens 1801 Punkte je Kanal, keine Persistenz. Der Sollwert bestätigt keine tatsächliche Geräteausgabe; Sensor- oder Konfigurationswechsel leeren den jeweiligen Verlauf. [Bedienung und Grenzen](../fan-history.md).
 

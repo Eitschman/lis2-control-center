@@ -891,6 +891,20 @@
         </StackPanel>
       </ScrollViewer>
       <ScrollViewer Name="DiagnosticsView" Grid.Row="1" IsVisible="False">
+        <StackPanel Spacing="14">
+          <Border Background="{DynamicResource Lis2CardBrush}" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Connection test" FontSize="18" FontWeight="SemiBold"/>
+              <WrapPanel>
+                <ComboBox Name="ConnectionTestSource" Width="245" Margin="0,0,8,8"/>
+                <Button Name="ConnectionTestStart" Content="Test connection" Margin="0,0,8,8"/>
+                <Button Name="ConnectionTestCancel" Content="Cancel test" IsEnabled="False" Margin="0,0,8,8"/>
+                <Button Name="ConnectionTestOpen" Content="Open source" Margin="0,0,8,8"/>
+              </WrapPanel>
+              <TextBlock Name="ConnectionTestStatus" Text="Select a source and start the test" TextWrapping="Wrap"/>
+              <StackPanel Name="ConnectionTestResults" Spacing="10"/>
+            </StackPanel>
+          </Border>
         <Grid ColumnDefinitions="*,12,*" RowDefinitions="Auto,12,Auto" Margin="0,0,8,8">
           <Border Background="{DynamicResource Lis2CardBrush}" Grid.Row="0" Grid.Column="0" BorderBrush="{DynamicResource Lis2BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
             <StackPanel Spacing="8">
@@ -921,6 +935,7 @@
             </StackPanel>
           </Border>
         </Grid>
+        </StackPanel>
       </ScrollViewer>
       <ScrollViewer Name="EventsView" Grid.Row="1" IsVisible="False">
         <StackPanel Spacing="14">

@@ -134,6 +134,7 @@ Add("Windows CPU temperatures", "Windows CPU temperatures require the official s
                 Add("Settings", "Autostart uses the Windows user registry or a Linux XDG autostart entry. Windows closes to tray; Linux closes the application and keeps minimized windows in the taskbar. Tray menus offer Open and Exit. A second launch activates the existing instance. F1 opens help for the current section.");
                 break;
             case 8:
+                Add("Connection test", ConnectionTestText.Help);
                 Add("Export", "Diagnostics includes version, UTC time, applied transport and port, last transmitted frame, source errors and four fan configurations. The virtual state is separate. Startup and crash traces persist in avalonia-errors.log without exception messages or tokens.");
                 Add("Diagnostics", "Inspect the current device snapshot, decoded command history and protocol log.");
                 Add("Export", "Export diagnostic information for troubleshooting or hardware-validation sessions.");

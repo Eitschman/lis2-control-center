@@ -9,6 +9,7 @@ public partial class MainWindow
 {
     private void InitializeDiagnostics()
     {
+        InitializeConnectionTests();
         this.FindControl<Button>("DiagnosticsRefresh")!.Click += (_, _) => RefreshDiagnostics();
         this.FindControl<Button>("DiagnosticsExport")!.Click += async (_, _) =>
         {
@@ -38,8 +39,14 @@ public partial class MainWindow
     internal string BuildDiagnosticsReport()
     {
         RefreshDiagnostics();
+        var connectionTest = string.Join(Environment.NewLine, _connectionTestResults.Select(result =>
+            UiText(result.Name) + ": " + UiText(result.State.ToString()) +
+            (result.Detail.Length == 0 ? "" : " · " + ConnectionTestText.TranslateDetail(result.Detail, CurrentUiLanguage())) +
+            (result.Remedy.Length == 0 ? "" : " · " + UiText(result.Remedy))));
         var report = string.Join(Environment.NewLine + Environment.NewLine, new[]
         {
+            UiText("Connection test") + " (" + (_connectionTestSource ?? "") + ") " +
+                _connectionTestAt?.ToLocalTime().ToString("G", CultureInfo.CurrentCulture) + Environment.NewLine + connectionTest,
             UiText("Diagnostics Snapshot") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsSnapshot")!.Text ?? ""),
             UiText("Virtual LIS2 state") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsVirtualState")!.Text ?? ""),
             UiText("Decoded command history") + Environment.NewLine + (this.FindControl<TextBox>("DiagnosticsCommandHistory")!.Text ?? ""),

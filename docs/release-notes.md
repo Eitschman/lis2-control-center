@@ -1,4 +1,10 @@
-# LIS2 Control Center 0.1.22
+# LIS2 Control Center 0.1.23
+
+## Gezielte Verbindungstests
+
+ROAD-07 ergänzt unter Diagnose eine plattformgerechte Quellenauswahl mit einzelnen Prüfschritten, Ergebnissen und passenden Handlungsmöglichkeiten. Home Assistant prüft Adresse, Token, WebSocket-Verbindung, Begrüßung und Anmeldung über eine separate Testverbindung. Bestehende Quellen und Tokenstore bleiben unverändert. Hardware, Medien und Transport verwenden ihre vorhandenen Zustände; Metadaten und Audio werden getrennt geprüft. Ohne Wiedergabe werden Audioprüfungen übersprungen.
+
+Serielle Tests prüfen Portauswahl, Betriebssystemerkennung und eine bereits geöffnete Verbindung, ohne einen Port zu öffnen oder Befehle zu senden. Ein erkannter Port allein bestätigt weder LIS2-Identität noch Zugriffsrechte. Tests sind abbrechbar und werden beim Shutdown abgebrochen und abgewartet. Zeitpunkt und Ergebnisse stehen im Diagnoseexport. Zugangsdaten, URLs und fremde Serverfehlertexte erscheinen nicht in den Testergebnissen. Hilfe und Bedienung sind fünfsprachig. [Bedienung und Grenzen](connection-tests.md).
 
 ## Sensor- und Lüfterverlauf
 
@@ -142,13 +148,13 @@ App, Protokolltester und Headless-Tests verwenden **Avalonia 11.3.22**. Die DBus
 
 Enthalten sind portable Pakete für Windows x64, Linux x64 und Linux ARM64, Debian-Pakete für amd64/arm64, der Windows-Protokolltester, das native 32-Bit-Winamp-Plug-in `gen_lis2.dll` und beide Legacy-Plug-in-Pakete.
 
-Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.22_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
+Unter Windows das ZIP entpacken und `LIS2.App.Avalonia.exe` starten. Unter Debian das passende Paket mit `sudo apt install ./lis2-control-center_0.1.23_amd64.deb` beziehungsweise `_arm64.deb` installieren. Portable Linux-Archive enthalten den Startbefehl `LIS2.App.Avalonia`. Prüfsummen stehen in `SHA256SUMS.txt`.
 
 Die Anwendungspakete liefern **.NET 10.0.13** mit; .NET muss nicht separat installiert werden. Lizenztexte, Fremdkomponentenhinweise und feste Quellverweise liegen unter `licenses/` und `THIRD-PARTY-NOTICES.txt` bei. Avalonia-Lizenztext und Inter-Schrift wurden gegen den tatsächlichen Paketstand geprüft.
 
 ## Prüfumfang und offene Praxisprüfungen
 
-[Main-CI 40905698394](https://github.com/Eitschman/lis2-control-center/actions/runs/40905698394) besteht zwölf Jobs, [Release-CI 40905698970](https://github.com/Eitschman/lis2-control-center/actions/runs/40905698970) alle 14. Linux besteht 635 Anwendungstests, Windows 634 mit einem übersprungenen Linux-Schlüsselbundtest. 32 Paketprüfungen bestehen. Alle neun heruntergeladenen Nutzdateien stimmen mit SHA256SUMS.txt überein. Produktversion 0.1.22, Runtime 10.0.13, Paketarchitekturen, Lizenzbeilagen, Debian-Empfehlungen und zehn README-Downloadlinks sind geprüft. Beide Legacy-Pakete bestehen Architektur- und statische Laufzeitprüfung; die Winamp-DLL besteht x86-PE- und Importprüfung. Der Windows-Paket-Smoke bestätigt Austausch und Wiederherstellung mit erneutem Desktopstart.
+Lokal bestehen unter Windows und Linux jeweils 657 Anwendungstests bei einem übersprungenen Schlüsselbundtest. 32 Paketprüfungen bestehen. Die Verbindungstests prüfen unter anderem abgelehnte und ausbleibende HA-Anmeldung, unerwartete WebSocket-Begrüßung, Abbruch, fehlende Audiowerkzeuge und den Ausschluss vertraulicher Servermeldungen. Gerenderte Diagnoseansichten und Hilfe wurden in mehreren Sprachen, schmaler Fensterbreite und dunklem Theme geprüft. Die Veröffentlichung durchläuft zusätzlich die folgenden CI-Prüfungen.
 
 Die Release-Pipeline prüft Bibliotheken, Avalonia-Controls, native Windows-/Linux-Oberflächen, GSMTC-Anbieterstart, extrahierte Archive und Debian-Installation auf x64 und nativem ARM64. Die nativen Legacy-Plug-ins werden für beide Architekturen gebaut und mit Microsoft Defender geprüft. Die Desktop-Smokes prüfen unter anderem zehn Ansichten, Hilfe/About, Aktivierung aus einem zweiten Prozess und Shutdown. Screenshots dienen der Sichtprüfung.
 

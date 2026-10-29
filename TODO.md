@@ -114,10 +114,10 @@ ROAD-01/ROAD-05 bieten Update-Hinweise und Windows-Dateiaustausch sowie geprüft
 
 ### ROAD-07: Gezielter Verbindungstest
 
-- [ ] Für die ausgewählte Quelle die Verbindungsschritte einzeln prüfen und den fehlgeschlagenen Schritt benennen, etwa HA-Anmeldung, Medien-Pipe oder serieller Port.
-- [ ] Ergebnisse mit konkreten Fehlermeldungen und passenden Handlungsmöglichkeiten anzeigen; Zugangsdaten nicht ausgeben.
-- [ ] Serielle Tests ohne unbekannte Protokollkommandos und ohne ungefragt aktivierte Lüfterausgabe gestalten.
-- [ ] Erfolgreiche Verbindung, fehlende Voraussetzungen und Verbindungsfehler gezielt prüfen.
+- [x] Plattformgerechte Quellenauswahl in Diagnose; einzelne Prüfschritte für HA-Adresse, Token, WebSocket und Anmeldung sowie bestehende Metadaten-, Audio-, Sensor- und serielle Verbindungen.
+- [x] Ergebnis, Fehlerschritt und passende Handlungsmöglichkeit anzeigen; Abbruch, Wiederholung, Quellennavigation und Export mit Zeitpunkt. Zugangsdaten, URLs und fremde Servertexte bleiben aus den Testergebnissen ausgeschlossen.
+- [x] Serielle Prüfung bleibt lesend: angewendete Auswahl, Betriebssystemerkennung und bereits geöffnete Verbindung. Kein Portöffnen, kein Identifikations- oder Protokollbefehl, keine Lüfterfreigabe.
+- [x] Erfolg, fehlende Voraussetzungen, Metadaten-/Audiofehler, Zeitüberschreitung, Abbruch und Shutdown in bestehenden Suiten prüfen; lokale HA-WebSocket-Fixtures und fünfsprachige Oberfläche/Hilfe. [Bedienung und Aussagegrenzen](docs/connection-tests.md).
 
 ### ROAD-08: Virtueller Testlauf für Seiten
 

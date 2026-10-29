@@ -20,7 +20,7 @@ internal sealed class HomeAssistantServer : IAsyncDisposable
         Url = "http://127.0.0.1:" + ((IPEndPoint)_listener.LocalEndpoint).Port;
     }
 
-    public async Task<WebSocket> AcceptAsync(bool authenticate = true)
+    public async Task<WebSocket> AcceptAsync(bool? authenticate = true, string? failureMessage = null, string greetingType = "auth_required")
     {
         var client = await _listener.AcceptTcpClientAsync(_timeout.Token);
         var stream = client.GetStream();
@@ -38,11 +38,13 @@ internal sealed class HomeAssistantServer : IAsyncDisposable
         await stream.WriteAsync(Encoding.ASCII.GetBytes("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: " + accept + "\r\n\r\n"), _timeout.Token);
         var socket = WebSocket.CreateFromStream(stream, true, null, Timeout.InfiniteTimeSpan);
         _sockets.Add(socket);
-        await SendAsync(socket, new { type = "auth_required", ha_version = "test" });
+        await SendAsync(socket, new { type = greetingType, ha_version = "test" });
+        if (greetingType != "auth_required") return socket;
         using var auth = await ReadAsync(socket);
         Assert.Equal("auth", auth.RootElement.GetProperty("type").GetString());
         Assert.Equal("fixture-token", auth.RootElement.GetProperty("access_token").GetString());
-        await SendAsync(socket, authenticate ? new { type = "auth_ok", ha_version = "test" } : (object)new { type = "auth_invalid", message = "Authentication failed." });
+        if (authenticate.HasValue)
+            await SendAsync(socket, authenticate.Value ? new { type = "auth_ok", ha_version = "test" } : (object)new { type = "auth_invalid", message = failureMessage ?? "Authentication failed." });
         return socket;
     }
 

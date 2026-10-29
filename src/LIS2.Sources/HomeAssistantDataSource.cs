@@ -4,6 +4,8 @@ using System.Text.Json;
 
 namespace LIS2.Sources;
 
+public enum HomeAssistantConnectionStage { WebSocketConnected, GreetingAccepted, Authenticated }
+
 public sealed class HomeAssistantDataSource : IDataSource
 {
     private readonly SemaphoreSlim _lifecycleLock = new(1, 1);
@@ -126,7 +128,8 @@ public sealed class HomeAssistantDataSource : IDataSource
         }
     }
 
-    public async Task TestConnectionAsync(CancellationToken cancellationToken = default)
+    public async Task TestConnectionAsync(CancellationToken cancellationToken = default,
+        Action<HomeAssistantConnectionStage>? progress = null)
     {
         if (!IsConfigured)
             throw new InvalidOperationException("Home Assistant URL and access token are required.");
@@ -136,10 +139,12 @@ public sealed class HomeAssistantDataSource : IDataSource
         timeout.CancelAfter(TimeSpan.FromSeconds(10));
 
         await socket.ConnectAsync(CreateWebSocketUri(), timeout.Token).ConfigureAwait(false);
+        progress?.Invoke(HomeAssistantConnectionStage.WebSocketConnected);
         using var hello = await ReceiveJsonAsync(socket, timeout.Token).ConfigureAwait(false);
 
         if (GetType(hello) != "auth_required")
             throw new InvalidOperationException("Unexpected Home Assistant WebSocket greeting.");
+        progress?.Invoke(HomeAssistantConnectionStage.GreetingAccepted);
 
         await SendJsonAsync(
             socket,
@@ -159,6 +164,7 @@ public sealed class HomeAssistantDataSource : IDataSource
 
         if (type != "auth_ok")
             throw new InvalidOperationException("Home Assistant WebSocket authentication failed.");
+        progress?.Invoke(HomeAssistantConnectionStage.Authenticated);
     }
 
     private async Task RunReconnectLoopAsync(CancellationToken cancellationToken)

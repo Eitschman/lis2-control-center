@@ -173,6 +173,7 @@ public partial class MainWindow : Window
         _hardwareRefreshTimer.Stop();
         StopHomeAssistantUi();
         await RuntimeShutdown.RunAsync(
+            StopConnectionTestAsync,
             () => _transportStartup, () => _sourceStartup,
             DrainDeviceActionsAsync,
             StopMediaAsync,

@@ -1,7 +1,11 @@
 # Architektur
 
-Stand: 29.10.2026. Geltungsbereich: `main`, gemeinsame Windows-/Linux-Anwendung einschließlich PORT-08, ROAD-01/ROAD-05, ROAD-03/ROAD-04 und ROAD-06.
+Stand: 29.10.2026. Geltungsbereich: `main`, gemeinsame Windows-/Linux-Anwendung einschließlich PORT-08, ROAD-01/ROAD-05, ROAD-03/ROAD-04, ROAD-06 und ROAD-07.
 Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md).
+
+## Gezielte Verbindungstests
+
+`ConnectionTest` führt abbrechbare Schritte aus, überspringt abhängige Prüfungen nach Fehlern und übergibt unveränderliche Ergebnisschnappschüsse an die Oberfläche. `ConnectionTestPlans` prüft vorhandene Sensor-, Medien- und serielle Zustände; es besitzt keine Schreib- oder Portöffnungsfunktion. `HomeAssistantConnectionProbe` nutzt die separate Anmeldung von `HomeAssistantDataSource` mit bestätigten WebSocket-/Begrüßungs-/Anmeldestufen. Fremde Fehlertexte werden nicht übernommen. `MainWindow.ConnectionTest` verwaltet Auswahl, Fortschritt, Wiederholung, Sprache, Theme und Shutdown; der Diagnoseexport enthält Zeitpunkt und Ergebnisse. [Bedienung und Grenzen](connection-tests.md).
 
 ## Sensor- und Lüfterverlauf
 
