@@ -1,6 +1,6 @@
 # Architektur
 
-Stand: 20.10.2026. Geltungsbereich: `feature/linux-avalonia`, Arbeitspaket PORT-02.
+Stand: 29.10.2026. Geltungsbereich: `main`, gemeinsame Windows-/Linux-Anwendung einschließlich PORT-08 und ROAD-01/ROAD-05.
 Implementierungs- und Prüfnachweise stehen im [Status](prp/linux-port-status.md).
 
 ## Anwendungsupdates

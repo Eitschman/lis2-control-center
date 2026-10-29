@@ -1,7 +1,7 @@
 # PRP: LIS2 Control Center mit Avalonia
 
-Stand: 22.10.2026. Hauptbranch: `main`.
-Implementierungsstand: PORT-08 und Windows Media Player Legacy; genaue Prüfnachweise im [Status](linux-port-status.md).
+Stand: 29.10.2026. Hauptbranch: `main`.
+Implementierungsstand: PORT-08, Windows Media Player Legacy und gemeinsames Updatepaket ROAD-01/ROAD-05; genaue Prüfnachweise im [Status](linux-port-status.md).
 
 ## Ziel und verbindlicher Umfang
 
