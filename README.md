@@ -388,7 +388,7 @@ The Debian packages include the .NET runtime, an application menu entry and the 
 - [Windows Media Player Legacy setup](docs/wmp-legacy-integration.md)
 - [Home Assistant integration](docs/home-assistant-integration.md)
 - [Release process](docs/release.md)
-- [Roadmap and remaining work](TODO.md), including updates, template validation, data freshness, sensor/fan history, connection tests, virtual page testing and failure notifications
+- [Roadmap and remaining work](TODO.md), including real update checks on target systems, sensor/fan history, connection tests, virtual page testing and failure notifications
 
 ## Scope decisions
 

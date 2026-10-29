@@ -74,7 +74,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] Quellenabgrenzung mit pausiertem Legacy-Player und gleichzeitigem Testton eines anderen Prozesses: Pegel und Spektrum bleiben null; Fortsetzen liefert wieder Audio.
 - [ ] Direkte Audioerfassung auf weiteren Windows-Systemen und mit der anderen Playerarchitektur prüfen.
 
-Die Update-Hinweise und der automatische Windows-Dateiaustausch bilden das gemeinsame Paket ROAD-01/ROAD-05. Linux ergänzt geprüfte Debian-Downloads mit Übergabe an die System-Paketinstallation sowie portable Archivdownloads. Ein eigenes APT-Repository bleibt ausgeschlossen. Anschließend folgen Vorlagenprüfung und Datenaktualität. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
+ROAD-01/ROAD-05 bieten Update-Hinweise und Windows-Dateiaustausch sowie geprüfte Linux-Downloads mit Debian-Systeminstallation. ROAD-03/ROAD-04 ergänzen Vorlagenprüfung und Datenaktualität. Als nächstes Entwicklungspaket folgt ROAD-06 mit Sensor- und Lüfterverlauf. Ein eigenes APT-Repository bleibt ausgeschlossen. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
 
 ### ROAD-01 / ROAD-05: Update-Hinweise und Installation
 
