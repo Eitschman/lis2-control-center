@@ -23,7 +23,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] [GitHub-Build 40858349727](https://github.com/Eitschman/lis2-control-center/actions/runs/40858349727): zwölf Jobs erfolgreich, einschließlich Windows-/Linux-Tests, echter Sandbox-Gegenprobe und ARM64-Debian-Installation. Testpaket `0.0~ci607.1`, SHA-256 und Paketmetadaten geprüft.
 - [x] Benutzer bestätigt erfolgreichen Betrieb mit Tuner als Flatpak auf Raspberry Pi 5 und beauftragt Release v0.1.18.
 - [ ] Weitere einzeln dokumentierte Zielsystemprüfungen: Titelwechsel, Pause, Minimieren, Streamneustart, Medienkarte und VFD-Ausgabe entsprechend dem Linux-Audioleitfaden.
-- [ ] Release v0.1.18 veröffentlichen und Pakete, Prüfsummen sowie Downloadlinks prüfen.
+- [x] Release v0.1.18 veröffentlicht: [Main-CI 40860529374](https://github.com/Eitschman/lis2-control-center/actions/runs/40860529374) besteht zwölf Jobs, [Release-CI 40860537606](https://github.com/Eitschman/lis2-control-center/actions/runs/40860537606) alle 14. Linux 557 Anwendungstests erfolgreich, Windows 556 und ein Linux-Schlüsselbundtest übersprungen. Neun SHA-256-Prüfsummen, Produkt-/Runtimeversionen, Debian-Abhängigkeiten, Lizenzbeilagen, beide Legacy-Architekturen und zehn README-Downloadlinks geprüft.
 
 ### Dashboard-Feinschliff
 
