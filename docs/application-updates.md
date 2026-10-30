@@ -2,7 +2,7 @@
 
 ## Bedienung
 
-Der Benutzer bestätigt den Pi-Updateversuch von der installierten v0.1.19 auf v0.1.21 als erfolgreich. Der reale Versionswechsel auf einem Windows-Zielsystem bleibt offen; Austausch und Wiederherstellung werden im Paket-Smoke automatisiert geprüft.
+Der Benutzer bestätigt den Pi-Updateversuch von der installierten v0.1.19 auf v0.1.21 als erfolgreich. Der Benutzer bestätigt am 30.10.2026 auch den Windows-Updater als erfolgreich. Die Windows-Ausgangs- und Zielversion wurden nicht angegeben. Austausch und Wiederherstellung werden zusätzlich im Paket-Smoke automatisiert geprüft.
 
 Unter Einstellungen zeigt „Updates“ die installierte Version und bietet eine manuelle Suche. Gefunden werden stabile Releases des öffentlichen Repositorys `Eitschman/lis2-control-center`. Vorabversionen und Entwürfe werden nicht angeboten. Versionsvergleich, Versionshinweise, Downloadfortschritt und Fehlerstatus stehen in derselben Karte. Ein verfügbarer neuer Stand erscheint zusätzlich als Schaltfläche unter der Kopfzeile.
 

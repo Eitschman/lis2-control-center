@@ -74,7 +74,7 @@ Diese Liste gilt für die Avalonia-Anwendung auf `main`. [PRP](docs/prp/linux-av
 - [x] Quellenabgrenzung mit pausiertem Legacy-Player und gleichzeitigem Testton eines anderen Prozesses: Pegel und Spektrum bleiben null; Fortsetzen liefert wieder Audio.
 - [ ] Direkte Audioerfassung auf weiteren Windows-Systemen und mit der anderen Playerarchitektur prüfen.
 
-ROAD-01/ROAD-05 bieten Update-Hinweise und Windows-Dateiaustausch sowie geprüfte Linux-Downloads mit Debian-Systeminstallation. ROAD-03/ROAD-04 ergänzen Vorlagenprüfung und Datenaktualität. Als nächstes Entwicklungspaket folgt ROAD-06 mit Sensor- und Lüfterverlauf. Ein eigenes APT-Repository bleibt ausgeschlossen. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
+ROAD-01/ROAD-05 bieten Update-Hinweise und Windows-Dateiaustausch sowie geprüfte Linux-Downloads mit Debian-Systeminstallation. ROAD-03/ROAD-04 ergänzen Vorlagenprüfung und Datenaktualität. ROAD-06 ergänzt Sensor- und Lüfterverlauf, ROAD-07 gezielte Verbindungstests. Als nächstes Entwicklungspaket folgt ROAD-08 mit virtuellem Testlauf für Seiten. Ein eigenes APT-Repository bleibt ausgeschlossen. Offene Praxis- und Hardwareprüfungen stehen weiterhin in ihren jeweiligen Abschnitten.
 
 ### ROAD-01 / ROAD-05: Update-Hinweise und Installation
 
@@ -89,7 +89,7 @@ ROAD-01/ROAD-05 bieten Update-Hinweise und Windows-Dateiaustausch sowie geprüft
 - [ ] Tatsächliche Debian-Paketübergabe und Installation auf dem Pi/KDE mit dessen Dateizuordnung prüfen. Die isolierte Prozessprüfung belegt keine Installation durch Discover oder GNOME Software.
 - [x] Benutzer bestätigt v0.1.19 auf dem Pi installiert; Ausgangsstand für den Updateversuch vorhanden.
 - [x] Benutzer bestätigt den Updateversuch auf dem Pi von der installierten v0.1.19 auf v0.1.21 als erfolgreich.
-- [ ] Update zwischen veröffentlichten Produktversionen auf einem Windows-Zielsystem prüfen; der Paket-Smoke prüft Austausch und Wiederherstellung automatisiert.
+- [x] Benutzer bestätigt am 30.10.2026 den Windows-Updater als erfolgreich; Ausgangs- und Zielversion sind nicht angegeben. Der Paket-Smoke prüft Austausch und Wiederherstellung zusätzlich automatisiert.
 
 ### ROAD-03: Vorlagenprüfung im Seiteneditor
 

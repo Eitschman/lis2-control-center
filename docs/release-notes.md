@@ -18,7 +18,7 @@ ROAD-03 ergänzt anklickbare Hinweise direkt unter den beiden Vorlagenzeilen. Fe
 
 ROAD-04 ergänzt Zustand, lokalen Zeitpunkt und Datenalter bei Hardware, ausgewähltem Sensor, Home Assistant und Medien. Fehlgeschlagene oder fehlende Erfassungen verjüngen den Zeitpunkt nicht. Periodische Hardware und Medien haben Zeitgrenzen; ereignisgesteuerter Windows Media Player und Home Assistant werden wegen unveränderter Werte allein nicht als veraltet eingestuft. HA nennt ausdrücklich den letzten Quell-Datenempfang. Bedienung und Hilfe sind in fünf Sprachen ergänzt. [Details und Grenzen](template-validation-and-freshness.md).
 
-Das Release lässt sich über Einstellungen → Updates beziehen. Der Benutzer bestätigt den Pi-Updateversuch von v0.1.19 auf v0.1.21 als erfolgreich. Der reale Versionswechsel auf einem Windows-Zielsystem bleibt offen; der Paket-Smoke prüft Austausch und Wiederherstellung automatisiert.
+Das Release lässt sich über Einstellungen → Updates beziehen. Der Benutzer bestätigt den Pi-Updateversuch von v0.1.19 auf v0.1.21 als erfolgreich. Der Benutzer bestätigt am 30.10.2026 auch den Windows-Updater als erfolgreich; Ausgangs- und Zielversion sind nicht angegeben. Der Paket-Smoke prüft Austausch und Wiederherstellung zusätzlich automatisiert.
 
 ## Updates für Windows und Linux
 
